@@ -26,8 +26,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 //
+  static const NavigationDestinationLabelBehavior onlyShowSelected =
+      NavigationDestinationLabelBehavior.onlyShowSelected;
   static const int library = 0;
-  var _selectedIndex = library;
+  var selectedPage = library;
   static const List<Widget> _widgetOptions = <Widget>[
     LibraryPage(),
     DictionariesPage(),
@@ -35,9 +37,9 @@ class _MyAppState extends State<MyApp> {
     WordLookupPage(),
   ];
 
-  void updatePageIndex(int index) {
+  void updateSelectedPage(int index) {
     setState(() {
-      _selectedIndex = index;
+      selectedPage = index;
     });
   }
 
@@ -80,14 +82,11 @@ class _MyAppState extends State<MyApp> {
             );
           },
           home: Scaffold(
-            appBar: AppBar(
-              title: const Text('placeholder'),
-            ),
             body: Center(
-              child: _widgetOptions.elementAt(_selectedIndex),
+              child: _widgetOptions.elementAt(selectedPage),
             ),
             bottomNavigationBar: NavigationBar(
-              onDestinationSelected: updatePageIndex,
+              onDestinationSelected: updateSelectedPage,
               destinations: const <Widget>[
                 NavigationDestination(
                   icon: Icon(Icons.library_books),
@@ -106,7 +105,8 @@ class _MyAppState extends State<MyApp> {
                   label: 'Word Lookup',
                 ),
               ],
-              selectedIndex: _selectedIndex,
+              selectedIndex: selectedPage,
+              labelBehavior: onlyShowSelected,
             ),
           ),
         );
