@@ -7,7 +7,30 @@ class LibraryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Library'),
+        leading: IconButton(
+          icon: const Icon(Icons.filter_list),
+          onPressed: () {},
+        ),
+        title: SearchAnchor.bar(
+          suggestionsBuilder:
+              (BuildContext context, SearchController controller) {
+            return List<Widget>.empty();
+          },
+          //isFullScreen: true,
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: () {},
+          ),
+          const VerticalDivider(),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+          ),
+        ],
       ),
       body: const Center(
         child: Text('Library Page'),
