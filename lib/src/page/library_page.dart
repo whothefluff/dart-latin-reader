@@ -32,13 +32,51 @@ class LibraryPage extends StatelessWidget {
           const VerticalDivider(),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
           ),
         ],
       ),
-      body: const Center(
-        child: Text('Library Page'),
+      body: authors(),
+    );
+  }
+
+  GridView authors() {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 300,
       ),
+      itemCount: 10,
+      itemBuilder: (BuildContext context, int index) {
+        return GestureDetector(
+          onTap: () {
+            showWorks(context);
+          },
+          child: GridTile(
+            child: Card(
+              child: Text(
+                'Item $index',
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  ListView showWorks(BuildContext context) {
+    final List<String> items = List<String>.generate(10000, (i) => 'Item $i');
+    return ListView.builder(
+      itemCount: items.length,
+      prototypeItem: ListTile(
+        title: Text(items.first),
+      ),
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(items[index]),
+        );
+      },
     );
   }
   //
