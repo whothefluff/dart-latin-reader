@@ -11,12 +11,18 @@ class LibraryPage extends StatelessWidget {
           icon: const Icon(Icons.filter_list),
           onPressed: () {},
         ),
-        title: SearchAnchor.bar(
-          suggestionsBuilder:
-              (BuildContext context, SearchController controller) {
-            return List<Widget>.empty();
-          },
-          //isFullScreen: true,
+        title: Row(
+          children: [
+            Expanded(
+              child: SearchAnchor.bar(
+                suggestionsBuilder:
+                    (BuildContext context, SearchController controller) {
+                  return List<Widget>.empty();
+                },
+                //isFullScreen: true,
+              ),
+            ),
+          ],
         ),
         actions: <Widget>[
           IconButton(
@@ -26,9 +32,7 @@ class LibraryPage extends StatelessWidget {
           const VerticalDivider(),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.pushNamed(context, '/settings');
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -37,4 +41,5 @@ class LibraryPage extends StatelessWidget {
       ),
     );
   }
+  //
 }
