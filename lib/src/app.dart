@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:latin_reader/src/page/dictionaries_page.dart';
-import 'package:latin_reader/src/page/library_page.dart';
-import 'package:latin_reader/src/page/word_frequency_page.dart';
-
-import 'page/word_lookup_page.dart';
-import 'sample_feature/sample_item_details_view.dart';
-import 'sample_feature/sample_item_list_view.dart';
+import 'package:latin_reader/src/page/library/author_detail_page.dart';
+import 'package:latin_reader/src/page/library/authors_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:latin_reader/src/page/library/work_detail_page.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
+import 'page/library/works_page.dart';
+import 'page/library/text_page.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({
@@ -21,26 +20,82 @@ class MyApp extends StatefulWidget {
 
   @override
   _MyAppState createState() => _MyAppState();
-//
 }
 
 class _MyAppState extends State<MyApp> {
-//
-  static const NavigationDestinationLabelBehavior onlyShowSelected =
-      NavigationDestinationLabelBehavior.onlyShowSelected;
-  static const int library = 0;
-  var selectedPage = library;
-  static const List<Widget> _widgetOptions = <Widget>[
-    LibraryPage(),
-    DictionariesPage(),
-    WordFrequencyPage(),
-    WordLookupPage(),
-  ];
+  late final GoRouter _router;
 
-  void updateSelectedPage(int index) {
-    setState(() {
-      selectedPage = index;
-    });
+  @override
+  void initState() {
+    super.initState();
+
+    _router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          redirect: (_, __) => '/authors',
+        ),
+        GoRoute(
+          path: '/authors',
+          builder: (context, state) => const AuthorsPage(),
+          routes: [
+            GoRoute(
+              path: ':id',
+              pageBuilder: (context, state) {
+                final id = int.parse(state.pathParameters['id']!);
+                return MaterialPage(child: AuthorDetailPage(authorIndex: id));
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/works',
+          pageBuilder: (context, state) {
+            final id = int.parse(state.pathParameters['id']!);
+            return MaterialPage(child: WorksPage(authorIndex: id));
+          },
+          routes: [
+            GoRoute(
+              path: ':id',
+              pageBuilder: (context, state) {
+                final id = int.parse(state.pathParameters['id']!);
+                return MaterialPage(child: WorkDetailPage(workIndex: id));
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/reader:workIndex',
+          pageBuilder: (context, state) => MaterialPage<TextPage>(
+            child: TextPage(
+              workIndex: state.pathParameters['id']!,
+            ),
+          ),
+        ),
+        // GoRoute(
+        //   path: '/settings',
+        //   builder: (context, state) =>
+        //       SettingsView(controller: widget.settingsController),
+        // ),
+      ],
+      errorPageBuilder: (context, state) => MaterialPage<void>(
+        child: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SelectableText(state.error!.message),
+                TextButton(
+                  onPressed: () => context.go('/'),
+                  child: const Text('Home'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -48,7 +103,8 @@ class _MyAppState extends State<MyApp> {
     return ListenableBuilder(
       listenable: widget.settingsController,
       builder: (BuildContext context, Widget? child) {
-        return MaterialApp(
+        return MaterialApp.router(
+          routerConfig: _router,
           restorationScopeId: 'app',
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -64,51 +120,6 @@ class _MyAppState extends State<MyApp> {
           theme: ThemeData(),
           darkTheme: ThemeData.dark(),
           themeMode: widget.settingsController.themeMode,
-          // Define a function to handle named routes in order to support Flutter web url navigation and deep linking.
-          onGenerateRoute: (RouteSettings routeSettings) {
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                switch (routeSettings.name) {
-                  case SettingsView.routeName:
-                    return SettingsView(controller: widget.settingsController);
-                  case SampleItemDetailsView.routeName:
-                    return const SampleItemDetailsView();
-                  case SampleItemListView.routeName:
-                  default:
-                    return const SampleItemListView();
-                }
-              },
-            );
-          },
-          home: Scaffold(
-            body: Center(
-              child: _widgetOptions.elementAt(selectedPage),
-            ),
-            bottomNavigationBar: NavigationBar(
-              onDestinationSelected: updateSelectedPage,
-              destinations: const <Widget>[
-                NavigationDestination(
-                  icon: Icon(Icons.library_books),
-                  label: 'Library',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.book),
-                  label: 'Dictionaries',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.format_list_numbered),
-                  label: 'Word Frequency',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.search),
-                  label: 'Word Lookup',
-                ),
-              ],
-              selectedIndex: selectedPage,
-              labelBehavior: onlyShowSelected,
-            ),
-          ),
         );
       },
     );

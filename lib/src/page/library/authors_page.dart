@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class LibraryPage extends StatelessWidget {
-  const LibraryPage({super.key});
+class AuthorsPage extends StatelessWidget {
+  const AuthorsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class LibraryPage extends StatelessWidget {
                     (BuildContext context, SearchController controller) {
                   return List<Widget>.empty();
                 },
-                //isFullScreen: true,
+                // isFullScreen: true,
               ),
             ),
           ],
@@ -42,42 +43,35 @@ class LibraryPage extends StatelessWidget {
     );
   }
 
-  GridView authors() {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 300,
-      ),
-      itemCount: 10,
-      itemBuilder: (BuildContext context, int index) {
-        return GestureDetector(
-          onTap: () {
-            showWorks(context);
-          },
-          child: GridTile(
-            child: Card(
-              child: Text(
-                'Item $index',
+  Scaffold authors() {
+    return Scaffold(
+      body: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 300,
+        ),
+        itemCount: 10,
+        itemBuilder: (context, int index) {
+          var cardBorderRadius = BorderRadius.circular(12);
+          return Card(
+            child: InkWell(
+              onTap: () {
+                context.push('/authors/$index');
+              },
+              borderRadius: cardBorderRadius,
+              child: GridTile(
+                footer: GridTileBar(
+                  title: Text('Author $index'),
+                ),
+                child: Center(
+                  child: Text(
+                    '$index',
+                  ),
+                ),
               ),
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  ListView showWorks(BuildContext context) {
-    final List<String> items = List<String>.generate(10000, (i) => 'Item $i');
-    return ListView.builder(
-      itemCount: items.length,
-      prototypeItem: ListTile(
-        title: Text(items.first),
+          );
+        },
       ),
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(items[index]),
-        );
-      },
     );
   }
-  //
 }
