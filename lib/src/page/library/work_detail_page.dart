@@ -13,31 +13,22 @@ class WorkDetailPage extends StatelessWidget {
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 200.0,
             flexibleSpace: FlexibleSpaceBar(
-              background: const BookThingy(
-                author: 'Cicero',
-                title: 'De Oratore',
-              ),
               title: Text('Work $workIndex'),
             ),
           ),
           const SliverToBoxAdapter(
-            child: SizedBox(
-              child: LinkButton(
-                text: 'Author',
-                route: '/authors/1',
+              child: BookThingy(author: 'author', title: 'title')),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    'Scrollable free text\n' * 100,
+                  ),
+                ],
               ),
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return ListTile(
-                  title: Text('Item $index'),
-                );
-              },
-              childCount: 100,
             ),
           ),
         ],
@@ -78,39 +69,55 @@ class BookThingy extends StatelessWidget {
 
   final String author;
   final String title;
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300.0, // Matches the height of the FlexibleSpaceBar
-      child: Row(
-        children: [
-          // Simulated Book Cover Image
-          PseudoCover(
-            bookAuthor: 'Cicero',
-            bookTitle: 'Testing',
+    return const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Flexible(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Center(
+                    child: PseudoCover(
+                        bookTitle: 'bookTitle', bookAuthor: 'bookAuthor'),
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 2,
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Page No:'),
+                      Text('Year:'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          // Title and Author
-          Expanded(
-            child: Text(
-              'Title: $title\nAuthor: $author',
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class PseudoCover extends StatelessWidget {
-  final String bookTitle;
-  final String bookAuthor;
-
   const PseudoCover({
-    Key? key,
+    super.key,
     required this.bookTitle,
     required this.bookAuthor,
-  }) : super(key: key);
+  });
+
+  final String bookTitle;
+  final String bookAuthor;
 
   @override
   Widget build(BuildContext context) {
@@ -119,50 +126,40 @@ class PseudoCover extends StatelessWidget {
     final onPrimaryColor = Theme.of(context).colorScheme.onPrimary;
     final onSecondaryColor = Theme.of(context).colorScheme.onSecondary;
 
-    return Container(
-      width: 300.0, // Adjust width as needed
-      height: 500.0, // Adjust height as needed
-      child: Column(
-        children: [
-          Container(
-            color: primaryColor,
-            width: double.infinity,
-            padding: EdgeInsets.all(20.0),
-            child: Center(
-              child: Text(
-                bookAuthor,
-                style: TextStyle(
-                  color: onPrimaryColor,
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
+    var upper = Flexible(
+      flex: 1,
+      child: Container(
+        color: primaryColor,
+        padding: const EdgeInsets.all(8),
+        child: Text(
+          bookAuthor,
+          style: TextStyle(
+            color: onPrimaryColor,
           ),
-          Expanded(
-            child: Container(
-              color: secondaryColor,
-              width: double.infinity,
-              padding: EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    bookTitle,
-                    style: TextStyle(
-                      color: onSecondaryColor,
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          textAlign: TextAlign.center,
+        ),
       ),
+    );
+    var lower = Flexible(
+      flex: 2,
+      child: Container(
+        color: secondaryColor,
+        padding: const EdgeInsets.all(20.0),
+        child: Text(
+          bookTitle,
+          style: TextStyle(
+            color: onSecondaryColor,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        upper,
+        lower,
+      ],
     );
   }
 }
