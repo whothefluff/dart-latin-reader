@@ -71,36 +71,50 @@ class BookThingy extends StatelessWidget {
   final String title;
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(8.0),
+    const cover = Flexible(
+      flex: 1,
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: Center(
+          child: PseudoCover(bookTitle: 'bookTitle', bookAuthor: 'bookAuthor'),
+        ),
+      ),
+    );
+
+    var basicInfo = Flexible(
+      flex: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Title',
+              style: TextStyle(),
+            ),
+            const Text('Page No:'),
+            TextButton(
+              onPressed: () => context.go('/author/1'),
+              child: const Text('Go to author'),
+            ),
+            FilledButton(
+              onPressed: () => context.go('/works'),
+              child: const Text('Read'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Card(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Flexible(
-                flex: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Center(
-                    child: PseudoCover(
-                        bookTitle: 'bookTitle', bookAuthor: 'bookAuthor'),
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 2,
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Page No:'),
-                      Text('Year:'),
-                    ],
-                  ),
-                ),
-              ),
+              cover,
+              basicInfo,
             ],
           ),
         ),
@@ -118,6 +132,7 @@ class PseudoCover extends StatelessWidget {
 
   final String bookTitle;
   final String bookAuthor;
+  static const proportion = (2, 3);
 
   @override
   Widget build(BuildContext context) {
@@ -126,40 +141,54 @@ class PseudoCover extends StatelessWidget {
     final onPrimaryColor = Theme.of(context).colorScheme.onPrimary;
     final onSecondaryColor = Theme.of(context).colorScheme.onSecondary;
 
-    var upper = Flexible(
-      flex: 1,
+    final upper = Expanded(
+      flex: proportion.$1,
       child: Container(
         color: primaryColor,
         padding: const EdgeInsets.all(8),
-        child: Text(
-          bookAuthor,
-          style: TextStyle(
-            color: onPrimaryColor,
+        child: Center(
+          child: Text(
+            bookAuthor,
+            style: TextStyle(
+              color: onPrimaryColor,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
       ),
     );
-    var lower = Flexible(
-      flex: 2,
+
+    final lower = Expanded(
+      flex: proportion.$2,
       child: Container(
         color: secondaryColor,
         padding: const EdgeInsets.all(20.0),
-        child: Text(
-          bookTitle,
-          style: TextStyle(
-            color: onSecondaryColor,
+        child: Center(
+          child: Text(
+            bookTitle,
+            style: TextStyle(
+              color: onSecondaryColor,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
       ),
     );
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        upper,
-        lower,
-      ],
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        maxWidth: 200,
+        maxHeight: 400,
+      ),
+      child: AspectRatio(
+        aspectRatio: proportion.$1 / proportion.$2,
+        child: Column(
+          children: [
+            upper,
+            lower,
+          ],
+        ),
+      ),
     );
   }
 }
