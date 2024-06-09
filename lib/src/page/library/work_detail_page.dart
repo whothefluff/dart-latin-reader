@@ -37,38 +37,17 @@ class WorkDetailPage extends StatelessWidget {
   }
 }
 
-class LinkButton extends StatelessWidget {
-  const LinkButton({super.key, required this.text, required this.route});
-
-  final String text;
-  final String route;
-
-  @override //TODO: check maybe use a regular text button because it looks soso
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        context.push(route);
-      },
-      style: TextButton.styleFrom(
-        padding: EdgeInsets.zero,
-        minimumSize: const Size(0, 0),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.blue,
-        ),
-      ),
-    );
-  }
-}
-
 class BookThingy extends StatelessWidget {
   const BookThingy({super.key, required this.author, required this.title});
 
   final String author;
   final String title;
+
+  static const boxConstraints = BoxConstraints(
+    maxWidth: 200,
+    maxHeight: 400,
+  );
+
   @override
   Widget build(BuildContext context) {
     const cover = Flexible(
@@ -81,28 +60,11 @@ class BookThingy extends StatelessWidget {
       ),
     );
 
-    var basicInfo = Flexible(
+    var basicInfo = const Flexible(
       flex: 2,
       child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Title',
-              style: TextStyle(),
-            ),
-            const Text('Page No:'),
-            TextButton(
-              onPressed: () => context.go('/author/1'),
-              child: const Text('Go to author'),
-            ),
-            FilledButton(
-              onPressed: () => context.go('/works'),
-              child: const Text('Read'),
-            ),
-          ],
-        ),
+        padding: EdgeInsets.all(8),
+        child: Details(bookTitle: 'bookTitle', bookAuthor: 'bookAuthor'),
       ),
     );
 
@@ -112,6 +74,7 @@ class BookThingy extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               cover,
               basicInfo,
@@ -176,16 +139,61 @@ class PseudoCover extends StatelessWidget {
     );
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(
-        maxWidth: 200,
-        maxHeight: 400,
-      ),
+      constraints: BookThingy.boxConstraints,
       child: AspectRatio(
         aspectRatio: proportion.$1 / proportion.$2,
         child: Column(
           children: [
             upper,
             lower,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Details extends StatelessWidget {
+  const Details({
+    super.key,
+    required this.bookTitle,
+    required this.bookAuthor,
+  });
+
+  final String bookTitle;
+  final String bookAuthor;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BookThingy.boxConstraints,
+      child: AspectRatio(
+        aspectRatio: 3 / 2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Title'),
+                Text('Page No:'),
+              ],
+            ),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FilledButton(
+                  onPressed: () => context.go('/works/1'),
+                  child: const Text('Read'),
+                ),
+                TextButton(
+                  onPressed: () => context.go('/author/1'),
+                  child: const Text('Go to author'),
+                ),
+              ],
+            )
           ],
         ),
       ),
