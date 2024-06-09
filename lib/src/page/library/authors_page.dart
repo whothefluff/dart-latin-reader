@@ -25,7 +25,7 @@ class AuthorsPage extends StatelessWidget {
             ),
           ],
         ),
-        actions: <Widget>[
+        actions: [
           IconButton(
             icon: const Icon(Icons.sort),
             onPressed: () {},
@@ -60,7 +60,13 @@ class AuthorsPage extends StatelessWidget {
               borderRadius: cardBorderRadius,
               child: GridTile(
                 footer: GridTileBar(
-                  title: Text('Author $index'),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Author $index'),
+                      Text('0'), //no of works
+                    ],
+                  ),
                 ),
                 child: Center(
                   child: Text(
