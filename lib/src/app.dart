@@ -6,7 +6,6 @@ import 'package:latin_reader/src/page/library/authors_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/page/library/work_detail_page.dart';
 import 'settings/settings_controller.dart';
-import 'settings/settings_view.dart';
 import 'page/library/works_page.dart';
 import 'page/library/text_page.dart';
 

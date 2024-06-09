@@ -13,7 +13,7 @@ void main() async {
 }
 
 //TODO: do go router nav to works
-//TODO: add go router builder
+//TODO: add go router type-safe navigation https://pub.dev/documentation/go_router/latest/topics/Type-safe%20routes-topic.html
 
 //TODO: make state restorable (RestorationManager)
 

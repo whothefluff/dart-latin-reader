@@ -15,7 +15,7 @@ class WorkDetailPage extends StatelessWidget {
             pinned: true,
             expandedHeight: 200.0,
             flexibleSpace: FlexibleSpaceBar(
-              background: BookCover(
+              background: const BookThingy(
                 author: 'Cicero',
                 title: 'De Oratore',
               ),
@@ -24,14 +24,10 @@ class WorkDetailPage extends StatelessWidget {
           ),
           const SliverToBoxAdapter(
             child: SizedBox(
-              // height: 20,
               child: LinkButton(
                 text: 'Author',
                 route: '/authors/1',
               ),
-              // Center(
-              // child: //doesn't seem to be necessary
-              // ),
             ),
           ),
           SliverList(
@@ -77,8 +73,8 @@ class LinkButton extends StatelessWidget {
   }
 }
 
-class BookCover extends StatelessWidget {
-  const BookCover({super.key, required this.author, required this.title});
+class BookThingy extends StatelessWidget {
+  const BookThingy({super.key, required this.author, required this.title});
 
   final String author;
   final String title;
@@ -87,48 +83,79 @@ class BookCover extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 300.0, // Matches the height of the FlexibleSpaceBar
-      color: Colors.yellow[100],
       child: Row(
         children: [
           // Simulated Book Cover Image
-          Container(
-            width: 150.0, // Adjust width as needed
-            height: double.infinity,
-            color: Colors.green[800],
-            child: Center(
-              child: Text(
-                'COVER',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+          PseudoCover(
+            bookAuthor: 'Cicero',
+            bookTitle: 'Testing',
           ),
           // Title and Author
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Title: $title\nAuthor: $author',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PseudoCover extends StatelessWidget {
+  final String bookTitle;
+  final String bookAuthor;
+
+  const PseudoCover({
+    Key? key,
+    required this.bookTitle,
+    required this.bookAuthor,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
+    final onPrimaryColor = Theme.of(context).colorScheme.onPrimary;
+    final onSecondaryColor = Theme.of(context).colorScheme.onSecondary;
+
+    return Container(
+      width: 300.0, // Adjust width as needed
+      height: 500.0, // Adjust height as needed
+      child: Column(
+        children: [
+          Container(
+            color: primaryColor,
+            width: double.infinity,
+            padding: EdgeInsets.all(20.0),
+            child: Center(
+              child: Text(
+                bookAuthor,
+                style: TextStyle(
+                  color: onPrimaryColor,
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: secondaryColor,
+              width: double.infinity,
+              padding: EdgeInsets.all(20.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title.toUpperCase(),
+                    bookTitle,
                     style: TextStyle(
-                      color: Colors.green[800],
-                      fontSize: 28,
+                      color: onSecondaryColor,
+                      fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  SizedBox(height: 10.0),
-                  Text(
-                    author.toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.green[800],
-                      fontSize: 20,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
