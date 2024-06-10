@@ -11,7 +11,7 @@ class AuthorDetailPage extends StatelessWidget {
     final items = List<String>.generate(authorIndex * 10, (i) => 'Work $i');
     return Scaffold(
       appBar: AppBar(
-        title: Text('Works of Author $authorIndex'),
+        title: Text('Author $authorIndex'),
       ),
       body: ListView.builder(
         itemCount: items.length,

@@ -6,7 +6,6 @@ import 'package:latin_reader/src/page/library/authors_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/page/library/work_detail_page.dart';
 import 'settings/settings_controller.dart';
-import 'page/library/works_page.dart';
 import 'page/library/text_page.dart';
 
 class MyApp extends StatefulWidget {
@@ -50,10 +49,6 @@ class _MyAppState extends State<MyApp> {
         ),
         GoRoute(
           path: '/works',
-          pageBuilder: (context, state) {
-            final id = int.parse(state.pathParameters['id']!);
-            return MaterialPage(child: WorksPage(authorIndex: id));
-          },
           routes: [
             GoRoute(
               path: ':id',
@@ -65,10 +60,10 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
         GoRoute(
-          path: '/reader:workIndex',
+          path: '/reader/:workId',
           pageBuilder: (context, state) => MaterialPage<TextPage>(
             child: TextPage(
-              workIndex: state.pathParameters['id']!,
+              workIndex: state.pathParameters['workId']!,
             ),
           ),
         ),

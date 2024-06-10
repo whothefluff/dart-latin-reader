@@ -12,7 +12,9 @@ void main() async {
 //
 }
 
-//TODO: do go router nav to works
+//TODO: add card in author detail page
+//TODO: finish top bar navigation (añadir barra búsqueda en la página de works)
+//TODO: add bottom navigation bar between main pages
 //TODO: add go router type-safe navigation https://pub.dev/documentation/go_router/latest/topics/Type-safe%20routes-topic.html
 
 //TODO: make state restorable (RestorationManager)

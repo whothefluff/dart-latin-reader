@@ -185,11 +185,11 @@ class Details extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 FilledButton(
-                  onPressed: () => context.go('/works/1'),
+                  onPressed: () => context.push('/reader/1'),
                   child: const Text('Read'),
                 ),
                 TextButton(
-                  onPressed: () => context.go('/author/1'),
+                  onPressed: () => context.push('/author/1'),
                   child: const Text('Go to author'),
                 ),
               ],
