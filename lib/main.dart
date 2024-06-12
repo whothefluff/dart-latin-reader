@@ -12,12 +12,11 @@ void main() async {
 //
 }
 
-//TODO: finish top bar navigation (añadir barra búsqueda en la página de works)
 //TODO: add card in author detail page
+
+//secondary
 //TODO: add go router type-safe navigation https://pub.dev/documentation/go_router/latest/topics/Type-safe%20routes-topic.html
-
 //TODO: make state restorable (example RestorableStatefulShellRouteExampleApp)
-
 //TODO: add adaptive scaffold
 
 //TODO settings page (design and implementation)

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latin_reader/src/widget/searchable_app_bar.dart';
 
 class AuthorsPage extends StatelessWidget {
   const AuthorsPage({super.key});
@@ -7,43 +8,19 @@ class AuthorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.filter_list),
-          onPressed: () {},
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: SearchAnchor.bar(
-                suggestionsBuilder:
-                    (BuildContext context, SearchController controller) {
-                  return List<Widget>.empty();
-                },
-                // isFullScreen: true,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.sort),
-            onPressed: () {},
-          ),
-          const VerticalDivider(),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.pushNamed(context, '/settings');
-            },
-          ),
-        ],
+      appBar: SearchableAppBar(
+        onFilterPressed: () {},
+        onSortPressed: () {},
+        onSettingsPressed: () {
+          Navigator.pushNamed(context, '/settings');
+        },
+        searchSuggestionsBuilder: (context, controller) async => [],
       ),
-      body: authors(),
+      body: authorsGrid(),
     );
   }
 
-  Scaffold authors() {
+  Scaffold authorsGrid() {
     return Scaffold(
       body: GridView.builder(
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
