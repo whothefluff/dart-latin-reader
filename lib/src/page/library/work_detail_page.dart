@@ -9,26 +9,20 @@ class WorkDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text('Work $workIndex'),
-            ),
-          ),
-          const SliverToBoxAdapter(
-              child: BookThingy(author: 'author', title: 'title')),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text(
-                    'Scrollable free text\n' * 100,
-                  ),
-                ],
-              ),
+      appBar: AppBar(
+        title: Text('Work $workIndex'),
+      ),
+      body: ListView(
+        children: [
+          const BookThingy(author: 'author', title: 'title'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Text(
+                  'Scrollable free text\n' * 100,
+                ),
+              ],
             ),
           ),
         ],
