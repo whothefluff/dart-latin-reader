@@ -12,15 +12,13 @@ void main() async {
 //
 }
 
-//TODO: add card in author detail page
-
-//secondary
-//TODO: add go router type-safe navigation https://pub.dev/documentation/go_router/latest/topics/Type-safe%20routes-topic.html
-//TODO: make state restorable (example RestorableStatefulShellRouteExampleApp)
-//TODO: add adaptive scaffold
-
 //TODO settings page (design and implementation)
 
 //TODO: ask about db and parse
 //TODO: load authors and books from db
 //TODO: do I need to create Intent(s) for my buttons?
+
+//secondary
+//TODO: add go router type-safe navigation https://pub.dev/documentation/go_router/latest/topics/Type-safe%20routes-topic.html
+//TODO: make state restorable (example RestorableStatefulShellRouteExampleApp)
+//TODO: add adaptive scaffold
