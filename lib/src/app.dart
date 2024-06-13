@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'sample_feature/sample_item_details_view.dart';
-import 'sample_feature/sample_item_list_view.dart';
+import 'package:latin_reader/src/page/library/author_detail_page.dart';
+import 'package:latin_reader/src/page/library/authors_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:latin_reader/src/page/library/work_detail_page.dart';
+import 'page/dictionary/placeholder.dart';
+import 'page/library/works_page.dart';
 import 'settings/settings_controller.dart';
+import 'page/library/text_page.dart';
 import 'settings/settings_view.dart';
 
-/// The Widget that configures your application.
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({
     super.key,
     required this.settingsController,
@@ -17,24 +20,118 @@ class MyApp extends StatelessWidget {
   final SettingsController settingsController;
 
   @override
-  Widget build(BuildContext context) {
-    // Glue the SettingsController to the MaterialApp.
-    //
-    // The ListenableBuilder Widget listens to the SettingsController for changes.
-    // Whenever the user updates their settings, the MaterialApp is rebuilt.
-    return ListenableBuilder(
-      listenable: settingsController,
-      builder: (BuildContext context, Widget? child) {
-        return MaterialApp(
-          // Providing a restorationScopeId allows the Navigator built by the
-          // MaterialApp to restore the navigation stack when a user leaves and
-          // returns to the app after it has been killed while running in the
-          // background.
-          restorationScopeId: 'app',
+  MyAppState createState() => MyAppState();
+}
 
-          // Provide the generated AppLocalizations to the MaterialApp. This
-          // allows descendant Widgets to display the correct translations
-          // depending on the user's locale.
+class MyAppState extends State<MyApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navShell) =>
+              ScaffoldWithNavBar(navigationShell: navShell),
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/',
+                  redirect: (_, __) => '/authors',
+                ),
+                GoRoute(
+                  path: '/authors',
+                  builder: (context, state) => const AuthorsPage(),
+                  routes: [
+                    GoRoute(
+                      path: ':id',
+                      builder: (context, state) {
+                        final id = int.parse(state.pathParameters['id']!);
+                        return AuthorDetailPage(authorIndex: id);
+                      },
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: '/works',
+                  builder: (context, state) => const WorksPage(
+                      authorIndex: 0), //not yet implemented, if ever
+                  routes: [
+                    GoRoute(
+                      path: ':id',
+                      builder: (context, state) {
+                        final id = int.parse(state.pathParameters['id']!);
+                        return WorkDetailPage(workIndex: id);
+                      },
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: '/reader/:workId',
+                  builder: (context, state) => TextPage(
+                    workIndex: state.pathParameters['workId']!,
+                  ),
+                ),
+              ],
+            ),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/dictionaries',
+                builder: (context, state) =>
+                    const PlaceholderDict(title: 'testing'),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/word-frequency',
+                builder: (context, state) =>
+                    const PlaceholderDict(title: 'testing'),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/word-lookup',
+                builder: (context, state) =>
+                    const PlaceholderDict(title: 'testing'),
+              ),
+            ]),
+          ],
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) =>
+              SettingsView(controller: widget.settingsController),
+        ),
+      ],
+      errorBuilder: (context, state) => Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SelectableText(state.error!.message),
+              TextButton(
+                onPressed: () => context.go('/'),
+                child: const Text('Home'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(context) {
+    return ListenableBuilder(
+      listenable: widget.settingsController,
+      builder: (context, child) {
+        return MaterialApp.router(
+          routerConfig: _router,
+          restorationScopeId: 'app',
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -44,42 +141,64 @@ class MyApp extends StatelessWidget {
           supportedLocales: const [
             Locale('en', ''), // English, no country code
           ],
-
-          // Use AppLocalizations to configure the correct application title
-          // depending on the user's locale.
-          //
-          // The appTitle is defined in .arb files found in the localization
-          // directory.
-          onGenerateTitle: (BuildContext context) =>
-              AppLocalizations.of(context)!.appTitle,
-
-          // Define a light and dark color theme. Then, read the user's
-          // preferred ThemeMode (light, dark, or system default) from the
-          // SettingsController to display the correct theme.
+          onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
           theme: ThemeData(),
           darkTheme: ThemeData.dark(),
-          themeMode: settingsController.themeMode,
-
-          // Define a function to handle named routes in order to support
-          // Flutter web url navigation and deep linking.
-          onGenerateRoute: (RouteSettings routeSettings) {
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                switch (routeSettings.name) {
-                  case SettingsView.routeName:
-                    return SettingsView(controller: settingsController);
-                  case SampleItemDetailsView.routeName:
-                    return const SampleItemDetailsView();
-                  case SampleItemListView.routeName:
-                  default:
-                    return const SampleItemListView();
-                }
-              },
-            );
-          },
+          themeMode: widget.settingsController.themeMode,
         );
       },
+    );
+  }
+}
+
+class ScaffoldWithNavBar extends StatelessWidget {
+  const ScaffoldWithNavBar({
+    required this.navigationShell,
+    super.key,
+  });
+
+  final StatefulNavigationShell navigationShell;
+  static const homeDestination = NavigationDestination(
+    icon: Icon(Icons.auto_stories),
+    label: 'Home',
+  );
+  static const dictionariesDestination = NavigationDestination(
+    icon: Icon(Icons.book),
+    label: 'Dictionaries',
+  );
+  static const wordFrequencyDestination = NavigationDestination(
+    icon: Icon(Icons.bar_chart),
+    label: 'Word Frequency',
+  );
+  static const wordLookupDestination = NavigationDestination(
+    icon: Icon(Icons.plagiarism),
+    label: 'Word Lookup',
+  );
+  static const mainPages = {
+    '/authors': homeDestination,
+    '/dictionaries': dictionariesDestination,
+    '/word-frequency': wordFrequencyDestination,
+    '/word-lookup': wordLookupDestination,
+  };
+  static final mainDestinations = mainPages.values.toList();
+
+  @override
+  Widget build(context) {
+    return Scaffold(
+      body: navigationShell,
+      bottomNavigationBar: NavigationBar(
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        onDestinationSelected: (idx) => _goToBranch(idx, context),
+        selectedIndex: navigationShell.currentIndex,
+        destinations: mainDestinations,
+      ),
+    );
+  }
+
+  void _goToBranch(int index, BuildContext context) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
     );
   }
 }
