@@ -12,8 +12,6 @@ void main() async {
 //
 }
 
-//TODO settings page (design and implementation)
-
 //TODO: ask about db and parse
 //TODO: load authors and books from db
 //TODO: do I need to create Intent(s) for my buttons?

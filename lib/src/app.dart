@@ -9,6 +9,7 @@ import 'page/dictionary/placeholder.dart';
 import 'page/library/works_page.dart';
 import 'settings/settings_controller.dart';
 import 'page/library/text_page.dart';
+import 'settings/settings_view.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({
@@ -19,10 +20,10 @@ class MyApp extends StatefulWidget {
   final SettingsController settingsController;
 
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   late final GoRouter _router;
 
   @override
@@ -30,11 +31,9 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     _router = GoRouter(
-      //navigatorKey: _rootNavigatorKey,
       initialLocation: '/',
       routes: [
         StatefulShellRoute.indexedStack(
-          //navigatorKey: _shellNavigatorKey,
           builder: (context, state, navShell) =>
               ScaffoldWithNavBar(navigationShell: navShell),
           branches: [
@@ -100,12 +99,12 @@ class _MyAppState extends State<MyApp> {
                     const PlaceholderDict(title: 'testing'),
               ),
             ]),
-            // GoRoute(
-            //   path: '/settings',
-            //   builder: (context, state) =>
-            //       SettingsView(controller: widget.settingsController),
-            // ),
           ],
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) =>
+              SettingsView(controller: widget.settingsController),
         ),
       ],
       errorBuilder: (context, state) => Scaffold(

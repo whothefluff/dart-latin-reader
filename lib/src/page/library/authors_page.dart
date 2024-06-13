@@ -12,7 +12,7 @@ class AuthorsPage extends StatelessWidget {
         onFilterPressed: () {},
         onSortPressed: () {},
         onSettingsPressed: () {
-          Navigator.pushNamed(context, '/settings');
+          context.push('/settings');
         },
         searchSuggestionsBuilder: (context, controller) async => [],
       ),
