@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/widget/searchable_app_bar.dart';
+import 'package:latin_reader/src/ui/widget/searchable_app_bar.dart';
 
 class AuthorsPage extends StatelessWidget {
   const AuthorsPage({super.key});
@@ -41,7 +41,7 @@ class AuthorsPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Author $index'),
-                      Text('0'), //no of works
+                      const Text('0'), //no of works
                     ],
                   ),
                 ),
