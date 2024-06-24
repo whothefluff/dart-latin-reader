@@ -1,13 +1,20 @@
---CREATE TABLE "Dictionaries"(
---CREATE TABLE "DictionaryEntries"(
+CREATE TABLE "DataVersion" (
+  "idx" INTEGER NOT NULL,
+  "createdAt" INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY( idx )
+) 
+-- STRICT
+;
 
 CREATE TABLE "MorphologicalDetails"(
     "form" TEXT NOT NULL,
     "item" INTEGER NOT NULL CHECK( item > 0 ),
     "dictionaryRef" TEXT NOT NULL,
     PRIMARY KEY( form, item )
-    -- FOREIGN KEY( dictionaryRef ) REFERENCES DictionaryEntries( dictionary, Id )
-) STRICT, WITHOUT ROWID;
+) 
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "MorphologicalDetailInflections"(
     "form" TEXT NOT NULL,
@@ -20,14 +27,17 @@ CREATE TABLE "MorphologicalDetailInflections"(
     "gender" TEXT,
     "number" TEXT,
     "declension" TEXT,
-    "case" TEXT,
+    "gramm_case" TEXT,
     "mood" TEXT,
     "tense" TEXT,
     "voice" TEXT ,
     "person" TEXT,
     PRIMARY KEY( form, item, cnt ),
     FOREIGN KEY( form, item ) REFERENCES MorphologicalDetails( form, item )
-) STRICT, WITHOUT ROWID;
+) 
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "Macronizations"( 
     "form" TEXT NOT NULL,
@@ -35,7 +45,10 @@ CREATE TABLE "Macronizations"(
     "macronizedSyllable" TEXT NOT NULL,
     "isUncertain" INTEGER NOT NULL CHECK( isUncertain IN (0, 1) ),
     PRIMARY KEY( form, syllableNumber )
-) STRICT, WITHOUT ROWID;
+) 
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "Authors"(
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
@@ -43,7 +56,10 @@ CREATE TABLE "Authors"(
     "about" TEXT,
     "image" BLOB,
     PRIMARY KEY( id )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "AuthorAbbreviations"(
     "authorId" TEXT NOT NULL,
@@ -51,14 +67,20 @@ CREATE TABLE "AuthorAbbreviations"(
     "val" TEXT NOT NULL,
     PRIMARY KEY( authorId, id ),
     FOREIGN KEY( authorId ) REFERENCES Authors( id )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "Works"(
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
     "name" TEXT NOT NULL,
     "about" TEXT,
     PRIMARY KEY( id )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "WorkAbbreviations"(
     "workId" TEXT NOT NULL,
@@ -66,7 +88,10 @@ CREATE TABLE "WorkAbbreviations"(
     "val" TEXT NOT NULL,
     PRIMARY KEY( workId, id ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "WorkContents"(
     "workId" TEXT NOT NULL,
@@ -75,7 +100,10 @@ CREATE TABLE "WorkContents"(
     "sourceReference" TEXT NOT NULL,
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "UserProvidedMacronizations"( 
     "workId" TEXT NOT NULL,
@@ -84,7 +112,10 @@ CREATE TABLE "UserProvidedMacronizations"(
     "macronizedSyllable" TEXT NOT NULL,
     PRIMARY KEY( workId, idx, syllableNumber ),
     FOREIGN KEY( workId, idx ) REFERENCES WorkContents( workId, idx )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "WorkContentSubdivisions"(
     "workId" TEXT NOT NULL,
@@ -98,7 +129,10 @@ CREATE TABLE "WorkContentSubdivisions"(
     PRIMARY KEY( workId, typ, cnt ),
     FOREIGN KEY( workId, fromIndex ) REFERENCES WorkContents( workId, idx ),
     FOREIGN KEY( workId, toIndex ) REFERENCES WorkContents( workId, idx )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "WorkContentSupplementary"(
     "workId" TEXT NOT NULL,
@@ -109,7 +143,10 @@ CREATE TABLE "WorkContentSupplementary"(
     "val" TEXT NOT NULL,
     PRIMARY KEY( workId, typ, cnt ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
 
 CREATE TABLE "AuthorsAndWorks"(
     "authorId" TEXT NOT NULL,
@@ -117,4 +154,13 @@ CREATE TABLE "AuthorsAndWorks"(
     PRIMARY KEY( authorId, workId ),
     FOREIGN KEY( authorId ) REFERENCES Authors( id ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
-) STRICT, WITHOUT ROWID;
+)
+-- STRICT, 
+WITHOUT ROWID
+;
+
+CREATE VIEW "LatestDataVersion" AS
+    SELECT *
+        FROM DataVersion
+        ORDER BY idx DESC
+        LIMIT 1;

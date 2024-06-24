@@ -12,12 +12,6 @@ void main() async {
   await settingsController.loadSettings();
   WidgetsFlutterBinding.ensureInitialized();
   final db = AppDb();
-  // await db.into(db.authors).insert(
-  //       AuthorsCompanion.insert(
-  //         id: '1',
-  //         name: 'Cicero',
-  //       ),
-  //     );
   runApp(
     ProviderScope(
       child: MyApp(settingsController: settingsController),
@@ -26,9 +20,7 @@ void main() async {
 //
 }
 
-//TODO: load asset .csv files into existing .sqlite with empty tables
-//TODO: load info from db
-//TODO: how to ship the db with the app and/or overwrite it
+//add db to provider and use it in the app
 
 //TODO: do I need to create Intent(s) for my buttons?
 
