@@ -2844,6 +2844,13 @@ class WorkContentSubdivisions extends Table
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
+  static const VerificationMeta _nodeMeta = const VerificationMeta('node');
+  late final GeneratedColumn<String> node = GeneratedColumn<String>(
+      'node', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints:
+          'NOT NULL CHECK (node LIKE \'________-____-____-____-____________\')');
   static const VerificationMeta _typMeta = const VerificationMeta('typ');
   late final GeneratedColumn<String> typ = GeneratedColumn<String>(
       'typ', aliasedName, false,
@@ -2863,20 +2870,13 @@ class WorkContentSubdivisions extends Table
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
-  static const VerificationMeta _nodeMeta = const VerificationMeta('node');
-  late final GeneratedColumn<String> node = GeneratedColumn<String>(
-      'node', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints:
-          'NOT NULL UNIQUE CHECK (node LIKE \'________-____-____-____-____________\')');
   static const VerificationMeta _parentMeta = const VerificationMeta('parent');
   late final GeneratedColumn<String> parent = GeneratedColumn<String>(
       'parent', aliasedName, true,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       $customConstraints:
-          'CHECK (parent LIKE \'________-____-____-____-____________\')');
+          'CHECK (parent IS NULL OR parent LIKE \'________-____-____-____-____________\')');
   static const VerificationMeta _fromIndexMeta =
       const VerificationMeta('fromIndex');
   late final GeneratedColumn<int> fromIndex = GeneratedColumn<int>(
@@ -2893,7 +2893,7 @@ class WorkContentSubdivisions extends Table
       $customConstraints: 'NOT NULL CHECK (toIndex > 0)');
   @override
   List<GeneratedColumn> get $columns =>
-      [workId, typ, cnt, name, node, parent, fromIndex, toIndex];
+      [workId, node, typ, cnt, name, parent, fromIndex, toIndex];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2910,6 +2910,12 @@ class WorkContentSubdivisions extends Table
           workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta));
     } else if (isInserting) {
       context.missing(_workIdMeta);
+    }
+    if (data.containsKey('node')) {
+      context.handle(
+          _nodeMeta, node.isAcceptableOrUnknown(data['node']!, _nodeMeta));
+    } else if (isInserting) {
+      context.missing(_nodeMeta);
     }
     if (data.containsKey('typ')) {
       context.handle(
@@ -2928,12 +2934,6 @@ class WorkContentSubdivisions extends Table
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
     } else if (isInserting) {
       context.missing(_nameMeta);
-    }
-    if (data.containsKey('node')) {
-      context.handle(
-          _nodeMeta, node.isAcceptableOrUnknown(data['node']!, _nodeMeta));
-    } else if (isInserting) {
-      context.missing(_nodeMeta);
     }
     if (data.containsKey('parent')) {
       context.handle(_parentMeta,
@@ -2955,21 +2955,21 @@ class WorkContentSubdivisions extends Table
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {workId, typ, cnt};
+  Set<GeneratedColumn> get $primaryKey => {workId, node};
   @override
   WorkContentSubdivision map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return WorkContentSubdivision(
       workId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}workId'])!,
+      node: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}node'])!,
       typ: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}typ'])!,
       cnt: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}cnt'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      node: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}node'])!,
       parent: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}parent']),
       fromIndex: attachedDatabase.typeMapping
@@ -2988,7 +2988,7 @@ class WorkContentSubdivisions extends Table
   bool get withoutRowId => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(workId, typ, cnt)',
+        'PRIMARY KEY(workId, node)',
         'FOREIGN KEY(workId, fromIndex)REFERENCES WorkContents(workId, idx)',
         'FOREIGN KEY(workId, toIndex)REFERENCES WorkContents(workId, idx)'
       ];
@@ -2999,21 +2999,21 @@ class WorkContentSubdivisions extends Table
 class WorkContentSubdivision extends DataClass
     implements Insertable<WorkContentSubdivision> {
   final String workId;
+  final String node;
   final String typ;
 
   ///add more as needed
   final int cnt;
   final String name;
-  final String node;
   final String? parent;
   final int fromIndex;
   final int toIndex;
   const WorkContentSubdivision(
       {required this.workId,
+      required this.node,
       required this.typ,
       required this.cnt,
       required this.name,
-      required this.node,
       this.parent,
       required this.fromIndex,
       required this.toIndex});
@@ -3021,10 +3021,10 @@ class WorkContentSubdivision extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['workId'] = Variable<String>(workId);
+    map['node'] = Variable<String>(node);
     map['typ'] = Variable<String>(typ);
     map['cnt'] = Variable<int>(cnt);
     map['name'] = Variable<String>(name);
-    map['node'] = Variable<String>(node);
     if (!nullToAbsent || parent != null) {
       map['parent'] = Variable<String>(parent);
     }
@@ -3036,10 +3036,10 @@ class WorkContentSubdivision extends DataClass
   WorkContentSubdivisionsCompanion toCompanion(bool nullToAbsent) {
     return WorkContentSubdivisionsCompanion(
       workId: Value(workId),
+      node: Value(node),
       typ: Value(typ),
       cnt: Value(cnt),
       name: Value(name),
-      node: Value(node),
       parent:
           parent == null && nullToAbsent ? const Value.absent() : Value(parent),
       fromIndex: Value(fromIndex),
@@ -3052,10 +3052,10 @@ class WorkContentSubdivision extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return WorkContentSubdivision(
       workId: serializer.fromJson<String>(json['workId']),
+      node: serializer.fromJson<String>(json['node']),
       typ: serializer.fromJson<String>(json['typ']),
       cnt: serializer.fromJson<int>(json['cnt']),
       name: serializer.fromJson<String>(json['name']),
-      node: serializer.fromJson<String>(json['node']),
       parent: serializer.fromJson<String?>(json['parent']),
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
@@ -3066,10 +3066,10 @@ class WorkContentSubdivision extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'workId': serializer.toJson<String>(workId),
+      'node': serializer.toJson<String>(node),
       'typ': serializer.toJson<String>(typ),
       'cnt': serializer.toJson<int>(cnt),
       'name': serializer.toJson<String>(name),
-      'node': serializer.toJson<String>(node),
       'parent': serializer.toJson<String?>(parent),
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
@@ -3078,19 +3078,19 @@ class WorkContentSubdivision extends DataClass
 
   WorkContentSubdivision copyWith(
           {String? workId,
+          String? node,
           String? typ,
           int? cnt,
           String? name,
-          String? node,
           Value<String?> parent = const Value.absent(),
           int? fromIndex,
           int? toIndex}) =>
       WorkContentSubdivision(
         workId: workId ?? this.workId,
+        node: node ?? this.node,
         typ: typ ?? this.typ,
         cnt: cnt ?? this.cnt,
         name: name ?? this.name,
-        node: node ?? this.node,
         parent: parent.present ? parent.value : this.parent,
         fromIndex: fromIndex ?? this.fromIndex,
         toIndex: toIndex ?? this.toIndex,
@@ -3099,10 +3099,10 @@ class WorkContentSubdivision extends DataClass
   String toString() {
     return (StringBuffer('WorkContentSubdivision(')
           ..write('workId: $workId, ')
+          ..write('node: $node, ')
           ..write('typ: $typ, ')
           ..write('cnt: $cnt, ')
           ..write('name: $name, ')
-          ..write('node: $node, ')
           ..write('parent: $parent, ')
           ..write('fromIndex: $fromIndex, ')
           ..write('toIndex: $toIndex')
@@ -3112,16 +3112,16 @@ class WorkContentSubdivision extends DataClass
 
   @override
   int get hashCode =>
-      Object.hash(workId, typ, cnt, name, node, parent, fromIndex, toIndex);
+      Object.hash(workId, node, typ, cnt, name, parent, fromIndex, toIndex);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is WorkContentSubdivision &&
           other.workId == this.workId &&
+          other.node == this.node &&
           other.typ == this.typ &&
           other.cnt == this.cnt &&
           other.name == this.name &&
-          other.node == this.node &&
           other.parent == this.parent &&
           other.fromIndex == this.fromIndex &&
           other.toIndex == this.toIndex);
@@ -3130,55 +3130,55 @@ class WorkContentSubdivision extends DataClass
 class WorkContentSubdivisionsCompanion
     extends UpdateCompanion<WorkContentSubdivision> {
   final Value<String> workId;
+  final Value<String> node;
   final Value<String> typ;
   final Value<int> cnt;
   final Value<String> name;
-  final Value<String> node;
   final Value<String?> parent;
   final Value<int> fromIndex;
   final Value<int> toIndex;
   const WorkContentSubdivisionsCompanion({
     this.workId = const Value.absent(),
+    this.node = const Value.absent(),
     this.typ = const Value.absent(),
     this.cnt = const Value.absent(),
     this.name = const Value.absent(),
-    this.node = const Value.absent(),
     this.parent = const Value.absent(),
     this.fromIndex = const Value.absent(),
     this.toIndex = const Value.absent(),
   });
   WorkContentSubdivisionsCompanion.insert({
     required String workId,
+    required String node,
     required String typ,
     required int cnt,
     required String name,
-    required String node,
     this.parent = const Value.absent(),
     required int fromIndex,
     required int toIndex,
   })  : workId = Value(workId),
+        node = Value(node),
         typ = Value(typ),
         cnt = Value(cnt),
         name = Value(name),
-        node = Value(node),
         fromIndex = Value(fromIndex),
         toIndex = Value(toIndex);
   static Insertable<WorkContentSubdivision> custom({
     Expression<String>? workId,
+    Expression<String>? node,
     Expression<String>? typ,
     Expression<int>? cnt,
     Expression<String>? name,
-    Expression<String>? node,
     Expression<String>? parent,
     Expression<int>? fromIndex,
     Expression<int>? toIndex,
   }) {
     return RawValuesInsertable({
       if (workId != null) 'workId': workId,
+      if (node != null) 'node': node,
       if (typ != null) 'typ': typ,
       if (cnt != null) 'cnt': cnt,
       if (name != null) 'name': name,
-      if (node != null) 'node': node,
       if (parent != null) 'parent': parent,
       if (fromIndex != null) 'fromIndex': fromIndex,
       if (toIndex != null) 'toIndex': toIndex,
@@ -3187,19 +3187,19 @@ class WorkContentSubdivisionsCompanion
 
   WorkContentSubdivisionsCompanion copyWith(
       {Value<String>? workId,
+      Value<String>? node,
       Value<String>? typ,
       Value<int>? cnt,
       Value<String>? name,
-      Value<String>? node,
       Value<String?>? parent,
       Value<int>? fromIndex,
       Value<int>? toIndex}) {
     return WorkContentSubdivisionsCompanion(
       workId: workId ?? this.workId,
+      node: node ?? this.node,
       typ: typ ?? this.typ,
       cnt: cnt ?? this.cnt,
       name: name ?? this.name,
-      node: node ?? this.node,
       parent: parent ?? this.parent,
       fromIndex: fromIndex ?? this.fromIndex,
       toIndex: toIndex ?? this.toIndex,
@@ -3212,6 +3212,9 @@ class WorkContentSubdivisionsCompanion
     if (workId.present) {
       map['workId'] = Variable<String>(workId.value);
     }
+    if (node.present) {
+      map['node'] = Variable<String>(node.value);
+    }
     if (typ.present) {
       map['typ'] = Variable<String>(typ.value);
     }
@@ -3220,9 +3223,6 @@ class WorkContentSubdivisionsCompanion
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
-    }
-    if (node.present) {
-      map['node'] = Variable<String>(node.value);
     }
     if (parent.present) {
       map['parent'] = Variable<String>(parent.value);
@@ -3240,10 +3240,10 @@ class WorkContentSubdivisionsCompanion
   String toString() {
     return (StringBuffer('WorkContentSubdivisionsCompanion(')
           ..write('workId: $workId, ')
+          ..write('node: $node, ')
           ..write('typ: $typ, ')
           ..write('cnt: $cnt, ')
           ..write('name: $name, ')
-          ..write('node: $node, ')
           ..write('parent: $parent, ')
           ..write('fromIndex: $fromIndex, ')
           ..write('toIndex: $toIndex')
@@ -5195,10 +5195,10 @@ class $UserProvidedMacronizationsOrderingComposer
 typedef $WorkContentSubdivisionsInsertCompanionBuilder
     = WorkContentSubdivisionsCompanion Function({
   required String workId,
+  required String node,
   required String typ,
   required int cnt,
   required String name,
-  required String node,
   Value<String?> parent,
   required int fromIndex,
   required int toIndex,
@@ -5206,10 +5206,10 @@ typedef $WorkContentSubdivisionsInsertCompanionBuilder
 typedef $WorkContentSubdivisionsUpdateCompanionBuilder
     = WorkContentSubdivisionsCompanion Function({
   Value<String> workId,
+  Value<String> node,
   Value<String> typ,
   Value<int> cnt,
   Value<String> name,
-  Value<String> node,
   Value<String?> parent,
   Value<int> fromIndex,
   Value<int> toIndex,
@@ -5237,40 +5237,40 @@ class $WorkContentSubdivisionsTableManager extends RootTableManager<
               $WorkContentSubdivisionsProcessedTableManager(p),
           getUpdateCompanionBuilder: ({
             Value<String> workId = const Value.absent(),
+            Value<String> node = const Value.absent(),
             Value<String> typ = const Value.absent(),
             Value<int> cnt = const Value.absent(),
             Value<String> name = const Value.absent(),
-            Value<String> node = const Value.absent(),
             Value<String?> parent = const Value.absent(),
             Value<int> fromIndex = const Value.absent(),
             Value<int> toIndex = const Value.absent(),
           }) =>
               WorkContentSubdivisionsCompanion(
             workId: workId,
+            node: node,
             typ: typ,
             cnt: cnt,
             name: name,
-            node: node,
             parent: parent,
             fromIndex: fromIndex,
             toIndex: toIndex,
           ),
           getInsertCompanionBuilder: ({
             required String workId,
+            required String node,
             required String typ,
             required int cnt,
             required String name,
-            required String node,
             Value<String?> parent = const Value.absent(),
             required int fromIndex,
             required int toIndex,
           }) =>
               WorkContentSubdivisionsCompanion.insert(
             workId: workId,
+            node: node,
             typ: typ,
             cnt: cnt,
             name: name,
-            node: node,
             parent: parent,
             fromIndex: fromIndex,
             toIndex: toIndex,
@@ -5299,6 +5299,11 @@ class $WorkContentSubdivisionsFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<String> get node => $state.composableBuilder(
+      column: $state.table.node,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<String> get typ => $state.composableBuilder(
       column: $state.table.typ,
       builder: (column, joinBuilders) =>
@@ -5311,11 +5316,6 @@ class $WorkContentSubdivisionsFilterComposer
 
   ColumnFilters<String> get name => $state.composableBuilder(
       column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get node => $state.composableBuilder(
-      column: $state.table.node,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -5343,6 +5343,11 @@ class $WorkContentSubdivisionsOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
+  ColumnOrderings<String> get node => $state.composableBuilder(
+      column: $state.table.node,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
   ColumnOrderings<String> get typ => $state.composableBuilder(
       column: $state.table.typ,
       builder: (column, joinBuilders) =>
@@ -5355,11 +5360,6 @@ class $WorkContentSubdivisionsOrderingComposer
 
   ColumnOrderings<String> get name => $state.composableBuilder(
       column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get node => $state.composableBuilder(
-      column: $state.table.node,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

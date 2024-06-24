@@ -20,7 +20,10 @@ void main() async {
 //
 }
 
+//use batches to insert data into db
+//simplify functions
 //add db to provider and use it in the app
+// create db indexes
 
 //TODO: do I need to create Intent(s) for my buttons?
 

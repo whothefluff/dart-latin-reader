@@ -7,6 +7,7 @@ import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:csv/csv.dart';
 import 'dart:convert';
+import 'package:package_info_plus/package_info_plus.dart';
 
 part 'database.g.dart';
 
@@ -42,7 +43,9 @@ class AppDb extends _$AppDb {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'userdata.sqlite'));
+    final packageInfo = await PackageInfo.fromPlatform();
+    final file =
+        File(p.join(dbFolder.path, packageInfo.appName, 'userdata.sqlite'));
     if (Platform.isAndroid) {
       await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
     }
@@ -85,13 +88,15 @@ Future<void> _populateDatabaseFromCsv(AppDb db) async {
 
   await db.transaction(() async {
     // TODO make better
-    await db.delete(db.authors).go();
-    await db.delete(db.authorAbbreviations).go();
-    await db.delete(db.works).go();
-    await db.delete(db.workContents).go();
-    await db.delete(db.workContentSubdivisions).go();
-    await db.delete(db.workContentSupplementary).go();
-    await db.delete(db.authorsAndWorks).go();
+    await Future.wait([
+      db.delete(db.authors).go(),
+      db.delete(db.authorAbbreviations).go(),
+      db.delete(db.works).go(),
+      db.delete(db.workContents).go(),
+      db.delete(db.workContentSubdivisions).go(),
+      db.delete(db.workContentSupplementary).go(),
+      db.delete(db.authorsAndWorks).go(),
+    ]);
     var operations = {
       'Authors': (List<dynamic> rows, AppDb db) async {
         for (var row in rows.skip(1)) {
@@ -102,6 +107,7 @@ Future<void> _populateDatabaseFromCsv(AppDb db) async {
                   about: Value(row[2].toString()),
                   image: Value(base64Decode(row[3].toString())),
                 ),
+                mode: InsertMode.insertOrRollback,
               );
         }
       },
@@ -113,6 +119,7 @@ Future<void> _populateDatabaseFromCsv(AppDb db) async {
                   id: Value(row[1] as int),
                   val: Value(row[2].toString()),
                 ),
+                mode: InsertMode.insertOrRollback,
               );
         }
       },
@@ -124,6 +131,7 @@ Future<void> _populateDatabaseFromCsv(AppDb db) async {
                   name: Value(row[1].toString()),
                   // about: Value(row[2].toString()),
                 ),
+                mode: InsertMode.insertOrRollback,
               );
         }
       },
@@ -136,47 +144,51 @@ Future<void> _populateDatabaseFromCsv(AppDb db) async {
                   word: Value(row[2].toString()),
                   sourceReference: Value(row[3].toString()),
                 ),
+                mode: InsertMode.insertOrRollback,
               );
         }
       },
       'WorkContentSubdivisions': (List<dynamic> rows, AppDb db) async {
         for (var row in rows.skip(1)) {
           await db.into(db.workContentSubdivisions).insert(
-                WorkContentSubdivisionsCompanion(
-                  workId: Value(row[0].toString()),
-                  typ: Value(row[1].toString()),
-                  cnt: Value(row[2] as int),
-                  name: Value(row[3].toString()),
-                  node: Value(row[4].toString()),
-                  parent: Value(row[5].toString()),
-                  fromIndex: Value(row[6] as int),
-                  toIndex: Value(row[7] as int),
-                ),
-              );
+              WorkContentSubdivisionsCompanion(
+                workId: Value(row[0].toString()),
+                node: Value(row[1].toString()),
+                typ: Value(row[2].toString()),
+                cnt: Value(row[3] as int),
+                name: Value(row[4].toString()),
+                parent:
+                    Value(row[5].toString().isEmpty ? null : row[5].toString()),
+                fromIndex: Value(row[6] as int),
+                toIndex: Value(row[7] as int),
+              ),
+              mode: InsertMode.insertOrRollback);
         }
       },
       'WorkContentSupplementary': (List<dynamic> rows, AppDb db) async {
         for (var row in rows.skip(1)) {
-          await db
-              .into(db.workContentSupplementary)
-              .insert(WorkContentSupplementaryCompanion(
-                workId: Value(row[0].toString()),
-                typ: Value(row[1].toString()),
-                cnt: Value(row[2] as int),
-                fromIndex: Value(row[3] as int),
-                toIndex: Value(row[4] as int),
-                val: Value(row[5].toString()),
-              ));
+          await db.into(db.workContentSupplementary).insert(
+                WorkContentSupplementaryCompanion(
+                  workId: Value(row[0].toString()),
+                  typ: Value(row[1].toString()),
+                  cnt: Value(row[2] as int),
+                  fromIndex: Value(row[3] as int),
+                  toIndex: Value(row[4] as int),
+                  val: Value(row[5].toString()),
+                ),
+                mode: InsertMode.insertOrRollback,
+              );
         }
       },
       'AuthorsAndWorks': (List<dynamic> rows, AppDb db) async {
         for (var row in rows.skip(1)) {
-          await db
-              .into(db.authorsAndWorks)
-              .insert(AuthorsAndWorksCompanion(
-                authorId: Value(row[0].toString()),
-                workId: Value(row[1].toString()),
-              ));
+          await db.into(db.authorsAndWorks).insert(
+                AuthorsAndWorksCompanion(
+                  authorId: Value(row[0].toString()),
+                  workId: Value(row[1].toString()),
+                ),
+                mode: InsertMode.insertOrRollback,
+              );
         }
       }
     };
@@ -185,7 +197,7 @@ Future<void> _populateDatabaseFromCsv(AppDb db) async {
       List<List<dynamic>> rows = const CsvToListConverter().convert(csvData);
       final tableName = entry.key;
       if (operations.containsKey(tableName)) {
-        operations[tableName]!(rows, db);
+        await operations[tableName]!(rows, db);
       } else {
         throw Exception('Operation for table $tableName not found.');
       }

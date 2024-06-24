@@ -119,14 +119,14 @@ WITHOUT ROWID
 
 CREATE TABLE "WorkContentSubdivisions"(
     "workId" TEXT NOT NULL,
+    "node" TEXT NOT NULL CHECK( node LIKE '________-____-____-____-____________' ),
     "typ" TEXT NOT NULL CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','TITL','PARA') ), --add more as needed
     "cnt" INTEGER NOT NULL CHECK( cnt > 0 ),
     "name" TEXT NOT NULL,
-    "node" TEXT NOT NULL UNIQUE CHECK( node LIKE '________-____-____-____-____________' ),
-    "parent" TEXT CHECK( parent LIKE '________-____-____-____-____________' ),
+    "parent" TEXT CHECK( parent IS NULL OR parent LIKE '________-____-____-____-____________' ),
     "fromIndex" INTEGER NOT NULL CHECK( fromIndex > 0 ),
     "toIndex" INTEGER NOT NULL CHECK( toIndex > 0 ),
-    PRIMARY KEY( workId, typ, cnt ),
+    PRIMARY KEY( workId, node ),
     FOREIGN KEY( workId, fromIndex ) REFERENCES WorkContents( workId, idx ),
     FOREIGN KEY( workId, toIndex ) REFERENCES WorkContents( workId, idx )
 )
