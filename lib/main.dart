@@ -11,6 +11,7 @@ void main() async {
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
   WidgetsFlutterBinding.ensureInitialized();
+  await AppDb.initialize();
   final db = AppDb();
   runApp(
     ProviderScope(
@@ -20,10 +21,10 @@ void main() async {
 //
 }
 
-//use batches to insert data into db
-//simplify functions
+//load work about line
 //add db to provider and use it in the app
-// create db indexes
+
+//create db indexes
 
 //TODO: do I need to create Intent(s) for my buttons?
 

@@ -16,9 +16,9 @@ class DataVersion extends Table with TableInfo<DataVersion, DataVersionData> {
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
-  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
       'createdAt', aliasedName, false,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       $customConstraints: 'NOT NULL DEFAULT CURRENT_TIMESTAMP',
       defaultValue: const CustomExpression('CURRENT_TIMESTAMP'));
@@ -54,7 +54,7 @@ class DataVersion extends Table with TableInfo<DataVersion, DataVersionData> {
       idx: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}idx'])!,
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}createdAt'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}createdAt'])!,
     );
   }
 
@@ -71,13 +71,13 @@ class DataVersion extends Table with TableInfo<DataVersion, DataVersionData> {
 
 class DataVersionData extends DataClass implements Insertable<DataVersionData> {
   final int idx;
-  final int createdAt;
+  final String createdAt;
   const DataVersionData({required this.idx, required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['idx'] = Variable<int>(idx);
-    map['createdAt'] = Variable<int>(createdAt);
+    map['createdAt'] = Variable<String>(createdAt);
     return map;
   }
 
@@ -93,7 +93,7 @@ class DataVersionData extends DataClass implements Insertable<DataVersionData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return DataVersionData(
       idx: serializer.fromJson<int>(json['idx']),
-      createdAt: serializer.fromJson<int>(json['createdAt']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
     );
   }
   @override
@@ -101,11 +101,11 @@ class DataVersionData extends DataClass implements Insertable<DataVersionData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'idx': serializer.toJson<int>(idx),
-      'createdAt': serializer.toJson<int>(createdAt),
+      'createdAt': serializer.toJson<String>(createdAt),
     };
   }
 
-  DataVersionData copyWith({int? idx, int? createdAt}) => DataVersionData(
+  DataVersionData copyWith({int? idx, String? createdAt}) => DataVersionData(
         idx: idx ?? this.idx,
         createdAt: createdAt ?? this.createdAt,
       );
@@ -130,7 +130,7 @@ class DataVersionData extends DataClass implements Insertable<DataVersionData> {
 
 class DataVersionCompanion extends UpdateCompanion<DataVersionData> {
   final Value<int> idx;
-  final Value<int> createdAt;
+  final Value<String> createdAt;
   const DataVersionCompanion({
     this.idx = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -141,7 +141,7 @@ class DataVersionCompanion extends UpdateCompanion<DataVersionData> {
   });
   static Insertable<DataVersionData> custom({
     Expression<int>? idx,
-    Expression<int>? createdAt,
+    Expression<String>? createdAt,
   }) {
     return RawValuesInsertable({
       if (idx != null) 'idx': idx,
@@ -149,7 +149,7 @@ class DataVersionCompanion extends UpdateCompanion<DataVersionData> {
     });
   }
 
-  DataVersionCompanion copyWith({Value<int>? idx, Value<int>? createdAt}) {
+  DataVersionCompanion copyWith({Value<int>? idx, Value<String>? createdAt}) {
     return DataVersionCompanion(
       idx: idx ?? this.idx,
       createdAt: createdAt ?? this.createdAt,
@@ -163,7 +163,7 @@ class DataVersionCompanion extends UpdateCompanion<DataVersionData> {
       map['idx'] = Variable<int>(idx.value);
     }
     if (createdAt.present) {
-      map['createdAt'] = Variable<int>(createdAt.value);
+      map['createdAt'] = Variable<String>(createdAt.value);
     }
     return map;
   }
@@ -3784,14 +3784,14 @@ class AuthorsAndWorksCompanion extends UpdateCompanion<AuthorsAndWork> {
 
 class LatestDataVersionData extends DataClass {
   final int idx;
-  final int createdAt;
+  final String createdAt;
   const LatestDataVersionData({required this.idx, required this.createdAt});
   factory LatestDataVersionData.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LatestDataVersionData(
       idx: serializer.fromJson<int>(json['idx']),
-      createdAt: serializer.fromJson<int>(json['createdAt']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
     );
   }
   @override
@@ -3799,11 +3799,11 @@ class LatestDataVersionData extends DataClass {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'idx': serializer.toJson<int>(idx),
-      'createdAt': serializer.toJson<int>(createdAt),
+      'createdAt': serializer.toJson<String>(createdAt),
     };
   }
 
-  LatestDataVersionData copyWith({int? idx, int? createdAt}) =>
+  LatestDataVersionData copyWith({int? idx, String? createdAt}) =>
       LatestDataVersionData(
         idx: idx ?? this.idx,
         createdAt: createdAt ?? this.createdAt,
@@ -3854,15 +3854,15 @@ class LatestDataVersion
       idx: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}idx'])!,
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}createdAt'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}createdAt'])!,
     );
   }
 
   late final GeneratedColumn<int> idx =
       GeneratedColumn<int>('idx', aliasedName, false, type: DriftSqlType.int);
-  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
       'createdAt', aliasedName, false,
-      type: DriftSqlType.int);
+      type: DriftSqlType.string);
   @override
   LatestDataVersion createAlias(String alias) {
     return LatestDataVersion(attachedDatabase, alias);
@@ -3921,11 +3921,11 @@ abstract class _$AppDb extends GeneratedDatabase {
 
 typedef $DataVersionInsertCompanionBuilder = DataVersionCompanion Function({
   Value<int> idx,
-  Value<int> createdAt,
+  Value<String> createdAt,
 });
 typedef $DataVersionUpdateCompanionBuilder = DataVersionCompanion Function({
   Value<int> idx,
-  Value<int> createdAt,
+  Value<String> createdAt,
 });
 
 class $DataVersionTableManager extends RootTableManager<
@@ -3948,7 +3948,7 @@ class $DataVersionTableManager extends RootTableManager<
           getChildManagerBuilder: (p) => $DataVersionProcessedTableManager(p),
           getUpdateCompanionBuilder: ({
             Value<int> idx = const Value.absent(),
-            Value<int> createdAt = const Value.absent(),
+            Value<String> createdAt = const Value.absent(),
           }) =>
               DataVersionCompanion(
             idx: idx,
@@ -3956,7 +3956,7 @@ class $DataVersionTableManager extends RootTableManager<
           ),
           getInsertCompanionBuilder: ({
             Value<int> idx = const Value.absent(),
-            Value<int> createdAt = const Value.absent(),
+            Value<String> createdAt = const Value.absent(),
           }) =>
               DataVersionCompanion.insert(
             idx: idx,
@@ -3984,7 +3984,7 @@ class $DataVersionFilterComposer extends FilterComposer<_$AppDb, DataVersion> {
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
-  ColumnFilters<int> get createdAt => $state.composableBuilder(
+  ColumnFilters<String> get createdAt => $state.composableBuilder(
       column: $state.table.createdAt,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
@@ -3998,7 +3998,7 @@ class $DataVersionOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
-  ColumnOrderings<int> get createdAt => $state.composableBuilder(
+  ColumnOrderings<String> get createdAt => $state.composableBuilder(
       column: $state.table.createdAt,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
