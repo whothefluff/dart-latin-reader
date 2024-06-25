@@ -160,7 +160,7 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
         final csvData =
             await rootBundle.loadString('${path}authors_and_works.csv');
         final rows = const CsvToListConverter().convert(csvData);
-        db.batch((b) => b.insertAll(
+        await db.batch((b) => b.insertAll(
               db.authorsAndWorks,
               rows.skip(1).map((row) => AuthorsAndWorksCompanion(
                     authorId: Value(row[0].toString()),
