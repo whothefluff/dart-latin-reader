@@ -1,23 +1,46 @@
 import 'dart:typed_data';
 import 'package:latin_reader/src/component/library/usecase/entity/abbreviations.dart';
+import 'package:latin_reader/src/component/library/usecase/entity/authors.dart';
 import 'package:latin_reader/src/component/library/usecase/entity/works.dart';
 
-abstract interface class Author {
+class Author {
   Author({
     required this.id,
     required this.name,
-    required this.abbreviations,
     required this.about,
     required this.image,
-    required this.works,
-  });
+    Abbreviations? abbreviations,
+    Works? works,
+  })  : _abbreviations = abbreviations ?? Abbreviations(list: []),
+        _works = works ?? Works(list: []);
 
   final String id;
   final String name;
-  final Abbreviations abbreviations;
   final String about;
   final Uint8List image;
-  final Works works;
+  Abbreviations _abbreviations;
+  Works _works;
+
+  Abbreviations get abbreviations => _abbreviations;
+
+  set abbreviations(Abbreviations abbreviations) {
+    if (_abbreviations.list().isEmpty) {
+      _abbreviations = abbreviations;
+    } else {
+      throw Exception('Works already set');
+    }
+  }
+
+  Works get works => _works;
+
+  set works(Works works) {
+    if (_works.list().isEmpty) {
+      _works = works;
+      works.list().map((w) => w.authors = Authors(list: [this]));
+    } else {
+      throw Exception('Works already set');
+    }
+  }
 
   @override
   String toString() {

@@ -1,4 +1,4 @@
-abstract interface class WorkContentsSegment {
+class WorkContentsSegment {
   WorkContentsSegment({
     required this.index,
     required this.value,

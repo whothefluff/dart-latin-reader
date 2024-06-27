@@ -1,4 +1,4 @@
-abstract interface class Abbreviation {
+class Abbreviation {
   Abbreviation({
     required this.value,
   });

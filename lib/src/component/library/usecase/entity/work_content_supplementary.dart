@@ -1,0 +1,34 @@
+import 'package:collection/collection.dart';
+import 'package:latin_reader/src/component/library/usecase/entity/work_content_supplementary_entry.dart';
+
+class WorkContentSupplementary {
+  WorkContentSupplementary({
+    required List<WorkContentSupplementaryEntry> list,
+  }) : _list = UnmodifiableListView(list);
+
+  final UnmodifiableListView<WorkContentSupplementaryEntry> _list;
+
+  UnmodifiableListView<WorkContentSupplementaryEntry> list() => _list;
+
+  @override
+  String toString() {
+    return 'WorkNotes{${list().join(',')}}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WorkContentSupplementary) return false;
+    return _defaultListEquality().equals(list(), other.list());
+  }
+
+  @override
+  int get hashCode => _defaultListEquality().hash(list());
+
+  ListEquality<WorkContentSupplementaryEntry> _defaultListEquality() {
+    const listEquality =
+        ListEquality<WorkContentSupplementaryEntry>(DefaultEquality());
+    return listEquality;
+  }
+//
+}

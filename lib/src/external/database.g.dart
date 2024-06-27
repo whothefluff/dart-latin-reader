@@ -3874,6 +3874,264 @@ class LatestDataVersion
   Set<String> get readTables => const {'DataVersion'};
 }
 
+class AuthorWork extends DataClass {
+  final String authorId;
+  final String id;
+  final String name;
+  final String? about;
+  const AuthorWork(
+      {required this.authorId,
+      required this.id,
+      required this.name,
+      this.about});
+  factory AuthorWork.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AuthorWork(
+      authorId: serializer.fromJson<String>(json['authorId']),
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      about: serializer.fromJson<String?>(json['about']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'authorId': serializer.toJson<String>(authorId),
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'about': serializer.toJson<String?>(about),
+    };
+  }
+
+  AuthorWork copyWith(
+          {String? authorId,
+          String? id,
+          String? name,
+          Value<String?> about = const Value.absent()}) =>
+      AuthorWork(
+        authorId: authorId ?? this.authorId,
+        id: id ?? this.id,
+        name: name ?? this.name,
+        about: about.present ? about.value : this.about,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('AuthorWork(')
+          ..write('authorId: $authorId, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('about: $about')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(authorId, id, name, about);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AuthorWork &&
+          other.authorId == this.authorId &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.about == this.about);
+}
+
+class AuthorWorks extends ViewInfo<AuthorWorks, AuthorWork>
+    implements HasResultSet {
+  final String? _alias;
+  @override
+  final _$AppDb attachedDatabase;
+  AuthorWorks(this.attachedDatabase, [this._alias]);
+  @override
+  List<GeneratedColumn> get $columns => [authorId, id, name, about];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'AuthorWorks';
+  @override
+  Map<SqlDialect, String> get createViewStatements => {
+        SqlDialect.sqlite:
+            'CREATE VIEW AuthorWorks AS SELECT aw.authorId, w.* FROM AuthorsAndWorks AS aw INNER JOIN Works AS w ON aw.workId = w.id',
+      };
+  @override
+  AuthorWorks get asDslTable => this;
+  @override
+  AuthorWork map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AuthorWork(
+      authorId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}authorId'])!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      about: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}about']),
+    );
+  }
+
+  late final GeneratedColumn<String> authorId = GeneratedColumn<String>(
+      'authorId', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+      'about', aliasedName, true,
+      type: DriftSqlType.string);
+  @override
+  AuthorWorks createAlias(String alias) {
+    return AuthorWorks(attachedDatabase, alias);
+  }
+
+  @override
+  Query? get query => null;
+  @override
+  Set<String> get readTables => const {'AuthorsAndWorks', 'Works'};
+}
+
+class WorkAuthor extends DataClass {
+  final String workId;
+  final String id;
+  final String name;
+  final String? about;
+  final Uint8List? image;
+  const WorkAuthor(
+      {required this.workId,
+      required this.id,
+      required this.name,
+      this.about,
+      this.image});
+  factory WorkAuthor.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WorkAuthor(
+      workId: serializer.fromJson<String>(json['workId']),
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      about: serializer.fromJson<String?>(json['about']),
+      image: serializer.fromJson<Uint8List?>(json['image']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'about': serializer.toJson<String?>(about),
+      'image': serializer.toJson<Uint8List?>(image),
+    };
+  }
+
+  WorkAuthor copyWith(
+          {String? workId,
+          String? id,
+          String? name,
+          Value<String?> about = const Value.absent(),
+          Value<Uint8List?> image = const Value.absent()}) =>
+      WorkAuthor(
+        workId: workId ?? this.workId,
+        id: id ?? this.id,
+        name: name ?? this.name,
+        about: about.present ? about.value : this.about,
+        image: image.present ? image.value : this.image,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('WorkAuthor(')
+          ..write('workId: $workId, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('about: $about, ')
+          ..write('image: $image')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(workId, id, name, about, $driftBlobEquality.hash(image));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WorkAuthor &&
+          other.workId == this.workId &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.about == this.about &&
+          $driftBlobEquality.equals(other.image, this.image));
+}
+
+class WorkAuthors extends ViewInfo<WorkAuthors, WorkAuthor>
+    implements HasResultSet {
+  final String? _alias;
+  @override
+  final _$AppDb attachedDatabase;
+  WorkAuthors(this.attachedDatabase, [this._alias]);
+  @override
+  List<GeneratedColumn> get $columns => [workId, id, name, about, image];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'WorkAuthors';
+  @override
+  Map<SqlDialect, String> get createViewStatements => {
+        SqlDialect.sqlite:
+            'CREATE VIEW WorkAuthors AS SELECT aw.workId, a.* FROM AuthorsAndWorks AS aw INNER JOIN Authors AS a ON aw.authorId = a.id',
+      };
+  @override
+  WorkAuthors get asDslTable => this;
+  @override
+  WorkAuthor map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WorkAuthor(
+      workId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}workId'])!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      about: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}about']),
+      image: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}image']),
+    );
+  }
+
+  late final GeneratedColumn<String> workId = GeneratedColumn<String>(
+      'workId', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+      'about', aliasedName, true,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<Uint8List> image = GeneratedColumn<Uint8List>(
+      'image', aliasedName, true,
+      type: DriftSqlType.blob);
+  @override
+  WorkAuthors createAlias(String alias) {
+    return WorkAuthors(attachedDatabase, alias);
+  }
+
+  @override
+  Query? get query => null;
+  @override
+  Set<String> get readTables => const {'AuthorsAndWorks', 'Authors'};
+}
+
 abstract class _$AppDb extends GeneratedDatabase {
   _$AppDb(QueryExecutor e) : super(e);
   _$AppDbManager get managers => _$AppDbManager(this);
@@ -3897,6 +4155,8 @@ abstract class _$AppDb extends GeneratedDatabase {
       WorkContentSupplementary(this);
   late final AuthorsAndWorks authorsAndWorks = AuthorsAndWorks(this);
   late final LatestDataVersion latestDataVersion = LatestDataVersion(this);
+  late final AuthorWorks authorWorks = AuthorWorks(this);
+  late final WorkAuthors workAuthors = WorkAuthors(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3915,7 +4175,9 @@ abstract class _$AppDb extends GeneratedDatabase {
         workContentSubdivisions,
         workContentSupplementary,
         authorsAndWorks,
-        latestDataVersion
+        latestDataVersion,
+        authorWorks,
+        workAuthors
       ];
 }
 

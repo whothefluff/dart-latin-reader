@@ -1,23 +1,57 @@
-import 'package:latin_reader/src/component/library/authors.dart';
+import 'package:latin_reader/src/component/library/usecase/entity/authors.dart';
 import 'package:latin_reader/src/component/library/usecase/entity/abbreviations.dart';
 import 'package:latin_reader/src/component/library/usecase/entity/work_contents.dart';
+import 'package:latin_reader/src/component/library/usecase/entity/works.dart';
 
-abstract interface class Work {
+class Work {
   Work({
     required this.id,
     required this.name,
-    required this.abbreviations,
     required this.about,
-    required this.authors,
-    required this.contents,
-  });
+    Abbreviations? abbreviations,
+    Authors? authors,
+    WorkContents? contents,
+  })  : _abbreviations = abbreviations ?? Abbreviations(list: []),
+        _authors = authors ?? Authors(list: []),
+        _contents = contents ?? WorkContents(list: []);
 
   final String id;
   final String name;
-  final Abbreviations abbreviations;
   final String about;
-  final Authors authors;
-  final WorkContents contents;
+  Abbreviations _abbreviations;
+  Authors _authors;
+  WorkContents _contents;
+
+  Abbreviations get abbreviations => _abbreviations;
+
+  set abbreviations(Abbreviations abbreviations) {
+    if (_abbreviations.list().isEmpty) {
+      _abbreviations = abbreviations;
+    } else {
+      throw Exception('Authors already set');
+    }
+  }
+
+  Authors get authors => _authors;
+
+  set authors(Authors authors) {
+    if (_authors.list().isEmpty) {
+      _authors = authors;
+      authors.list().map((a) => a.works = Works(list: [this]));
+    } else {
+      throw Exception('Authors already set');
+    }
+  }
+
+  WorkContents get contents => _contents;
+
+  set contents(WorkContents contents) {
+    if (_contents.list().isEmpty) {
+      _contents = contents;
+    } else {
+      throw Exception('Contents already set');
+    }
+  }
 
   @override
   String toString() {

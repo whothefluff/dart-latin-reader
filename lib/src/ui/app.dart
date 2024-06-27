@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/src/ui/page/library/author_detail_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +12,7 @@ import 'settings/settings_controller.dart';
 import 'page/library/text_page.dart';
 import 'settings/settings_view.dart';
  
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({
     super.key,
     required this.settingsController,
@@ -24,7 +25,7 @@ class MyApp extends StatefulWidget {
 
 }
 
-class MyAppState extends State<MyApp> {
+class MyAppState extends ConsumerState<MyApp> {
   late final GoRouter _router;
 
   @override

@@ -12,7 +12,6 @@ void main() async {
   await settingsController.loadSettings();
   WidgetsFlutterBinding.ensureInitialized();
   await AppDb.initialize();
-  final db = AppDb();
   runApp(
     ProviderScope(
       child: MyApp(settingsController: settingsController),
@@ -21,9 +20,12 @@ void main() async {
 //
 }
 
-//load work about line
-//add db to provider and use it in the app
+//check calls (look for redundancy)
+//load works from author in author page
+//load work about in .csv
 
+//TODO: optimizations
+//when loading authors, works are being loaded at the same time only to show a count
 //create db indexes
 
 //TODO: do I need to create Intent(s) for my buttons?

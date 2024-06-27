@@ -164,3 +164,17 @@ CREATE VIEW "LatestDataVersion" AS
         FROM DataVersion
         ORDER BY idx DESC
         LIMIT 1;
+
+CREATE VIEW "AuthorWorks" AS
+    SELECT aw.authorId,
+           w.*
+        FROM AuthorsAndWorks AS aw
+        INNER JOIN Works AS w
+            ON aw.workId = w.id;
+
+CREATE VIEW "WorkAuthors" AS
+    SELECT aw.workId,
+           a.*
+        FROM AuthorsAndWorks AS aw
+        INNER JOIN Authors AS a
+            ON aw.authorId = a.id;

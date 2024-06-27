@@ -1,5 +1,5 @@
-abstract interface class WorkNote {
-  WorkNote({
+class WorkContentSupplementaryEntry {
+  WorkContentSupplementaryEntry({
     required this.id,
     required this.fromIndex,
     required this.toIndex,
@@ -19,7 +19,9 @@ abstract interface class WorkNote {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is WorkNote && other.id == id && other.value == value;
+    return other is WorkContentSupplementaryEntry &&
+        other.id == id &&
+        other.value == value;
   }
 
   @override
