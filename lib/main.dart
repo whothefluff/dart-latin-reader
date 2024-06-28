@@ -24,6 +24,7 @@ void main() async {
 //
 }
 
+//can author detail data be done with a list inside it?
 //check errorBuilder for GoRouter and error for Riverpod (both needed?)
 //load work about in .csv
 
