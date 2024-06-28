@@ -325,5 +325,23 @@ class _AuthorsByWorkProviderElement
   @override
   String get workId => (origin as AuthorsByWorkProvider).workId;
 }
+
+String _$libraryAuthorsHash() => r'6b602b51326cf7ee48741fb1313213b86472eba9';
+
+/// See also [libraryAuthors].
+@ProviderFor(libraryAuthors)
+final libraryAuthorsProvider =
+    AutoDisposeFutureProvider<UnmodifiableListView<AuthorView>>.internal(
+  libraryAuthors,
+  name: r'libraryAuthorsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$libraryAuthorsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef LibraryAuthorsRef
+    = AutoDisposeFutureProviderRef<UnmodifiableListView<AuthorView>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

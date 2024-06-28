@@ -1,4 +1,5 @@
-import 'dart:typed_data';
+import 'dart:collection';
+import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/component/library/author_repository.dart' as i;
 import 'package:latin_reader/src/component/library/work_repository.dart' as i;
 import 'package:latin_reader/src/component/library/usecase/entity/author.dart'
@@ -9,6 +10,7 @@ import 'package:latin_reader/src/component/library/usecase/entity/work.dart'
     as e;
 import 'package:latin_reader/src/component/library/usecase/entity/works.dart'
     as e;
+import 'package:latin_reader/src/component/library/author_view.dart';
 import 'package:latin_reader/src/external/database.dart';
 
 class AuthorRepository implements i.AuthorRepository {
@@ -50,18 +52,23 @@ class AuthorRepository implements i.AuthorRepository {
         .map((a) => e.Author(
               id: a.id,
               name: a.name,
-              about: a.about?.toString() ?? '',
-              image: a.image ?? Uint8List(0),
+              about: a.about,
+              image: a.image,
             ))
         .toList();
     return e.Authors(list: eAuthors);
   }
 
-  e.Author dbToEntity(Author a) => e.Author(
-      id: a.id,
-      name: a.name,
-      about: a.about?.toString() ?? '',
-      image: a.image ?? Uint8List(0));
+  @override
+  Future<UnmodifiableListView<AuthorView>> getLibraryAuthors() async {
+    final db = AppDb();
+    log.info(() => 'AuthorRepository - reading library authors from db');
+    var dbAuthors = await db.getLibraryAuthors().get();
+    return UnmodifiableListView(dbAuthors as Iterable<AuthorView>);
+  }
+
+  e.Author dbToEntity(Author a) =>
+      e.Author(id: a.id, name: a.name, about: a.about, image: a.image);
 //
 }
 

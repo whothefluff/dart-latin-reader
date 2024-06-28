@@ -2,6 +2,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:csv/csv.dart';
 import 'dart:convert';
 import 'package:drift/drift.dart';
+import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/external/database.dart';
 
 const path = 'assets/preprocessed_data/';
@@ -175,7 +176,9 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
     await operations.fold(Future<void>.value(null),
         (previousFuture, operation) {
       return previousFuture.then((_) async {
+        log.info(() => 'populateDatabaseFromCsv() - deleting ${operation.id}');
         await operation.delete(db);
+        log.info(() => 'populateDatabaseFromCsv() - inserting ${operation.id}');
         await operation.insert(db);
       });
     });
@@ -183,6 +186,7 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
 }
 
 Future<void> updateDatabaseVersion(AppDb db) async {
+  log.info(() => 'updateDatabaseVersion() - updating data version');
   final assetVersion = await getDataVersion();
   await db.into(db.dataVersion).insertOnConflictUpdate(
         DataVersionCompanion(

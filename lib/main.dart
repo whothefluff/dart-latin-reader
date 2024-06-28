@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/src/external/database.dart';
-
+import 'package:latin_reader/logger.dart';
 import 'src/ui/app.dart';
 import 'src/ui/settings/settings_controller.dart';
 import 'src/ui/settings/settings_service.dart';
 
 void main() async {
 //
+  configureLogging();
+  log.info(() => 'main() - loading settings');
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
   WidgetsFlutterBinding.ensureInitialized();
+  log.info(() => 'main() - initializing AppDb');
   await AppDb.initialize();
+  log.info(() => 'main() - calling first widget');
   runApp(
     ProviderScope(
       child: MyApp(settingsController: settingsController),
@@ -25,7 +29,7 @@ void main() async {
 //load work about in .csv
 
 //TODO: optimizations
-//when loading authors, works are being loaded at the same time only to show a count
+//delete superfluous repository methods
 //create db indexes
 
 //TODO: do I need to create Intent(s) for my buttons?

@@ -1399,16 +1399,16 @@ class Authors extends Table with TableInfo<Authors, Author> {
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _aboutMeta = const VerificationMeta('about');
   late final GeneratedColumn<String> about = GeneratedColumn<String>(
-      'about', aliasedName, true,
+      'about', aliasedName, false,
       type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      $customConstraints: '');
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL');
   static const VerificationMeta _imageMeta = const VerificationMeta('image');
   late final GeneratedColumn<Uint8List> image = GeneratedColumn<Uint8List>(
-      'image', aliasedName, true,
+      'image', aliasedName, false,
       type: DriftSqlType.blob,
-      requiredDuringInsert: false,
-      $customConstraints: '');
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL');
   @override
   List<GeneratedColumn> get $columns => [id, name, about, image];
   @override
@@ -1435,10 +1435,14 @@ class Authors extends Table with TableInfo<Authors, Author> {
     if (data.containsKey('about')) {
       context.handle(
           _aboutMeta, about.isAcceptableOrUnknown(data['about']!, _aboutMeta));
+    } else if (isInserting) {
+      context.missing(_aboutMeta);
     }
     if (data.containsKey('image')) {
       context.handle(
           _imageMeta, image.isAcceptableOrUnknown(data['image']!, _imageMeta));
+    } else if (isInserting) {
+      context.missing(_imageMeta);
     }
     return context;
   }
@@ -1454,9 +1458,9 @@ class Authors extends Table with TableInfo<Authors, Author> {
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       about: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}about']),
+          .read(DriftSqlType.string, data['${effectivePrefix}about'])!,
       image: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}image']),
+          .read(DriftSqlType.blob, data['${effectivePrefix}image'])!,
     );
   }
 
@@ -1476,20 +1480,20 @@ class Authors extends Table with TableInfo<Authors, Author> {
 class Author extends DataClass implements Insertable<Author> {
   final String id;
   final String name;
-  final String? about;
-  final Uint8List? image;
-  const Author({required this.id, required this.name, this.about, this.image});
+  final String about;
+  final Uint8List image;
+  const Author(
+      {required this.id,
+      required this.name,
+      required this.about,
+      required this.image});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
-    if (!nullToAbsent || about != null) {
-      map['about'] = Variable<String>(about);
-    }
-    if (!nullToAbsent || image != null) {
-      map['image'] = Variable<Uint8List>(image);
-    }
+    map['about'] = Variable<String>(about);
+    map['image'] = Variable<Uint8List>(image);
     return map;
   }
 
@@ -1497,10 +1501,8 @@ class Author extends DataClass implements Insertable<Author> {
     return AuthorsCompanion(
       id: Value(id),
       name: Value(name),
-      about:
-          about == null && nullToAbsent ? const Value.absent() : Value(about),
-      image:
-          image == null && nullToAbsent ? const Value.absent() : Value(image),
+      about: Value(about),
+      image: Value(image),
     );
   }
 
@@ -1510,8 +1512,8 @@ class Author extends DataClass implements Insertable<Author> {
     return Author(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      about: serializer.fromJson<String?>(json['about']),
-      image: serializer.fromJson<Uint8List?>(json['image']),
+      about: serializer.fromJson<String>(json['about']),
+      image: serializer.fromJson<Uint8List>(json['image']),
     );
   }
   @override
@@ -1520,21 +1522,18 @@ class Author extends DataClass implements Insertable<Author> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
-      'about': serializer.toJson<String?>(about),
-      'image': serializer.toJson<Uint8List?>(image),
+      'about': serializer.toJson<String>(about),
+      'image': serializer.toJson<Uint8List>(image),
     };
   }
 
   Author copyWith(
-          {String? id,
-          String? name,
-          Value<String?> about = const Value.absent(),
-          Value<Uint8List?> image = const Value.absent()}) =>
+          {String? id, String? name, String? about, Uint8List? image}) =>
       Author(
         id: id ?? this.id,
         name: name ?? this.name,
-        about: about.present ? about.value : this.about,
-        image: image.present ? image.value : this.image,
+        about: about ?? this.about,
+        image: image ?? this.image,
       );
   @override
   String toString() {
@@ -1563,8 +1562,8 @@ class Author extends DataClass implements Insertable<Author> {
 class AuthorsCompanion extends UpdateCompanion<Author> {
   final Value<String> id;
   final Value<String> name;
-  final Value<String?> about;
-  final Value<Uint8List?> image;
+  final Value<String> about;
+  final Value<Uint8List> image;
   const AuthorsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -1574,10 +1573,12 @@ class AuthorsCompanion extends UpdateCompanion<Author> {
   AuthorsCompanion.insert({
     required String id,
     required String name,
-    this.about = const Value.absent(),
-    this.image = const Value.absent(),
+    required String about,
+    required Uint8List image,
   })  : id = Value(id),
-        name = Value(name);
+        name = Value(name),
+        about = Value(about),
+        image = Value(image);
   static Insertable<Author> custom({
     Expression<String>? id,
     Expression<String>? name,
@@ -1595,8 +1596,8 @@ class AuthorsCompanion extends UpdateCompanion<Author> {
   AuthorsCompanion copyWith(
       {Value<String>? id,
       Value<String>? name,
-      Value<String?>? about,
-      Value<Uint8List?>? image}) {
+      Value<String>? about,
+      Value<Uint8List>? image}) {
     return AuthorsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -3874,6 +3875,142 @@ class LatestDataVersion
   Set<String> get readTables => const {'DataVersion'};
 }
 
+class LibraryAuthor extends DataClass {
+  final String id;
+  final String name;
+  final String about;
+  final Uint8List image;
+  final int numberOfWorks;
+  const LibraryAuthor(
+      {required this.id,
+      required this.name,
+      required this.about,
+      required this.image,
+      required this.numberOfWorks});
+  factory LibraryAuthor.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LibraryAuthor(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      about: serializer.fromJson<String>(json['about']),
+      image: serializer.fromJson<Uint8List>(json['image']),
+      numberOfWorks: serializer.fromJson<int>(json['numberOfWorks']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'about': serializer.toJson<String>(about),
+      'image': serializer.toJson<Uint8List>(image),
+      'numberOfWorks': serializer.toJson<int>(numberOfWorks),
+    };
+  }
+
+  LibraryAuthor copyWith(
+          {String? id,
+          String? name,
+          String? about,
+          Uint8List? image,
+          int? numberOfWorks}) =>
+      LibraryAuthor(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        about: about ?? this.about,
+        image: image ?? this.image,
+        numberOfWorks: numberOfWorks ?? this.numberOfWorks,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('LibraryAuthor(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('about: $about, ')
+          ..write('image: $image, ')
+          ..write('numberOfWorks: $numberOfWorks')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id, name, about, $driftBlobEquality.hash(image), numberOfWorks);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LibraryAuthor &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.about == this.about &&
+          $driftBlobEquality.equals(other.image, this.image) &&
+          other.numberOfWorks == this.numberOfWorks);
+}
+
+class LibraryAuthors extends ViewInfo<LibraryAuthors, LibraryAuthor>
+    implements HasResultSet {
+  final String? _alias;
+  @override
+  final _$AppDb attachedDatabase;
+  LibraryAuthors(this.attachedDatabase, [this._alias]);
+  @override
+  List<GeneratedColumn> get $columns => [id, name, about, image, numberOfWorks];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'LibraryAuthors';
+  @override
+  Map<SqlDialect, String> get createViewStatements => {
+        SqlDialect.sqlite:
+            'CREATE VIEW LibraryAuthors AS SELECT a.id, a.name, a.about, a.image, COUNT(aw.workId)OVER (PARTITION BY a.id RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfWorks FROM Authors AS a LEFT JOIN AuthorsAndWorks AS aw ON a.id = aw.authorId',
+      };
+  @override
+  LibraryAuthors get asDslTable => this;
+  @override
+  LibraryAuthor map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LibraryAuthor(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      about: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}about'])!,
+      image: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}image'])!,
+      numberOfWorks: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}numberOfWorks'])!,
+    );
+  }
+
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+      'about', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<Uint8List> image = GeneratedColumn<Uint8List>(
+      'image', aliasedName, false,
+      type: DriftSqlType.blob);
+  late final GeneratedColumn<int> numberOfWorks = GeneratedColumn<int>(
+      'numberOfWorks', aliasedName, false,
+      type: DriftSqlType.int);
+  @override
+  LibraryAuthors createAlias(String alias) {
+    return LibraryAuthors(attachedDatabase, alias);
+  }
+
+  @override
+  Query? get query => null;
+  @override
+  Set<String> get readTables => const {'Authors', 'AuthorsAndWorks'};
+}
+
 class AuthorWork extends DataClass {
   final String authorId;
   final String id;
@@ -4000,14 +4137,14 @@ class WorkAuthor extends DataClass {
   final String workId;
   final String id;
   final String name;
-  final String? about;
-  final Uint8List? image;
+  final String about;
+  final Uint8List image;
   const WorkAuthor(
       {required this.workId,
       required this.id,
       required this.name,
-      this.about,
-      this.image});
+      required this.about,
+      required this.image});
   factory WorkAuthor.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -4015,8 +4152,8 @@ class WorkAuthor extends DataClass {
       workId: serializer.fromJson<String>(json['workId']),
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      about: serializer.fromJson<String?>(json['about']),
-      image: serializer.fromJson<Uint8List?>(json['image']),
+      about: serializer.fromJson<String>(json['about']),
+      image: serializer.fromJson<Uint8List>(json['image']),
     );
   }
   @override
@@ -4026,8 +4163,8 @@ class WorkAuthor extends DataClass {
       'workId': serializer.toJson<String>(workId),
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
-      'about': serializer.toJson<String?>(about),
-      'image': serializer.toJson<Uint8List?>(image),
+      'about': serializer.toJson<String>(about),
+      'image': serializer.toJson<Uint8List>(image),
     };
   }
 
@@ -4035,14 +4172,14 @@ class WorkAuthor extends DataClass {
           {String? workId,
           String? id,
           String? name,
-          Value<String?> about = const Value.absent(),
-          Value<Uint8List?> image = const Value.absent()}) =>
+          String? about,
+          Uint8List? image}) =>
       WorkAuthor(
         workId: workId ?? this.workId,
         id: id ?? this.id,
         name: name ?? this.name,
-        about: about.present ? about.value : this.about,
-        image: image.present ? image.value : this.image,
+        about: about ?? this.about,
+        image: image ?? this.image,
       );
   @override
   String toString() {
@@ -4100,9 +4237,9 @@ class WorkAuthors extends ViewInfo<WorkAuthors, WorkAuthor>
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       about: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}about']),
+          .read(DriftSqlType.string, data['${effectivePrefix}about'])!,
       image: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}image']),
+          .read(DriftSqlType.blob, data['${effectivePrefix}image'])!,
     );
   }
 
@@ -4116,10 +4253,10 @@ class WorkAuthors extends ViewInfo<WorkAuthors, WorkAuthor>
       'name', aliasedName, false,
       type: DriftSqlType.string);
   late final GeneratedColumn<String> about = GeneratedColumn<String>(
-      'about', aliasedName, true,
+      'about', aliasedName, false,
       type: DriftSqlType.string);
   late final GeneratedColumn<Uint8List> image = GeneratedColumn<Uint8List>(
-      'image', aliasedName, true,
+      'image', aliasedName, false,
       type: DriftSqlType.blob);
   @override
   WorkAuthors createAlias(String alias) {
@@ -4155,8 +4292,24 @@ abstract class _$AppDb extends GeneratedDatabase {
       WorkContentSupplementary(this);
   late final AuthorsAndWorks authorsAndWorks = AuthorsAndWorks(this);
   late final LatestDataVersion latestDataVersion = LatestDataVersion(this);
+  late final LibraryAuthors libraryAuthors = LibraryAuthors(this);
   late final AuthorWorks authorWorks = AuthorWorks(this);
   late final WorkAuthors workAuthors = WorkAuthors(this);
+  Selectable<AuthorView> getLibraryAuthors() {
+    return customSelect('SELECT * FROM LibraryAuthors',
+        variables: [],
+        readsFrom: {
+          authors,
+          authorsAndWorks,
+        }).map((QueryRow row) => AuthorView(
+          id: row.read<String>('id'),
+          name: row.read<String>('name'),
+          about: row.read<String>('about'),
+          image: row.read<Uint8List>('image'),
+          numberOfWorks: row.read<int>('numberOfWorks'),
+        ));
+  }
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4176,6 +4329,7 @@ abstract class _$AppDb extends GeneratedDatabase {
         workContentSupplementary,
         authorsAndWorks,
         latestDataVersion,
+        libraryAuthors,
         authorWorks,
         workAuthors
       ];
@@ -4794,14 +4948,14 @@ class $MacronizationsOrderingComposer
 typedef $AuthorsInsertCompanionBuilder = AuthorsCompanion Function({
   required String id,
   required String name,
-  Value<String?> about,
-  Value<Uint8List?> image,
+  required String about,
+  required Uint8List image,
 });
 typedef $AuthorsUpdateCompanionBuilder = AuthorsCompanion Function({
   Value<String> id,
   Value<String> name,
-  Value<String?> about,
-  Value<Uint8List?> image,
+  Value<String> about,
+  Value<Uint8List> image,
 });
 
 class $AuthorsTableManager extends RootTableManager<
@@ -4823,8 +4977,8 @@ class $AuthorsTableManager extends RootTableManager<
           getUpdateCompanionBuilder: ({
             Value<String> id = const Value.absent(),
             Value<String> name = const Value.absent(),
-            Value<String?> about = const Value.absent(),
-            Value<Uint8List?> image = const Value.absent(),
+            Value<String> about = const Value.absent(),
+            Value<Uint8List> image = const Value.absent(),
           }) =>
               AuthorsCompanion(
             id: id,
@@ -4835,8 +4989,8 @@ class $AuthorsTableManager extends RootTableManager<
           getInsertCompanionBuilder: ({
             required String id,
             required String name,
-            Value<String?> about = const Value.absent(),
-            Value<Uint8List?> image = const Value.absent(),
+            required String about,
+            required Uint8List image,
           }) =>
               AuthorsCompanion.insert(
             id: id,

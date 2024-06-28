@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:latin_reader/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:latin_reader/src/external/database_util.dart' as util;
+import 'package:latin_reader/src/component/library/author_view.dart';
 
 part 'database.g.dart';
 
@@ -27,6 +29,7 @@ class AppDb extends _$AppDb {
 
   static Future<void> initialize() async {
     if (!_isInitialized) {
+      log.info(() => 'AppDb - initializing singleton');
       await _instance._populateDb();
       _isInitialized = true;
     }
@@ -40,6 +43,7 @@ class AppDb extends _$AppDb {
 
   Future<void> _populateDb() async {
     final shouldPopulate = await util.shouldPopulate(this);
+    log.info(() => 'AppDb - shouldPopulate: $shouldPopulate');
     if (shouldPopulate) {
       await util.populateDatabaseFromCsv(this);
       await util.updateDatabaseVersion(this);
@@ -50,6 +54,7 @@ class AppDb extends _$AppDb {
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
+    log.info(() => '_openConnection() - getting path');
     final dbFolder = await getApplicationDocumentsDirectory();
     final packageInfo = await PackageInfo.fromPlatform();
     final folderPath = p.join(dbFolder.path, packageInfo.appName);
@@ -58,6 +63,7 @@ LazyDatabase _openConnection() {
     if (Platform.isAndroid) {
       await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
     }
+    log.info(() => '_openConnection() - creating database from file');
     return NativeDatabase.createInBackground(file);
   });
 }

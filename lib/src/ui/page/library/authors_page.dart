@@ -23,13 +23,13 @@ class AuthorsPage extends ConsumerWidget {
   }
 
   Widget authorsGrid(WidgetRef ref) {
-    return ref.watch(authorsWithWorksProvider).when(
+    return ref.watch(libraryAuthorsProvider).when(
           data: (authors) {
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 300,
               ),
-              itemCount: authors.list().length,
+              itemCount: authors.length,
               itemBuilder: (context, int index) {
                 var cardBorderRadius = BorderRadius.circular(12);
                 return Card(
@@ -47,20 +47,15 @@ class AuthorsPage extends ConsumerWidget {
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(authors.list()[index].name),
-                            Text(authors
-                                .list()[index]
-                                .works
-                                .list()
-                                .length
-                                .toString()),
+                            Text(authors[index].name),
+                            Text(authors[index].numberOfWorks.toString()),
                           ],
                         ),
                       ),
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: MemoryImage(authors.list()[index].image),
+                            image: MemoryImage(authors[index].image),
                             fit: BoxFit.cover,
                           ),
                           borderRadius:
