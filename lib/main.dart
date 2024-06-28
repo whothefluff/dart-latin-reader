@@ -24,8 +24,7 @@ void main() async {
 //
 }
 
-//check calls (look for redundancy)
-//load works from author in author page
+//check errorBuilder for GoRouter and error for Riverpod (both needed?)
 //load work about in .csv
 
 //TODO: optimizations

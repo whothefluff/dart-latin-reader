@@ -11,7 +11,7 @@ import 'page/library/works_page.dart';
 import 'settings/settings_controller.dart';
 import 'page/library/text_page.dart';
 import 'settings/settings_view.dart';
- 
+
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({
     super.key,
@@ -22,7 +22,7 @@ class MyApp extends ConsumerStatefulWidget {
 
   @override
   MyAppState createState() => MyAppState();
-
+//
 }
 
 class MyAppState extends ConsumerState<MyApp> {
@@ -52,8 +52,8 @@ class MyAppState extends ConsumerState<MyApp> {
                     GoRoute(
                       path: ':id',
                       builder: (context, state) {
-                        final id = int.parse(state.pathParameters['id']!);
-                        return AuthorDetailPage(authorIndex: id);
+                        final id = state.pathParameters['id']!;
+                        return AuthorDetailPage(authorId: id);
                       },
                     ),
                   ],
@@ -151,6 +151,7 @@ class MyAppState extends ConsumerState<MyApp> {
       },
     );
   }
+//
 }
 
 class ScaffoldWithNavBar extends StatelessWidget {
@@ -203,4 +204,5 @@ class ScaffoldWithNavBar extends StatelessWidget {
       initialLocation: index == navigationShell.currentIndex,
     );
   }
+//
 }

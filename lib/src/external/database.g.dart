@@ -3964,7 +3964,7 @@ class LibraryAuthors extends ViewInfo<LibraryAuthors, LibraryAuthor>
   @override
   Map<SqlDialect, String> get createViewStatements => {
         SqlDialect.sqlite:
-            'CREATE VIEW LibraryAuthors AS SELECT a.id, a.name, a.about, a.image, COUNT(aw.workId)OVER (PARTITION BY a.id RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfWorks FROM Authors AS a LEFT JOIN AuthorsAndWorks AS aw ON a.id = aw.authorId',
+            'CREATE VIEW LibraryAuthors AS SELECT a.id, a.name, a.about, a.image, COUNT(*)OVER (PARTITION BY aw.workId RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfWorks FROM Authors AS a LEFT JOIN AuthorsAndWorks AS aw ON a.id = aw.authorId',
       };
   @override
   LibraryAuthors get asDslTable => this;
@@ -4009,6 +4009,171 @@ class LibraryAuthors extends ViewInfo<LibraryAuthors, LibraryAuthor>
   Query? get query => null;
   @override
   Set<String> get readTables => const {'Authors', 'AuthorsAndWorks'};
+}
+
+class LibraryAuthorDetail extends DataClass {
+  final String id;
+  final String name;
+  final String about;
+  final Uint8List image;
+  final String workId;
+  final String workName;
+  final int numberOfWords;
+  const LibraryAuthorDetail(
+      {required this.id,
+      required this.name,
+      required this.about,
+      required this.image,
+      required this.workId,
+      required this.workName,
+      required this.numberOfWords});
+  factory LibraryAuthorDetail.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LibraryAuthorDetail(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      about: serializer.fromJson<String>(json['about']),
+      image: serializer.fromJson<Uint8List>(json['image']),
+      workId: serializer.fromJson<String>(json['workId']),
+      workName: serializer.fromJson<String>(json['workName']),
+      numberOfWords: serializer.fromJson<int>(json['numberOfWords']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'about': serializer.toJson<String>(about),
+      'image': serializer.toJson<Uint8List>(image),
+      'workId': serializer.toJson<String>(workId),
+      'workName': serializer.toJson<String>(workName),
+      'numberOfWords': serializer.toJson<int>(numberOfWords),
+    };
+  }
+
+  LibraryAuthorDetail copyWith(
+          {String? id,
+          String? name,
+          String? about,
+          Uint8List? image,
+          String? workId,
+          String? workName,
+          int? numberOfWords}) =>
+      LibraryAuthorDetail(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        about: about ?? this.about,
+        image: image ?? this.image,
+        workId: workId ?? this.workId,
+        workName: workName ?? this.workName,
+        numberOfWords: numberOfWords ?? this.numberOfWords,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('LibraryAuthorDetail(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('about: $about, ')
+          ..write('image: $image, ')
+          ..write('workId: $workId, ')
+          ..write('workName: $workName, ')
+          ..write('numberOfWords: $numberOfWords')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, about,
+      $driftBlobEquality.hash(image), workId, workName, numberOfWords);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LibraryAuthorDetail &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.about == this.about &&
+          $driftBlobEquality.equals(other.image, this.image) &&
+          other.workId == this.workId &&
+          other.workName == this.workName &&
+          other.numberOfWords == this.numberOfWords);
+}
+
+class LibraryAuthorDetails
+    extends ViewInfo<LibraryAuthorDetails, LibraryAuthorDetail>
+    implements HasResultSet {
+  final String? _alias;
+  @override
+  final _$AppDb attachedDatabase;
+  LibraryAuthorDetails(this.attachedDatabase, [this._alias]);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, name, about, image, workId, workName, numberOfWords];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'LibraryAuthorDetails';
+  @override
+  Map<SqlDialect, String> get createViewStatements => {
+        SqlDialect.sqlite:
+            'CREATE VIEW LibraryAuthorDetails AS WITH Aux AS (SELECT a.id, a.name, a.about, a.image, aw.workId, w.name AS workName FROM Authors AS a INNER JOIN AuthorsAndWorks AS aw ON a.id = aw.authorId INNER JOIN Works AS w ON aw.workId = w.id), WorksContents AS (SELECT wc.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents AS wc ON Aux.workId = wc.workId WHERE word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY wc.workId) SELECT Aux.*, wc.numberOfWords FROM Aux INNER JOIN WorksContents AS wc ON Aux.workId = wc.workId',
+      };
+  @override
+  LibraryAuthorDetails get asDslTable => this;
+  @override
+  LibraryAuthorDetail map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LibraryAuthorDetail(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      about: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}about'])!,
+      image: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}image'])!,
+      workId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}workId'])!,
+      workName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}workName'])!,
+      numberOfWords: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}numberOfWords'])!,
+    );
+  }
+
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> about = GeneratedColumn<String>(
+      'about', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<Uint8List> image = GeneratedColumn<Uint8List>(
+      'image', aliasedName, false,
+      type: DriftSqlType.blob);
+  late final GeneratedColumn<String> workId = GeneratedColumn<String>(
+      'workId', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> workName = GeneratedColumn<String>(
+      'workName', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<int> numberOfWords = GeneratedColumn<int>(
+      'numberOfWords', aliasedName, false,
+      type: DriftSqlType.int);
+  @override
+  LibraryAuthorDetails createAlias(String alias) {
+    return LibraryAuthorDetails(attachedDatabase, alias);
+  }
+
+  @override
+  Query? get query => null;
+  @override
+  Set<String> get readTables =>
+      const {'Authors', 'AuthorsAndWorks', 'Works', 'WorkContents'};
 }
 
 class AuthorWork extends DataClass {
@@ -4293,6 +4458,8 @@ abstract class _$AppDb extends GeneratedDatabase {
   late final AuthorsAndWorks authorsAndWorks = AuthorsAndWorks(this);
   late final LatestDataVersion latestDataVersion = LatestDataVersion(this);
   late final LibraryAuthors libraryAuthors = LibraryAuthors(this);
+  late final LibraryAuthorDetails libraryAuthorDetails =
+      LibraryAuthorDetails(this);
   late final AuthorWorks authorWorks = AuthorWorks(this);
   late final WorkAuthors workAuthors = WorkAuthors(this);
   Selectable<AuthorView> getLibraryAuthors() {
@@ -4307,6 +4474,27 @@ abstract class _$AppDb extends GeneratedDatabase {
           about: row.read<String>('about'),
           image: row.read<Uint8List>('image'),
           numberOfWorks: row.read<int>('numberOfWorks'),
+        ));
+  }
+
+  Selectable<AuthorDetailsView> getLibraryAuthorDetails(String var1) {
+    return customSelect('SELECT * FROM LibraryAuthorDetails WHERE id = ?1',
+        variables: [
+          Variable<String>(var1)
+        ],
+        readsFrom: {
+          authors,
+          authorsAndWorks,
+          works,
+          workContents,
+        }).map((QueryRow row) => AuthorDetailsView(
+          id: row.read<String>('id'),
+          name: row.read<String>('name'),
+          about: row.read<String>('about'),
+          image: row.read<Uint8List>('image'),
+          workId: row.read<String>('workId'),
+          workName: row.read<String>('workName'),
+          numberOfWords: row.read<int>('numberOfWords'),
         ));
   }
 
@@ -4330,6 +4518,7 @@ abstract class _$AppDb extends GeneratedDatabase {
         authorsAndWorks,
         latestDataVersion,
         libraryAuthors,
+        libraryAuthorDetails,
         authorWorks,
         workAuthors
       ];

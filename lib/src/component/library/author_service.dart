@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:latin_reader/src/component/library/author_details_view.dart';
 import 'package:latin_reader/src/external/repository.dart';
 import 'package:latin_reader/src/component/library/usecase/entity/author.dart'
     as e;
@@ -35,6 +36,10 @@ class AuthorService {
   Future<UnmodifiableListView<AuthorView>> getLibraryAuthors() async =>
       await repository.getLibraryAuthors();
 
+  Future<UnmodifiableListView<AuthorDetailsView>> getLibraryAuthorDetails(
+          String id) async =>
+      await repository.getLibraryAuthorDetails(id);
+
 //
 }
 
@@ -68,3 +73,8 @@ Future<e.Authors> authorsByWork(AuthorsByWorkRef ref, String workId) async =>
 Future<UnmodifiableListView<AuthorView>> libraryAuthors(
         LibraryAuthorsRef ref) async =>
     await ref.watch(authorServiceProvider).getLibraryAuthors();
+
+@riverpod
+Future<UnmodifiableListView<AuthorDetailsView>> libraryAuthorDetails(
+        LibraryAuthorDetailsRef ref, String id) async =>
+    await ref.watch(authorServiceProvider).getLibraryAuthorDetails(id);

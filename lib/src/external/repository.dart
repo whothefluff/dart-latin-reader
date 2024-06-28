@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:latin_reader/logger.dart';
+import 'package:latin_reader/src/component/library/author_details_view.dart';
 import 'package:latin_reader/src/component/library/author_repository.dart' as i;
 import 'package:latin_reader/src/component/library/work_repository.dart' as i;
 import 'package:latin_reader/src/component/library/usecase/entity/author.dart'
@@ -28,15 +29,15 @@ class AuthorRepository implements i.AuthorRepository {
   @override
   Future<e.Authors> getAllAuthors() async {
     final db = AppDb();
-    var dbAuthors = await db.select(db.authors).get();
-    var eAuthors = dbAuthors.map(dbToEntity).toList();
+    final dbAuthors = await db.select(db.authors).get();
+    final eAuthors = dbAuthors.map(dbToEntity).toList();
     return e.Authors(list: eAuthors);
   }
 
   @override
   Future<e.Author> getAuthor(String authorId) async {
     final db = AppDb();
-    var dbAuthor = await (db.select(db.authors)
+    final dbAuthor = await (db.select(db.authors)
           ..where((a) => a.id.equals(authorId)))
         .getSingle();
     return dbToEntity(dbAuthor);
@@ -45,10 +46,10 @@ class AuthorRepository implements i.AuthorRepository {
   @override
   Future<e.Authors> getAuthorsByWork(String workId) async {
     final db = AppDb();
-    var dbAuthors = await (db.select(db.workAuthors)
+    final dbAuthors = await (db.select(db.workAuthors)
           ..where((wa) => wa.workId.equals(workId)))
         .get();
-    var eAuthors = dbAuthors
+    final eAuthors = dbAuthors
         .map((a) => e.Author(
               id: a.id,
               name: a.name,
@@ -63,8 +64,17 @@ class AuthorRepository implements i.AuthorRepository {
   Future<UnmodifiableListView<AuthorView>> getLibraryAuthors() async {
     final db = AppDb();
     log.info(() => 'AuthorRepository - reading library authors from db');
-    var dbAuthors = await db.getLibraryAuthors().get();
+    final dbAuthors = await db.getLibraryAuthors().get();
     return UnmodifiableListView(dbAuthors as Iterable<AuthorView>);
+  }
+
+  @override
+  Future<UnmodifiableListView<AuthorDetailsView>> getLibraryAuthorDetails(
+      String id) async {
+    final db = AppDb();
+    log.info(() => 'AuthorRepository - reading author details from db');
+    final dbAuthorDetails = await db.getLibraryAuthorDetails(id).get();
+    return UnmodifiableListView(dbAuthorDetails as Iterable<AuthorDetailsView>);
   }
 
   e.Author dbToEntity(Author a) =>
@@ -87,15 +97,15 @@ class WorkRepository implements i.WorkRepository {
   @override
   Future<e.Works> getAllWorks() async {
     final db = AppDb();
-    var dbWorks = await db.select(db.works).get();
-    var eWorks = dbWorks.map(dbToEntity).toList();
+    final dbWorks = await db.select(db.works).get();
+    final eWorks = dbWorks.map(dbToEntity).toList();
     return e.Works(list: eWorks);
   }
 
   @override
   Future<e.Work> getWork(String workId) async {
     final db = AppDb();
-    var dbWork = await (db.select(db.works)..where((w) => w.id.equals(workId)))
+    final dbWork = await (db.select(db.works)..where((w) => w.id.equals(workId)))
         .getSingle();
     return dbToEntity(dbWork);
   }
@@ -103,10 +113,10 @@ class WorkRepository implements i.WorkRepository {
   @override
   Future<e.Works> getWorksByAuthor(String authorId) async {
     final db = AppDb();
-    var dbWorks = await (db.select(db.authorWorks)
+    final dbWorks = await (db.select(db.authorWorks)
           ..where((aw) => aw.authorId.equals(authorId)))
         .get();
-    var eWorks = dbWorks
+    final eWorks = dbWorks
         .map((w) => e.Work(
               id: w.id,
               name: w.name,

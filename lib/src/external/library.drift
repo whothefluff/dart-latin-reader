@@ -1,4 +1,5 @@
 import 'package:latin_reader/src/component/library/author_view.dart';
+import 'package:latin_reader/src/component/library/author_details_view.dart';
 
 CREATE TABLE "DataVersion" (
   "idx" INTEGER NOT NULL,
@@ -172,12 +173,39 @@ CREATE VIEW "LibraryAuthors" AS
            a.name,
            a.about,
            a.image,
-           COUNT( aw.workId ) OVER ( PARTITION BY a.id ) AS numberOfWorks
+           COUNT(*) OVER( PARTITION BY aw.workId ) AS numberOfWorks
         FROM Authors AS a
         LEFT JOIN AuthorsAndWorks AS aw
             ON a.id = aw.authorId;
 
 getLibraryAuthors WITH AuthorView: SELECT * FROM LibraryAuthors;
+
+CREATE VIEW "LibraryAuthorDetails" AS
+    WITH Aux AS ( SELECT a.id,
+                         a.name,
+                         a.about,
+                         a.image,
+                         aw.workId,
+                         w.name AS workName
+                     FROM Authors AS a
+                     INNER JOIN AuthorsAndWorks AS aw
+                        ON a.id = aw.authorId
+                     INNER JOIN Works AS w
+                        ON aw.workId = w.id ),
+         WorksContents AS ( SELECT wc.workId,
+                                   COUNT(*) AS numberOfWords
+                                FROM Aux 
+                                INNER JOIN WorkContents AS wc
+                                    ON Aux.workId = wc.workId
+                                WHERE word NOT IN ( '!', '"', '(', ')', ',', '.', ':', '?', '-' )
+                                GROUP BY wc.workId )
+        SELECT Aux.*,
+               wc.numberOfWords
+            FROM Aux
+            INNER JOIN WorksContents AS wc
+                ON Aux.workId = wc.workId;
+
+getLibraryAuthorDetails WITH AuthorDetailsView: SELECT * FROM LibraryAuthorDetails WHERE id = ?;
 
 CREATE VIEW "AuthorWorks" AS
     SELECT aw.authorId,

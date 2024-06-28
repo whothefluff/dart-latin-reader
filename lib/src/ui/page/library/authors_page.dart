@@ -30,12 +30,12 @@ class AuthorsPage extends ConsumerWidget {
                 maxCrossAxisExtent: 300,
               ),
               itemCount: authors.length,
-              itemBuilder: (context, int index) {
+              itemBuilder: (context, index) {
                 var cardBorderRadius = BorderRadius.circular(12);
                 return Card(
                   child: InkWell(
                     onTap: () {
-                      context.push('/authors/$index');
+                      context.push('/authors/${authors[index].id}');
                     },
                     borderRadius: cardBorderRadius,
                     child: GridTile(
@@ -83,4 +83,5 @@ class AuthorsPage extends ConsumerWidget {
           ),
         );
   }
+//
 }
