@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:typed_data';
 
 /// Represents an author details as seen from the library page
@@ -7,18 +8,15 @@ class AuthorDetailsView {
     required this.name,
     required this.about,
     required this.image,
-    required this.workId,
-    required this.workName,
-    required this.numberOfWords,
+    required this.works,
   });
 
   final String id;
   final String name;
   final String about;
   final Uint8List image;
-  final String workId;
-  final String workName;
-  final int numberOfWords;
+  final UnmodifiableListView<({String id, String name, int numberOfWords})>
+      works;
 
   @override
   String toString() {

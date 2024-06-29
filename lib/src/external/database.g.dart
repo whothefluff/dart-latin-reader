@@ -4477,7 +4477,7 @@ abstract class _$AppDb extends GeneratedDatabase {
         ));
   }
 
-  Selectable<AuthorDetailsView> getLibraryAuthorDetails(String var1) {
+  Selectable<LibraryAuthorDetail> getLibraryAuthorDetails(String var1) {
     return customSelect('SELECT * FROM LibraryAuthorDetails WHERE id = ?1',
         variables: [
           Variable<String>(var1)
@@ -4487,15 +4487,7 @@ abstract class _$AppDb extends GeneratedDatabase {
           authorsAndWorks,
           works,
           workContents,
-        }).map((QueryRow row) => AuthorDetailsView(
-          id: row.read<String>('id'),
-          name: row.read<String>('name'),
-          about: row.read<String>('about'),
-          image: row.read<Uint8List>('image'),
-          workId: row.read<String>('workId'),
-          workName: row.read<String>('workName'),
-          numberOfWords: row.read<int>('numberOfWords'),
-        ));
+        }).asyncMap(libraryAuthorDetails.mapFromRow);
   }
 
   @override

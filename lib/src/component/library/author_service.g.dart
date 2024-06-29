@@ -326,7 +326,7 @@ class _AuthorsByWorkProviderElement
   String get workId => (origin as AuthorsByWorkProvider).workId;
 }
 
-String _$libraryAuthorsHash() => r'6b602b51326cf7ee48741fb1313213b86472eba9';
+String _$libraryAuthorsHash() => r'741e38e9b6fcec32d29845e35cb3ecae9ecd15d2';
 
 /// See also [libraryAuthors].
 @ProviderFor(libraryAuthors)
@@ -344,15 +344,14 @@ final libraryAuthorsProvider =
 typedef LibraryAuthorsRef
     = AutoDisposeFutureProviderRef<UnmodifiableListView<AuthorView>>;
 String _$libraryAuthorDetailsHash() =>
-    r'd7e2a0a1bd235aaa9e274bf21fbb45a04c7b8bd3';
+    r'f8cbe95456ed98f17ca41eee589f3d23899f7c47';
 
 /// See also [libraryAuthorDetails].
 @ProviderFor(libraryAuthorDetails)
 const libraryAuthorDetailsProvider = LibraryAuthorDetailsFamily();
 
 /// See also [libraryAuthorDetails].
-class LibraryAuthorDetailsFamily
-    extends Family<AsyncValue<UnmodifiableListView<AuthorDetailsView>>> {
+class LibraryAuthorDetailsFamily extends Family<AsyncValue<AuthorDetailsView>> {
   /// See also [libraryAuthorDetails].
   const LibraryAuthorDetailsFamily();
 
@@ -391,7 +390,7 @@ class LibraryAuthorDetailsFamily
 
 /// See also [libraryAuthorDetails].
 class LibraryAuthorDetailsProvider
-    extends AutoDisposeFutureProvider<UnmodifiableListView<AuthorDetailsView>> {
+    extends AutoDisposeFutureProvider<AuthorDetailsView> {
   /// See also [libraryAuthorDetails].
   LibraryAuthorDetailsProvider(
     String id,
@@ -426,8 +425,7 @@ class LibraryAuthorDetailsProvider
 
   @override
   Override overrideWith(
-    FutureOr<UnmodifiableListView<AuthorDetailsView>> Function(
-            LibraryAuthorDetailsRef provider)
+    FutureOr<AuthorDetailsView> Function(LibraryAuthorDetailsRef provider)
         create,
   ) {
     return ProviderOverride(
@@ -445,8 +443,7 @@ class LibraryAuthorDetailsProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<UnmodifiableListView<AuthorDetailsView>>
-      createElement() {
+  AutoDisposeFutureProviderElement<AuthorDetailsView> createElement() {
     return _LibraryAuthorDetailsProviderElement(this);
   }
 
@@ -465,14 +462,14 @@ class LibraryAuthorDetailsProvider
 }
 
 mixin LibraryAuthorDetailsRef
-    on AutoDisposeFutureProviderRef<UnmodifiableListView<AuthorDetailsView>> {
+    on AutoDisposeFutureProviderRef<AuthorDetailsView> {
   /// The parameter `id` of this provider.
   String get id;
 }
 
 class _LibraryAuthorDetailsProviderElement
-    extends AutoDisposeFutureProviderElement<
-        UnmodifiableListView<AuthorDetailsView>> with LibraryAuthorDetailsRef {
+    extends AutoDisposeFutureProviderElement<AuthorDetailsView>
+    with LibraryAuthorDetailsRef {
   _LibraryAuthorDetailsProviderElement(super.provider);
 
   @override

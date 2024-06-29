@@ -1,5 +1,4 @@
 import 'package:latin_reader/src/component/library/author_view.dart';
-import 'package:latin_reader/src/component/library/author_details_view.dart';
 
 CREATE TABLE "DataVersion" (
   "idx" INTEGER NOT NULL,
@@ -205,7 +204,7 @@ CREATE VIEW "LibraryAuthorDetails" AS
             INNER JOIN WorksContents AS wc
                 ON Aux.workId = wc.workId;
 
-getLibraryAuthorDetails WITH AuthorDetailsView: SELECT * FROM LibraryAuthorDetails WHERE id = ?;
+getLibraryAuthorDetails: SELECT * FROM LibraryAuthorDetails WHERE id = ?;
 
 CREATE VIEW "AuthorWorks" AS
     SELECT aw.authorId,

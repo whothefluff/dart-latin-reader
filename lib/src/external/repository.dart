@@ -69,12 +69,21 @@ class AuthorRepository implements i.AuthorRepository {
   }
 
   @override
-  Future<UnmodifiableListView<AuthorDetailsView>> getLibraryAuthorDetails(
-      String id) async {
+  Future<AuthorDetailsView> getLibraryAuthorDetails(String id) async {
     final db = AppDb();
     log.info(() => 'AuthorRepository - reading author details from db');
     final dbAuthorDetails = await db.getLibraryAuthorDetails(id).get();
-    return UnmodifiableListView(dbAuthorDetails as Iterable<AuthorDetailsView>);
+    final firstLine = dbAuthorDetails.first;
+    return AuthorDetailsView(
+        id: firstLine.id,
+        name: firstLine.name,
+        about: firstLine.about,
+        image: firstLine.image,
+        works: UnmodifiableListView(dbAuthorDetails.map((e) => ((
+              id: e.workId,
+              name: e.workName,
+              numberOfWords: e.numberOfWords,
+            )))));
   }
 
   e.Author dbToEntity(Author a) =>
@@ -105,7 +114,8 @@ class WorkRepository implements i.WorkRepository {
   @override
   Future<e.Work> getWork(String workId) async {
     final db = AppDb();
-    final dbWork = await (db.select(db.works)..where((w) => w.id.equals(workId)))
+    final dbWork = await (db.select(db.works)
+          ..where((w) => w.id.equals(workId)))
         .getSingle();
     return dbToEntity(dbWork);
   }

@@ -8,7 +8,6 @@ import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:latin_reader/src/external/database_util.dart' as util;
 import 'package:latin_reader/src/component/library/author_view.dart';
-import 'package:latin_reader/src/component/library/author_details_view.dart';
 
 part 'database.g.dart';
 

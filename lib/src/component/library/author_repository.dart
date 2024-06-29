@@ -10,6 +10,6 @@ abstract interface class AuthorRepository {
   Future<Author> getAuthor(String id);
   Future<Authors> getAuthorsByWork(String workId);
   Future<UnmodifiableListView<AuthorView>> getLibraryAuthors();
-  Future<UnmodifiableListView<AuthorDetailsView>> getLibraryAuthorDetails(String id);
+  Future<AuthorDetailsView> getLibraryAuthorDetails(String id);
 //
 }

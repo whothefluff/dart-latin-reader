@@ -17,7 +17,7 @@ class AuthorDetailsPage extends ConsumerWidget {
           data: (authorDetails) {
             return Scaffold(
               appBar: AppBar(
-                title: Text(authorDetails[0].name),
+                title: Text(authorDetails.name),
               ),
               body: worksList(context, authorDetails),
             );
@@ -39,19 +39,18 @@ class AuthorDetailsPage extends ConsumerWidget {
         );
   }
 
-  Widget worksList(
-      BuildContext context, List<AuthorDetailsView> authorDetails) {
+  Widget worksList(BuildContext context, AuthorDetailsView authorDetails) {
     final allItems = [
-      authorItem(context, authorDetails[0]),
-      ...authorDetails.map(
-        (item) => ListTile(
+      authorItem(context, authorDetails),
+      ...authorDetails.works.map(
+        (work) => ListTile(
           title: Row(
             children: [
-              Expanded(child: Text(item.workName)),
-              Text('${(item.numberOfWords / 1000).round()}k words'),
+              Expanded(child: Text(work.name)),
+              Text('${(work.numberOfWords / 1000).round()}k words'),
             ],
           ),
-          onTap: () => context.push('/works/${item.workId}'),
+          onTap: () => context.push('/works/${work.id}'),
         ),
       ),
     ];

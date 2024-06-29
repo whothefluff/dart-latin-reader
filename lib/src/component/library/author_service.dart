@@ -37,7 +37,7 @@ class AuthorService {
   Future<UnmodifiableListView<AuthorView>> getLibraryAuthors() async =>
       await repository.getLibraryAuthors();
 
-  Future<UnmodifiableListView<AuthorDetailsView>> getLibraryAuthorDetails(
+  Future<AuthorDetailsView> getLibraryAuthorDetails(
           String id) async =>
       await repository.getLibraryAuthorDetails(id);
 
@@ -78,7 +78,7 @@ Future<UnmodifiableListView<AuthorView>> libraryAuthors(
         .getLibraryAuthors();
 
 @riverpod
-Future<UnmodifiableListView<AuthorDetailsView>> libraryAuthorDetails(
+Future<AuthorDetailsView> libraryAuthorDetails(
         LibraryAuthorDetailsRef ref, String id) async =>
     await (ref..cacheFor(const Duration(minutes: 2)))
         .watch(authorServiceProvider)
