@@ -4,14 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/component/library/author_details_view.dart';
 import 'package:latin_reader/src/component/library/author_service.dart';
 
-class AuthorDetailPage extends ConsumerWidget {
-  const AuthorDetailPage({super.key, required this.authorId});
+class AuthorDetailsPage extends ConsumerWidget {
+  const AuthorDetailsPage({super.key, required this.authorId});
 
   final String authorId;
-  static const boxConstraints = BoxConstraints(
-    //maxWidth: 500,
-    maxHeight: 200,
-  );
 
   @override
   Widget build(context, ref) {
@@ -41,7 +37,8 @@ class AuthorDetailPage extends ConsumerWidget {
         );
   }
 
-  Widget worksList(BuildContext context, List<AuthorDetailsView> authorDetails) {
+  Widget worksList(
+      BuildContext context, List<AuthorDetailsView> authorDetails) {
     return ListView(
       children: [
         Padding(
@@ -50,26 +47,28 @@ class AuthorDetailPage extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Wrap(
-                alignment: WrapAlignment.start,
+                alignment: WrapAlignment.spaceAround,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: ConstrainedBox(
-                      constraints: AuthorDetailPage.boxConstraints,
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Image.memory(authorDetails[0].image),
-                      ),
+                    child: Image.memory(
+                      authorDetails[0].image,
+                      filterQuality: FilterQuality.high,
+                      isAntiAlias: true,
+                      height: 200,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(minWidth: 150),
+                      constraints: const BoxConstraints(
+                        maxWidth: 800,
+                      ),
                       child: RichText(
                         text: TextSpan(
                           text: authorDetails[0].about,
+                          style: DefaultTextStyle.of(context).style,
                         ),
                       ),
                     ),

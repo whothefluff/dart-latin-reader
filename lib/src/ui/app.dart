@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/src/ui/page/library/author_detail_page.dart';
+import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/ui/page/library/work_detail_page.dart';
@@ -53,7 +53,7 @@ class MyAppState extends ConsumerState<MyApp> {
                       path: ':id',
                       builder: (context, state) {
                         final id = state.pathParameters['id']!;
-                        return AuthorDetailPage(authorId: id);
+                        return AuthorDetailsPage(authorId: id);
                       },
                     ),
                   ],
