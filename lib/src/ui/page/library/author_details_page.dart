@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -50,29 +52,8 @@ class AuthorDetailsPage extends ConsumerWidget {
                 alignment: WrapAlignment.spaceAround,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image.memory(
-                      authorDetails[0].image,
-                      filterQuality: FilterQuality.high,
-                      isAntiAlias: true,
-                      height: 200,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 800,
-                      ),
-                      child: RichText(
-                        text: TextSpan(
-                          text: authorDetails[0].about,
-                          style: DefaultTextStyle.of(context).style,
-                        ),
-                      ),
-                    ),
-                  ),
+                  authorImage(authorDetails[0].image),
+                  aboutAuthor(context, authorDetails[0].about),
                 ],
               ),
             ),
@@ -85,6 +66,33 @@ class AuthorDetailsPage extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Padding authorImage(Uint8List image) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Image.memory(
+        image,
+        filterQuality: FilterQuality.high,
+        isAntiAlias: true,
+        height: 200,
+      ),
+    );
+  }
+
+  Padding aboutAuthor(BuildContext context, String about) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 800),
+        child: RichText(
+          text: TextSpan(
+            text: about,
+            style: DefaultTextStyle.of(context).style,
+          ),
+        ),
+      ),
     );
   }
 //
