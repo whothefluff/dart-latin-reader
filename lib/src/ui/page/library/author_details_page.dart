@@ -41,31 +41,44 @@ class AuthorDetailsPage extends ConsumerWidget {
 
   Widget worksList(
       BuildContext context, List<AuthorDetailsView> authorDetails) {
-    return ListView(
-      children: [
-        Padding(
+    final allItems = [
+      authorItem(context, authorDetails[0]),
+      ...authorDetails.map(
+        (item) => ListTile(
+          title: Row(
+            children: [
+              Expanded(child: Text(item.workName)),
+              Text('${(item.numberOfWords / 1000).round()}k words'),
+            ],
+          ),
+          onTap: () => context.push('/works/${item.workId}'),
+        ),
+      ),
+    ];
+    return ListView.builder(
+      itemCount: allItems.length,
+      itemBuilder: (context, index) {
+        return allItems[index];
+      },
+    );
+  }
+
+  Widget authorItem(BuildContext context, AuthorDetailsView author) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                alignment: WrapAlignment.spaceAround,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  authorImage(authorDetails[0].image),
-                  aboutAuthor(context, authorDetails[0].about),
-                ],
-              ),
-            ),
+          child: Wrap(
+            alignment: WrapAlignment.spaceAround,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              authorImage(author.image),
+              aboutAuthor(context, author.about),
+            ],
           ),
         ),
-        ...authorDetails.map(
-          (item) => ListTile(
-            title: Text(item.workName),
-            onTap: () => context.push('/works/${item.workId}'),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
