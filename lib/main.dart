@@ -24,9 +24,9 @@ void main() async {
 //
 }
 
-//can author detail data be done with a list inside it?
+//implement read page
+//feed other instances to the providers adn test performance
 //check errorBuilder for GoRouter and error for Riverpod (both needed?)
-//load work about in .csv
 
 //TODO: optimizations
 //delete superfluous repository methods

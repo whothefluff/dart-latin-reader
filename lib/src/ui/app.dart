@@ -60,8 +60,8 @@ class MyAppState extends ConsumerState<MyApp> {
                 ),
                 GoRoute(
                   path: '/works',
-                  builder: (context, state) => const WorksPage(
-                      authorIndex: 0), //not yet implemented, if ever
+                  //TODO: (someday) implement
+                  builder: (context, state) => const WorksPage(authorIndex: 0),
                   routes: [
                     GoRoute(
                       path: ':id',

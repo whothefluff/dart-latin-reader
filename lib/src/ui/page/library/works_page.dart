@@ -18,7 +18,7 @@ class WorksPage extends StatelessWidget {
         itemCount: items.length,
         itemBuilder: (context, index) {
           return ListTile(
-            //TODO return list of all works and add to nav bar
+            //TODO: (someday) return list of all works and add to nav bar
             title: Text(items[index]),
             onTap: () => context.go('works/$index'),
           );

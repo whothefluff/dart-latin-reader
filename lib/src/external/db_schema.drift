@@ -56,7 +56,7 @@ WITHOUT ROWID
 CREATE TABLE "Authors"(
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
     "name" TEXT NOT NULL,
-    "about" TEXT NOT NULL,
+    "about" TEXT NOT NULL, --TODO: add check with length range so that it always looks ok from the page
     "image" BLOB NOT NULL,
     PRIMARY KEY( id )
 )
