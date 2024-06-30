@@ -4,11 +4,17 @@ class WorkDetailsView {
     required this.id,
     required this.name,
     required this.about,
+    required this.numberOfWords,
+    required this.authorId,
+    required this.authorName,
   });
 
   final String id;
   final String name;
   final String about;
+  final int numberOfWords;
+  final String? authorId;
+  final String? authorName;
 
   @override
   String toString() {

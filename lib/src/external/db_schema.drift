@@ -208,9 +208,27 @@ CREATE VIEW "LibraryAuthorDetails" AS
 getLibraryAuthorDetails: SELECT * FROM LibraryAuthorDetails WHERE id = ?;
 
 CREATE VIEW "LibraryWorkDetails" AS 
-    SELECT id,
-           name,
-           about
-        FROM Works;
+    WITH Aux AS ( SELECT id,
+                         name,
+                         about
+                      FROM Works ),
+         WorksContents AS ( SELECT wc.workId,
+                                   COUNT(*) AS numberOfWords
+                                FROM Aux 
+                                INNER JOIN WorkContents AS wc
+                                    ON Aux.id = wc.workId
+                                WHERE word NOT IN ( '!', '"', '(', ')', ',', '.', ':', '?', '-' )
+                                GROUP BY wc.workId )
+        SELECT Aux.*,
+               wc.numberOfWords,
+               aw.authorId,
+               a.name AS authorName
+            FROM Aux
+            INNER JOIN WorksContents AS wc
+                ON Aux.id = wc.workId
+            LEFT OUTER JOIN AuthorsAndWorks AS aw
+                ON Aux.id = aw.workId
+            LEFT OUTER JOIN Authors AS a
+                ON aw.authorId = a.id;
         
 getLibraryWorkDetails WITH WorkDetailsView: SELECT * FROM LibraryWorkDetails WHERE id = ?;

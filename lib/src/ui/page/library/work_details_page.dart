@@ -1,41 +1,84 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latin_reader/src/external/provider_work.dart';
 
-class WorkDetailsPage extends StatelessWidget {
-  const WorkDetailsPage({super.key, required this.workId});
+class WorkDetailsPage extends ConsumerWidget {
+  const WorkDetailsPage({
+    super.key,
+    required this.workId,
+  });
 
   final String workId;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Work $workId'),
-      ),
-      body: ListView(
-        children: [
-          const BookThingy(author: 'author', title: 'title'),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+  Widget build(context, ref) {
+    return ref.watch(libraryWorkDetailsProvider(workId)).when(
+          data: (workDetails) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(workDetails.name),
+              ),
+              body: ListView(
+                children: [
+                  BookThingy(
+                    id: workDetails.id,
+                    title: workDetails.name,
+                    numberOfWords: workDetails.numberOfWords,
+                    authorId: workDetails.authorId,
+                    authorName: workDetails.authorName,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: workDetails.about,
+                            style: DefaultTextStyle.of(context).style,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'Scrollable free text\n' * 100,
+                Text('Error: $error'),
+                TextButton(
+                  onPressed: () =>
+                      ref.refresh(libraryWorkDetailsProvider(workId)),
+                  child: const Text('Retry'),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
+        );
   }
+//
 }
 
 class BookThingy extends StatelessWidget {
-  const BookThingy({super.key, required this.author, required this.title});
+  const BookThingy({
+    super.key,
+    required this.id,
+    required this.title,
+    required this.numberOfWords,
+    required this.authorId,
+    required this.authorName,
+  });
 
-  final String author;
+  final String id;
   final String title;
+  final int numberOfWords;
+  final String? authorId;
+  final String? authorName;
 
   static const boxConstraints = BoxConstraints(
     maxWidth: 200,
@@ -44,21 +87,25 @@ class BookThingy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cover = Flexible(
+    final cover = Flexible(
       flex: 1,
       child: Padding(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Center(
-          child: PseudoCover(bookTitle: 'bookTitle', bookAuthor: 'bookAuthor'),
+          child: PseudoCover(bookTitle: title, bookAuthor: authorName),
         ),
       ),
     );
 
-    var basicInfo = const Flexible(
+    var basicInfo = Flexible(
       flex: 2,
       child: Padding(
-        padding: EdgeInsets.all(8),
-        child: Details(bookTitle: 'bookTitle', bookAuthor: 'bookAuthor'),
+        padding: const EdgeInsets.all(8),
+        child: Details(
+          workId: id,
+          authorId: authorId,
+          numberOfWords: numberOfWords,
+        ),
       ),
     );
 
@@ -88,7 +135,7 @@ class PseudoCover extends StatelessWidget {
   });
 
   final String bookTitle;
-  final String bookAuthor;
+  final String? bookAuthor;
   static const proportion = (2, 3);
 
   @override
@@ -105,7 +152,7 @@ class PseudoCover extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         child: Center(
           child: Text(
-            bookAuthor,
+            bookAuthor ?? 'Unknown',
             style: TextStyle(
               color: onPrimaryColor,
             ),
@@ -150,12 +197,14 @@ class PseudoCover extends StatelessWidget {
 class Details extends StatelessWidget {
   const Details({
     super.key,
-    required this.bookTitle,
-    required this.bookAuthor,
+    required this.workId,
+    required this.authorId,
+    required this.numberOfWords,
   });
 
-  final String bookTitle;
-  final String bookAuthor;
+  final String workId;
+  final String? authorId;
+  final int numberOfWords;
 
   @override
   Widget build(BuildContext context) {
@@ -166,11 +215,10 @@ class Details extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Title'),
-                Text('Page No:'),
+                Text('Number of words: $numberOfWords'),
               ],
             ),
             const Spacer(),
@@ -179,13 +227,16 @@ class Details extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 FilledButton(
-                  onPressed: () => context.push('/reader/1'),
+                  onPressed: () => context.push('/reader/$workId'),
                   child: const Text('Read'),
                 ),
-                TextButton(
-                  onPressed: () => context.push('/author/1'),
-                  child: const Text('Go to author'),
-                ),
+                if (authorId != null) ...{
+                  TextButton(
+                    //TODO: push('/author/id'), if prev stack is different author
+                    onPressed: () => context.pop(),
+                    child: const Text('Go to author'),
+                  ),
+                }
               ],
             )
           ],

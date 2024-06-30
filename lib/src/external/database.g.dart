@@ -4176,8 +4176,16 @@ class LibraryWorkDetail extends DataClass {
   final String id;
   final String name;
   final String about;
+  final int numberOfWords;
+  final String? authorId;
+  final String? authorName;
   const LibraryWorkDetail(
-      {required this.id, required this.name, required this.about});
+      {required this.id,
+      required this.name,
+      required this.about,
+      required this.numberOfWords,
+      this.authorId,
+      this.authorName});
   factory LibraryWorkDetail.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -4185,6 +4193,9 @@ class LibraryWorkDetail extends DataClass {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       about: serializer.fromJson<String>(json['about']),
+      numberOfWords: serializer.fromJson<int>(json['numberOfWords']),
+      authorId: serializer.fromJson<String?>(json['authorId']),
+      authorName: serializer.fromJson<String?>(json['authorName']),
     );
   }
   @override
@@ -4194,34 +4205,53 @@ class LibraryWorkDetail extends DataClass {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'about': serializer.toJson<String>(about),
+      'numberOfWords': serializer.toJson<int>(numberOfWords),
+      'authorId': serializer.toJson<String?>(authorId),
+      'authorName': serializer.toJson<String?>(authorName),
     };
   }
 
-  LibraryWorkDetail copyWith({String? id, String? name, String? about}) =>
+  LibraryWorkDetail copyWith(
+          {String? id,
+          String? name,
+          String? about,
+          int? numberOfWords,
+          Value<String?> authorId = const Value.absent(),
+          Value<String?> authorName = const Value.absent()}) =>
       LibraryWorkDetail(
         id: id ?? this.id,
         name: name ?? this.name,
         about: about ?? this.about,
+        numberOfWords: numberOfWords ?? this.numberOfWords,
+        authorId: authorId.present ? authorId.value : this.authorId,
+        authorName: authorName.present ? authorName.value : this.authorName,
       );
   @override
   String toString() {
     return (StringBuffer('LibraryWorkDetail(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('about: $about')
+          ..write('about: $about, ')
+          ..write('numberOfWords: $numberOfWords, ')
+          ..write('authorId: $authorId, ')
+          ..write('authorName: $authorName')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, about);
+  int get hashCode =>
+      Object.hash(id, name, about, numberOfWords, authorId, authorName);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LibraryWorkDetail &&
           other.id == this.id &&
           other.name == this.name &&
-          other.about == this.about);
+          other.about == this.about &&
+          other.numberOfWords == this.numberOfWords &&
+          other.authorId == this.authorId &&
+          other.authorName == this.authorName);
 }
 
 class LibraryWorkDetails extends ViewInfo<LibraryWorkDetails, LibraryWorkDetail>
@@ -4231,7 +4261,8 @@ class LibraryWorkDetails extends ViewInfo<LibraryWorkDetails, LibraryWorkDetail>
   final _$AppDb attachedDatabase;
   LibraryWorkDetails(this.attachedDatabase, [this._alias]);
   @override
-  List<GeneratedColumn> get $columns => [id, name, about];
+  List<GeneratedColumn> get $columns =>
+      [id, name, about, numberOfWords, authorId, authorName];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
@@ -4239,7 +4270,7 @@ class LibraryWorkDetails extends ViewInfo<LibraryWorkDetails, LibraryWorkDetail>
   @override
   Map<SqlDialect, String> get createViewStatements => {
         SqlDialect.sqlite:
-            'CREATE VIEW LibraryWorkDetails AS SELECT id, name, about FROM Works',
+            'CREATE VIEW LibraryWorkDetails AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT wc.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents AS wc ON Aux.id = wc.workId WHERE word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY wc.workId) SELECT Aux.*, wc.numberOfWords, aw.authorId, a.name AS authorName FROM Aux INNER JOIN WorksContents AS wc ON Aux.id = wc.workId LEFT OUTER JOIN AuthorsAndWorks AS aw ON Aux.id = aw.workId LEFT OUTER JOIN Authors AS a ON aw.authorId = a.id',
       };
   @override
   LibraryWorkDetails get asDslTable => this;
@@ -4253,6 +4284,12 @@ class LibraryWorkDetails extends ViewInfo<LibraryWorkDetails, LibraryWorkDetail>
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       about: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}about'])!,
+      numberOfWords: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}numberOfWords'])!,
+      authorId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}authorId']),
+      authorName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}authorName']),
     );
   }
 
@@ -4265,6 +4302,15 @@ class LibraryWorkDetails extends ViewInfo<LibraryWorkDetails, LibraryWorkDetail>
   late final GeneratedColumn<String> about = GeneratedColumn<String>(
       'about', aliasedName, false,
       type: DriftSqlType.string);
+  late final GeneratedColumn<int> numberOfWords = GeneratedColumn<int>(
+      'numberOfWords', aliasedName, false,
+      type: DriftSqlType.int);
+  late final GeneratedColumn<String> authorId = GeneratedColumn<String>(
+      'authorId', aliasedName, true,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> authorName = GeneratedColumn<String>(
+      'authorName', aliasedName, true,
+      type: DriftSqlType.string);
   @override
   LibraryWorkDetails createAlias(String alias) {
     return LibraryWorkDetails(attachedDatabase, alias);
@@ -4273,7 +4319,8 @@ class LibraryWorkDetails extends ViewInfo<LibraryWorkDetails, LibraryWorkDetail>
   @override
   Query? get query => null;
   @override
-  Set<String> get readTables => const {'Works'};
+  Set<String> get readTables =>
+      const {'Works', 'WorkContents', 'AuthorsAndWorks', 'Authors'};
 }
 
 abstract class _$AppDb extends GeneratedDatabase {
@@ -4338,10 +4385,16 @@ abstract class _$AppDb extends GeneratedDatabase {
         ],
         readsFrom: {
           works,
+          workContents,
+          authorsAndWorks,
+          authors,
         }).map((QueryRow row) => WorkDetailsView(
           id: row.read<String>('id'),
           name: row.read<String>('name'),
           about: row.read<String>('about'),
+          numberOfWords: row.read<int>('numberOfWords'),
+          authorId: row.readNullable<String>('authorId'),
+          authorName: row.readNullable<String>('authorName'),
         ));
   }
 
