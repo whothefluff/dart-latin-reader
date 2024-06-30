@@ -39,17 +39,22 @@ class AuthorsPage extends ConsumerWidget {
                     },
                     borderRadius: cardBorderRadius,
                     child: GridTile(
-                      footer: GridTileBar(
-                        backgroundColor: Theme.of(context)
-                            .colorScheme
-                            .shadow
-                            .withOpacity(0.2),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(authors[index].name),
-                            Text(authors[index].numberOfWorks.toString()),
-                          ],
+                      footer: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .shadow
+                              .withOpacity(0.2),
+                        ),
+                        child: GridTileBar(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(authors[index].name),
+                              Text(authors[index].numberOfWorks.toString()),
+                            ],
+                          ),
                         ),
                       ),
                       child: Container(
