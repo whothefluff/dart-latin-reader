@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/component/library/author_details_view.dart';
-import 'package:latin_reader/src/component/library/author_service.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_author_details.dart';
+import 'package:latin_reader/src/external/provider_author.dart';
 
 class AuthorDetailsPage extends ConsumerWidget {
   const AuthorDetailsPage({super.key, required this.authorId});
@@ -13,7 +13,7 @@ class AuthorDetailsPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    return ref.watch(libraryAuthorDetailsProvider(authorId)).when(
+    return ref.watch(LibraryAuthorDetailsProvider(authorId)).when(
           data: (authorDetails) {
             return Scaffold(
               appBar: AppBar(
@@ -42,23 +42,27 @@ class AuthorDetailsPage extends ConsumerWidget {
   Widget worksList(BuildContext context, AuthorDetailsView authorDetails) {
     final allItems = [
       authorItem(context, authorDetails),
-      ...authorDetails.works.map(
-        (work) => ListTile(
-          title: Row(
-            children: [
-              Expanded(child: Text(work.name)),
-              Text('${(work.numberOfWords / 1000).round()}k words'),
-            ],
-          ),
-          onTap: () => context.push('/works/${work.id}'),
-        ),
-      ),
+      ...workItems(context, authorDetails),
     ];
     return ListView.builder(
       itemCount: allItems.length,
       itemBuilder: (context, index) {
         return allItems[index];
       },
+    );
+  }
+
+  Iterable<ListTile> workItems(BuildContext context, AuthorDetailsView authorDetails) {
+    return authorDetails.works.map(
+      (work) => ListTile(
+        title: Row(
+          children: [
+            Expanded(child: Text(work.name)),
+            Text('${(work.numberOfWords / 1000).round()}k words'),
+          ],
+        ),
+        onTap: () => context.push('/works/${work.id}'),
+      ),
     );
   }
 

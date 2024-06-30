@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/ui/page/library/work_detail_page.dart';
+import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
 import 'page/dictionary/placeholder.dart';
 import 'page/library/works_page.dart';
 import 'settings/settings_controller.dart';
@@ -66,8 +66,8 @@ class MyAppState extends ConsumerState<MyApp> {
                     GoRoute(
                       path: ':id',
                       builder: (context, state) {
-                        final id = int.parse(state.pathParameters['id']!);
-                        return WorkDetailPage(workIndex: id);
+                        final id = state.pathParameters['id']!;
+                        return WorkDetailsPage(workId: id);
                       },
                     ),
                   ],

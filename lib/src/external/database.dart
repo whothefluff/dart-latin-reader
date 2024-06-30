@@ -6,13 +6,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:latin_reader/src/external/database_util.dart' as util;
-import 'package:latin_reader/src/component/library/author_view.dart';
+import 'package:latin_reader/src/external/db_util.dart' as util;
+import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
 
 part 'database.g.dart';
 
 @DriftDatabase(
-  include: {'library.drift'},
+  include: {'db_schema.drift'},
 )
 class AppDb extends _$AppDb {
   AppDb._() : super(_openConnection());

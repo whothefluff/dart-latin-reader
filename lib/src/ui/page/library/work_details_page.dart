@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class WorkDetailPage extends StatelessWidget {
-  const WorkDetailPage({super.key, required this.workIndex});
+class WorkDetailsPage extends StatelessWidget {
+  const WorkDetailsPage({super.key, required this.workId});
 
-  final int workIndex;
+  final String workId;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Work $workIndex'),
+        title: Text('Work $workId'),
       ),
       body: ListView(
         children: [

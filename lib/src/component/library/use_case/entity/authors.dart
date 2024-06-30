@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:latin_reader/src/component/library/usecase/entity/author.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/author.dart';
 
 class Authors {
   Authors({

@@ -1877,10 +1877,10 @@ class Works extends Table with TableInfo<Works, Work> {
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _aboutMeta = const VerificationMeta('about');
   late final GeneratedColumn<String> about = GeneratedColumn<String>(
-      'about', aliasedName, true,
+      'about', aliasedName, false,
       type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      $customConstraints: '');
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL');
   @override
   List<GeneratedColumn> get $columns => [id, name, about];
   @override
@@ -1907,6 +1907,8 @@ class Works extends Table with TableInfo<Works, Work> {
     if (data.containsKey('about')) {
       context.handle(
           _aboutMeta, about.isAcceptableOrUnknown(data['about']!, _aboutMeta));
+    } else if (isInserting) {
+      context.missing(_aboutMeta);
     }
     return context;
   }
@@ -1922,7 +1924,7 @@ class Works extends Table with TableInfo<Works, Work> {
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       about: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}about']),
+          .read(DriftSqlType.string, data['${effectivePrefix}about'])!,
     );
   }
 
@@ -1942,16 +1944,14 @@ class Works extends Table with TableInfo<Works, Work> {
 class Work extends DataClass implements Insertable<Work> {
   final String id;
   final String name;
-  final String? about;
-  const Work({required this.id, required this.name, this.about});
+  final String about;
+  const Work({required this.id, required this.name, required this.about});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
-    if (!nullToAbsent || about != null) {
-      map['about'] = Variable<String>(about);
-    }
+    map['about'] = Variable<String>(about);
     return map;
   }
 
@@ -1959,8 +1959,7 @@ class Work extends DataClass implements Insertable<Work> {
     return WorksCompanion(
       id: Value(id),
       name: Value(name),
-      about:
-          about == null && nullToAbsent ? const Value.absent() : Value(about),
+      about: Value(about),
     );
   }
 
@@ -1970,7 +1969,7 @@ class Work extends DataClass implements Insertable<Work> {
     return Work(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      about: serializer.fromJson<String?>(json['about']),
+      about: serializer.fromJson<String>(json['about']),
     );
   }
   @override
@@ -1979,18 +1978,14 @@ class Work extends DataClass implements Insertable<Work> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
-      'about': serializer.toJson<String?>(about),
+      'about': serializer.toJson<String>(about),
     };
   }
 
-  Work copyWith(
-          {String? id,
-          String? name,
-          Value<String?> about = const Value.absent()}) =>
-      Work(
+  Work copyWith({String? id, String? name, String? about}) => Work(
         id: id ?? this.id,
         name: name ?? this.name,
-        about: about.present ? about.value : this.about,
+        about: about ?? this.about,
       );
   @override
   String toString() {
@@ -2016,7 +2011,7 @@ class Work extends DataClass implements Insertable<Work> {
 class WorksCompanion extends UpdateCompanion<Work> {
   final Value<String> id;
   final Value<String> name;
-  final Value<String?> about;
+  final Value<String> about;
   const WorksCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -2025,9 +2020,10 @@ class WorksCompanion extends UpdateCompanion<Work> {
   WorksCompanion.insert({
     required String id,
     required String name,
-    this.about = const Value.absent(),
+    required String about,
   })  : id = Value(id),
-        name = Value(name);
+        name = Value(name),
+        about = Value(about);
   static Insertable<Work> custom({
     Expression<String>? id,
     Expression<String>? name,
@@ -2041,7 +2037,7 @@ class WorksCompanion extends UpdateCompanion<Work> {
   }
 
   WorksCompanion copyWith(
-      {Value<String>? id, Value<String>? name, Value<String?>? about}) {
+      {Value<String>? id, Value<String>? name, Value<String>? about}) {
     return WorksCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -4176,52 +4172,40 @@ class LibraryAuthorDetails
       const {'Authors', 'AuthorsAndWorks', 'Works', 'WorkContents'};
 }
 
-class AuthorWork extends DataClass {
-  final String authorId;
+class LibraryWorkDetail extends DataClass {
   final String id;
   final String name;
-  final String? about;
-  const AuthorWork(
-      {required this.authorId,
-      required this.id,
-      required this.name,
-      this.about});
-  factory AuthorWork.fromJson(Map<String, dynamic> json,
+  final String about;
+  const LibraryWorkDetail(
+      {required this.id, required this.name, required this.about});
+  factory LibraryWorkDetail.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return AuthorWork(
-      authorId: serializer.fromJson<String>(json['authorId']),
+    return LibraryWorkDetail(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      about: serializer.fromJson<String?>(json['about']),
+      about: serializer.fromJson<String>(json['about']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'authorId': serializer.toJson<String>(authorId),
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
-      'about': serializer.toJson<String?>(about),
+      'about': serializer.toJson<String>(about),
     };
   }
 
-  AuthorWork copyWith(
-          {String? authorId,
-          String? id,
-          String? name,
-          Value<String?> about = const Value.absent()}) =>
-      AuthorWork(
-        authorId: authorId ?? this.authorId,
+  LibraryWorkDetail copyWith({String? id, String? name, String? about}) =>
+      LibraryWorkDetail(
         id: id ?? this.id,
         name: name ?? this.name,
-        about: about.present ? about.value : this.about,
+        about: about ?? this.about,
       );
   @override
   String toString() {
-    return (StringBuffer('AuthorWork(')
-          ..write('authorId: $authorId, ')
+    return (StringBuffer('LibraryWorkDetail(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('about: $about')
@@ -4230,187 +4214,48 @@ class AuthorWork extends DataClass {
   }
 
   @override
-  int get hashCode => Object.hash(authorId, id, name, about);
+  int get hashCode => Object.hash(id, name, about);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is AuthorWork &&
-          other.authorId == this.authorId &&
+      (other is LibraryWorkDetail &&
           other.id == this.id &&
           other.name == this.name &&
           other.about == this.about);
 }
 
-class AuthorWorks extends ViewInfo<AuthorWorks, AuthorWork>
+class LibraryWorkDetails extends ViewInfo<LibraryWorkDetails, LibraryWorkDetail>
     implements HasResultSet {
   final String? _alias;
   @override
   final _$AppDb attachedDatabase;
-  AuthorWorks(this.attachedDatabase, [this._alias]);
+  LibraryWorkDetails(this.attachedDatabase, [this._alias]);
   @override
-  List<GeneratedColumn> get $columns => [authorId, id, name, about];
-  @override
-  String get aliasedName => _alias ?? entityName;
-  @override
-  String get entityName => 'AuthorWorks';
-  @override
-  Map<SqlDialect, String> get createViewStatements => {
-        SqlDialect.sqlite:
-            'CREATE VIEW AuthorWorks AS SELECT aw.authorId, w.* FROM AuthorsAndWorks AS aw INNER JOIN Works AS w ON aw.workId = w.id',
-      };
-  @override
-  AuthorWorks get asDslTable => this;
-  @override
-  AuthorWork map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return AuthorWork(
-      authorId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}authorId'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      about: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}about']),
-    );
-  }
-
-  late final GeneratedColumn<String> authorId = GeneratedColumn<String>(
-      'authorId', aliasedName, false,
-      type: DriftSqlType.string);
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string);
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: DriftSqlType.string);
-  late final GeneratedColumn<String> about = GeneratedColumn<String>(
-      'about', aliasedName, true,
-      type: DriftSqlType.string);
-  @override
-  AuthorWorks createAlias(String alias) {
-    return AuthorWorks(attachedDatabase, alias);
-  }
-
-  @override
-  Query? get query => null;
-  @override
-  Set<String> get readTables => const {'AuthorsAndWorks', 'Works'};
-}
-
-class WorkAuthor extends DataClass {
-  final String workId;
-  final String id;
-  final String name;
-  final String about;
-  final Uint8List image;
-  const WorkAuthor(
-      {required this.workId,
-      required this.id,
-      required this.name,
-      required this.about,
-      required this.image});
-  factory WorkAuthor.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return WorkAuthor(
-      workId: serializer.fromJson<String>(json['workId']),
-      id: serializer.fromJson<String>(json['id']),
-      name: serializer.fromJson<String>(json['name']),
-      about: serializer.fromJson<String>(json['about']),
-      image: serializer.fromJson<Uint8List>(json['image']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'workId': serializer.toJson<String>(workId),
-      'id': serializer.toJson<String>(id),
-      'name': serializer.toJson<String>(name),
-      'about': serializer.toJson<String>(about),
-      'image': serializer.toJson<Uint8List>(image),
-    };
-  }
-
-  WorkAuthor copyWith(
-          {String? workId,
-          String? id,
-          String? name,
-          String? about,
-          Uint8List? image}) =>
-      WorkAuthor(
-        workId: workId ?? this.workId,
-        id: id ?? this.id,
-        name: name ?? this.name,
-        about: about ?? this.about,
-        image: image ?? this.image,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('WorkAuthor(')
-          ..write('workId: $workId, ')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('about: $about, ')
-          ..write('image: $image')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(workId, id, name, about, $driftBlobEquality.hash(image));
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is WorkAuthor &&
-          other.workId == this.workId &&
-          other.id == this.id &&
-          other.name == this.name &&
-          other.about == this.about &&
-          $driftBlobEquality.equals(other.image, this.image));
-}
-
-class WorkAuthors extends ViewInfo<WorkAuthors, WorkAuthor>
-    implements HasResultSet {
-  final String? _alias;
-  @override
-  final _$AppDb attachedDatabase;
-  WorkAuthors(this.attachedDatabase, [this._alias]);
-  @override
-  List<GeneratedColumn> get $columns => [workId, id, name, about, image];
+  List<GeneratedColumn> get $columns => [id, name, about];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
-  String get entityName => 'WorkAuthors';
+  String get entityName => 'LibraryWorkDetails';
   @override
   Map<SqlDialect, String> get createViewStatements => {
         SqlDialect.sqlite:
-            'CREATE VIEW WorkAuthors AS SELECT aw.workId, a.* FROM AuthorsAndWorks AS aw INNER JOIN Authors AS a ON aw.authorId = a.id',
+            'CREATE VIEW LibraryWorkDetails AS SELECT id, name, about FROM Works',
       };
   @override
-  WorkAuthors get asDslTable => this;
+  LibraryWorkDetails get asDslTable => this;
   @override
-  WorkAuthor map(Map<String, dynamic> data, {String? tablePrefix}) {
+  LibraryWorkDetail map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return WorkAuthor(
-      workId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}workId'])!,
+    return LibraryWorkDetail(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       about: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}about'])!,
-      image: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}image'])!,
     );
   }
 
-  late final GeneratedColumn<String> workId = GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: DriftSqlType.string);
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
       type: DriftSqlType.string);
@@ -4420,18 +4265,15 @@ class WorkAuthors extends ViewInfo<WorkAuthors, WorkAuthor>
   late final GeneratedColumn<String> about = GeneratedColumn<String>(
       'about', aliasedName, false,
       type: DriftSqlType.string);
-  late final GeneratedColumn<Uint8List> image = GeneratedColumn<Uint8List>(
-      'image', aliasedName, false,
-      type: DriftSqlType.blob);
   @override
-  WorkAuthors createAlias(String alias) {
-    return WorkAuthors(attachedDatabase, alias);
+  LibraryWorkDetails createAlias(String alias) {
+    return LibraryWorkDetails(attachedDatabase, alias);
   }
 
   @override
   Query? get query => null;
   @override
-  Set<String> get readTables => const {'AuthorsAndWorks', 'Authors'};
+  Set<String> get readTables => const {'Works'};
 }
 
 abstract class _$AppDb extends GeneratedDatabase {
@@ -4460,8 +4302,7 @@ abstract class _$AppDb extends GeneratedDatabase {
   late final LibraryAuthors libraryAuthors = LibraryAuthors(this);
   late final LibraryAuthorDetails libraryAuthorDetails =
       LibraryAuthorDetails(this);
-  late final AuthorWorks authorWorks = AuthorWorks(this);
-  late final WorkAuthors workAuthors = WorkAuthors(this);
+  late final LibraryWorkDetails libraryWorkDetails = LibraryWorkDetails(this);
   Selectable<AuthorView> getLibraryAuthors() {
     return customSelect('SELECT * FROM LibraryAuthors',
         variables: [],
@@ -4490,6 +4331,20 @@ abstract class _$AppDb extends GeneratedDatabase {
         }).asyncMap(libraryAuthorDetails.mapFromRow);
   }
 
+  Selectable<WorkDetailsView> getLibraryWorkDetails(String var1) {
+    return customSelect('SELECT * FROM LibraryWorkDetails WHERE id = ?1',
+        variables: [
+          Variable<String>(var1)
+        ],
+        readsFrom: {
+          works,
+        }).map((QueryRow row) => WorkDetailsView(
+          id: row.read<String>('id'),
+          name: row.read<String>('name'),
+          about: row.read<String>('about'),
+        ));
+  }
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4511,8 +4366,7 @@ abstract class _$AppDb extends GeneratedDatabase {
         latestDataVersion,
         libraryAuthors,
         libraryAuthorDetails,
-        authorWorks,
-        workAuthors
+        libraryWorkDetails
       ];
 }
 
@@ -5348,12 +5202,12 @@ class $AuthorAbbreviationsOrderingComposer
 typedef $WorksInsertCompanionBuilder = WorksCompanion Function({
   required String id,
   required String name,
-  Value<String?> about,
+  required String about,
 });
 typedef $WorksUpdateCompanionBuilder = WorksCompanion Function({
   Value<String> id,
   Value<String> name,
-  Value<String?> about,
+  Value<String> about,
 });
 
 class $WorksTableManager extends RootTableManager<
@@ -5375,7 +5229,7 @@ class $WorksTableManager extends RootTableManager<
           getUpdateCompanionBuilder: ({
             Value<String> id = const Value.absent(),
             Value<String> name = const Value.absent(),
-            Value<String?> about = const Value.absent(),
+            Value<String> about = const Value.absent(),
           }) =>
               WorksCompanion(
             id: id,
@@ -5385,7 +5239,7 @@ class $WorksTableManager extends RootTableManager<
           getInsertCompanionBuilder: ({
             required String id,
             required String name,
-            Value<String?> about = const Value.absent(),
+            required String about,
           }) =>
               WorksCompanion.insert(
             id: id,

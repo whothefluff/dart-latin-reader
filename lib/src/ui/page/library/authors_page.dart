@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/component/library/author_service.dart';
 import 'package:latin_reader/src/ui/widget/searchable_app_bar.dart';
+import 'package:latin_reader/src/external/provider_author.dart';
 
 class AuthorsPage extends ConsumerWidget {
   const AuthorsPage({super.key});
@@ -75,7 +75,7 @@ class AuthorsPage extends ConsumerWidget {
               children: [
                 Text('Error: $error'),
                 TextButton(
-                  onPressed: () => ref.refresh(authorsProvider),
+                  onPressed: () => ref.refresh(libraryAuthorsProvider),
                   child: const Text('Retry'),
                 ),
               ],

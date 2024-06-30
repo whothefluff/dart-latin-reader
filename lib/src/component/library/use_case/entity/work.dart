@@ -1,7 +1,7 @@
-import 'package:latin_reader/src/component/library/usecase/entity/authors.dart';
-import 'package:latin_reader/src/component/library/usecase/entity/abbreviations.dart';
-import 'package:latin_reader/src/component/library/usecase/entity/work_contents.dart';
-import 'package:latin_reader/src/component/library/usecase/entity/works.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/authors.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/abbreviations.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/work_contents.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/works.dart';
 
 class Work {
   Work({

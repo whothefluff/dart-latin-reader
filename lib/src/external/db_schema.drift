@@ -1,4 +1,5 @@
-import 'package:latin_reader/src/component/library/author_view.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
 
 CREATE TABLE "DataVersion" (
   "idx" INTEGER NOT NULL,
@@ -77,7 +78,7 @@ WITHOUT ROWID
 CREATE TABLE "Works"(
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
     "name" TEXT NOT NULL,
-    "about" TEXT,
+    "about" TEXT NOT NULL,
     PRIMARY KEY( id )
 )
 -- STRICT, 
@@ -206,16 +207,10 @@ CREATE VIEW "LibraryAuthorDetails" AS
 
 getLibraryAuthorDetails: SELECT * FROM LibraryAuthorDetails WHERE id = ?;
 
-CREATE VIEW "AuthorWorks" AS
-    SELECT aw.authorId,
-           w.*
-        FROM AuthorsAndWorks AS aw
-        INNER JOIN Works AS w
-            ON aw.workId = w.id;
-
-CREATE VIEW "WorkAuthors" AS
-    SELECT aw.workId,
-           a.*
-        FROM AuthorsAndWorks AS aw
-        INNER JOIN Authors AS a
-            ON aw.authorId = a.id;
+CREATE VIEW "LibraryWorkDetails" AS 
+    SELECT id,
+           name,
+           about
+        FROM Works;
+        
+getLibraryWorkDetails WITH WorkDetailsView: SELECT * FROM LibraryWorkDetails WHERE id = ?;

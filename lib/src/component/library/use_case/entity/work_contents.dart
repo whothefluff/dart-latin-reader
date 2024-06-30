@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:latin_reader/src/component/library/usecase/entity/work_contents_segment.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/work_contents_segment.dart';
 
 class WorkContents {
   WorkContents({

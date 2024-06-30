@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:csv/csv.dart';
-import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/external/database.dart';
@@ -77,7 +77,7 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
               rows.skip(1).map((row) => WorksCompanion(
                     id: Value(row[0].toString()),
                     name: Value(row[1].toString()),
-                    // about: Value(row[2].toString()),
+                    about: Value(row[2].toString()),
                   )),
               mode: InsertMode.insertOrRollback,
             ));

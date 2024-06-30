@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:latin_reader/src/component/library/usecase/entity/work_content_supplementary_entry.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/work_content_supplementary_entry.dart';
 
 class WorkContentSupplementary {
   WorkContentSupplementary({
