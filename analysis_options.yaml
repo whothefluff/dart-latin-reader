@@ -20,9 +20,72 @@ linter:
   # or a specific dart file by using the `// ignore: name_of_lint` and
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
-  rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+  # The following are manually added from the `package:flutter_lints/flutter.yaml` https://github.com/dart-lang/lints
+  rules:
+    - annotate_overrides: true
+    - avoid_function_literals_in_foreach_calls: true
+    - avoid_init_to_null: true
+    - avoid_null_checks_in_equality_operators: true
+    - avoid_renaming_method_parameters: true
+    - avoid_return_types_on_setters: true
+    - avoid_returning_null_for_void: true
+    - avoid_single_cascade_in_expression_statements: true
+    - constant_identifier_names: true
+    - control_flow_in_finally: true
+    - empty_constructor_bodies: true
+    - empty_statements: true
+    - exhaustive_cases: true
+    - implementation_imports: true
+    - library_prefixes: true
+    - library_private_types_in_public_api: true
+    - no_leading_underscores_for_library_prefixes: true
+    - no_leading_underscores_for_local_identifiers: true
+    - null_closures: true
+    - overridden_fields: true
+    - package_names: true
+    - prefer_adjacent_string_concatenation: true
+    - prefer_collection_literals: true
+    - prefer_conditional_assignment: true
+    - prefer_contains: true
+    - prefer_final_fields: true
+    - prefer_for_elements_to_map_fromIterable: true
+    - prefer_function_declarations_over_variables: true
+    - prefer_if_null_operators: true
+    - prefer_initializing_formals: true
+    - prefer_inlined_adds: true
+    - prefer_interpolation_to_compose_strings: true
+    - prefer_is_not_operator: true
+    - prefer_null_aware_operators: true
+    - prefer_spread_collections: true
+    - recursive_getters: true
+    - slash_for_doc_comments: true
+    - type_init_formals: true
+    - unnecessary_brace_in_string_interps: true
+    - unnecessary_const: true
+    - unnecessary_constructor_name: true
+    - unnecessary_getters_setters: true
+    - unnecessary_late: true
+    - unnecessary_new: true
+    - unnecessary_null_aware_assignments: true
+    - unnecessary_null_in_if_null_operators: true
+    - unnecessary_nullable_for_final_variable_declarations: true
+    - unnecessary_string_escapes: true
+    - unnecessary_string_interpolations: true
+    - unnecessary_this: false
+    - unnecessary_to_list_in_spreads: true
+    - use_function_type_syntax_for_parameters: true
+    - use_rethrow_when_possible: true
+    - use_super_parameters: true
+
+analyzer:
+  # Additional information about this file can be found at
+  # https://dart.dev/guides/language/analysis-options
+  plugins:
+    - custom_lint
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - "**/*.g.dart"

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:latin_reader/src/page/library/author_detail_page.dart';
-import 'package:latin_reader/src/page/library/authors_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
+import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/page/library/work_detail_page.dart';
+import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
 import 'page/dictionary/placeholder.dart';
 import 'page/library/works_page.dart';
 import 'settings/settings_controller.dart';
 import 'page/library/text_page.dart';
 import 'settings/settings_view.dart';
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({
     super.key,
     required this.settingsController,
@@ -21,9 +22,10 @@ class MyApp extends StatefulWidget {
 
   @override
   MyAppState createState() => MyAppState();
+//
 }
 
-class MyAppState extends State<MyApp> {
+class MyAppState extends ConsumerState<MyApp> {
   late final GoRouter _router;
 
   @override
@@ -50,22 +52,22 @@ class MyAppState extends State<MyApp> {
                     GoRoute(
                       path: ':id',
                       builder: (context, state) {
-                        final id = int.parse(state.pathParameters['id']!);
-                        return AuthorDetailPage(authorIndex: id);
+                        final id = state.pathParameters['id']!;
+                        return AuthorDetailsPage(authorId: id);
                       },
                     ),
                   ],
                 ),
                 GoRoute(
                   path: '/works',
-                  builder: (context, state) => const WorksPage(
-                      authorIndex: 0), //not yet implemented, if ever
+                  //TODO: (someday) implement
+                  builder: (context, state) => const WorksPage(authorIndex: 0),
                   routes: [
                     GoRoute(
                       path: ':id',
                       builder: (context, state) {
-                        final id = int.parse(state.pathParameters['id']!);
-                        return WorkDetailPage(workIndex: id);
+                        final id = state.pathParameters['id']!;
+                        return WorkDetailsPage(workId: id);
                       },
                     ),
                   ],
@@ -149,6 +151,7 @@ class MyAppState extends State<MyApp> {
       },
     );
   }
+//
 }
 
 class ScaffoldWithNavBar extends StatelessWidget {
@@ -201,4 +204,5 @@ class ScaffoldWithNavBar extends StatelessWidget {
       initialLocation: index == navigationShell.currentIndex,
     );
   }
+//
 }

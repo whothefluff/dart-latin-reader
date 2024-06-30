@@ -1,19 +1,37 @@
 import 'package:flutter/material.dart';
-
-import 'src/app.dart';
-import 'src/settings/settings_controller.dart';
-import 'src/settings/settings_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latin_reader/src/external/database.dart';
+import 'package:latin_reader/logger.dart';
+import 'src/ui/app.dart';
+import 'src/ui/settings/settings_controller.dart';
+import 'src/ui/settings/settings_service.dart';
 
 void main() async {
 //
+  configureLogging();
+  log.info(() => 'main() - loading settings');
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
-  runApp(MyApp(settingsController: settingsController));
+  WidgetsFlutterBinding.ensureInitialized();
+  log.info(() => 'main() - initializing AppDb');
+  await AppDb.initialize();
+  log.info(() => 'main() - calling first widget');
+  runApp(
+    ProviderScope(
+      child: MyApp(settingsController: settingsController),
+    ),
+  );
 //
 }
 
-//TODO: ask about db and parse
-//TODO: load authors and books from db
+//implement read page
+//feed other instances to the providers adn test performance
+//check errorBuilder for GoRouter and error for Riverpod (both needed?)
+
+//TODO: optimizations
+//delete superfluous repository methods
+//create db indexes
+
 //TODO: do I need to create Intent(s) for my buttons?
 
 //secondary
