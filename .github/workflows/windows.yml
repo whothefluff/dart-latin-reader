@@ -2,9 +2,9 @@ name: Flutter Windows CI
 
 on:
   push:
-    branches: [ main, READ101-5-Configure-CI-CD-pipeline ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, READ101-5-Configure-CI-CD-pipeline ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
