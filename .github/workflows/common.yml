@@ -10,7 +10,7 @@ on:
         type: string
 
 jobs:
-  common-tasks:
+  static-checks:
     runs-on: ${{ inputs.runner }}
 
     steps:
