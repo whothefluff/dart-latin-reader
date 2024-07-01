@@ -28,6 +28,15 @@ jobs:
 
     - run: flutter --version # Print the Flutter version for debugging purposes
 
+    - name: Cache Flutter Dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.pub-cache
+        key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-flutter-
+
     - name: Install dependencies
       run: flutter pub get
 
