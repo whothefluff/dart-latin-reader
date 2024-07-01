@@ -30,7 +30,7 @@ jobs:
     - name: Cache Flutter Dependencies
       uses: actions/cache@v2
       with:
-        path: ~/.pub-cache
+        path: C:\Users\runneradmin\AppData\Local\Pub\Cache
         key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
         restore-keys: ${{ runner.os }}-flutter-
 
