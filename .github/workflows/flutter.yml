@@ -40,6 +40,9 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
+    - name: Check for Outdated Dependencies
+      run: flutter pub outdated
+
     - name: Run Flutter Analyze
       run: flutter analyze 
 
