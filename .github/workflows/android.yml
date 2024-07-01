@@ -19,8 +19,8 @@ jobs:
       runner: ubuntu-latest
 
   android-specific-steps:
-    needs: build-android
     runs-on: ubuntu-latest
+    needs: build-android
 
     steps:
     - name: Set up JDK 17
