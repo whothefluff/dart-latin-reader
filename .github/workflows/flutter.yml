@@ -30,3 +30,6 @@ jobs:
 
     - name: Run Unit Tests
       run: flutter test
+
+    - name: Build APK
+      run: flutter build apk --release
