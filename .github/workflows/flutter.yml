@@ -27,3 +27,6 @@ jobs:
 
     - name: Run Flutter Analyze
       run: flutter analyze 
+
+    - name: Run Unit Tests
+      run: flutter test
