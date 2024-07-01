@@ -29,6 +29,9 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Print PATH
+      run: echo $PATH
+
     - name: Build APK
       run: flutter build apk --release
 
