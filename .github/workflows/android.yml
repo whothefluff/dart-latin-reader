@@ -1,0 +1,48 @@
+name: Flutter Android CI
+
+on:
+  push:
+    branches: [ main, READ101-5-Configure-CI-CD-pipeline ]
+  pull_request:
+    branches: [ main, READ101-5-Configure-CI-CD-pipeline ]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy to Google Play'
+        required: false
+        default: 'false'
+
+jobs:
+  build-android:
+    uses: ./.github/workflows/common.yml
+    with:
+      runner: ubuntu-latest
+
+  android-specific-steps:
+    needs: build-android
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build APK
+      run: flutter build apk --release
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-release.apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+    - name: Deploy to Google Play
+      if: ${{ github.event.inputs.deploy == 'true' }}
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJson: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        packageName: ${{ secrets.PACKAGE_NAME }}
+        releaseFile: build/app/outputs/flutter-apk/app-release.apk
+        track: internal
