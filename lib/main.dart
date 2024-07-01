@@ -38,3 +38,6 @@ void main() async {
 //TODO: add go router type-safe navigation https://pub.dev/documentation/go_router/latest/topics/Type-safe%20routes-topic.html
 //TODO: make state restorable (example RestorableStatefulShellRouteExampleApp)
 //TODO: add adaptive scaffold
+
+//maybe someday
+//add wfs (and builds) for iOS and web
