@@ -1,0 +1,28 @@
+name: Flutter Windows CI
+
+on:
+  push:
+    branches: [ main, READ101-5-Configure-CI-CD-pipeline ]
+  pull_request:
+    branches: [ main, READ101-5-Configure-CI-CD-pipeline ]
+  workflow_dispatch:
+
+jobs:
+  common:
+    uses: ./.github/workflows/common.yml
+    with:
+      runner: windows-latest
+
+  windows-specific-steps:
+    needs: common
+    runs-on: windows-latest
+
+    steps:
+    - name: Build Windows App
+      run: flutter build windows --release
+
+    - name: Upload Windows Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-release.exe
+        path: build/windows/runner/Release/app-release.exe

@@ -13,14 +13,14 @@ on:
         default: 'false'
 
 jobs:
-  build-android:
+  common:
     uses: ./.github/workflows/common.yml
     with:
       runner: ubuntu-latest
 
   android-specific-steps:
     runs-on: ubuntu-latest
-    needs: build-android
+    needs: common
 
     steps:
         
