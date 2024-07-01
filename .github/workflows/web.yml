@@ -1,0 +1,47 @@
+name: Flutter Web CI
+
+on:
+  push:
+    branches: [ main, READ101-5-Configure-CI-CD-pipeline ]
+  pull_request:
+    branches: [ main, READ101-5-Configure-CI-CD-pipeline ]
+  workflow_dispatch:
+
+jobs:
+  common:
+    uses: ./.github/workflows/common.yml
+    with:
+      runner: ubuntu-latest
+
+  web-specific-steps:
+    needs: common
+    runs-on: ubuntu-latest
+
+    steps:
+        
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2 
+      with:
+        channel: stable
+
+    - name: Cache Flutter Dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.pub-cache
+        key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: ${{ runner.os }}-flutter-
+
+    - name: Install dependencies
+      run: flutter pub get
+      
+    - name: Build Web App
+      run: flutter build web --release
+
+    - name: Upload Web Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: web-release
+        path: build/web
