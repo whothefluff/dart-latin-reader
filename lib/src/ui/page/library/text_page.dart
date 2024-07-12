@@ -41,7 +41,7 @@ class TextPageState extends ConsumerState<TextPage> {
         data: (words) => Column(
           children: [
             Expanded(
-              child: StyledWordList(
+              child: _StyledWordList(
                 words: words,
                 onRightSideTap: _loadNextPage,
                 onLastVisibleIndexChanged: (index) {
@@ -65,9 +65,8 @@ class TextPageState extends ConsumerState<TextPage> {
 
 typedef LastVisibleIndexCallback = void Function(int lastVisibleIndex);
 
-class StyledWordList extends StatefulWidget {
-  const StyledWordList({
-    super.key,
+class _StyledWordList extends StatefulWidget {
+  const _StyledWordList({
     required this.words,
     required this.onRightSideTap,
     required this.onLastVisibleIndexChanged,
@@ -82,7 +81,7 @@ class StyledWordList extends StatefulWidget {
 //
 }
 
-class _StyledWordListState extends State<StyledWordList> {
+class _StyledWordListState extends State<_StyledWordList> {
   int _lastVisibleIndex = 0;
 
   @override
@@ -123,20 +122,27 @@ class _StyledWordListState extends State<StyledWordList> {
       maxLines: null,
     );
 
-    List<InlineSpan> allSpans = widget.words
-        .map((wordItem) => TextSpan(
-              text: '${wordItem.word} ',
-              style: styles[wordItem.typ] ?? styles['default'],
-            ))
-        .toList();
+    List<InlineSpan> allSpans =
+        List<InlineSpan>.generate(widget.words.length, (index) {
+      final wordItem = widget.words[index];
+      final punctuationSigns = ['.', ',', '!', '?', ':', ';', ')'];
+      bool nextIsPunctuation = index + 1 < widget.words.length &&
+          punctuationSigns
+              .any((sign) => widget.words[index + 1].word.startsWith(sign));
+      bool currentEndsWithOpeningParenthesis = wordItem.word.endsWith('(');
+      String spaceIfNeeded =
+          nextIsPunctuation || currentEndsWithOpeningParenthesis ? '' : ' ';
+      return TextSpan(
+        text: '${wordItem.word}$spaceIfNeeded',
+        style: styles[wordItem.typ] ?? styles['default'],
+      );
+    }).toList();
 
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
 
-    final lastPosition = textPainter.getPositionForOffset(Offset(
-      constraints.maxWidth,
-      constraints.maxHeight,
-    ));
+    final lastPosition = textPainter.getPositionForOffset(
+        Offset(constraints.maxWidth, constraints.maxHeight));
 
     int lastVisibleIndex = lastPosition.offset;
 
@@ -158,7 +164,7 @@ class _StyledWordListState extends State<StyledWordList> {
     });
 
     return RichText(
-      text: TextSpan(children: allSpans.sublist(0, wordIndex)),
+      text: TextSpan(children: allSpans.sublist(0, _lastVisibleIndex)),
     );
   }
 //
