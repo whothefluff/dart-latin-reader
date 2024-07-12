@@ -9,6 +9,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
 import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 
 part 'database.g.dart';
 

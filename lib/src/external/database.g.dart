@@ -1481,6 +1481,8 @@ class Author extends DataClass implements Insertable<Author> {
   final String id;
   final String name;
   final String about;
+
+  ///TODO: add check with length range so that it always looks ok from the page
   final Uint8List image;
   const Author(
       {required this.id,
@@ -3779,6 +3781,196 @@ class AuthorsAndWorksCompanion extends UpdateCompanion<AuthorsAndWork> {
   }
 }
 
+class WorkContentSubdivisionsHierarchyData extends DataClass {
+  final String workId;
+  final String node;
+  final String typ;
+  final int cnt;
+  final String name;
+  final String? parent;
+  final int fromIndex;
+  final int toIndex;
+  final int depth;
+  const WorkContentSubdivisionsHierarchyData(
+      {required this.workId,
+      required this.node,
+      required this.typ,
+      required this.cnt,
+      required this.name,
+      this.parent,
+      required this.fromIndex,
+      required this.toIndex,
+      required this.depth});
+  factory WorkContentSubdivisionsHierarchyData.fromJson(
+      Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WorkContentSubdivisionsHierarchyData(
+      workId: serializer.fromJson<String>(json['workId']),
+      node: serializer.fromJson<String>(json['node']),
+      typ: serializer.fromJson<String>(json['typ']),
+      cnt: serializer.fromJson<int>(json['cnt']),
+      name: serializer.fromJson<String>(json['name']),
+      parent: serializer.fromJson<String?>(json['parent']),
+      fromIndex: serializer.fromJson<int>(json['fromIndex']),
+      toIndex: serializer.fromJson<int>(json['toIndex']),
+      depth: serializer.fromJson<int>(json['depth']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'node': serializer.toJson<String>(node),
+      'typ': serializer.toJson<String>(typ),
+      'cnt': serializer.toJson<int>(cnt),
+      'name': serializer.toJson<String>(name),
+      'parent': serializer.toJson<String?>(parent),
+      'fromIndex': serializer.toJson<int>(fromIndex),
+      'toIndex': serializer.toJson<int>(toIndex),
+      'depth': serializer.toJson<int>(depth),
+    };
+  }
+
+  WorkContentSubdivisionsHierarchyData copyWith(
+          {String? workId,
+          String? node,
+          String? typ,
+          int? cnt,
+          String? name,
+          Value<String?> parent = const Value.absent(),
+          int? fromIndex,
+          int? toIndex,
+          int? depth}) =>
+      WorkContentSubdivisionsHierarchyData(
+        workId: workId ?? this.workId,
+        node: node ?? this.node,
+        typ: typ ?? this.typ,
+        cnt: cnt ?? this.cnt,
+        name: name ?? this.name,
+        parent: parent.present ? parent.value : this.parent,
+        fromIndex: fromIndex ?? this.fromIndex,
+        toIndex: toIndex ?? this.toIndex,
+        depth: depth ?? this.depth,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('WorkContentSubdivisionsHierarchyData(')
+          ..write('workId: $workId, ')
+          ..write('node: $node, ')
+          ..write('typ: $typ, ')
+          ..write('cnt: $cnt, ')
+          ..write('name: $name, ')
+          ..write('parent: $parent, ')
+          ..write('fromIndex: $fromIndex, ')
+          ..write('toIndex: $toIndex, ')
+          ..write('depth: $depth')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      workId, node, typ, cnt, name, parent, fromIndex, toIndex, depth);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WorkContentSubdivisionsHierarchyData &&
+          other.workId == this.workId &&
+          other.node == this.node &&
+          other.typ == this.typ &&
+          other.cnt == this.cnt &&
+          other.name == this.name &&
+          other.parent == this.parent &&
+          other.fromIndex == this.fromIndex &&
+          other.toIndex == this.toIndex &&
+          other.depth == this.depth);
+}
+
+class WorkContentSubdivisionsHierarchy extends ViewInfo<
+    WorkContentSubdivisionsHierarchy,
+    WorkContentSubdivisionsHierarchyData> implements HasResultSet {
+  final String? _alias;
+  @override
+  final _$AppDb attachedDatabase;
+  WorkContentSubdivisionsHierarchy(this.attachedDatabase, [this._alias]);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [workId, node, typ, cnt, name, parent, fromIndex, toIndex, depth];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'WorkContentSubdivisionsHierarchy';
+  @override
+  Map<SqlDialect, String> get createViewStatements => {
+        SqlDialect.sqlite:
+            'CREATE VIEW WorkContentSubdivisionsHierarchy AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1 FROM WorkContentSubdivisions AS s JOIN Subsets ON s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
+      };
+  @override
+  WorkContentSubdivisionsHierarchy get asDslTable => this;
+  @override
+  WorkContentSubdivisionsHierarchyData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WorkContentSubdivisionsHierarchyData(
+      workId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}workId'])!,
+      node: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}node'])!,
+      typ: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}typ'])!,
+      cnt: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}cnt'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      parent: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}parent']),
+      fromIndex: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}fromIndex'])!,
+      toIndex: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}toIndex'])!,
+      depth: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}depth'])!,
+    );
+  }
+
+  late final GeneratedColumn<String> workId = GeneratedColumn<String>(
+      'workId', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> node = GeneratedColumn<String>(
+      'node', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> typ = GeneratedColumn<String>(
+      'typ', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<int> cnt =
+      GeneratedColumn<int>('cnt', aliasedName, false, type: DriftSqlType.int);
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> parent = GeneratedColumn<String>(
+      'parent', aliasedName, true,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<int> fromIndex = GeneratedColumn<int>(
+      'fromIndex', aliasedName, false,
+      type: DriftSqlType.int);
+  late final GeneratedColumn<int> toIndex = GeneratedColumn<int>(
+      'toIndex', aliasedName, false,
+      type: DriftSqlType.int);
+  late final GeneratedColumn<int> depth =
+      GeneratedColumn<int>('depth', aliasedName, false, type: DriftSqlType.int);
+  @override
+  WorkContentSubdivisionsHierarchy createAlias(String alias) {
+    return WorkContentSubdivisionsHierarchy(attachedDatabase, alias);
+  }
+
+  @override
+  Query? get query => null;
+  @override
+  Set<String> get readTables => const {'WorkContentSubdivisions'};
+}
+
 class LatestDataVersionData extends DataClass {
   final int idx;
   final String createdAt;
@@ -4323,6 +4515,356 @@ class LibraryWorkDetails extends ViewInfo<LibraryWorkDetails, LibraryWorkDetail>
       const {'Works', 'WorkContents', 'AuthorsAndWorks', 'Authors'};
 }
 
+class LibraryWorkContent extends DataClass {
+  final String id;
+  final String? parent;
+  final String node;
+  final int idx;
+  final String word;
+  final String typ;
+  final int depth;
+  final String sourceReference;
+  const LibraryWorkContent(
+      {required this.id,
+      this.parent,
+      required this.node,
+      required this.idx,
+      required this.word,
+      required this.typ,
+      required this.depth,
+      required this.sourceReference});
+  factory LibraryWorkContent.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LibraryWorkContent(
+      id: serializer.fromJson<String>(json['id']),
+      parent: serializer.fromJson<String?>(json['parent']),
+      node: serializer.fromJson<String>(json['node']),
+      idx: serializer.fromJson<int>(json['idx']),
+      word: serializer.fromJson<String>(json['word']),
+      typ: serializer.fromJson<String>(json['typ']),
+      depth: serializer.fromJson<int>(json['depth']),
+      sourceReference: serializer.fromJson<String>(json['sourceReference']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'parent': serializer.toJson<String?>(parent),
+      'node': serializer.toJson<String>(node),
+      'idx': serializer.toJson<int>(idx),
+      'word': serializer.toJson<String>(word),
+      'typ': serializer.toJson<String>(typ),
+      'depth': serializer.toJson<int>(depth),
+      'sourceReference': serializer.toJson<String>(sourceReference),
+    };
+  }
+
+  LibraryWorkContent copyWith(
+          {String? id,
+          Value<String?> parent = const Value.absent(),
+          String? node,
+          int? idx,
+          String? word,
+          String? typ,
+          int? depth,
+          String? sourceReference}) =>
+      LibraryWorkContent(
+        id: id ?? this.id,
+        parent: parent.present ? parent.value : this.parent,
+        node: node ?? this.node,
+        idx: idx ?? this.idx,
+        word: word ?? this.word,
+        typ: typ ?? this.typ,
+        depth: depth ?? this.depth,
+        sourceReference: sourceReference ?? this.sourceReference,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('LibraryWorkContent(')
+          ..write('id: $id, ')
+          ..write('parent: $parent, ')
+          ..write('node: $node, ')
+          ..write('idx: $idx, ')
+          ..write('word: $word, ')
+          ..write('typ: $typ, ')
+          ..write('depth: $depth, ')
+          ..write('sourceReference: $sourceReference')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, parent, node, idx, word, typ, depth, sourceReference);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LibraryWorkContent &&
+          other.id == this.id &&
+          other.parent == this.parent &&
+          other.node == this.node &&
+          other.idx == this.idx &&
+          other.word == this.word &&
+          other.typ == this.typ &&
+          other.depth == this.depth &&
+          other.sourceReference == this.sourceReference);
+}
+
+class LibraryWorkContents
+    extends ViewInfo<LibraryWorkContents, LibraryWorkContent>
+    implements HasResultSet {
+  final String? _alias;
+  @override
+  final _$AppDb attachedDatabase;
+  LibraryWorkContents(this.attachedDatabase, [this._alias]);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, parent, node, idx, word, typ, depth, sourceReference];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'LibraryWorkContents';
+  @override
+  Map<SqlDialect, String> get createViewStatements => {
+        SqlDialect.sqlite:
+            'CREATE VIEW LibraryWorkContents AS WITH ClosestSubdivision AS (SELECT wc.workId, wc.idx, wc.word, wc.sourceReference, sh.node, sh.typ, sh.parent, sh.depth, ROW_NUMBER()OVER (PARTITION BY wc.workId, wc.idx ORDER BY sh.fromIndex DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents AS wc INNER JOIN WorkContentSubdivisionsHierarchy AS sh ON wc.workId = sh.workId AND wc.idx BETWEEN sh.fromIndex AND sh.toIndex AND sh.typ <> \'TITL\') SELECT workId AS id, parent, node, idx, word, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+      };
+  @override
+  LibraryWorkContents get asDslTable => this;
+  @override
+  LibraryWorkContent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LibraryWorkContent(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      parent: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}parent']),
+      node: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}node'])!,
+      idx: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}idx'])!,
+      word: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}word'])!,
+      typ: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}typ'])!,
+      depth: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}depth'])!,
+      sourceReference: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}sourceReference'])!,
+    );
+  }
+
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> parent = GeneratedColumn<String>(
+      'parent', aliasedName, true,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> node = GeneratedColumn<String>(
+      'node', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<int> idx =
+      GeneratedColumn<int>('idx', aliasedName, false, type: DriftSqlType.int);
+  late final GeneratedColumn<String> word = GeneratedColumn<String>(
+      'word', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> typ = GeneratedColumn<String>(
+      'typ', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<int> depth =
+      GeneratedColumn<int>('depth', aliasedName, false, type: DriftSqlType.int);
+  late final GeneratedColumn<String> sourceReference = GeneratedColumn<String>(
+      'sourceReference', aliasedName, false,
+      type: DriftSqlType.string);
+  @override
+  LibraryWorkContents createAlias(String alias) {
+    return LibraryWorkContents(attachedDatabase, alias);
+  }
+
+  @override
+  Query? get query => null;
+  @override
+  Set<String> get readTables =>
+      const {'WorkContents', 'WorkContentSubdivisions'};
+}
+
+class LibraryWorkIndexe extends DataClass {
+  final String? parent;
+  final String node;
+  final int depth;
+  final String typ;
+  final int cnt;
+  final int fromIndex;
+  final int toIndex;
+  final String name;
+  const LibraryWorkIndexe(
+      {this.parent,
+      required this.node,
+      required this.depth,
+      required this.typ,
+      required this.cnt,
+      required this.fromIndex,
+      required this.toIndex,
+      required this.name});
+  factory LibraryWorkIndexe.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LibraryWorkIndexe(
+      parent: serializer.fromJson<String?>(json['parent']),
+      node: serializer.fromJson<String>(json['node']),
+      depth: serializer.fromJson<int>(json['depth']),
+      typ: serializer.fromJson<String>(json['typ']),
+      cnt: serializer.fromJson<int>(json['cnt']),
+      fromIndex: serializer.fromJson<int>(json['fromIndex']),
+      toIndex: serializer.fromJson<int>(json['toIndex']),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'parent': serializer.toJson<String?>(parent),
+      'node': serializer.toJson<String>(node),
+      'depth': serializer.toJson<int>(depth),
+      'typ': serializer.toJson<String>(typ),
+      'cnt': serializer.toJson<int>(cnt),
+      'fromIndex': serializer.toJson<int>(fromIndex),
+      'toIndex': serializer.toJson<int>(toIndex),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  LibraryWorkIndexe copyWith(
+          {Value<String?> parent = const Value.absent(),
+          String? node,
+          int? depth,
+          String? typ,
+          int? cnt,
+          int? fromIndex,
+          int? toIndex,
+          String? name}) =>
+      LibraryWorkIndexe(
+        parent: parent.present ? parent.value : this.parent,
+        node: node ?? this.node,
+        depth: depth ?? this.depth,
+        typ: typ ?? this.typ,
+        cnt: cnt ?? this.cnt,
+        fromIndex: fromIndex ?? this.fromIndex,
+        toIndex: toIndex ?? this.toIndex,
+        name: name ?? this.name,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('LibraryWorkIndexe(')
+          ..write('parent: $parent, ')
+          ..write('node: $node, ')
+          ..write('depth: $depth, ')
+          ..write('typ: $typ, ')
+          ..write('cnt: $cnt, ')
+          ..write('fromIndex: $fromIndex, ')
+          ..write('toIndex: $toIndex, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(parent, node, depth, typ, cnt, fromIndex, toIndex, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LibraryWorkIndexe &&
+          other.parent == this.parent &&
+          other.node == this.node &&
+          other.depth == this.depth &&
+          other.typ == this.typ &&
+          other.cnt == this.cnt &&
+          other.fromIndex == this.fromIndex &&
+          other.toIndex == this.toIndex &&
+          other.name == this.name);
+}
+
+class LibraryWorkIndexes extends ViewInfo<LibraryWorkIndexes, LibraryWorkIndexe>
+    implements HasResultSet {
+  final String? _alias;
+  @override
+  final _$AppDb attachedDatabase;
+  LibraryWorkIndexes(this.attachedDatabase, [this._alias]);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [parent, node, depth, typ, cnt, fromIndex, toIndex, name];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'LibraryWorkIndexes';
+  @override
+  Map<SqlDialect, String> get createViewStatements => {
+        SqlDialect.sqlite:
+            'CREATE VIEW LibraryWorkIndexes AS SELECT h.parent, h.node, h.depth, h.typ, h.cnt, h.fromIndex, h.toIndex, t.name FROM WorkContentSubdivisionsHierarchy AS h INNER JOIN WorkContentSubdivisionsHierarchy AS t ON h.node = t.parent AND \'TITL\' = t.typ ORDER BY h.fromindex',
+      };
+  @override
+  LibraryWorkIndexes get asDslTable => this;
+  @override
+  LibraryWorkIndexe map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LibraryWorkIndexe(
+      parent: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}parent']),
+      node: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}node'])!,
+      depth: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}depth'])!,
+      typ: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}typ'])!,
+      cnt: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}cnt'])!,
+      fromIndex: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}fromIndex'])!,
+      toIndex: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}toIndex'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+    );
+  }
+
+  late final GeneratedColumn<String> parent = GeneratedColumn<String>(
+      'parent', aliasedName, true,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<String> node = GeneratedColumn<String>(
+      'node', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<int> depth =
+      GeneratedColumn<int>('depth', aliasedName, false, type: DriftSqlType.int);
+  late final GeneratedColumn<String> typ = GeneratedColumn<String>(
+      'typ', aliasedName, false,
+      type: DriftSqlType.string);
+  late final GeneratedColumn<int> cnt =
+      GeneratedColumn<int>('cnt', aliasedName, false, type: DriftSqlType.int);
+  late final GeneratedColumn<int> fromIndex = GeneratedColumn<int>(
+      'fromIndex', aliasedName, false,
+      type: DriftSqlType.int);
+  late final GeneratedColumn<int> toIndex = GeneratedColumn<int>(
+      'toIndex', aliasedName, false,
+      type: DriftSqlType.int);
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string);
+  @override
+  LibraryWorkIndexes createAlias(String alias) {
+    return LibraryWorkIndexes(attachedDatabase, alias);
+  }
+
+  @override
+  Query? get query => null;
+  @override
+  Set<String> get readTables => const {'WorkContentSubdivisions'};
+}
+
 abstract class _$AppDb extends GeneratedDatabase {
   _$AppDb(QueryExecutor e) : super(e);
   _$AppDbManager get managers => _$AppDbManager(this);
@@ -4345,11 +4887,16 @@ abstract class _$AppDb extends GeneratedDatabase {
   late final WorkContentSupplementary workContentSupplementary =
       WorkContentSupplementary(this);
   late final AuthorsAndWorks authorsAndWorks = AuthorsAndWorks(this);
+  late final WorkContentSubdivisionsHierarchy workContentSubdivisionsHierarchy =
+      WorkContentSubdivisionsHierarchy(this);
   late final LatestDataVersion latestDataVersion = LatestDataVersion(this);
   late final LibraryAuthors libraryAuthors = LibraryAuthors(this);
   late final LibraryAuthorDetails libraryAuthorDetails =
       LibraryAuthorDetails(this);
   late final LibraryWorkDetails libraryWorkDetails = LibraryWorkDetails(this);
+  late final LibraryWorkContents libraryWorkContents =
+      LibraryWorkContents(this);
+  late final LibraryWorkIndexes libraryWorkIndexes = LibraryWorkIndexes(this);
   Selectable<AuthorView> getLibraryAuthors() {
     return customSelect('SELECT * FROM LibraryAuthors',
         variables: [],
@@ -4398,6 +4945,30 @@ abstract class _$AppDb extends GeneratedDatabase {
         ));
   }
 
+  Selectable<WorkContentsElementView> getLibraryWorkContentsPartial(
+      String var1, int var2, int var3) {
+    return customSelect(
+        'SELECT * FROM LibraryWorkContents WHERE id = ?1 AND idx BETWEEN ?2 AND ?3',
+        variables: [
+          Variable<String>(var1),
+          Variable<int>(var2),
+          Variable<int>(var3)
+        ],
+        readsFrom: {
+          workContents,
+          workContentSubdivisions,
+        }).map((QueryRow row) => WorkContentsElementView(
+          id: row.read<String>('id'),
+          parent: row.readNullable<String>('parent'),
+          node: row.read<String>('node'),
+          idx: row.read<int>('idx'),
+          word: row.read<String>('word'),
+          typ: row.read<String>('typ'),
+          depth: row.read<int>('depth'),
+          sourceReference: row.read<String>('sourceReference'),
+        ));
+  }
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4416,10 +4987,13 @@ abstract class _$AppDb extends GeneratedDatabase {
         workContentSubdivisions,
         workContentSupplementary,
         authorsAndWorks,
+        workContentSubdivisionsHierarchy,
         latestDataVersion,
         libraryAuthors,
         libraryAuthorDetails,
-        libraryWorkDetails
+        libraryWorkDetails,
+        libraryWorkContents,
+        libraryWorkIndexes
       ];
 }
 

@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:latin_reader/logger.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_author_details.dart';
@@ -65,6 +66,19 @@ class WorkRepository implements i.WorkRepository {
     log.info(() => 'WorkRepository - reading work details from db');
     final dbWorkDetails = await db.getLibraryWorkDetails(id).getSingle();
     return dbWorkDetails;
+  }
+
+  @override
+  Future<UnmodifiableListView<WorkContentsElementView>>
+      getLibraryWorkContentsPartially(
+          String id, int fromIndex, int toIndex) async {
+    final db = AppDb();
+    log.info(() =>
+        'WorkRepository - reading work contents ($fromIndex - $toIndex) from db');
+    final dbWorkContents =
+        await db.getLibraryWorkContentsPartial(id, fromIndex, toIndex).get();
+    return UnmodifiableListView(
+        dbWorkContents as Iterable<WorkContentsElementView>);
   }
 
 //
