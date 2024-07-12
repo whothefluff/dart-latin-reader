@@ -49,7 +49,6 @@ class TextPageState extends ConsumerState<TextPage> {
                 },
               ),
             ),
-            Text('Current index: $_currentIndex'),
           ],
         ),
       ),
@@ -61,6 +60,7 @@ class TextPageState extends ConsumerState<TextPage> {
       _currentIndex = _lastVisibleIndex + 1;
     });
   }
+//
 }
 
 typedef LastVisibleIndexCallback = void Function(int lastVisibleIndex);
@@ -79,6 +79,7 @@ class StyledWordList extends StatefulWidget {
 
   @override
   _StyledWordListState createState() => _StyledWordListState();
+//
 }
 
 class _StyledWordListState extends State<StyledWordList> {
@@ -90,7 +91,7 @@ class _StyledWordListState extends State<StyledWordList> {
       builder: (context, constraints) {
         return Stack(
           children: [
-            _buildColumnWithOverflowDetection(context, constraints),
+            _buildTextWithOverflowDetection(context, constraints),
             Positioned(
               right: 0,
               top: 0,
@@ -108,7 +109,7 @@ class _StyledWordListState extends State<StyledWordList> {
     );
   }
 
-  Widget _buildColumnWithOverflowDetection(
+  Widget _buildTextWithOverflowDetection(
       BuildContext context, BoxConstraints constraints) {
     final styles = {
       'VERS': Theme.of(context).textTheme.bodyLarge!,
@@ -117,43 +118,48 @@ class _StyledWordListState extends State<StyledWordList> {
       'default': Theme.of(context).textTheme.bodyMedium!,
     };
 
-    List<Widget> visibleWords = [];
-    double currentHeight = 0;
+    final textPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      maxLines: null,
+    );
 
-    for (int i = 0; i < widget.words.length; i++) {
-      final wordItem = widget.words[i];
-      final textPainter = TextPainter(
-        text: TextSpan(
-          text: wordItem.word,
-          style: styles[wordItem.typ] ?? styles['default'],
-        ),
-        textDirection: TextDirection.ltr,
-        maxLines: 1,
-      )..layout(maxWidth: constraints.maxWidth);
+    List<InlineSpan> allSpans = widget.words
+        .map((wordItem) => TextSpan(
+              text: '${wordItem.word} ',
+              style: styles[wordItem.typ] ?? styles['default'],
+            ))
+        .toList();
 
-      if (currentHeight + textPainter.height > constraints.maxHeight) {
-        _lastVisibleIndex = i - 1;
+    textPainter.text = TextSpan(children: allSpans);
+    textPainter.layout(maxWidth: constraints.maxWidth);
+
+    final lastPosition = textPainter.getPositionForOffset(Offset(
+      constraints.maxWidth,
+      constraints.maxHeight,
+    ));
+
+    int lastVisibleIndex = lastPosition.offset;
+
+    // Find the last fully visible word
+    int currentLength = 0;
+    int wordIndex = 0;
+    for (var span in allSpans) {
+      if (currentLength + span.toPlainText().length > lastVisibleIndex) {
         break;
       }
-
-      currentHeight += textPainter.height;
-      visibleWords.add(Text(
-        wordItem.word,
-        style: styles[wordItem.typ] ?? styles['default'],
-      ));
+      currentLength += span.toPlainText().length;
+      wordIndex++;
     }
 
-    // If we've reached the end of the list without overflowing
-    if (_lastVisibleIndex == 0 && widget.words.isNotEmpty) {
-      _lastVisibleIndex = widget.words.length - 1;
-    }
+    _lastVisibleIndex = wordIndex - 1;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onLastVisibleIndexChanged(_lastVisibleIndex);
     });
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: visibleWords,
+    return RichText(
+      text: TextSpan(children: allSpans.sublist(0, wordIndex)),
     );
   }
+//
 }
