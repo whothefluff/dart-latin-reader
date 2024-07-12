@@ -1,5 +1,6 @@
 import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 
 CREATE TABLE "DataVersion" (
   "idx" INTEGER NOT NULL,
@@ -162,6 +163,22 @@ CREATE TABLE "AuthorsAndWorks"(
 WITHOUT ROWID
 ;
 
+CREATE VIEW "WorkContentSubdivisionsHierarchy" AS
+    WITH RECURSIVE Subsets AS ( SELECT *, 
+                                       0 AS depth
+                                    FROM WorkContentSubdivisions
+                                    WHERE parent IS NULL
+                                UNION ALL
+                                -- Recursively find descendants until reaching leaf nodes
+                                SELECT s.*,
+                                       Subsets.depth + 1
+                                    FROM WorkContentSubdivisions AS s
+                                    JOIN Subsets
+                                        ON s.parent = Subsets.node )
+        SELECT * 
+            FROM Subsets
+            ORDER BY fromindex, depth, toindex;
+
 CREATE VIEW "LatestDataVersion" AS
     SELECT *
         FROM DataVersion
@@ -232,3 +249,48 @@ CREATE VIEW "LibraryWorkDetails" AS
                 ON aw.authorId = a.id;
         
 getLibraryWorkDetails WITH WorkDetailsView: SELECT * FROM LibraryWorkDetails WHERE id = ?;
+
+CREATE VIEW "LibraryWorkContents" AS
+    WITH ClosestSubdivision AS ( SELECT wc.workId,
+                                        wc.idx,
+                                        wc.word,
+                                        wc.sourceReference,
+                                        sh.node,
+                                        sh.typ,
+                                        sh.parent,
+                                        sh.depth,
+                                        ROW_NUMBER( ) OVER( PARTITION BY wc.workId, wc.idx ORDER BY sh.fromIndex DESC ) AS rn
+                                     FROM WorkContents wc
+                                     INNER JOIN WorkContentSubdivisionsHierarchy AS sh
+                                         ON wc.workId = sh.workId
+                                            AND wc.idx BETWEEN sh.fromIndex AND sh.toIndex
+                                            AND sh.typ <> 'TITL' )
+        SELECT workId AS id,
+               parent,
+               node,
+               idx,
+               word,
+               typ,
+               depth,
+               sourceReference
+               --( SELECT name FROM WorkContentSubdivisions AS aux WHERE aux.parent = ClosestSubdivision.parent AND aux.typ = 'TITL' LIMIT 1 ) AS title
+            FROM ClosestSubdivision
+            WHERE rn = 1
+            ORDER BY idx;
+        
+getLibraryWorkContentsPartial WITH WorkContentsElementView: SELECT * FROM LibraryWorkContents WHERE id = ? AND idx BETWEEN ? AND ?;
+
+CREATE VIEW "LibraryWorkIndexes" AS
+	SELECT h.parent,
+           h.node,
+           h.depth,
+           h.typ,
+           h.cnt,
+           h.fromIndex,
+           h.toIndex,
+           t.name
+        FROM WorkContentSubdivisionsHierarchy AS h
+        INNER JOIN WorkContentSubdivisionsHierarchy as t
+            ON h.node = t.parent
+               AND 'TITL' = t.typ
+        ORDER BY h.fromindex;

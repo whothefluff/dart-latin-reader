@@ -75,7 +75,7 @@ class MyAppState extends ConsumerState<MyApp> {
                 GoRoute(
                   path: '/reader/:workId',
                   builder: (context, state) => TextPage(
-                    workIndex: state.pathParameters['workId']!,
+                    workId: state.pathParameters['workId']!,
                   ),
                 ),
               ],
