@@ -19,7 +19,6 @@ class TextPage extends ConsumerStatefulWidget {
 }
 
 class TextPageState extends ConsumerState<TextPage> {
-
   int _currentIndex = 1;
   int _lastVisibleIndex = 0;
   static const int _pageSize = 250;
@@ -106,7 +105,7 @@ class _StyledWordListState extends State<_StyledWordList> {
     );
   }
 
-Widget _buildTextWithOverflowDetection(
+  Widget _buildTextWithOverflowDetection(
       BuildContext context, BoxConstraints constraints) {
     final styles = {
       'VERS': Theme.of(context).textTheme.bodyLarge!,
@@ -139,26 +138,27 @@ Widget _buildTextWithOverflowDetection(
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
 
-    // Calculate the last fully visible word index
-    int lastVisibleWordIndex = 0;
-    double currentHeight = 0.0;
+    int binarySearchLastVisibleWord(int low, int high) {
+      while (low <= high) {
+        int mid = (low + high) ~/ 2;
+        textPainter.text = TextSpan(children: allSpans.sublist(0, mid + 1));
+        textPainter.layout(maxWidth: constraints.maxWidth);
 
-    for (int i = 0; i < allSpans.length; i++) {
-      textPainter.text = TextSpan(children: allSpans.sublist(0, i + 1));
-      textPainter.layout(maxWidth: constraints.maxWidth);
-
-      currentHeight = textPainter.height;
-
-      if (currentHeight > constraints.maxHeight) {
-        lastVisibleWordIndex = i - 1;
-        break;
-      } else {
-        lastVisibleWordIndex = i;
+        if (textPainter.height <= constraints.maxHeight) {
+          if (mid == high ||
+              textPainter.height + textPainter.preferredLineHeight >
+                  constraints.maxHeight) {
+            return mid;
+          }
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
       }
+      return low - 1;
     }
 
-    // Update the last visible index
-    _lastVisibleIndex = lastVisibleWordIndex;
+    _lastVisibleIndex = binarySearchLastVisibleWord(0, allSpans.length - 1);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onLastVisibleIndexChanged(_lastVisibleIndex);
@@ -168,6 +168,5 @@ Widget _buildTextWithOverflowDetection(
       text: TextSpan(children: allSpans.sublist(0, _lastVisibleIndex)),
     );
   }
-
 //
 }
