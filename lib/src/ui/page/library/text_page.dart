@@ -14,15 +14,13 @@ class TextPage extends ConsumerStatefulWidget {
   final String workId;
 
   @override
-  TextPageState createState() => TextPageState(workId: workId);
+  TextPageState createState() => TextPageState();
 //
 }
 
 class TextPageState extends ConsumerState<TextPage> {
-  TextPageState({required this.workId});
 
-  final String workId;
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   int _lastVisibleIndex = 0;
   static const int _pageSize = 250;
 
@@ -30,7 +28,7 @@ class TextPageState extends ConsumerState<TextPage> {
   Widget build(BuildContext context) {
     final wordsProvider = ref.watch(
       libraryWorkContentsPartiallyProvider(
-          workId, _currentIndex, _currentIndex + _pageSize),
+          widget.workId, _currentIndex, _currentIndex + _pageSize),
     );
 
     return Scaffold(
@@ -57,7 +55,7 @@ class TextPageState extends ConsumerState<TextPage> {
 
   void _loadNextPage() {
     setState(() {
-      _currentIndex = _lastVisibleIndex + 1;
+      _currentIndex = _lastVisibleIndex;
     });
   }
 //
@@ -108,7 +106,7 @@ class _StyledWordListState extends State<_StyledWordList> {
     );
   }
 
-  Widget _buildTextWithOverflowDetection(
+Widget _buildTextWithOverflowDetection(
       BuildContext context, BoxConstraints constraints) {
     final styles = {
       'VERS': Theme.of(context).textTheme.bodyLarge!,
@@ -141,23 +139,26 @@ class _StyledWordListState extends State<_StyledWordList> {
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
 
-    final lastPosition = textPainter.getPositionForOffset(
-        Offset(constraints.maxWidth, constraints.maxHeight));
+    // Calculate the last fully visible word index
+    int lastVisibleWordIndex = 0;
+    double currentHeight = 0.0;
 
-    int lastVisibleIndex = lastPosition.offset;
+    for (int i = 0; i < allSpans.length; i++) {
+      textPainter.text = TextSpan(children: allSpans.sublist(0, i + 1));
+      textPainter.layout(maxWidth: constraints.maxWidth);
 
-    // Find the last fully visible word
-    int currentLength = 0;
-    int wordIndex = 0;
-    for (var span in allSpans) {
-      if (currentLength + span.toPlainText().length > lastVisibleIndex) {
+      currentHeight = textPainter.height;
+
+      if (currentHeight > constraints.maxHeight) {
+        lastVisibleWordIndex = i - 1;
         break;
+      } else {
+        lastVisibleWordIndex = i;
       }
-      currentLength += span.toPlainText().length;
-      wordIndex++;
     }
 
-    _lastVisibleIndex = wordIndex - 1;
+    // Update the last visible index
+    _lastVisibleIndex = lastVisibleWordIndex;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onLastVisibleIndexChanged(_lastVisibleIndex);
@@ -167,5 +168,6 @@ class _StyledWordListState extends State<_StyledWordList> {
       text: TextSpan(children: allSpans.sublist(0, _lastVisibleIndex)),
     );
   }
+
 //
 }
