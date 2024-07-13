@@ -83,6 +83,7 @@ class _StyledWordListState extends State<_StyledWordList> {
 
   @override
   Widget build(BuildContext context) {
+    _rebuildOnScreenSizeChange(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         return Stack(
@@ -103,6 +104,10 @@ class _StyledWordListState extends State<_StyledWordList> {
         );
       },
     );
+  }
+
+  void _rebuildOnScreenSizeChange(BuildContext context) {
+    MediaQuery.of(context);
   }
 
   Widget _buildTextWithOverflowDetection(
