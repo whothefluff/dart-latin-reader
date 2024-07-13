@@ -81,6 +81,8 @@ class _StyledWordList extends StatefulWidget {
 class _StyledWordListState extends State<_StyledWordList> {
   int _lastVisibleIndex = 0;
 
+  final closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
+
   @override
   Widget build(BuildContext context) {
     _rebuildOnScreenSizeChange(context);
@@ -127,9 +129,8 @@ class _StyledWordListState extends State<_StyledWordList> {
     List<InlineSpan> allSpans =
         List<InlineSpan>.generate(widget.words.length, (index) {
       final wordItem = widget.words[index];
-      final punctuationSigns = ['.', ',', '!', '?', ':', ';', ')'];
       bool nextIsPunctuation = index + 1 < widget.words.length &&
-          punctuationSigns
+          closingPunctSigns
               .any((sign) => widget.words[index + 1].word.startsWith(sign));
       bool currentEndsWithOpeningParenthesis = wordItem.word.endsWith('(');
       String spaceIfNeeded =
@@ -143,24 +144,30 @@ class _StyledWordListState extends State<_StyledWordList> {
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
 
+    bool isPunctuation(String word) {
+      return closingPunctSigns.contains(word) ||
+          closingPunctSigns.any((sign) => word.startsWith(sign));
+    }
+
     int binarySearchLastVisibleWord(int low, int high) {
+      var lastFittingIndex = low - 1;
       while (low <= high) {
-        int mid = (low + high) ~/ 2;
+        var mid = (low + high) ~/ 2;
         textPainter.text = TextSpan(children: allSpans.sublist(0, mid + 1));
         textPainter.layout(maxWidth: constraints.maxWidth);
 
         if (textPainter.height <= constraints.maxHeight) {
-          if (mid == high ||
-              textPainter.height + textPainter.preferredLineHeight >
-                  constraints.maxHeight) {
-            return mid;
-          }
+          lastFittingIndex = mid;
           low = mid + 1;
         } else {
           high = mid - 1;
         }
       }
-      return low - 1;
+      if (lastFittingIndex < widget.words.length &&
+          isPunctuation(widget.words[lastFittingIndex].word)) {
+        return lastFittingIndex - 1;
+      }
+      return lastFittingIndex;
     }
 
     _lastVisibleIndex = binarySearchLastVisibleWord(0, allSpans.length - 1);
