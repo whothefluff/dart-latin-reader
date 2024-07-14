@@ -121,25 +121,38 @@ class _StyledWordListState extends State<_StyledWordList> {
       'default': Theme.of(context).textTheme.bodyMedium!,
     };
 
+    bool needsSpace(int index) {
+      bool nextIsPunctuation = index + 1 < widget.words.length &&
+          closingPunctSigns
+              .any((sign) => widget.words[index + 1].word.startsWith(sign));
+      bool currentEndsWithOpeningParenthesis =
+          widget.words[index].word.endsWith('(');
+      return !nextIsPunctuation && !currentEndsWithOpeningParenthesis;
+    }
+
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
       maxLines: null,
     );
 
-    List<InlineSpan> allSpans =
-        List<InlineSpan>.generate(widget.words.length, (index) {
-      final wordItem = widget.words[index];
-      bool nextIsPunctuation = index + 1 < widget.words.length &&
-          closingPunctSigns
-              .any((sign) => widget.words[index + 1].word.startsWith(sign));
-      bool currentEndsWithOpeningParenthesis = wordItem.word.endsWith('(');
-      String spaceIfNeeded =
-          nextIsPunctuation || currentEndsWithOpeningParenthesis ? '' : ' ';
-      return TextSpan(
-        text: '${wordItem.word}$spaceIfNeeded',
-        style: styles[wordItem.typ] ?? styles['default'],
-      );
-    }).toList();
+    List<InlineSpan> createSpansWithLineBreaks() {
+      List<InlineSpan> spans = [];
+      String? previousStyle;
+      for (int index = 0; index < widget.words.length; index++) {
+        final wordItem = widget.words[index];
+        final currentStyle = wordItem.typ;
+        final potentialSpace = needsSpace(index) ? ' ' : '';
+        final potentialLineBreak = previousStyle != null && currentStyle != previousStyle ? '\n' : '';
+        spans.add(TextSpan(
+          text: '$potentialLineBreak${wordItem.word}$potentialSpace',
+          style: styles[currentStyle] ?? styles['default'],
+        ));
+        previousStyle = currentStyle;
+      }
+      return spans;
+    }
+
+    final allSpans = createSpansWithLineBreaks();
 
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
