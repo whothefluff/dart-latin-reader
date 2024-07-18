@@ -20,7 +20,7 @@ class TextPage extends ConsumerStatefulWidget {
 }
 
 class TextPageState extends ConsumerState<TextPage> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
   int _lastVisibleIndex = 0;
   static const int _pageSize = 250;
 
@@ -55,7 +55,7 @@ class TextPageState extends ConsumerState<TextPage> {
 
   void _loadNextPage() {
     setState(() {
-      _currentIndex = _lastVisibleIndex;
+      _currentIndex = _lastVisibleIndex + 1;
     });
   }
 
@@ -199,9 +199,11 @@ class _StyledWordListState extends State<_StyledWordList> {
   Widget _buildTextWithOverflowDetection(
       BuildContext context, BoxConstraints constraints) {
     final styles = {
-      'VERS': Theme.of(context).textTheme.bodyLarge!,
+      'BOOK': Theme.of(context).textTheme.headlineSmall!,
+      'PROL': Theme.of(context).textTheme.titleMedium!,
       'POEM': Theme.of(context).textTheme.titleMedium!,
-      'BOOK': Theme.of(context).textTheme.titleLarge!,
+      'EPIL': Theme.of(context).textTheme.titleMedium!,
+      'VERS': Theme.of(context).textTheme.bodyLarge!,
       'default': Theme.of(context).textTheme.bodyMedium!,
     };
 
@@ -222,17 +224,33 @@ class _StyledWordListState extends State<_StyledWordList> {
     List<InlineSpan> createSpansWithLineBreaks() {
       List<InlineSpan> spans = [];
       String? previousStyle;
+      String? previousNode;
       for (int index = 0; index < widget.words.length; index++) {
         final wordItem = widget.words[index];
         final currentStyle = wordItem.typ;
+        final currentNode = wordItem.node;
         final potentialSpace = needsSpace(index) ? ' ' : '';
-        final potentialLineBreak =
+        var potentialLineBreak =
             previousStyle != null && currentStyle != previousStyle ? '\n' : '';
+        if (potentialLineBreak.isNotEmpty && currentStyle == 'POEM') {
+          potentialLineBreak = '\n\n';
+        }
+        if (potentialLineBreak.isNotEmpty && currentStyle == 'PROL' ||
+            currentStyle == 'EPIL') {
+          potentialLineBreak = '\n\n';
+        }
+        if (potentialLineBreak.isNotEmpty && currentStyle == 'BOOK') {
+          potentialLineBreak = '\n\n\n';
+        }
+        if (potentialLineBreak.isEmpty && previousNode != currentNode) {
+          potentialLineBreak = '\n';
+        }
         spans.add(TextSpan(
           text: '$potentialLineBreak${wordItem.word}$potentialSpace',
           style: styles[currentStyle] ?? styles['default'],
         ));
         previousStyle = currentStyle;
+        previousNode = currentNode;
       }
       return spans;
     }
@@ -261,9 +279,34 @@ class _StyledWordListState extends State<_StyledWordList> {
           high = mid - 1;
         }
       }
-      if (lastFittingIndex < widget.words.length &&
-          isPunctuation(widget.words[lastFittingIndex].word)) {
-        return lastFittingIndex - 1;
+      // Adjust lastFittingIndex to end of previous verse if necessary
+      if (lastFittingIndex < widget.words.length - 1) {
+        var lastElement = widget.words[lastFittingIndex];
+        if (lastElement.typ == 'VERS') {
+          var currentNode = lastElement.node;
+          var nextNode = lastFittingIndex + 1 < widget.words.length
+              ? widget.words[lastFittingIndex + 1].node
+              : null;
+          // If the next word is from a different verse (node), we're good
+          if (currentNode != nextNode) {
+            return lastFittingIndex;
+          }
+          // If we're in the middle of a verse, move back to the end of the previous verse
+          while (lastFittingIndex > 0 &&
+              widget.words[lastFittingIndex - 1].node == currentNode) {
+            lastFittingIndex--;
+          }
+          // Now lastFittingIndex is at the start of the current verse
+          // Move it back one more to get to the end of the previous verse
+          if (lastFittingIndex > 0) {
+            lastFittingIndex--;
+          }
+        } else {
+          if (lastFittingIndex < widget.words.length &&
+              isPunctuation(widget.words[lastFittingIndex + 1].word)) {
+            lastFittingIndex --;
+          }
+        }
       }
       return lastFittingIndex;
     }
@@ -274,9 +317,13 @@ class _StyledWordListState extends State<_StyledWordList> {
       widget.onLastVisibleIndexChanged(_lastVisibleIndex);
     });
 
+    List<T> tail<T>(List<T> list, int inclussiveEnd) {
+      return list.sublist(0, inclussiveEnd + 1);
+    }
+
     return Text.rich(
       key: _textKey,
-      TextSpan(children: allSpans.sublist(0, _lastVisibleIndex)),
+      TextSpan(children: tail(allSpans, _lastVisibleIndex)),
     );
   }
 //

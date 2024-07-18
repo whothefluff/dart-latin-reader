@@ -195,7 +195,7 @@ class MorphologicalDetails extends Table
       'item', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (item > 0)');
+      $customConstraints: 'NOT NULL CHECK (item >= 0)');
   static const VerificationMeta _dictionaryRefMeta =
       const VerificationMeta('dictionaryRef');
   late final GeneratedColumn<String> dictionaryRef = GeneratedColumn<String>(
@@ -427,7 +427,7 @@ class MorphologicalDetailInflections extends Table
       'cnt', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (cnt > 0)');
+      $customConstraints: 'NOT NULL CHECK (cnt >= 0)');
   static const VerificationMeta _termMeta = const VerificationMeta('term');
   late final GeneratedColumn<String> term = GeneratedColumn<String>(
       'term', aliasedName, false,
@@ -1124,7 +1124,7 @@ class Macronizations extends Table
       'syllableNumber', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (syllableNumber > 0)');
+      $customConstraints: 'NOT NULL CHECK (syllableNumber >= 0)');
   static const VerificationMeta _macronizedSyllableMeta =
       const VerificationMeta('macronizedSyllable');
   late final GeneratedColumn<String> macronizedSyllable =
@@ -1656,7 +1656,7 @@ class AuthorAbbreviations extends Table
       'id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (id > 0)');
+      $customConstraints: 'NOT NULL CHECK (id >= 0)');
   static const VerificationMeta _valMeta = const VerificationMeta('val');
   late final GeneratedColumn<String> val = GeneratedColumn<String>(
       'val', aliasedName, false,
@@ -2090,7 +2090,7 @@ class WorkAbbreviations extends Table
       'id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (id > 0)');
+      $customConstraints: 'NOT NULL CHECK (id >= 0)');
   static const VerificationMeta _valMeta = const VerificationMeta('val');
   late final GeneratedColumn<String> val = GeneratedColumn<String>(
       'val', aliasedName, false,
@@ -2309,7 +2309,7 @@ class WorkContents extends Table with TableInfo<WorkContents, WorkContent> {
       'idx', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (idx > 0)');
+      $customConstraints: 'NOT NULL CHECK (idx >= 0)');
   static const VerificationMeta _wordMeta = const VerificationMeta('word');
   late final GeneratedColumn<String> word = GeneratedColumn<String>(
       'word', aliasedName, false,
@@ -2862,7 +2862,7 @@ class WorkContentSubdivisions extends Table
       'cnt', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (cnt > 0)');
+      $customConstraints: 'NOT NULL CHECK (cnt >= 0)');
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
@@ -2882,14 +2882,14 @@ class WorkContentSubdivisions extends Table
       'fromIndex', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (fromIndex > 0)');
+      $customConstraints: 'NOT NULL CHECK (fromIndex >= 0)');
   static const VerificationMeta _toIndexMeta =
       const VerificationMeta('toIndex');
   late final GeneratedColumn<int> toIndex = GeneratedColumn<int>(
       'toIndex', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (toIndex > 0)');
+      $customConstraints: 'NOT NULL CHECK (toIndex >= 0)');
   @override
   List<GeneratedColumn> get $columns =>
       [workId, node, typ, cnt, name, parent, fromIndex, toIndex];
@@ -3275,7 +3275,7 @@ class WorkContentSupplementary extends Table
       'cnt', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (cnt > 0)');
+      $customConstraints: 'NOT NULL CHECK (cnt >= 0)');
   static const VerificationMeta _fromIndexMeta =
       const VerificationMeta('fromIndex');
   late final GeneratedColumn<int> fromIndex = GeneratedColumn<int>(
