@@ -238,11 +238,13 @@ class WordSelector {
     final selStart = fullText.indexOf(selectedText);
     if (selStart == -1) return false;
     final selEnd = selStart + selectedText.length;
-    final previousChar = fullText[selStart - 1];
-    final startIsValid = (selStart == 0 || previousChar == ' ') ||
+    final previousChar = selStart > 0 ? fullText[selStart - 1] : null;
+    final startIsValid = previousChar == null ||
+        previousChar == ' ' ||
         _closingPunctSigns.contains(previousChar);
-    final nextChar = fullText[selEnd];
-    final endIsValid = (selEnd == selectedText.length || nextChar == ' ') ||
+    final nextChar = selEnd < fullText.length ? fullText[selEnd] : null;
+    final endIsValid = nextChar == null ||
+        nextChar == ' ' ||
         _closingPunctSigns.contains(nextChar);
     final middleIsValid = (!selectedText.contains(' ') &&
         !_closingPunctSigns.any((sign) => selectedText.contains(sign)));
