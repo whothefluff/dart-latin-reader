@@ -20,27 +20,28 @@ class TextPage extends ConsumerStatefulWidget {
 }
 
 class TextPageState extends ConsumerState<TextPage> {
+//
+  static const _pageSize = 250;
   var _currentIndex = 0;
   var _lastVisibleIndex = 0;
-  static const _pageSize = 250;
 
   @override
   Widget build(BuildContext context) {
-    final wordsProvider = ref.watch(
+    final segmentsProvider = ref.watch(
       libraryWorkContentsPartiallyProvider(
           widget.workId, _currentIndex, _currentIndex + _pageSize),
     );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Styled Word List')),
-      body: wordsProvider.when(
+      body: segmentsProvider.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
-        data: (words) => Column(
+        data: (segment) => Column(
           children: [
             Expanded(
               child: _StyledWordList(
-                words: words,
+                segments: segment,
                 onNavigateNext: _loadNextPage,
                 onNavigatePrevious: _loadPreviousPage,
                 onLastVisibleIndexChanged: (index) =>
@@ -67,20 +68,20 @@ class TextPageState extends ConsumerState<TextPage> {
 
 final _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
 
-typedef LastVisibleIndexCallback = void Function(int lastVisibleIndex);
+typedef _LastVisibleIndexCallback = void Function(int lastVisibleIndex);
 
 class _StyledWordList extends StatefulWidget {
   const _StyledWordList({
-    required this.words,
+    required this.segments,
     required this.onNavigateNext,
     required this.onNavigatePrevious,
     required this.onLastVisibleIndexChanged,
   });
 
-  final UnmodifiableListView<WorkContentsElementView> words;
+  final UnmodifiableListView<WorkContentsElementView> segments;
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
-  final LastVisibleIndexCallback onLastVisibleIndexChanged;
+  final _LastVisibleIndexCallback onLastVisibleIndexChanged;
 
   @override
   _StyledWordListState createState() => _StyledWordListState();
@@ -146,8 +147,8 @@ class _TextRenderer {
 //
 }
 
-class GestureHandler {
-  GestureHandler({
+class _GestureHandler {
+  _GestureHandler({
     required this.onNavigateNext,
     required this.onNavigatePrevious,
   });
@@ -165,18 +166,19 @@ class GestureHandler {
   }
 
   void handleSwipe(double? velocity) {
-    if (velocity == null) return; //TODO necessary?
-    if (velocity < 0) {
-      onNavigateNext();
-    } else if (velocity > 0) {
-      onNavigatePrevious();
+    if (velocity != null) {
+      if (velocity < 0) {
+        onNavigateNext();
+      } else if (velocity > 0) {
+        onNavigatePrevious();
+      }
     }
   }
 //
 }
 
-class WordSelector {
-  WordSelector({
+class _WordSelector {
+  _WordSelector({
     required this.segments,
     required this.textKey,
   });
@@ -190,13 +192,12 @@ class WordSelector {
     selected = null;
   }
 
-  void Function(SelectedContent?)? sync(SelectedContent? content) {
-    _updateCache();
+  void synchronize(SelectedContent? content) {
+    _refreshCache();
     if (_cachedVisibleText != null) {
       if (content != null && content.plainText.isNotEmpty) {
         if (_isFullWordSelected(content, _cachedVisibleText!)) {
           selected = content.plainText;
-          print('Full word selected: $selected');
         } else {
           clearSelectedWord();
         }
@@ -206,7 +207,6 @@ class WordSelector {
     } else {
       clearSelectedWord();
     }
-    return null;
   }
 
   void invalidateCacheWhenElementsChange(
@@ -216,7 +216,7 @@ class WordSelector {
     }
   }
 
-  void _updateCache() {
+  void _refreshCache() {
     if (_cachedVisibleText == null) {
       final renderObject = textKey.currentContext?.findRenderObject();
       if (renderObject is RenderParagraph) {
@@ -241,6 +241,7 @@ class WordSelector {
     final previousChar = selStart > 0 ? fullText[selStart - 1] : null;
     final startIsValid = previousChar == null ||
         previousChar == ' ' ||
+        previousChar == '\n' ||
         _closingPunctSigns.contains(previousChar);
     final nextChar = selEnd < fullText.length ? fullText[selEnd] : null;
     final endIsValid = nextChar == null ||
@@ -251,26 +252,22 @@ class WordSelector {
     return startIsValid && endIsValid && middleIsValid;
   }
 
-  bool singleFullWordSelected() {
+  bool fullSingleWordSelected() {
     return selected != null;
   }
 //
 }
 
-class WordSelectionButton extends ContextMenuButtonItem {
-  const WordSelectionButton._(
-    this.word,
-    VoidCallback onPressed,
-  ) : super(onPressed: onPressed, label: 'See details');
-
-  final String word;
-
-  factory WordSelectionButton({required String word}) {
-    return WordSelectionButton._(word, () => _onPressed(word));
-  }
+class _WordSelectionButton extends ContextMenuButtonItem {
+  _WordSelectionButton({
+    required String word,
+  }) : super(
+          onPressed: () => _onPressed(word),
+          label: 'See details for "$word"',
+        );
 
   static void _onPressed(String word) {
-    print(word);
+    print('Selected word: $word');
   }
 //
 }
@@ -279,15 +276,15 @@ class _StyledWordListState extends State<_StyledWordList> {
 //
   var _lastVisibleIndex = 0;
   final _textKey = GlobalKey();
-  late GestureHandler _gestureHandler;
+  late _GestureHandler _gestureHandler;
   late final _wordSelector =
-      WordSelector(segments: widget.words, textKey: _textKey);
-  ContextMenuButtonItem? _wordSelectionButton;
+      _WordSelector(segments: widget.segments, textKey: _textKey);
+  var _wordSelectionButtons = <ContextMenuButtonItem>[];
 
   @override
   void initState() {
     super.initState();
-    _gestureHandler = GestureHandler(
+    _gestureHandler = _GestureHandler(
       onNavigateNext: widget.onNavigateNext,
       onNavigatePrevious: widget.onNavigatePrevious,
     );
@@ -296,7 +293,7 @@ class _StyledWordListState extends State<_StyledWordList> {
   @override
   void didUpdateWidget(covariant _StyledWordList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _wordSelector.invalidateCacheWhenElementsChange(oldWidget.words);
+    _wordSelector.invalidateCacheWhenElementsChange(oldWidget.segments);
   }
 
   @override
@@ -311,37 +308,39 @@ class _StyledWordListState extends State<_StyledWordList> {
           onHorizontalDragEnd: (DragEndDetails details) {
             _gestureHandler.handleSwipe(details.primaryVelocity);
           },
-          child: SelectionArea(
-            onSelectionChanged: (content) {
-              _wordSelector.sync(content);
-              setState(() {
-                if (_wordSelector.singleFullWordSelected()) {
-                  final selectedWord = _wordSelector.selected!;
-                  _wordSelectionButton =
-                      WordSelectionButton(word: selectedWord);
-                } else {
-                  _wordSelectionButton = null;
-                }
-              });
-            },
-            contextMenuBuilder: (context, selectableRegionState) {
-              return StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  var buttonItems = [
-                    ...selectableRegionState.contextMenuButtonItems,
-                    if (_wordSelectionButton != null) _wordSelectionButton!,
-                  ];
-                  return AdaptiveTextSelectionToolbar.buttonItems(
-                    anchors: selectableRegionState.contextMenuAnchors,
-                    buttonItems: buttonItems,
-                  );
-                },
-              );
-            },
-            child: _buildTextWithOverflowDetection(context, constraints),
-          ),
+          child: _buildSelectionArea(context, constraints),
         );
       },
+    );
+  }
+
+  Widget _buildSelectionArea(BuildContext context, BoxConstraints constraints) {
+    return SelectionArea(
+      onSelectionChanged: _handleSelectionChanged,
+      contextMenuBuilder: _buildContextMenu,
+      child: _buildTextWithOverflowDetection(context, constraints),
+    );
+  }
+
+  void _handleSelectionChanged(SelectedContent? content) {
+    _wordSelector.synchronize(content);
+    setState(() {
+      if (_wordSelector.fullSingleWordSelected()) {
+        final selectedWord = _wordSelector.selected!;
+        _wordSelectionButtons = [_WordSelectionButton(word: selectedWord)];
+      } else {
+        _wordSelectionButtons = [];
+      }
+    });
+  }
+
+  Widget _buildContextMenu(BuildContext context, SelectableRegionState state) {
+    return AdaptiveTextSelectionToolbar.buttonItems(
+      anchors: state.contextMenuAnchors,
+      buttonItems: [
+        ...state.contextMenuButtonItems,
+        ..._wordSelectionButtons,
+      ],
     );
   }
 
@@ -363,7 +362,7 @@ class _StyledWordListState extends State<_StyledWordList> {
       textDirection: TextDirection.ltr,
       maxLines: null,
     );
-    final allSpans = _TextRenderer(textStyles, widget.words).createSpans();
+    final allSpans = _TextRenderer(textStyles, widget.segments).createSpans();
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
 
@@ -387,12 +386,12 @@ class _StyledWordListState extends State<_StyledWordList> {
         }
       }
       // Adjust lastFittingIndex to end of previous verse if necessary
-      if (lastFittingIndex < widget.words.length - 1) {
-        var lastElement = widget.words[lastFittingIndex];
+      if (lastFittingIndex < widget.segments.length - 1) {
+        var lastElement = widget.segments[lastFittingIndex];
         if (lastElement.typ == 'VERS') {
           var currentNode = lastElement.node;
-          var nextNode = lastFittingIndex + 1 < widget.words.length
-              ? widget.words[lastFittingIndex + 1].node
+          var nextNode = lastFittingIndex + 1 < widget.segments.length
+              ? widget.segments[lastFittingIndex + 1].node
               : null;
           // If the next word is from a different verse (node), we're good
           if (currentNode != nextNode) {
@@ -400,7 +399,7 @@ class _StyledWordListState extends State<_StyledWordList> {
           }
           // If we're in the middle of a verse, move back to the end of the previous verse
           while (lastFittingIndex > 0 &&
-              widget.words[lastFittingIndex - 1].node == currentNode) {
+              widget.segments[lastFittingIndex - 1].node == currentNode) {
             lastFittingIndex--;
           }
           // Now lastFittingIndex is at the start of the current verse
@@ -409,8 +408,8 @@ class _StyledWordListState extends State<_StyledWordList> {
             lastFittingIndex--;
           }
         } else {
-          if (lastFittingIndex < widget.words.length &&
-              isPunctuation(widget.words[lastFittingIndex + 1].word)) {
+          if (lastFittingIndex < widget.segments.length &&
+              isPunctuation(widget.segments[lastFittingIndex + 1].word)) {
             lastFittingIndex--;
           }
         }
