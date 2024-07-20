@@ -20,9 +20,9 @@ class TextPage extends ConsumerStatefulWidget {
 }
 
 class TextPageState extends ConsumerState<TextPage> {
-  int _currentIndex = 0;
-  int _lastVisibleIndex = 0;
-  static const int _pageSize = 250;
+  var _currentIndex = 0;
+  var _lastVisibleIndex = 0;
+  static const _pageSize = 250;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +65,8 @@ class TextPageState extends ConsumerState<TextPage> {
 //
 }
 
+final _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
+
 typedef LastVisibleIndexCallback = void Function(int lastVisibleIndex);
 
 class _StyledWordList extends StatefulWidget {
@@ -85,62 +87,214 @@ class _StyledWordList extends StatefulWidget {
 //
 }
 
-class _StyledWordListState extends State<_StyledWordList> {
+class _TextRenderer {
+  const _TextRenderer(
+    this.styles,
+    this.workSegments,
+  );
+
+  final UnmodifiableListView<WorkContentsElementView> workSegments;
+  final Map<String, TextStyle> styles;
+  static const Map<String, String> styleToLineBreak = {
+    'POEM': '\n\n',
+    'PROL': '\n\n',
+    'EPIL': '\n\n',
+    'BOOK': '\n\n\n',
+  };
+
+  String _getSpace(int index, WorkContentsElementView segment) {
+    final nextIsPunctuation = index + 1 < workSegments.length &&
+        _closingPunctSigns
+            .any((sign) => workSegments[index + 1].word.startsWith(sign));
+    final currentEndsWithOpeningParenthesis = segment.word.endsWith('(');
+    return nextIsPunctuation || currentEndsWithOpeningParenthesis ? '' : ' ';
+  }
+
+  String _getLineBreak(String? previousStyle, String currentStyle,
+      String? previousNode, String currentNode) {
+    var lineBreak = '';
+    if (previousStyle != null && currentStyle != previousStyle) {
+      lineBreak = styleToLineBreak[currentStyle] ?? '\n';
+    } else {
+      if (currentNode != previousNode) {
+        lineBreak = '\n';
+      }
+    }
+    return lineBreak;
+  }
+
+  List<InlineSpan> createSpans() {
+    List<InlineSpan> spans = [];
+    String? previousStyle;
+    String? previousNode;
+    for (var index = 0; index < workSegments.length; index++) {
+      final segment = workSegments[index];
+      final currentStyle = segment.typ;
+      final currentNode = segment.node;
+      final potentialSpace = _getSpace(index, segment);
+      final potentialLineBreak =
+          _getLineBreak(previousStyle, currentStyle, previousNode, currentNode);
+      spans.add(TextSpan(
+        text: '$potentialLineBreak${segment.word}$potentialSpace',
+        style: styles[currentStyle] ?? styles['default'],
+      ));
+      previousStyle = currentStyle;
+      previousNode = currentNode;
+    }
+    return spans;
+  }
 //
-  int _lastVisibleIndex = 0;
-  String? _selectedWord;
-  final _textKey = GlobalKey();
+}
 
-  final closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
+class GestureHandler {
+  GestureHandler({
+    required this.onNavigateNext,
+    required this.onNavigatePrevious,
+  });
 
-  void _handleTap(Offset tapPosition, BoxConstraints constraints) {
+  final VoidCallback onNavigateNext;
+  final VoidCallback onNavigatePrevious;
+
+  void handleTap(Offset tapPosition, BoxConstraints constraints) {
     final screenWidth = constraints.maxWidth;
     if (tapPosition.dx < screenWidth / 5) {
-      widget.onNavigatePrevious();
+      onNavigateNext();
     } else if (tapPosition.dx > 4 * screenWidth / 5) {
-      widget.onNavigateNext();
+      onNavigatePrevious();
     }
   }
 
-  void _handleSwipe(double? velocity) {
-    if (velocity == null) return; //necessary?
+  void handleSwipe(double? velocity) {
+    if (velocity == null) return; //TODO necessary?
     if (velocity < 0) {
-      widget.onNavigateNext();
+      onNavigateNext();
     } else if (velocity > 0) {
-      widget.onNavigatePrevious();
+      onNavigatePrevious();
     }
   }
+//
+}
 
-  String? _getFullText() {
-    final renderObject = _textKey.currentContext?.findRenderObject();
-    if (renderObject is RenderParagraph) {
-      return renderObject.text.toPlainText();
-    } else if (renderObject is RenderBox) {
-      // Try to find a descendant RenderParagraph
-      RenderParagraph? paragraph;
-      renderObject.visitChildren((child) {
-        if (child is RenderParagraph) {
-          paragraph = child;
+class WordSelector {
+  WordSelector({
+    required this.segments,
+    required this.textKey,
+  });
+
+  final UnmodifiableListView<WorkContentsElementView> segments;
+  final GlobalKey textKey;
+  String? _cachedVisibleText;
+  String? selected;
+
+  void clearSelectedWord() {
+    selected = null;
+  }
+
+  void Function(SelectedContent?)? sync(SelectedContent? content) {
+    _updateCache();
+    if (_cachedVisibleText != null) {
+      if (content != null && content.plainText.isNotEmpty) {
+        if (_isFullWordSelected(content, _cachedVisibleText!)) {
+          selected = content.plainText;
+          print('Full word selected: $selected');
+        } else {
+          clearSelectedWord();
         }
-      });
-      return paragraph?.text.toPlainText();
+      } else {
+        clearSelectedWord();
+      }
+    } else {
+      clearSelectedWord();
     }
     return null;
   }
 
+  void invalidateCacheWhenElementsChange(
+      UnmodifiableListView<WorkContentsElementView> oldSegments) {
+    if (segments != oldSegments) {
+      _cachedVisibleText = null;
+    }
+  }
+
+  void _updateCache() {
+    if (_cachedVisibleText == null) {
+      final renderObject = textKey.currentContext?.findRenderObject();
+      if (renderObject is RenderParagraph) {
+        _cachedVisibleText = renderObject.text.toPlainText();
+      } else if (renderObject is RenderBox) {
+        RenderParagraph? paragraph;
+        renderObject.visitChildren((child) {
+          if (child is RenderParagraph) {
+            paragraph = child;
+          }
+        });
+        _cachedVisibleText = paragraph?.text.toPlainText();
+      }
+    }
+  }
+
   bool _isFullWordSelected(SelectedContent content, String fullText) {
     final selectedText = content.plainText;
-    final selectionStart = fullText.indexOf(selectedText);
-    if (selectionStart == -1) return false;
-    final selectionEnd = selectionStart + selectedText.length;
-    final bool isStartValid =
-        (selectionStart == 0 || fullText[selectionStart - 1] == ' ') ||
-            closingPunctSigns.contains(fullText[selectionStart - 1]);
-    final bool isEndValid = (selectionEnd == selectedText.length ||
-            fullText[selectionEnd] == ' ') ||
-        closingPunctSigns.contains(fullText[selectionEnd]);
+    final selStart = fullText.indexOf(selectedText);
+    if (selStart == -1) return false;
+    final selEnd = selStart + selectedText.length;
+    final previousChar = fullText[selStart - 1];
+    final startIsValid = (selStart == 0 || previousChar == ' ') ||
+        _closingPunctSigns.contains(previousChar);
+    final nextChar = fullText[selEnd];
+    final endIsValid = (selEnd == selectedText.length || nextChar == ' ') ||
+        _closingPunctSigns.contains(nextChar);
+    final middleIsValid = (!selectedText.contains(' ') &&
+        !_closingPunctSigns.any((sign) => selectedText.contains(sign)));
+    return startIsValid && endIsValid && middleIsValid;
+  }
 
-    return isStartValid && isEndValid && !selectedText.contains(' ');
+  bool singleFullWordSelected() {
+    return selected != null;
+  }
+//
+}
+
+class WordSelectionButton extends ContextMenuButtonItem {
+  const WordSelectionButton._(
+    this.word,
+    VoidCallback onPressed,
+  ) : super(onPressed: onPressed, label: 'See details');
+
+  final String word;
+
+  factory WordSelectionButton({required String word}) {
+    return WordSelectionButton._(word, () => _onPressed(word));
+  }
+
+  static void _onPressed(String word) {
+    print(word);
+  }
+//
+}
+
+class _StyledWordListState extends State<_StyledWordList> {
+//
+  var _lastVisibleIndex = 0;
+  final _textKey = GlobalKey();
+  late GestureHandler _gestureHandler;
+  late final _wordSelector =
+      WordSelector(segments: widget.words, textKey: _textKey);
+  ContextMenuButtonItem? _wordSelectionButton;
+
+  @override
+  void initState() {
+    super.initState();
+    _gestureHandler = GestureHandler(
+      onNavigateNext: widget.onNavigateNext,
+      onNavigatePrevious: widget.onNavigatePrevious,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _StyledWordList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _wordSelector.invalidateCacheWhenElementsChange(oldWidget.words);
   }
 
   @override
@@ -151,38 +305,35 @@ class _StyledWordListState extends State<_StyledWordList> {
         return GestureDetector(
           //TODO: add on tap for big screens but not here since
           //it collides with the text events, possibly with Stack and margins
-          // onTap
+          // onTap: (TapDownDetails details) => _gestureHandler.handleTap(details.globalPosition, constraints),
           onHorizontalDragEnd: (DragEndDetails details) {
-            _handleSwipe(details.primaryVelocity);
+            _gestureHandler.handleSwipe(details.primaryVelocity);
           },
           child: SelectionArea(
             onSelectionChanged: (content) {
-              final fullText = _getFullText();
-              if (fullText == null) return;
-
-              if (content != null && content.plainText.isNotEmpty) {
-                if (_isFullWordSelected(content, fullText)) {
-                  setState(() {
-                    _selectedWord = content.plainText;
-                  });
-                  print('Full word selected: $_selectedWord');
+              _wordSelector.sync(content);
+              setState(() {
+                if (_wordSelector.singleFullWordSelected()) {
+                  final selectedWord = _wordSelector.selected!;
+                  _wordSelectionButton =
+                      WordSelectionButton(word: selectedWord);
                 } else {
-                  setState(() {
-                    _selectedWord = null;
-                  });
+                  _wordSelectionButton = null;
                 }
-              } else {
-                setState(() {
-                  _selectedWord = null;
-                });
-              }
+              });
             },
             contextMenuBuilder: (context, selectableRegionState) {
-              final List<ContextMenuButtonItem> buttonItems =
-                  selectableRegionState.contextMenuButtonItems;
-              return AdaptiveTextSelectionToolbar.buttonItems(
-                anchors: selectableRegionState.contextMenuAnchors,
-                buttonItems: buttonItems,
+              return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  var buttonItems = [
+                    ...selectableRegionState.contextMenuButtonItems,
+                    if (_wordSelectionButton != null) _wordSelectionButton!,
+                  ];
+                  return AdaptiveTextSelectionToolbar.buttonItems(
+                    anchors: selectableRegionState.contextMenuAnchors,
+                    buttonItems: buttonItems,
+                  );
+                },
               );
             },
             child: _buildTextWithOverflowDetection(context, constraints),
@@ -198,7 +349,7 @@ class _StyledWordListState extends State<_StyledWordList> {
 
   Widget _buildTextWithOverflowDetection(
       BuildContext context, BoxConstraints constraints) {
-    final styles = {
+    final textStyles = {
       'BOOK': Theme.of(context).textTheme.headlineSmall!,
       'PROL': Theme.of(context).textTheme.titleMedium!,
       'POEM': Theme.of(context).textTheme.titleMedium!,
@@ -206,63 +357,17 @@ class _StyledWordListState extends State<_StyledWordList> {
       'VERS': Theme.of(context).textTheme.bodyLarge!,
       'default': Theme.of(context).textTheme.bodyMedium!,
     };
-
-    bool needsSpace(int index) {
-      bool nextIsPunctuation = index + 1 < widget.words.length &&
-          closingPunctSigns
-              .any((sign) => widget.words[index + 1].word.startsWith(sign));
-      bool currentEndsWithOpeningParenthesis =
-          widget.words[index].word.endsWith('(');
-      return !nextIsPunctuation && !currentEndsWithOpeningParenthesis;
-    }
-
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
       maxLines: null,
     );
-
-    List<InlineSpan> createSpansWithLineBreaks() {
-      List<InlineSpan> spans = [];
-      String? previousStyle;
-      String? previousNode;
-      for (int index = 0; index < widget.words.length; index++) {
-        final wordItem = widget.words[index];
-        final currentStyle = wordItem.typ;
-        final currentNode = wordItem.node;
-        final potentialSpace = needsSpace(index) ? ' ' : '';
-        var potentialLineBreak =
-            previousStyle != null && currentStyle != previousStyle ? '\n' : '';
-        if (potentialLineBreak.isNotEmpty && currentStyle == 'POEM') {
-          potentialLineBreak = '\n\n';
-        }
-        if (potentialLineBreak.isNotEmpty && currentStyle == 'PROL' ||
-            currentStyle == 'EPIL') {
-          potentialLineBreak = '\n\n';
-        }
-        if (potentialLineBreak.isNotEmpty && currentStyle == 'BOOK') {
-          potentialLineBreak = '\n\n\n';
-        }
-        if (potentialLineBreak.isEmpty && previousNode != currentNode) {
-          potentialLineBreak = '\n';
-        }
-        spans.add(TextSpan(
-          text: '$potentialLineBreak${wordItem.word}$potentialSpace',
-          style: styles[currentStyle] ?? styles['default'],
-        ));
-        previousStyle = currentStyle;
-        previousNode = currentNode;
-      }
-      return spans;
-    }
-
-    final allSpans = createSpansWithLineBreaks();
-
+    final allSpans = _TextRenderer(textStyles, widget.words).createSpans();
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
 
     bool isPunctuation(String word) {
-      return closingPunctSigns.contains(word) ||
-          closingPunctSigns.any((sign) => word.startsWith(sign));
+      return _closingPunctSigns.contains(word) ||
+          _closingPunctSigns.any((sign) => word.startsWith(sign));
     }
 
     int getLastVisibleWord(int low, int high) {
@@ -304,7 +409,7 @@ class _StyledWordListState extends State<_StyledWordList> {
         } else {
           if (lastFittingIndex < widget.words.length &&
               isPunctuation(widget.words[lastFittingIndex + 1].word)) {
-            lastFittingIndex --;
+            lastFittingIndex--;
           }
         }
       }
