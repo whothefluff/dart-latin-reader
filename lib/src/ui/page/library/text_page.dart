@@ -6,6 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 import 'package:latin_reader/src/external/provider_work.dart';
 
+final _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
+
+typedef _LastVisibleIndexCallback = void Function(int first, int last);
+
 class TextPage extends ConsumerStatefulWidget {
   const TextPage({
     super.key,
@@ -22,14 +26,15 @@ class TextPage extends ConsumerStatefulWidget {
 class TextPageState extends ConsumerState<TextPage> {
 //
   static const _pageSize = 250;
-  var _currentIndex = 0;
-  var _lastVisibleIndex = 0;
+  var _currentFirstVisibleIndex = 0;
+  var _currentLastVisibleIndex = 0;
+  var _fromIndex = 0;
+  var _toIndex = _pageSize;
 
   @override
   Widget build(BuildContext context) {
     final segmentsProvider = ref.watch(
-      libraryWorkContentsPartiallyProvider(
-          widget.workId, _currentIndex, _currentIndex + _pageSize),
+      libraryWorkContentsPartiallyProvider(widget.workId, _fromIndex, _toIndex),
     );
 
     return Scaffold(
@@ -41,12 +46,13 @@ class TextPageState extends ConsumerState<TextPage> {
           children: [
             Expanded(
               child: _StyledWordList(
-                segments: segment,
-                onNavigateNext: _loadNextPage,
-                onNavigatePrevious: _loadPreviousPage,
-                onLastVisibleIndexChanged: (index) =>
-                    _lastVisibleIndex = _currentIndex + index,
-              ),
+                  segments: segment,
+                  onNavigateNext: _loadNextPage,
+                  onNavigatePrevious: _loadPreviousPage,
+                  onVisibleIndicesChanged: (first, last) {
+                    _currentFirstVisibleIndex = first;
+                    _currentLastVisibleIndex = last;
+                  }),
             ),
           ],
         ),
@@ -56,32 +62,37 @@ class TextPageState extends ConsumerState<TextPage> {
 
   void _loadNextPage() {
     setState(() {
-      _currentIndex = _lastVisibleIndex + 1;
+      // if (_currentLastVisibleIndex + _pageSize <= totalLength ) { //TODO implement ending of work
+      _fromIndex = _currentLastVisibleIndex + 1;
+      _toIndex = _currentLastVisibleIndex + _pageSize;
     });
   }
 
   void _loadPreviousPage() {
-    //TODO
+    // setState(() {
+    //TODO implement final solution
+    // if (_fromIndex != 0) {
+    //   _currentLastVisibleIndex = _currentFirstVisibleIndex - 1;
+    //   _fromIndex = max(0, _currentLastVisibleIndex - _pageSize);
+    //   _toIndex = _currentLastVisibleIndex;
+    // }
+    // });
   }
 //
 }
-
-final _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
-
-typedef _LastVisibleIndexCallback = void Function(int lastVisibleIndex);
 
 class _StyledWordList extends StatefulWidget {
   const _StyledWordList({
     required this.segments,
     required this.onNavigateNext,
     required this.onNavigatePrevious,
-    required this.onLastVisibleIndexChanged,
+    required this.onVisibleIndicesChanged,
   });
 
   final UnmodifiableListView<WorkContentsElementView> segments;
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
-  final _LastVisibleIndexCallback onLastVisibleIndexChanged;
+  final _LastVisibleIndexCallback onVisibleIndicesChanged;
 
   @override
   _StyledWordListState createState() => _StyledWordListState();
@@ -274,7 +285,6 @@ class _WordSelectionButton extends ContextMenuButtonItem {
 
 class _StyledWordListState extends State<_StyledWordList> {
 //
-  var _lastVisibleIndex = 0;
   final _textKey = GlobalKey();
   late _GestureHandler _gestureHandler;
   late final _wordSelector =
@@ -423,12 +433,13 @@ class _StyledWordListState extends State<_StyledWordList> {
     ).createSpans();
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
-    _lastVisibleIndex = getLastVisibleWord(textPainter, allSpans);
-    WidgetsBinding.instance.addPostFrameCallback(
-        (_) => widget.onLastVisibleIndexChanged(_lastVisibleIndex));
+    final lastVisible = getLastVisibleWord(textPainter, allSpans);
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        widget.onVisibleIndicesChanged(
+            widget.segments[0].idx, widget.segments[lastVisible].idx));
     return Text.rich(
       key: _textKey,
-      TextSpan(children: tail(allSpans, _lastVisibleIndex)),
+      TextSpan(children: tail(allSpans, lastVisible)),
     );
   }
 //
