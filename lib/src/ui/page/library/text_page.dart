@@ -358,20 +358,19 @@ class _StyledWordListState extends State<_StyledWordList> {
       'VERS': Theme.of(context).textTheme.bodyLarge!,
       'default': Theme.of(context).textTheme.bodyMedium!,
     };
-    final textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      maxLines: null,
-    );
-    final allSpans = _TextRenderer(textStyles, widget.segments).createSpans();
-    textPainter.text = TextSpan(children: allSpans);
-    textPainter.layout(maxWidth: constraints.maxWidth);
 
     bool isPunctuation(String word) {
       return _closingPunctSigns.contains(word) ||
           _closingPunctSigns.any((sign) => word.startsWith(sign));
     }
 
-    int getLastVisibleWord(int low, int high) {
+    List<T> tail<T>(List<T> list, int inclussiveEnd) {
+      return list.sublist(0, inclussiveEnd + 1);
+    }
+
+    int getLastVisibleWord(TextPainter textPainter, List<InlineSpan> allSpans) {
+      var low = 0;
+      var high = allSpans.length - 1;
       var lastFittingIndex = low - 1;
       while (low <= high) {
         var mid = (low + high) ~/ 2;
@@ -417,16 +416,16 @@ class _StyledWordListState extends State<_StyledWordList> {
       return lastFittingIndex;
     }
 
-    _lastVisibleIndex = getLastVisibleWord(0, allSpans.length - 1);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.onLastVisibleIndexChanged(_lastVisibleIndex);
-    });
-
-    List<T> tail<T>(List<T> list, int inclussiveEnd) {
-      return list.sublist(0, inclussiveEnd + 1);
-    }
-
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    final allSpans = _TextRenderer(
+      textStyles,
+      widget.segments,
+    ).createSpans();
+    textPainter.text = TextSpan(children: allSpans);
+    textPainter.layout(maxWidth: constraints.maxWidth);
+    _lastVisibleIndex = getLastVisibleWord(textPainter, allSpans);
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => widget.onLastVisibleIndexChanged(_lastVisibleIndex));
     return Text.rich(
       key: _textKey,
       TextSpan(children: tail(allSpans, _lastVisibleIndex)),
