@@ -1,14 +1,18 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 import 'package:latin_reader/src/external/provider_work.dart';
 
 final _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
 
 typedef _LastVisibleIndexCallback = void Function(int first, int last);
+
+enum _PageFlow { previous, next }
 
 class TextPage extends ConsumerStatefulWidget {
   const TextPage({
@@ -26,33 +30,49 @@ class TextPage extends ConsumerStatefulWidget {
 class TextPageState extends ConsumerState<TextPage> {
 //
   static const _pageSize = 250;
+  late int _workSize;
   var _currentFirstVisibleIndex = 0;
   var _currentLastVisibleIndex = 0;
   var _fromIndex = 0;
   var _toIndex = _pageSize;
+  var _pageFlow = _PageFlow.next;
 
   @override
   Widget build(BuildContext context) {
+    final workSizeProvider = ref.watch(libraryWorkDetailsProvider(widget.workId)
+        .select((model) => model.whenData((work) => work.numberOfWords)));
+    return workSizeProvider.when(
+      data: (workSize) {
+        _workSize = workSize;
+        return _scaffold();
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text('Error: $error')),
+    );
+  }
+
+  Widget _scaffold() {
     final segmentsProvider = ref.watch(
       libraryWorkContentsPartiallyProvider(widget.workId, _fromIndex, _toIndex),
     );
-
     return Scaffold(
       appBar: AppBar(title: const Text('Styled Word List')),
       body: segmentsProvider.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
-        data: (segment) => Column(
+        data: (segments) => Column(
           children: [
             Expanded(
               child: _StyledWordList(
-                  segments: segment,
+                  segments: segments,
                   onNavigateNext: _loadNextPage,
                   onNavigatePrevious: _loadPreviousPage,
                   onVisibleIndicesChanged: (first, last) {
                     _currentFirstVisibleIndex = first;
                     _currentLastVisibleIndex = last;
-                  }),
+                    _pageFlow = _PageFlow.next;
+                  },
+                  pageFlow: _pageFlow),
             ),
           ],
         ),
@@ -61,22 +81,26 @@ class TextPageState extends ConsumerState<TextPage> {
   }
 
   void _loadNextPage() {
+    log.info(() => 'TextPage - attempting to navigate to next page');
     setState(() {
-      // if (_currentLastVisibleIndex + _pageSize <= totalLength ) { //TODO implement ending of work
-      _fromIndex = _currentLastVisibleIndex + 1;
-      _toIndex = _currentLastVisibleIndex + _pageSize;
+      if (_currentLastVisibleIndex != _workSize) {
+        _pageFlow = _PageFlow.next;
+        _fromIndex = _currentLastVisibleIndex + 1;
+        _toIndex = min(_currentLastVisibleIndex + _pageSize, _workSize);
+      }
     });
   }
 
   void _loadPreviousPage() {
-    // setState(() {
-    //TODO implement final solution
-    // if (_fromIndex != 0) {
-    //   _currentLastVisibleIndex = _currentFirstVisibleIndex - 1;
-    //   _fromIndex = max(0, _currentLastVisibleIndex - _pageSize);
-    //   _toIndex = _currentLastVisibleIndex;
-    // }
-    // });
+    log.info(() => 'TextPage - attempting to navigate to previous page');
+    setState(() {
+      if (_currentFirstVisibleIndex != 0) {
+        _pageFlow = _PageFlow.previous;
+        _currentLastVisibleIndex = _currentFirstVisibleIndex - 1;
+        _fromIndex = max(0, _currentLastVisibleIndex - _pageSize);
+        _toIndex = _currentLastVisibleIndex;
+      }
+    });
   }
 //
 }
@@ -87,12 +111,14 @@ class _StyledWordList extends StatefulWidget {
     required this.onNavigateNext,
     required this.onNavigatePrevious,
     required this.onVisibleIndicesChanged,
+    required this.pageFlow,
   });
 
   final UnmodifiableListView<WorkContentsElementView> segments;
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
   final _LastVisibleIndexCallback onVisibleIndicesChanged;
+  final _PageFlow pageFlow;
 
   @override
   _StyledWordListState createState() => _StyledWordListState();
@@ -100,19 +126,27 @@ class _StyledWordList extends StatefulWidget {
 }
 
 class _TextRenderer {
-  const _TextRenderer(
-    this.styles,
+  _TextRenderer(
+    this.textTheme,
     this.workSegments,
   );
 
-  final UnmodifiableListView<WorkContentsElementView> workSegments;
-  final Map<String, TextStyle> styles;
+  final TextTheme textTheme;
   static const Map<String, String> styleToLineBreak = {
     'POEM': '\n\n',
     'PROL': '\n\n',
     'EPIL': '\n\n',
     'BOOK': '\n\n\n',
   };
+  late final Map<String, TextStyle> styles = {
+    'BOOK': textTheme.headlineSmall!,
+    'PROL': textTheme.titleMedium!,
+    'POEM': textTheme.titleMedium!,
+    'EPIL': textTheme.titleMedium!,
+    'VERS': textTheme.bodyLarge!,
+    'default': textTheme.bodyMedium!,
+  };
+  final UnmodifiableListView<WorkContentsElementView> workSegments;
 
   String _getSpace(int index, WorkContentsElementView segment) {
     final nextIsPunctuation = index + 1 < workSegments.length &&
@@ -170,8 +204,10 @@ class _GestureHandler {
   void handleTap(Offset tapPosition, BoxConstraints constraints) {
     final screenWidth = constraints.maxWidth;
     if (tapPosition.dx < screenWidth / 5) {
+      log.info(() => 'TextPage - handling left tap');
       onNavigateNext();
     } else if (tapPosition.dx > 4 * screenWidth / 5) {
+      log.info(() => 'TextPage - handling right tap');
       onNavigatePrevious();
     }
   }
@@ -179,8 +215,10 @@ class _GestureHandler {
   void handleSwipe(double? velocity) {
     if (velocity != null) {
       if (velocity < 0) {
+        log.info(() => 'TextPage - handling left swipe');
         onNavigateNext();
       } else if (velocity > 0) {
+        log.info(() => 'TextPage - handling right swipe');
         onNavigatePrevious();
       }
     }
@@ -283,6 +321,126 @@ class _WordSelectionButton extends ContextMenuButtonItem {
 //
 }
 
+class _VisibleSegmentRange {
+//
+  final int first;
+  final int last;
+
+  _VisibleSegmentRange.build(
+    TextPainter textPainter,
+    List<InlineSpan> allSpans,
+    UnmodifiableListView<WorkContentsElementView> segments,
+    _PageFlow pageFlow,
+    BoxConstraints constraints,
+  )   : first = pageFlow == _PageFlow.previous
+            ? _getFirstVisibleWord(textPainter, allSpans, segments, constraints)
+            : 0,
+        last = pageFlow == _PageFlow.next
+            ? _getLastVisibleWord(textPainter, allSpans, segments, constraints)
+            : segments.length - 1;
+
+  static int _getFirstVisibleWord(
+      TextPainter textPainter,
+      List<InlineSpan> allSpans,
+      UnmodifiableListView<WorkContentsElementView> segments,
+      BoxConstraints constraints) {
+    var high = allSpans.length - 1;
+    var low = 0;
+    var firstFittingIndex = high + 1;
+    while (low <= high) {
+      var mid = (low + high) ~/ 2;
+      textPainter.text = TextSpan(children: allSpans.sublist(mid));
+      textPainter.layout(maxWidth: constraints.maxWidth);
+      if (textPainter.height <= constraints.maxHeight) {
+        firstFittingIndex = mid;
+        high = mid - 1;
+      } else {
+        low = mid + 1;
+      }
+    }
+    // Adjust firstFittingIndex to start of next verse if necessary
+    if (firstFittingIndex > 0 && firstFittingIndex < segments.length) {
+      var firstElement = segments[firstFittingIndex];
+      if (firstElement.typ == 'VERS') {
+        var currentNode = firstElement.node;
+        var previousNode =
+            firstFittingIndex > 0 ? segments[firstFittingIndex - 1].node : null;
+        if (currentNode != previousNode) {
+          return firstFittingIndex;
+        }
+        // If we're in the middle of a verse, move forward to the start of the next verse
+        while (firstFittingIndex < segments.length - 1 &&
+            segments[firstFittingIndex + 1].node == currentNode) {
+          firstFittingIndex++;
+        }
+        // Now firstFittingIndex is at the end of the current verse
+        // Move it forward one more to get to the start of the next verse
+        if (firstFittingIndex < segments.length - 1) {
+          firstFittingIndex++;
+        }
+      }
+    }
+    return firstFittingIndex;
+  }
+
+  static int _getLastVisibleWord(
+      TextPainter textPainter,
+      List<InlineSpan> allSpans,
+      UnmodifiableListView<WorkContentsElementView> segments,
+      BoxConstraints constraints) {
+    var low = 0;
+    var high = allSpans.length - 1;
+    var lastFittingIndex = low - 1;
+    while (low <= high) {
+      var mid = (low + high) ~/ 2;
+      textPainter.text = TextSpan(children: allSpans.sublist(0, mid + 1));
+      textPainter.layout(maxWidth: constraints.maxWidth);
+      if (textPainter.height <= constraints.maxHeight) {
+        lastFittingIndex = mid;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+    // Adjust lastFittingIndex to end of previous verse if necessary
+    if (lastFittingIndex < segments.length - 1) {
+      var lastElement = segments[lastFittingIndex];
+      if (lastElement.typ == 'VERS') {
+        var currentNode = lastElement.node;
+        var nextNode = lastFittingIndex + 1 < segments.length
+            ? segments[lastFittingIndex + 1].node
+            : null;
+        // If the next word is from a different verse (node), we're good
+        if (currentNode != nextNode) {
+          return lastFittingIndex;
+        }
+        // If we're in the middle of a verse, move back to the end of the previous verse
+        while (lastFittingIndex > 0 &&
+            segments[lastFittingIndex - 1].node == currentNode) {
+          lastFittingIndex--;
+        }
+        // Now lastFittingIndex is at the start of the current verse
+        // Move it back one more to get to the end of the previous verse
+        if (lastFittingIndex > 0) {
+          lastFittingIndex--;
+        }
+      } else {
+        if (lastFittingIndex < segments.length &&
+            _isPunctuation(segments[lastFittingIndex + 1].word)) {
+          lastFittingIndex--;
+        }
+      }
+    }
+    return lastFittingIndex;
+  }
+
+  static bool _isPunctuation(String word) {
+    return _closingPunctSigns.contains(word) ||
+        _closingPunctSigns.any((sign) => word.startsWith(sign));
+  }
+//
+}
+
 class _StyledWordListState extends State<_StyledWordList> {
 //
   final _textKey = GlobalKey();
@@ -360,86 +518,30 @@ class _StyledWordListState extends State<_StyledWordList> {
 
   Widget _buildTextWithOverflowDetection(
       BuildContext context, BoxConstraints constraints) {
-    final textStyles = {
-      'BOOK': Theme.of(context).textTheme.headlineSmall!,
-      'PROL': Theme.of(context).textTheme.titleMedium!,
-      'POEM': Theme.of(context).textTheme.titleMedium!,
-      'EPIL': Theme.of(context).textTheme.titleMedium!,
-      'VERS': Theme.of(context).textTheme.bodyLarge!,
-      'default': Theme.of(context).textTheme.bodyMedium!,
-    };
-
-    bool isPunctuation(String word) {
-      return _closingPunctSigns.contains(word) ||
-          _closingPunctSigns.any((sign) => word.startsWith(sign));
-    }
-
-    List<T> tail<T>(List<T> list, int inclussiveEnd) {
-      return list.sublist(0, inclussiveEnd + 1);
-    }
-
-    int getLastVisibleWord(TextPainter textPainter, List<InlineSpan> allSpans) {
-      var low = 0;
-      var high = allSpans.length - 1;
-      var lastFittingIndex = low - 1;
-      while (low <= high) {
-        var mid = (low + high) ~/ 2;
-        textPainter.text = TextSpan(children: allSpans.sublist(0, mid + 1));
-        textPainter.layout(maxWidth: constraints.maxWidth);
-
-        if (textPainter.height <= constraints.maxHeight) {
-          lastFittingIndex = mid;
-          low = mid + 1;
-        } else {
-          high = mid - 1;
-        }
-      }
-      // Adjust lastFittingIndex to end of previous verse if necessary
-      if (lastFittingIndex < widget.segments.length - 1) {
-        var lastElement = widget.segments[lastFittingIndex];
-        if (lastElement.typ == 'VERS') {
-          var currentNode = lastElement.node;
-          var nextNode = lastFittingIndex + 1 < widget.segments.length
-              ? widget.segments[lastFittingIndex + 1].node
-              : null;
-          // If the next word is from a different verse (node), we're good
-          if (currentNode != nextNode) {
-            return lastFittingIndex;
-          }
-          // If we're in the middle of a verse, move back to the end of the previous verse
-          while (lastFittingIndex > 0 &&
-              widget.segments[lastFittingIndex - 1].node == currentNode) {
-            lastFittingIndex--;
-          }
-          // Now lastFittingIndex is at the start of the current verse
-          // Move it back one more to get to the end of the previous verse
-          if (lastFittingIndex > 0) {
-            lastFittingIndex--;
-          }
-        } else {
-          if (lastFittingIndex < widget.segments.length &&
-              isPunctuation(widget.segments[lastFittingIndex + 1].word)) {
-            lastFittingIndex--;
-          }
-        }
-      }
-      return lastFittingIndex;
-    }
-
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
     final allSpans = _TextRenderer(
-      textStyles,
+      Theme.of(context).textTheme,
       widget.segments,
     ).createSpans();
     textPainter.text = TextSpan(children: allSpans);
     textPainter.layout(maxWidth: constraints.maxWidth);
-    final lastVisible = getLastVisibleWord(textPainter, allSpans);
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        widget.onVisibleIndicesChanged(
-            widget.segments[0].idx, widget.segments[lastVisible].idx));
+    final visible = _VisibleSegmentRange.build(
+      textPainter,
+      allSpans,
+      widget.segments,
+      widget.pageFlow,
+      constraints,
+    );
+    log.info(() =>
+        'TextPage - displaying new range (${widget.segments[visible.first].idx} - ${widget.segments[visible.last].idx})');
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => widget.onVisibleIndicesChanged(
+              widget.segments[visible.first].idx,
+              widget.segments[visible.last].idx,
+            ));
     return Text.rich(
       key: _textKey,
-      TextSpan(children: tail(allSpans, lastVisible)),
+      TextSpan(children: allSpans.sublist(visible.first, visible.last + 1)),
     );
   }
 //
