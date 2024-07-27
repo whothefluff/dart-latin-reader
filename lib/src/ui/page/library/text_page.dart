@@ -60,23 +60,35 @@ class TextPageState extends ConsumerState<TextPage> {
       body: segmentsProvider.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
-        data: (segments) => Column(
-          children: [
-            Expanded(
-              child: _StyledWordList(
-                  segments: segments,
-                  onNavigateNext: _loadNextPage,
-                  onNavigatePrevious: _loadPreviousPage,
-                  onVisibleIndicesChanged: (first, last) {
-                    _currentFirstVisibleIndex = first;
-                    _currentLastVisibleIndex = last;
-                    _pageFlow = _PageFlow.next;
-                  },
-                  pageFlow: _pageFlow),
-            ),
-          ],
-        ),
+        data: (segments) => _buildResponsiveContent(segments),
       ),
+    );
+  }
+
+  Widget _buildResponsiveContent(
+    UnmodifiableListView<WorkContentsElementView> segments,
+  ) {
+    const a4Width = 595.0;
+    const spaceForMargins = 200;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isLargeScreen = constraints.maxWidth > a4Width + spaceForMargins;
+        return _StyledWordList(
+          segments: segments,
+          onNavigateNext: _loadNextPage,
+          onNavigatePrevious: _loadPreviousPage,
+          onVisibleIndicesChanged: (first, last) {
+            _currentFirstVisibleIndex = first;
+            _currentLastVisibleIndex = last;
+            _pageFlow = _PageFlow.next;
+          },
+          pageFlow: _pageFlow,
+          isLargeScreen: isLargeScreen,
+          layoutConstraints: constraints,
+          largeScreenConstraints:
+              isLargeScreen ? const BoxConstraints(maxWidth: a4Width) : null,
+        );
+      },
     );
   }
 
@@ -112,6 +124,9 @@ class _StyledWordList extends StatefulWidget {
     required this.onNavigatePrevious,
     required this.onVisibleIndicesChanged,
     required this.pageFlow,
+    required this.isLargeScreen,
+    required this.layoutConstraints,
+    required this.largeScreenConstraints,
   });
 
   final UnmodifiableListView<WorkContentsElementView> segments;
@@ -119,6 +134,9 @@ class _StyledWordList extends StatefulWidget {
   final VoidCallback onNavigatePrevious;
   final _LastVisibleIndexCallback onVisibleIndicesChanged;
   final _PageFlow pageFlow;
+  final bool isLargeScreen;
+  final BoxConstraints layoutConstraints;
+  final BoxConstraints? largeScreenConstraints;
 
   @override
   _StyledWordListState createState() => _StyledWordListState();
@@ -445,8 +463,10 @@ class _StyledWordListState extends State<_StyledWordList> {
 //
   final _textKey = GlobalKey();
   late _GestureHandler _gestureHandler;
-  late final _wordSelector =
-      _WordSelector(segments: widget.segments, textKey: _textKey);
+  late final _wordSelector = _WordSelector(
+    segments: widget.segments,
+    textKey: _textKey,
+  );
   var _wordSelectionButtons = <ContextMenuButtonItem>[];
 
   @override
@@ -467,18 +487,68 @@ class _StyledWordListState extends State<_StyledWordList> {
   @override
   Widget build(BuildContext context) {
     _rebuildOnScreenSizeChange(context);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return GestureDetector(
-          //TODO: add on tap for big screens but not here since
-          //it collides with the text events, possibly with Stack and margins
-          // onTap: (TapDownDetails details) => _gestureHandler.handleTap(details.globalPosition, constraints),
-          onHorizontalDragEnd: (DragEndDetails details) {
-            _gestureHandler.handleSwipe(details.primaryVelocity);
+    return widget.isLargeScreen
+        ? _buildLargeScreenLayout()
+        : _buildSmallScreenLayout(context);
+  }
+
+  Widget _buildSmallScreenLayout(BuildContext context) {
+    return Row(children: [
+      Expanded(
+        child: SizedBox.expand(
+          child: GestureDetector(
+            onHorizontalDragEnd: (details) =>
+                _gestureHandler.handleSwipe(details.primaryVelocity),
+            child: Container(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: _buildSelectionArea(context, widget.layoutConstraints),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _buildLargeScreenLayout() {
+    final availableWidth = widget.layoutConstraints.maxWidth;
+    final textWidth = widget.largeScreenConstraints!.maxWidth;
+    final marginWidth = (availableWidth - textWidth) / 2;
+    return Row(
+      children: [
+        if (marginWidth > 0)
+          SizedBox(
+            width: marginWidth,
+            child: GestureDetector(
+              onTap: widget.onNavigatePrevious,
+            ),
+          ),
+        SizedBox(
+          width: textWidth,
+          child: _buildStylizedTextArea(),
+        ),
+        if (marginWidth > 0)
+          SizedBox(
+            width: marginWidth,
+            child: GestureDetector(
+              onTap: widget.onNavigateNext,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildStylizedTextArea() {
+    const padding = EdgeInsets.only(
+        left: 24, right: BorderSide.strokeAlignCenter, top: 0, bottom: 14);
+    return Card(
+      child: Padding(
+        padding: padding,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return _buildSelectionArea(context, constraints);
           },
-          child: _buildSelectionArea(context, constraints),
-        );
-      },
+        ),
+      ),
     );
   }
 
