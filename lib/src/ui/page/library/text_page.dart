@@ -69,10 +69,12 @@ class TextPageState extends ConsumerState<TextPage> {
     UnmodifiableListView<WorkContentsElementView> segments,
   ) {
     const a4Width = 595.0;
-    const spaceForMargins = 200;
+    const marginsSpace = 200;
     return LayoutBuilder(
-      builder: (context, constraints) {
-        final isLargeScreen = constraints.maxWidth > a4Width + spaceForMargins;
+      builder: (context, pageConstraints) {
+        final isLargeScreen = pageConstraints.maxWidth > a4Width + marginsSpace;
+        const largeScreenTxtConsts = BoxConstraints(maxWidth: a4Width);
+        final textAreaConstraints = isLargeScreen ? largeScreenTxtConsts : null;
         return _StyledWordList(
           segments: segments,
           onNavigateNext: _loadNextPage,
@@ -84,9 +86,8 @@ class TextPageState extends ConsumerState<TextPage> {
           },
           pageFlow: _pageFlow,
           isLargeScreen: isLargeScreen,
-          layoutConstraints: constraints,
-          largeScreenConstraints:
-              isLargeScreen ? const BoxConstraints(maxWidth: a4Width) : null,
+          pageConstraints: pageConstraints,
+          textAreaConstraints: textAreaConstraints,
         );
       },
     );
@@ -114,32 +115,6 @@ class TextPageState extends ConsumerState<TextPage> {
       }
     });
   }
-//
-}
-
-class _StyledWordList extends StatefulWidget {
-  const _StyledWordList({
-    required this.segments,
-    required this.onNavigateNext,
-    required this.onNavigatePrevious,
-    required this.onVisibleIndicesChanged,
-    required this.pageFlow,
-    required this.isLargeScreen,
-    required this.layoutConstraints,
-    required this.largeScreenConstraints,
-  });
-
-  final UnmodifiableListView<WorkContentsElementView> segments;
-  final VoidCallback onNavigateNext;
-  final VoidCallback onNavigatePrevious;
-  final _LastVisibleIndexCallback onVisibleIndicesChanged;
-  final _PageFlow pageFlow;
-  final bool isLargeScreen;
-  final BoxConstraints layoutConstraints;
-  final BoxConstraints? largeScreenConstraints;
-
-  @override
-  _StyledWordListState createState() => _StyledWordListState();
 //
 }
 
@@ -219,13 +194,12 @@ class _GestureHandler {
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
 
-  void handleTap(Offset tapPosition, BoxConstraints constraints) {
-    final screenWidth = constraints.maxWidth;
-    if (tapPosition.dx < screenWidth / 5) {
-      log.info(() => 'TextPage - handling left tap');
-      onNavigateNext();
-    } else if (tapPosition.dx > 4 * screenWidth / 5) {
+  void handleTap(_PageFlow pageFlow) {
+    if (pageFlow == _PageFlow.next) {
       log.info(() => 'TextPage - handling right tap');
+      onNavigateNext();
+    } else if (pageFlow == _PageFlow.previous) {
+      log.info(() => 'TextPage - handling left tap');
       onNavigatePrevious();
     }
   }
@@ -277,7 +251,8 @@ class _WordSelector {
   }
 
   void invalidateCacheWhenElementsChange(
-      UnmodifiableListView<WorkContentsElementView> oldSegments) {
+    UnmodifiableListView<WorkContentsElementView> oldSegments,
+  ) {
     if (segments != oldSegments) {
       _cachedVisibleText = null;
     }
@@ -345,31 +320,32 @@ class _VisibleSegmentRange {
   final int last;
 
   _VisibleSegmentRange.build(
-    TextPainter textPainter,
+    TextPainter txtPainter,
     List<InlineSpan> allSpans,
     UnmodifiableListView<WorkContentsElementView> segments,
     _PageFlow pageFlow,
-    BoxConstraints constraints,
+    BoxConstraints textConstraints,
   )   : first = pageFlow == _PageFlow.previous
-            ? _getFirstVisibleWord(textPainter, allSpans, segments, constraints)
+            ? _firstVisibleWord(txtPainter, allSpans, segments, textConstraints)
             : 0,
         last = pageFlow == _PageFlow.next
-            ? _getLastVisibleWord(textPainter, allSpans, segments, constraints)
+            ? _lastVisibleWord(txtPainter, allSpans, segments, textConstraints)
             : segments.length - 1;
 
-  static int _getFirstVisibleWord(
-      TextPainter textPainter,
-      List<InlineSpan> allSpans,
-      UnmodifiableListView<WorkContentsElementView> segments,
-      BoxConstraints constraints) {
+  static int _firstVisibleWord(
+    TextPainter textPainter,
+    List<InlineSpan> allSpans,
+    UnmodifiableListView<WorkContentsElementView> segments,
+    BoxConstraints textConstraints,
+  ) {
     var high = allSpans.length - 1;
     var low = 0;
     var firstFittingIndex = high + 1;
     while (low <= high) {
       var mid = (low + high) ~/ 2;
       textPainter.text = TextSpan(children: allSpans.sublist(mid));
-      textPainter.layout(maxWidth: constraints.maxWidth);
-      if (textPainter.height <= constraints.maxHeight) {
+      textPainter.layout(maxWidth: textConstraints.maxWidth);
+      if (textPainter.height <= textConstraints.maxHeight) {
         firstFittingIndex = mid;
         high = mid - 1;
       } else {
@@ -401,19 +377,20 @@ class _VisibleSegmentRange {
     return firstFittingIndex;
   }
 
-  static int _getLastVisibleWord(
-      TextPainter textPainter,
-      List<InlineSpan> allSpans,
-      UnmodifiableListView<WorkContentsElementView> segments,
-      BoxConstraints constraints) {
+  static int _lastVisibleWord(
+    TextPainter textPainter,
+    List<InlineSpan> allSpans,
+    UnmodifiableListView<WorkContentsElementView> segments,
+    BoxConstraints textConstraints,
+  ) {
     var low = 0;
     var high = allSpans.length - 1;
     var lastFittingIndex = low - 1;
     while (low <= high) {
       var mid = (low + high) ~/ 2;
       textPainter.text = TextSpan(children: allSpans.sublist(0, mid + 1));
-      textPainter.layout(maxWidth: constraints.maxWidth);
-      if (textPainter.height <= constraints.maxHeight) {
+      textPainter.layout(maxWidth: textConstraints.maxWidth);
+      if (textPainter.height <= textConstraints.maxHeight) {
         lastFittingIndex = mid;
         low = mid + 1;
       } else {
@@ -459,6 +436,32 @@ class _VisibleSegmentRange {
 //
 }
 
+class _StyledWordList extends StatefulWidget {
+  const _StyledWordList({
+    required this.segments,
+    required this.onNavigateNext,
+    required this.onNavigatePrevious,
+    required this.onVisibleIndicesChanged,
+    required this.pageFlow,
+    required this.isLargeScreen,
+    required this.pageConstraints,
+    required this.textAreaConstraints,
+  });
+
+  final UnmodifiableListView<WorkContentsElementView> segments;
+  final VoidCallback onNavigateNext;
+  final VoidCallback onNavigatePrevious;
+  final _LastVisibleIndexCallback onVisibleIndicesChanged;
+  final _PageFlow pageFlow;
+  final bool isLargeScreen;
+  final BoxConstraints pageConstraints;
+  final BoxConstraints? textAreaConstraints;
+
+  @override
+  _StyledWordListState createState() => _StyledWordListState();
+//
+}
+
 class _StyledWordListState extends State<_StyledWordList> {
 //
   final _textKey = GlobalKey();
@@ -501,7 +504,7 @@ class _StyledWordListState extends State<_StyledWordList> {
                 _gestureHandler.handleSwipe(details.primaryVelocity),
             child: Container(
               padding: const EdgeInsets.only(left: 20, right: 20),
-              child: _buildSelectionArea(context, widget.layoutConstraints),
+              child: _buildSelectionArea(context, widget.pageConstraints),
             ),
           ),
         ),
@@ -510,8 +513,8 @@ class _StyledWordListState extends State<_StyledWordList> {
   }
 
   Widget _buildLargeScreenLayout() {
-    final availableWidth = widget.layoutConstraints.maxWidth;
-    final textWidth = widget.largeScreenConstraints!.maxWidth;
+    final availableWidth = widget.pageConstraints.maxWidth;
+    final textWidth = widget.textAreaConstraints!.maxWidth;
     final marginWidth = (availableWidth - textWidth) / 2;
     return Row(
       children: [
@@ -519,7 +522,7 @@ class _StyledWordListState extends State<_StyledWordList> {
           SizedBox(
             width: marginWidth,
             child: GestureDetector(
-              onTap: widget.onNavigatePrevious,
+              onTap: () => _gestureHandler.handleTap(_PageFlow.previous),
             ),
           ),
         SizedBox(
@@ -530,7 +533,7 @@ class _StyledWordListState extends State<_StyledWordList> {
           SizedBox(
             width: marginWidth,
             child: GestureDetector(
-              onTap: widget.onNavigateNext,
+              onTap: () => _gestureHandler.handleTap(_PageFlow.next),
             ),
           ),
       ],
@@ -544,8 +547,8 @@ class _StyledWordListState extends State<_StyledWordList> {
       child: Padding(
         padding: padding,
         child: LayoutBuilder(
-          builder: (context, constraints) {
-            return _buildSelectionArea(context, constraints);
+          builder: (context, textAreaConstraints) {
+            return _buildSelectionArea(context, textAreaConstraints);
           },
         ),
       ),
