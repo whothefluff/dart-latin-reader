@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
+
 import 'page/dictionary/placeholder.dart';
+import 'page/library/text_page.dart';
 import 'page/library/works_page.dart';
 import 'settings/settings_controller.dart';
-import 'page/library/text_page.dart';
 import 'settings/settings_view.dart';
+import 'widget/custom_adaptive_scaffold.dart';
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({
@@ -186,19 +188,17 @@ class ScaffoldWithNavBar extends StatelessWidget {
   static final mainDestinations = mainPages.values.toList();
 
   @override
-  Widget build(context) {
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        onDestinationSelected: (idx) => _goToBranch(idx, context),
-        selectedIndex: navigationShell.currentIndex,
-        destinations: mainDestinations,
-      ),
+  Widget build(BuildContext context) {
+    return CustomAdaptiveScaffold(
+      selectedIndex: navigationShell.currentIndex,
+      destinations: mainDestinations,
+      body: (_) => navigationShell,
+      onSelectedIndexChange: _goToBranch,
+      useDrawer: false,
     );
   }
 
-  void _goToBranch(int index, BuildContext context) {
+  void _goToBranch(int index) {
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,
