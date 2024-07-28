@@ -14,6 +14,93 @@ import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 import 'widget/custom_adaptive_scaffold.dart';
 
+const _homeDestination = NavigationDestination(
+  icon: Icon(Icons.auto_stories),
+  label: 'Home',
+);
+final _authorRoutes = [
+  GoRoute(
+    path: '/',
+    redirect: (_, __) => '/authors',
+  ),
+  GoRoute(
+    path: '/authors',
+    builder: (context, state) => const AuthorsPage(),
+    routes: [
+      GoRoute(
+        path: ':id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return AuthorDetailsPage(authorId: id);
+        },
+      ),
+    ],
+  ),
+  GoRoute(
+    path: '/works',
+    //TODO: (someday) implement
+    builder: (context, state) => const WorksPage(authorIndex: 0),
+    routes: [
+      GoRoute(
+        path: ':id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return WorkDetailsPage(workId: id);
+        },
+      ),
+    ],
+  ),
+  GoRoute(
+    path: '/reader/:workId',
+    pageBuilder: (context, state) {
+      return MaterialPage(
+        fullscreenDialog: true,
+        child: TextPage(
+          workId: state.pathParameters['workId']!,
+        ),
+      );
+    },
+  ),
+];
+const _dictionariesDest = NavigationDestination(
+  icon: Icon(Icons.book),
+  label: 'Dictionaries',
+);
+final _dictionaryRoutes = [
+  GoRoute(
+      path: '/dictionaries',
+      builder: (context, state) => const PlaceholderDict(title: 'testing'),
+      name: '/dictionaries'),
+];
+const _wordFreqDest = NavigationDestination(
+  icon: Icon(Icons.bar_chart),
+  label: 'Word Frequency',
+);
+final _wordFrequencyRoutes = [
+  GoRoute(
+    path: '/word-frequency',
+    builder: (context, state) => const PlaceholderDict(title: 'testing'),
+  ),
+];
+const _wordLookupDest = NavigationDestination(
+  icon: Icon(Icons.plagiarism),
+  label: 'Word Lookup',
+);
+final _wordLookupRoutes = [
+  GoRoute(
+    path: '/word-lookup',
+    builder: (context, state) => const PlaceholderDict(title: 'testing'),
+  ),
+];
+final mainBranches = [
+  (id: '/authors', navDest: _homeDestination, routes: _authorRoutes),
+  (id: '/dictionaries', navDest: _dictionariesDest, routes: _dictionaryRoutes),
+  (id: '/word-frequency', navDest: _wordFreqDest, routes: _wordFrequencyRoutes),
+  (id: '/word-lookup', navDest: _wordLookupDest, routes: _wordLookupRoutes),
+];
+final mainBranchesDests = mainBranches.map((e) => e.navDest).toList();
+const _pagesWithoutNavBar = ['/reader/:workId'];
+
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({
     super.key,
@@ -28,82 +115,23 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class MyAppState extends ConsumerState<MyApp> {
+//
   late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
-
     _router = GoRouter(
       initialLocation: '/',
       routes: [
         StatefulShellRoute.indexedStack(
-          builder: (context, state, navShell) =>
-              ScaffoldWithNavBar(navigationShell: navShell),
-          branches: [
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/',
-                  redirect: (_, __) => '/authors',
-                ),
-                GoRoute(
-                  path: '/authors',
-                  builder: (context, state) => const AuthorsPage(),
-                  routes: [
-                    GoRoute(
-                      path: ':id',
-                      builder: (context, state) {
-                        final id = state.pathParameters['id']!;
-                        return AuthorDetailsPage(authorId: id);
-                      },
-                    ),
-                  ],
-                ),
-                GoRoute(
-                  path: '/works',
-                  //TODO: (someday) implement
-                  builder: (context, state) => const WorksPage(authorIndex: 0),
-                  routes: [
-                    GoRoute(
-                      path: ':id',
-                      builder: (context, state) {
-                        final id = state.pathParameters['id']!;
-                        return WorkDetailsPage(workId: id);
-                      },
-                    ),
-                  ],
-                ),
-                GoRoute(
-                  path: '/reader/:workId',
-                  builder: (context, state) => TextPage(
-                    workId: state.pathParameters['workId']!,
-                  ),
-                ),
-              ],
-            ),
-            StatefulShellBranch(routes: [
-              GoRoute(
-                path: '/dictionaries',
-                builder: (context, state) =>
-                    const PlaceholderDict(title: 'testing'),
-              ),
-            ]),
-            StatefulShellBranch(routes: [
-              GoRoute(
-                path: '/word-frequency',
-                builder: (context, state) =>
-                    const PlaceholderDict(title: 'testing'),
-              ),
-            ]),
-            StatefulShellBranch(routes: [
-              GoRoute(
-                path: '/word-lookup',
-                builder: (context, state) =>
-                    const PlaceholderDict(title: 'testing'),
-              ),
-            ]),
-          ],
+          builder: (_, state, navShell) => ScaffoldWithNavBar(
+            navigationShell: navShell,
+            createBottomNavBar: !_pagesWithoutNavBar.contains(state.fullPath),
+          ),
+          branches: mainBranches
+              .map((e) => StatefulShellBranch(routes: e.routes))
+              .toList(),
         ),
         GoRoute(
           path: '/settings',
@@ -159,42 +187,23 @@ class MyAppState extends ConsumerState<MyApp> {
 class ScaffoldWithNavBar extends StatelessWidget {
   const ScaffoldWithNavBar({
     required this.navigationShell,
+    this.createBottomNavBar = true,
     super.key,
   });
 
   final StatefulNavigationShell navigationShell;
-  static const homeDestination = NavigationDestination(
-    icon: Icon(Icons.auto_stories),
-    label: 'Home',
-  );
-  static const dictionariesDestination = NavigationDestination(
-    icon: Icon(Icons.book),
-    label: 'Dictionaries',
-  );
-  static const wordFrequencyDestination = NavigationDestination(
-    icon: Icon(Icons.bar_chart),
-    label: 'Word Frequency',
-  );
-  static const wordLookupDestination = NavigationDestination(
-    icon: Icon(Icons.plagiarism),
-    label: 'Word Lookup',
-  );
-  static const mainPages = {
-    '/authors': homeDestination,
-    '/dictionaries': dictionariesDestination,
-    '/word-frequency': wordFrequencyDestination,
-    '/word-lookup': wordLookupDestination,
-  };
-  static final mainDestinations = mainPages.values.toList();
+  final bool createBottomNavBar;
 
   @override
   Widget build(BuildContext context) {
     return CustomAdaptiveScaffold(
       selectedIndex: navigationShell.currentIndex,
-      destinations: mainDestinations,
+      destinations: mainBranchesDests,
       body: (_) => navigationShell,
       onSelectedIndexChange: _goToBranch,
       useDrawer: false,
+      createBottomNavigationBar: createBottomNavBar,
+      bottomNavBarKey: const Key('main_bottom_nav_bar'),
     );
   }
 
