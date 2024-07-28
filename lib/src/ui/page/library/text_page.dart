@@ -56,7 +56,7 @@ class TextPageState extends ConsumerState<TextPage> {
       libraryWorkContentsPartiallyProvider(widget.workId, _fromIndex, _toIndex),
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('Styled Word List')),
+      appBar: AppBar(),
       body: segmentsProvider.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
