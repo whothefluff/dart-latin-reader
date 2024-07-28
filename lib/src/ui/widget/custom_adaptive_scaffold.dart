@@ -3,6 +3,7 @@ import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
 /// This is a copy of the [AdaptiveScaffold] widget from the flutter_adaptive_scaffold package.
 /// It allows to specify the [bottomNavigationBarLabelBehavior] for the [BottomNavigationBar].
+/// It allows to specify whether to create a [BottomNavigationBar] or not
 class CustomAdaptiveScaffold extends StatefulWidget {
   /// Returns a const [CustomAdaptiveScaffold] by passing information down to an
   /// [AdaptiveLayout].
@@ -35,6 +36,8 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     this.appBarBreakpoint,
     this.bottomNavigationBarLabelBehavior =
         NavigationDestinationLabelBehavior.onlyShowSelected,
+    this.createBottomNavigationBar = true,
+    this.bottomNavBarKey,
   }) : assert(
           destinations.length >= 2,
           'At least two destinations are required',
@@ -181,6 +184,12 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// The width used for the internal [BottomNavigationBar] at the small [Breakpoint].
   final NavigationDestinationLabelBehavior bottomNavigationBarLabelBehavior;
 
+  final Key? bottomNavBarKey;
+
+  /// Whether to create a [BottomNavigationBar] or not
+  /// as long as the [drawerBreakpoint] is not active and [useDrawer] is false.
+  final bool createBottomNavigationBar;
+
   /// Callback function for when the index of a [NavigationRail] changes.
   static WidgetBuilder emptyBuilder = (_) => const SizedBox();
 
@@ -267,8 +276,10 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     double iconSize = 24,
     ValueChanged<int>? onDestinationSelected,
     required NavigationDestinationLabelBehavior labelBehavior,
+    Key? key,
   }) {
     return Builder(
+      key: key,
       builder: (BuildContext context) {
         final NavigationBarThemeData currentNavBarTheme =
             NavigationBarTheme.of(context);
@@ -519,8 +530,9 @@ class _CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
             ),
           },
         ),
-        bottomNavigation: !widget.drawerBreakpoint.isActive(context) ||
-                !widget.useDrawer
+        bottomNavigation: widget.createBottomNavigationBar &&
+                (!widget.drawerBreakpoint.isActive(context) ||
+                    !widget.useDrawer)
             ? SlotLayout(
                 config: <Breakpoint, SlotLayoutConfig>{
                   widget.smallBreakpoint: SlotLayout.from(
@@ -531,6 +543,7 @@ class _CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                       destinations: widget.destinations,
                       onDestinationSelected: widget.onSelectedIndexChange,
                       labelBehavior: widget.bottomNavigationBarLabelBehavior,
+                      key: widget.bottomNavBarKey,
                     ),
                   ),
                 },

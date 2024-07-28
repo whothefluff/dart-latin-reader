@@ -3,10 +3,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 import 'package:latin_reader/src/external/provider_work.dart';
+import 'package:latin_reader/src/ui/app.dart';
+import 'package:latin_reader/src/ui/widget/custom_adaptive_scaffold.dart';
 
 final _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
 
@@ -65,6 +69,25 @@ class TextPageState extends ConsumerState<TextPage> {
     );
   }
 
+  void _showBottomNavBar(BuildContext context) {
+    final mainBranchesNames = mainBranches.map((e) => e.id).toList();
+    showModalBottomSheet<Builder>(
+      context: context,
+      builder: (context) {
+        return CustomAdaptiveScaffold.standardBottomNavigationBar(
+          key: const Key('main_bottom_nav_bar'),
+          destinations: mainBranchesDests,
+          currentIndex: 0,
+          onDestinationSelected: (index) {
+            context.pop();
+            context.go(mainBranchesNames[index]);
+          },
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        );
+      },
+    );
+  }
+
   Widget _buildResponsiveContent(
     UnmodifiableListView<WorkContentsElementView> segments,
   ) {
@@ -75,20 +98,39 @@ class TextPageState extends ConsumerState<TextPage> {
         final isLargeScreen = pageConstraints.maxWidth > a4Width + marginsSpace;
         const largeScreenTxtConsts = BoxConstraints(maxWidth: a4Width);
         final textAreaConstraints = isLargeScreen ? largeScreenTxtConsts : null;
-        return _StyledWordList(
-          segments: segments,
-          onNavigateNext: _loadNextPage,
-          onNavigatePrevious: _loadPreviousPage,
-          onVisibleIndicesChanged: (first, last) {
-            _currentFirstVisibleIndex = first;
-            _currentLastVisibleIndex = last;
-            _pageFlow = _PageFlow.next;
-          },
-          pageFlow: _pageFlow,
-          isLargeScreen: isLargeScreen,
-          pageConstraints: pageConstraints,
-          textAreaConstraints: textAreaConstraints,
-        );
+        if (Breakpoints.smallDesktop.isActive(context)) {
+          return GestureDetector(
+              onDoubleTap: () => _showBottomNavBar(context),
+              child: _StyledWordList(
+                segments: segments,
+                onNavigateNext: _loadNextPage,
+                onNavigatePrevious: _loadPreviousPage,
+                onVisibleIndicesChanged: (first, last) {
+                  _currentFirstVisibleIndex = first;
+                  _currentLastVisibleIndex = last;
+                  _pageFlow = _PageFlow.next;
+                },
+                pageFlow: _pageFlow,
+                isLargeScreen: isLargeScreen,
+                pageConstraints: pageConstraints,
+                textAreaConstraints: textAreaConstraints,
+              ));
+        } else {
+          return _StyledWordList(
+            segments: segments,
+            onNavigateNext: _loadNextPage,
+            onNavigatePrevious: _loadPreviousPage,
+            onVisibleIndicesChanged: (first, last) {
+              _currentFirstVisibleIndex = first;
+              _currentLastVisibleIndex = last;
+              _pageFlow = _PageFlow.next;
+            },
+            pageFlow: _pageFlow,
+            isLargeScreen: isLargeScreen,
+            pageConstraints: pageConstraints,
+            textAreaConstraints: textAreaConstraints,
+          );
+        }
       },
     );
   }
