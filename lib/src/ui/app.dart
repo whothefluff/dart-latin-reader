@@ -100,6 +100,8 @@ final mainBranches = [
 ];
 final mainBranchesDests = mainBranches.map((e) => e.navDest).toList();
 const _pagesWithoutNavBar = ['/reader/:workId'];
+const _pagesWithoutNavRail = [..._pagesWithoutNavBar];
+final customAdaptiveScaffoldKey = GlobalKey<CustomAdaptiveScaffoldState>();
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({
@@ -128,6 +130,7 @@ class MyAppState extends ConsumerState<MyApp> {
           builder: (_, state, navShell) => ScaffoldWithNavBar(
             navigationShell: navShell,
             createBottomNavBar: !_pagesWithoutNavBar.contains(state.fullPath),
+            createNavRail: !_pagesWithoutNavRail.contains(state.fullPath),
           ),
           branches: mainBranches
               .map((e) => StatefulShellBranch(routes: e.routes))
@@ -188,22 +191,25 @@ class ScaffoldWithNavBar extends StatelessWidget {
   const ScaffoldWithNavBar({
     required this.navigationShell,
     this.createBottomNavBar = true,
+    this.createNavRail = true,
     super.key,
   });
 
   final StatefulNavigationShell navigationShell;
   final bool createBottomNavBar;
+  final bool createNavRail;
 
   @override
   Widget build(BuildContext context) {
     return CustomAdaptiveScaffold(
+      key: customAdaptiveScaffoldKey,
       selectedIndex: navigationShell.currentIndex,
       destinations: mainBranchesDests,
       body: (_) => navigationShell,
       onSelectedIndexChange: _goToBranch,
       useDrawer: false,
       createBottomNavigationBar: createBottomNavBar,
-      bottomNavBarKey: const Key('main_bottom_nav_bar'),
+      createNavigationRail: createNavRail,
     );
   }
 
