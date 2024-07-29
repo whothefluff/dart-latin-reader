@@ -37,7 +37,7 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     this.bottomNavigationBarLabelBehavior =
         NavigationDestinationLabelBehavior.onlyShowSelected,
     this.createBottomNavigationBar = true,
-    this.bottomNavBarKey,
+    this.createNavigationRail = true,
   }) : assert(
           destinations.length >= 2,
           'At least two destinations are required',
@@ -184,11 +184,13 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// The width used for the internal [BottomNavigationBar] at the small [Breakpoint].
   final NavigationDestinationLabelBehavior bottomNavigationBarLabelBehavior;
 
-  final Key? bottomNavBarKey;
-
   /// Whether to create a [BottomNavigationBar] or not
   /// as long as the [drawerBreakpoint] is not active and [useDrawer] is false.
   final bool createBottomNavigationBar;
+
+  /// Whether to create a [NavigationRail] or not
+  /// as long as at least the [mediumBreakpoint] or [largeBreakpoint] are active.
+  final bool createNavigationRail;
 
   /// Callback function for when the index of a [NavigationRail] changes.
   static WidgetBuilder emptyBuilder = (_) => const SizedBox();
@@ -231,41 +233,43 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     if (extended && width == 72) {
       width = 192;
     }
-    return Builder(builder: (BuildContext context) {
-      return Padding(
-        padding: padding,
-        child: SizedBox(
-          width: width,
-          height: MediaQuery.of(context).size.height,
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: NavigationRail(
-                      labelType: labelType,
-                      leading: leading,
-                      trailing: trailing,
-                      onDestinationSelected: onDestinationSelected,
-                      groupAlignment: groupAlignment,
-                      backgroundColor: backgroundColor,
-                      extended: extended,
-                      selectedIndex: selectedIndex,
-                      selectedIconTheme: selectedIconTheme,
-                      unselectedIconTheme: unselectedIconTheme,
-                      selectedLabelTextStyle: selectedLabelTextStyle,
-                      unselectedLabelTextStyle: unSelectedLabelTextStyle,
-                      destinations: destinations,
+    return Builder(
+        builder: (BuildContext context) {
+          return Padding(
+            padding: padding,
+            child: SizedBox(
+              width: width,
+              height: MediaQuery.of(context).size.height,
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: IntrinsicHeight(
+                        child: NavigationRail(
+                          labelType: labelType,
+                          leading: leading,
+                          trailing: trailing,
+                          onDestinationSelected: onDestinationSelected,
+                          groupAlignment: groupAlignment,
+                          backgroundColor: backgroundColor,
+                          extended: extended,
+                          selectedIndex: selectedIndex,
+                          selectedIconTheme: selectedIconTheme,
+                          unselectedIconTheme: unselectedIconTheme,
+                          selectedLabelTextStyle: selectedLabelTextStyle,
+                          unselectedLabelTextStyle: unSelectedLabelTextStyle,
+                          destinations: destinations,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      );
-    });
+                  );
+                },
+              ),
+            ),
+          );
+        });
   }
 
   /// Public helper method to be used for creating a [BottomNavigationBar] from
@@ -276,10 +280,8 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     double iconSize = 24,
     ValueChanged<int>? onDestinationSelected,
     required NavigationDestinationLabelBehavior labelBehavior,
-    Key? key,
   }) {
     return Builder(
-      key: key,
       builder: (BuildContext context) {
         final NavigationBarThemeData currentNavBarTheme =
             NavigationBarTheme.of(context);
@@ -449,10 +451,10 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   }
 
   @override
-  State<CustomAdaptiveScaffold> createState() => _CustomAdaptiveScaffoldState();
+  State<CustomAdaptiveScaffold> createState() => CustomAdaptiveScaffoldState();
 }
 
-class _CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
+class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
   // Global scaffold key that will help to manage drawer state.
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -491,42 +493,52 @@ class _CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
           config: <Breakpoint, SlotLayoutConfig>{
             widget.mediumBreakpoint: SlotLayout.from(
               key: const Key('primaryNavigation'),
-              builder: (_) => CustomAdaptiveScaffold.standardNavigationRail(
-                width: widget.navigationRailWidth,
-                leading: widget.leadingUnextendedNavRail,
-                trailing: widget.trailingNavRail,
-                selectedIndex: widget.selectedIndex,
-                destinations: widget.destinations
-                    .map((NavigationDestination destination) =>
-                        CustomAdaptiveScaffold.toRailDestination(destination))
-                    .toList(),
-                onDestinationSelected: widget.onSelectedIndexChange,
-                backgroundColor: navRailTheme.backgroundColor,
-                selectedIconTheme: navRailTheme.selectedIconTheme,
-                unselectedIconTheme: navRailTheme.unselectedIconTheme,
-                selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
-                unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
-              ),
+              builder: widget.createNavigationRail == true
+                  ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
+                        width: widget.navigationRailWidth,
+                        leading: widget.leadingUnextendedNavRail,
+                        trailing: widget.trailingNavRail,
+                        selectedIndex: widget.selectedIndex,
+                        destinations: widget.destinations
+                            .map((NavigationDestination destination) =>
+                                CustomAdaptiveScaffold.toRailDestination(
+                                    destination))
+                            .toList(),
+                        onDestinationSelected: widget.onSelectedIndexChange,
+                        backgroundColor: navRailTheme.backgroundColor,
+                        selectedIconTheme: navRailTheme.selectedIconTheme,
+                        unselectedIconTheme: navRailTheme.unselectedIconTheme,
+                        selectedLabelTextStyle:
+                            navRailTheme.selectedLabelTextStyle,
+                        unSelectedLabelTextStyle:
+                            navRailTheme.unselectedLabelTextStyle,
+                      )
+                  : null,
             ),
             widget.largeBreakpoint: SlotLayout.from(
               key: const Key('primaryNavigation1'),
-              builder: (_) => CustomAdaptiveScaffold.standardNavigationRail(
-                width: widget.extendedNavigationRailWidth,
-                extended: true,
-                leading: widget.leadingExtendedNavRail,
-                trailing: widget.trailingNavRail,
-                selectedIndex: widget.selectedIndex,
-                destinations: widget.destinations
-                    .map((NavigationDestination destination) =>
-                        CustomAdaptiveScaffold.toRailDestination(destination))
-                    .toList(),
-                onDestinationSelected: widget.onSelectedIndexChange,
-                backgroundColor: navRailTheme.backgroundColor,
-                selectedIconTheme: navRailTheme.selectedIconTheme,
-                unselectedIconTheme: navRailTheme.unselectedIconTheme,
-                selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
-                unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
-              ),
+              builder: widget.createNavigationRail == true
+                  ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
+                        width: widget.extendedNavigationRailWidth,
+                        extended: true,
+                        leading: widget.leadingExtendedNavRail,
+                        trailing: widget.trailingNavRail,
+                        selectedIndex: widget.selectedIndex,
+                        destinations: widget.destinations
+                            .map((NavigationDestination destination) =>
+                                CustomAdaptiveScaffold.toRailDestination(
+                                    destination))
+                            .toList(),
+                        onDestinationSelected: widget.onSelectedIndexChange,
+                        backgroundColor: navRailTheme.backgroundColor,
+                        selectedIconTheme: navRailTheme.selectedIconTheme,
+                        unselectedIconTheme: navRailTheme.unselectedIconTheme,
+                        selectedLabelTextStyle:
+                            navRailTheme.selectedLabelTextStyle,
+                        unSelectedLabelTextStyle:
+                            navRailTheme.unselectedLabelTextStyle,
+                      )
+                  : null,
             ),
           },
         ),
@@ -543,7 +555,6 @@ class _CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                       destinations: widget.destinations,
                       onDestinationSelected: widget.onSelectedIndexChange,
                       labelBehavior: widget.bottomNavigationBarLabelBehavior,
-                      key: widget.bottomNavBarKey,
                     ),
                   ),
                 },

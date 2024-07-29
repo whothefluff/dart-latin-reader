@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 import 'package:latin_reader/src/external/provider_work.dart';
@@ -69,25 +68,6 @@ class TextPageState extends ConsumerState<TextPage> {
     );
   }
 
-  void _showBottomNavBar(BuildContext context) {
-    final mainBranchesNames = mainBranches.map((e) => e.id).toList();
-    showModalBottomSheet<Builder>(
-      context: context,
-      builder: (context) {
-        return CustomAdaptiveScaffold.standardBottomNavigationBar(
-          key: const Key('main_bottom_nav_bar'),
-          destinations: mainBranchesDests,
-          currentIndex: 0,
-          onDestinationSelected: (index) {
-            context.pop();
-            context.go(mainBranchesNames[index]);
-          },
-          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        );
-      },
-    );
-  }
-
   Widget _buildResponsiveContent(
     UnmodifiableListView<WorkContentsElementView> segments,
   ) {
@@ -98,39 +78,20 @@ class TextPageState extends ConsumerState<TextPage> {
         final isLargeScreen = pageConstraints.maxWidth > a4Width + marginsSpace;
         const largeScreenTxtConsts = BoxConstraints(maxWidth: a4Width);
         final textAreaConstraints = isLargeScreen ? largeScreenTxtConsts : null;
-        if (Breakpoints.smallDesktop.isActive(context)) {
-          return GestureDetector(
-              onDoubleTap: () => _showBottomNavBar(context),
-              child: _StyledWordList(
-                segments: segments,
-                onNavigateNext: _loadNextPage,
-                onNavigatePrevious: _loadPreviousPage,
-                onVisibleIndicesChanged: (first, last) {
-                  _currentFirstVisibleIndex = first;
-                  _currentLastVisibleIndex = last;
-                  _pageFlow = _PageFlow.next;
-                },
-                pageFlow: _pageFlow,
-                isLargeScreen: isLargeScreen,
-                pageConstraints: pageConstraints,
-                textAreaConstraints: textAreaConstraints,
-              ));
-        } else {
-          return _StyledWordList(
-            segments: segments,
-            onNavigateNext: _loadNextPage,
-            onNavigatePrevious: _loadPreviousPage,
-            onVisibleIndicesChanged: (first, last) {
-              _currentFirstVisibleIndex = first;
-              _currentLastVisibleIndex = last;
-              _pageFlow = _PageFlow.next;
-            },
-            pageFlow: _pageFlow,
-            isLargeScreen: isLargeScreen,
-            pageConstraints: pageConstraints,
-            textAreaConstraints: textAreaConstraints,
-          );
-        }
+        return _StyledWordList(
+          segments: segments,
+          onNavigateNext: _loadNextPage,
+          onNavigatePrevious: _loadPreviousPage,
+          onVisibleIndicesChanged: (first, last) {
+            _currentFirstVisibleIndex = first;
+            _currentLastVisibleIndex = last;
+            _pageFlow = _PageFlow.next;
+          },
+          pageFlow: _pageFlow,
+          isLargeScreen: isLargeScreen,
+          pageConstraints: pageConstraints,
+          textAreaConstraints: textAreaConstraints,
+        );
       },
     );
   }
@@ -231,10 +192,12 @@ class _GestureHandler {
   _GestureHandler({
     required this.onNavigateNext,
     required this.onNavigatePrevious,
+    required this.onNavMenuToggle,
   });
 
-  final VoidCallback onNavigateNext;
-  final VoidCallback onNavigatePrevious;
+  final void Function() onNavigateNext;
+  final void Function() onNavigatePrevious;
+  final void Function(BuildContext context) onNavMenuToggle;
 
   void handleTap(_PageFlow pageFlow) {
     if (pageFlow == _PageFlow.next) {
@@ -518,9 +481,11 @@ class _StyledWordListState extends State<_StyledWordList> {
   void initState() {
     super.initState();
     _gestureHandler = _GestureHandler(
-      onNavigateNext: widget.onNavigateNext,
-      onNavigatePrevious: widget.onNavigatePrevious,
-    );
+        onNavigateNext: widget.onNavigateNext,
+        onNavigatePrevious: widget.onNavigatePrevious,
+        onNavMenuToggle: (context) => Breakpoints.smallDesktop.isActive(context)
+            ? _showBottomNavBar(context)
+            : _showNavigationOverlay(context));
   }
 
   @override
@@ -533,7 +498,7 @@ class _StyledWordListState extends State<_StyledWordList> {
   Widget build(BuildContext context) {
     _rebuildOnScreenSizeChange(context);
     return widget.isLargeScreen
-        ? _buildLargeScreenLayout()
+        ? _buildLargeScreenLayout(context)
         : _buildSmallScreenLayout(context);
   }
 
@@ -544,6 +509,7 @@ class _StyledWordListState extends State<_StyledWordList> {
           child: GestureDetector(
             onHorizontalDragEnd: (details) =>
                 _gestureHandler.handleSwipe(details.primaryVelocity),
+            onDoubleTap: () => _gestureHandler.onNavMenuToggle(context),
             child: Container(
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: _buildSelectionArea(context, widget.pageConstraints),
@@ -554,7 +520,7 @@ class _StyledWordListState extends State<_StyledWordList> {
     ]);
   }
 
-  Widget _buildLargeScreenLayout() {
+  Widget _buildLargeScreenLayout(BuildContext context) {
     final availableWidth = widget.pageConstraints.maxWidth;
     final textWidth = widget.textAreaConstraints!.maxWidth;
     final marginWidth = (availableWidth - textWidth) / 2;
@@ -565,6 +531,7 @@ class _StyledWordListState extends State<_StyledWordList> {
             width: marginWidth,
             child: GestureDetector(
               onTap: () => _gestureHandler.handleTap(_PageFlow.previous),
+              onSecondaryTap: () => _gestureHandler.onNavMenuToggle(context),
             ),
           ),
         SizedBox(
@@ -576,6 +543,7 @@ class _StyledWordListState extends State<_StyledWordList> {
             width: marginWidth,
             child: GestureDetector(
               onTap: () => _gestureHandler.handleTap(_PageFlow.next),
+              onSecondaryTap: () => _gestureHandler.onNavMenuToggle(context),
             ),
           ),
       ],
@@ -660,4 +628,68 @@ class _StyledWordListState extends State<_StyledWordList> {
     );
   }
 //
+}
+
+void _showBottomNavBar(BuildContext context) {
+  final customAdaptiveScaffoldState = customAdaptiveScaffoldKey.currentState ??
+      Exception('CustomAdaptiveScaffold state is null')
+          as CustomAdaptiveScaffoldState;
+  final stateWidget = customAdaptiveScaffoldState.widget;
+  showModalBottomSheet<Builder>(
+    context: context,
+    builder: (_) {
+      return CustomAdaptiveScaffold.standardBottomNavigationBar(
+        destinations: stateWidget.destinations,
+        currentIndex: stateWidget.selectedIndex,
+        onDestinationSelected: stateWidget.onSelectedIndexChange,
+        labelBehavior: stateWidget.bottomNavigationBarLabelBehavior,
+      );
+    },
+  );
+}
+
+void _showNavigationOverlay(BuildContext context) {
+  final customAdaptiveScaffoldState = customAdaptiveScaffoldKey.currentState ??
+      Exception('CustomAdaptiveScaffold state is null')
+          as CustomAdaptiveScaffoldState;
+  final stateWidget = customAdaptiveScaffoldState.widget;
+  final navRailTheme = Theme.of(context).navigationRailTheme;
+  OverlayEntry? overlayEntry;
+  overlayEntry = OverlayEntry(
+    builder: (context) => Stack(
+      children: [
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: () => overlayEntry?.remove(),
+            child: Container(color: Colors.black54),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          top: 0,
+          bottom: 0,
+          child: Material(
+            elevation: 8,
+            child: CustomAdaptiveScaffold.standardNavigationRail(
+              width: stateWidget.navigationRailWidth,
+              leading: stateWidget.leadingUnextendedNavRail,
+              trailing: stateWidget.trailingNavRail,
+              selectedIndex: stateWidget.selectedIndex,
+              extended: stateWidget.largeBreakpoint.isActive(context),
+              destinations: stateWidget.destinations
+                  .map((nd) => CustomAdaptiveScaffold.toRailDestination(nd))
+                  .toList(),
+              onDestinationSelected: stateWidget.onSelectedIndexChange,
+              backgroundColor: navRailTheme.backgroundColor,
+              selectedIconTheme: navRailTheme.selectedIconTheme,
+              unselectedIconTheme: navRailTheme.unselectedIconTheme,
+              selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
+              unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+  Overlay.of(context).insert(overlayEntry);
 }
