@@ -426,7 +426,7 @@ class _NavigationRailDefaultsM3 extends BottomSheetThemeData {
   late final ColorScheme _colors = Theme.of(context).colorScheme;
 
   @override
-  Color? get backgroundColor => _colors.surfaceContainerLow;
+  Color? get backgroundColor => _colors.surface;
 
   @override
   Color? get surfaceTintColor => Colors.transparent;
