@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 import 'package:latin_reader/src/external/provider_work.dart';
 import 'package:latin_reader/src/ui/app.dart';
 import 'package:latin_reader/src/ui/widget/custom_adaptive_scaffold.dart';
+import 'package:latin_reader/src/ui/widget/navigation_rail.dart';
 
 final _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
 
@@ -630,22 +632,28 @@ class _StyledWordListState extends State<_StyledWordList> {
 //
 }
 
+final _mainBranchesNames = mainBranches.map((e) => e.id).toList();
+
+void _dismissModalAndNavigate(BuildContext context, int index) {
+  context.pop();
+  context.go(_mainBranchesNames[index]);
+}
+
 void _showBottomNavBar(BuildContext context) {
   final customAdaptiveScaffoldState = customAdaptiveScaffoldKey.currentState ??
       Exception('CustomAdaptiveScaffold state is null')
           as CustomAdaptiveScaffoldState;
   final stateWidget = customAdaptiveScaffoldState.widget;
   showModalBottomSheet<Builder>(
-    context: context,
-    builder: (_) {
-      return CustomAdaptiveScaffold.standardBottomNavigationBar(
-        destinations: stateWidget.destinations,
-        currentIndex: stateWidget.selectedIndex,
-        onDestinationSelected: stateWidget.onSelectedIndexChange,
-        labelBehavior: stateWidget.bottomNavigationBarLabelBehavior,
-      );
-    },
-  );
+      context: context,
+      builder: (_) {
+        return CustomAdaptiveScaffold.standardBottomNavigationBar(
+          destinations: stateWidget.destinations,
+          currentIndex: stateWidget.selectedIndex,
+          onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
+          labelBehavior: stateWidget.bottomNavigationBarLabelBehavior,
+        );
+      });
 }
 
 void _showNavigationOverlay(BuildContext context) {
@@ -654,42 +662,24 @@ void _showNavigationOverlay(BuildContext context) {
           as CustomAdaptiveScaffoldState;
   final stateWidget = customAdaptiveScaffoldState.widget;
   final navRailTheme = Theme.of(context).navigationRailTheme;
-  OverlayEntry? overlayEntry;
-  overlayEntry = OverlayEntry(
-    builder: (context) => Stack(
-      children: [
-        Positioned.fill(
-          child: GestureDetector(
-            onTap: () => overlayEntry?.remove(),
-            child: Container(color: Colors.black54),
-          ),
-        ),
-        Positioned(
-          left: 0,
-          top: 0,
-          bottom: 0,
-          child: Material(
-            elevation: 8,
-            child: CustomAdaptiveScaffold.standardNavigationRail(
-              width: stateWidget.navigationRailWidth,
-              leading: stateWidget.leadingUnextendedNavRail,
-              trailing: stateWidget.trailingNavRail,
-              selectedIndex: stateWidget.selectedIndex,
-              extended: stateWidget.largeBreakpoint.isActive(context),
-              destinations: stateWidget.destinations
-                  .map((nd) => CustomAdaptiveScaffold.toRailDestination(nd))
-                  .toList(),
-              onDestinationSelected: stateWidget.onSelectedIndexChange,
-              backgroundColor: navRailTheme.backgroundColor,
-              selectedIconTheme: navRailTheme.selectedIconTheme,
-              unselectedIconTheme: navRailTheme.unselectedIconTheme,
-              selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
-              unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-  Overlay.of(context).insert(overlayEntry);
+  showModalNavigationRail<Builder>(
+      context: context,
+      builder: (_) {
+        return CustomAdaptiveScaffold.standardNavigationRail(
+          width: stateWidget.navigationRailWidth,
+          leading: stateWidget.leadingUnextendedNavRail,
+          trailing: stateWidget.trailingNavRail,
+          selectedIndex: stateWidget.selectedIndex,
+          extended: stateWidget.largeBreakpoint.isActive(context),
+          destinations: stateWidget.destinations
+              .map((nd) => CustomAdaptiveScaffold.toRailDestination(nd))
+              .toList(),
+          onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
+          backgroundColor: navRailTheme.backgroundColor,
+          selectedIconTheme: navRailTheme.selectedIconTheme,
+          unselectedIconTheme: navRailTheme.unselectedIconTheme,
+          selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
+          unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
+        );
+      });
 }
