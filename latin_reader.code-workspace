@@ -4,5 +4,38 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"sqltools.useNodeRuntime": true,
+		"sqltools.connections": [
+			{
+				"previewLimit": 250,
+				"driver": "SQLite",
+				"name": "library",
+				"database": "C:\\Users\\whoth\\OneDrive\\Documentos\\latin_reader\\library.db"
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Flutter - debug",
+				"request": "launch",
+				"type": "dart",
+				"flutterMode": "debug"
+			},
+			{
+				"name": "Flutter - release",
+				"request": "launch",
+				"type": "dart",
+				"flutterMode": "release"
+			},
+			{
+				"name": "Flutter - profile",
+				"request": "launch",
+				"type": "dart",
+				"flutterMode": "profile"
+			}
+		]
+	}
 }
