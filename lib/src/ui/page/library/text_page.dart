@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -13,7 +14,9 @@ import 'package:latin_reader/src/ui/app.dart';
 import 'package:latin_reader/src/ui/widget/custom_adaptive_scaffold.dart';
 import 'package:latin_reader/src/ui/widget/navigation_rail.dart';
 
-final _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
+const _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
+const _blank = ' ';
+final _lineTerminator = Platform.lineTerminator;
 
 typedef _LastVisibleIndexCallback = void Function(int first, int last);
 
@@ -84,11 +87,7 @@ class TextPageState extends ConsumerState<TextPage> {
           segments: segments,
           onNavigateNext: _loadNextPage,
           onNavigatePrevious: _loadPreviousPage,
-          onVisibleIndicesChanged: (first, last) {
-            _currentFirstVisibleIndex = first;
-            _currentLastVisibleIndex = last;
-            _pageFlow = _PageFlow.next;
-          },
+          onVisibleIndicesChanged: _updateVisibleIndices,
           pageFlow: _pageFlow,
           isLargeScreen: isLargeScreen,
           pageConstraints: pageConstraints,
@@ -96,6 +95,12 @@ class TextPageState extends ConsumerState<TextPage> {
         );
       },
     );
+  }
+
+  void _updateVisibleIndices(int first, int last) {
+    _currentFirstVisibleIndex = first;
+    _currentLastVisibleIndex = last;
+    _pageFlow = _PageFlow.next;
   }
 
   void _loadNextPage() {
@@ -130,11 +135,11 @@ class _TextRenderer {
   );
 
   final TextTheme textTheme;
-  static const Map<String, String> styleToLineBreak = {
-    'POEM': '\n\n',
-    'PROL': '\n\n',
-    'EPIL': '\n\n',
-    'BOOK': '\n\n\n',
+  static final Map<String, String> styleToLineBreak = {
+    'POEM': _lineTerminator + _lineTerminator,
+    'PROL': _lineTerminator + _lineTerminator,
+    'EPIL': _lineTerminator + _lineTerminator,
+    'BOOK': _lineTerminator + _lineTerminator + _lineTerminator,
   };
   late final Map<String, TextStyle> styles = {
     'BOOK': textTheme.headlineSmall!,
@@ -145,23 +150,24 @@ class _TextRenderer {
     'default': textTheme.bodyMedium!,
   };
   final UnmodifiableListView<WorkContentsElementView> workSegments;
+  static const _empty = '';
 
   String _getSpace(int index, WorkContentsElementView segment) {
     final nextIsPunctuation = index + 1 < workSegments.length &&
         _closingPunctSigns
             .any((sign) => workSegments[index + 1].word.startsWith(sign));
-    final currentEndsWithOpeningParenthesis = segment.word.endsWith('(');
-    return nextIsPunctuation || currentEndsWithOpeningParenthesis ? '' : ' ';
+    final endsWithOpeningParenthesis = segment.word.endsWith('(');
+    return nextIsPunctuation || endsWithOpeningParenthesis ? _empty : _blank;
   }
 
   String _getLineBreak(String? previousStyle, String currentStyle,
       String? previousNode, String currentNode) {
-    var lineBreak = '';
+    var lineBreak = _empty;
     if (previousStyle != null && currentStyle != previousStyle) {
-      lineBreak = styleToLineBreak[currentStyle] ?? '\n';
+      lineBreak = styleToLineBreak[currentStyle] ?? _lineTerminator;
     } else {
       if (currentNode != previousNode) {
-        lineBreak = '\n';
+        lineBreak = _lineTerminator;
       }
     }
     return lineBreak;
@@ -169,21 +175,22 @@ class _TextRenderer {
 
   List<InlineSpan> createSpans() {
     List<InlineSpan> spans = [];
-    String? previousStyle;
-    String? previousNode;
+    String? prevStyle;
+    String? prevNode;
     for (var index = 0; index < workSegments.length; index++) {
       final segment = workSegments[index];
       final currentStyle = segment.typ;
       final currentNode = segment.node;
-      final potentialSpace = _getSpace(index, segment);
-      final potentialLineBreak =
-          _getLineBreak(previousStyle, currentStyle, previousNode, currentNode);
+      final buffer = StringBuffer()
+        ..write(_getLineBreak(prevStyle, currentStyle, prevNode, currentNode))
+        ..write(segment.word)
+        ..write(_getSpace(index, segment));
       spans.add(TextSpan(
-        text: '$potentialLineBreak${segment.word}$potentialSpace',
+        text: buffer.toString(),
         style: styles[currentStyle] ?? styles['default'],
       ));
-      previousStyle = currentStyle;
-      previousNode = currentNode;
+      prevStyle = currentStyle;
+      prevNode = currentNode;
     }
     return spans;
   }
@@ -195,11 +202,14 @@ class _GestureHandler {
     required this.onNavigateNext,
     required this.onNavigatePrevious,
     required this.onNavMenuToggle,
+    required this.customAdaptiveScaffoldKey,
   });
 
   final void Function() onNavigateNext;
   final void Function() onNavigatePrevious;
   final void Function(BuildContext context) onNavMenuToggle;
+  final GlobalKey<CustomAdaptiveScaffoldState> customAdaptiveScaffoldKey;
+  final _mainBranchesNames = mainBranches.map((e) => e.id).toList();
 
   void handleTap(_PageFlow pageFlow) {
     if (pageFlow == _PageFlow.next) {
@@ -221,6 +231,58 @@ class _GestureHandler {
         onNavigatePrevious();
       }
     }
+  }
+
+  void _dismissModalAndNavigate(BuildContext context, int index) {
+    context.pop();
+    context.go(_mainBranchesNames[index]);
+  }
+
+  void _showBottomNavBar(BuildContext context) {
+    final customAdaptiveScaffoldState =
+        customAdaptiveScaffoldKey.currentState ??
+            Exception('CustomAdaptiveScaffold state is null')
+                as CustomAdaptiveScaffoldState;
+    final stateWidget = customAdaptiveScaffoldState.widget;
+    showModalBottomSheet<Builder>(
+        context: context,
+        builder: (_) {
+          return CustomAdaptiveScaffold.standardBottomNavigationBar(
+            destinations: stateWidget.destinations,
+            currentIndex: stateWidget.selectedIndex,
+            onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
+            labelBehavior: stateWidget.bottomNavigationBarLabelBehavior,
+          );
+        });
+  }
+
+  void _showNavigationOverlay(BuildContext context) {
+    final customAdaptiveScaffoldState =
+        customAdaptiveScaffoldKey.currentState ??
+            Exception('CustomAdaptiveScaffold state is null')
+                as CustomAdaptiveScaffoldState;
+    final stateWidget = customAdaptiveScaffoldState.widget;
+    final navRailTheme = Theme.of(context).navigationRailTheme;
+    showModalNavigationRail<Builder>(
+        context: context,
+        builder: (_) {
+          return CustomAdaptiveScaffold.standardNavigationRail(
+            width: stateWidget.navigationRailWidth,
+            leading: stateWidget.leadingUnextendedNavRail,
+            trailing: stateWidget.trailingNavRail,
+            selectedIndex: stateWidget.selectedIndex,
+            extended: stateWidget.largeBreakpoint.isActive(context),
+            destinations: stateWidget.destinations
+                .map((nd) => CustomAdaptiveScaffold.toRailDestination(nd))
+                .toList(),
+            onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
+            backgroundColor: navRailTheme.backgroundColor,
+            selectedIconTheme: navRailTheme.selectedIconTheme,
+            unselectedIconTheme: navRailTheme.unselectedIconTheme,
+            selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
+            unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
+          );
+        });
   }
 //
 }
@@ -289,14 +351,14 @@ class _WordSelector {
     final selEnd = selStart + selectedText.length;
     final previousChar = selStart > 0 ? fullText[selStart - 1] : null;
     final startIsValid = previousChar == null ||
-        previousChar == ' ' ||
-        previousChar == '\n' ||
+        previousChar == _blank ||
+        previousChar == _lineTerminator ||
         _closingPunctSigns.contains(previousChar);
     final nextChar = selEnd < fullText.length ? fullText[selEnd] : null;
     final endIsValid = nextChar == null ||
-        nextChar == ' ' ||
+        nextChar == _blank ||
         _closingPunctSigns.contains(nextChar);
-    final middleIsValid = (!selectedText.contains(' ') &&
+    final middleIsValid = (!selectedText.contains(_blank) &&
         !_closingPunctSigns.any((sign) => selectedText.contains(sign)));
     return startIsValid && endIsValid && middleIsValid;
   }
@@ -485,9 +547,8 @@ class _StyledWordListState extends State<_StyledWordList> {
     _gestureHandler = _GestureHandler(
         onNavigateNext: widget.onNavigateNext,
         onNavigatePrevious: widget.onNavigatePrevious,
-        onNavMenuToggle: (context) => Breakpoints.smallDesktop.isActive(context)
-            ? _showBottomNavBar(context)
-            : _showNavigationOverlay(context));
+        onNavMenuToggle: _handleNavMenuToggle,
+        customAdaptiveScaffoldKey: customAdaptiveScaffoldKey);
   }
 
   @override
@@ -502,6 +563,12 @@ class _StyledWordListState extends State<_StyledWordList> {
     return widget.isLargeScreen
         ? _buildLargeScreenLayout(context)
         : _buildSmallScreenLayout(context);
+  }
+
+  void _handleNavMenuToggle(BuildContext context) {
+    Breakpoints.smallDesktop.isActive(context)
+        ? _gestureHandler._showBottomNavBar(context)
+        : _gestureHandler._showNavigationOverlay(context);
   }
 
   Widget _buildSmallScreenLayout(BuildContext context) {
@@ -630,56 +697,4 @@ class _StyledWordListState extends State<_StyledWordList> {
     );
   }
 //
-}
-
-final _mainBranchesNames = mainBranches.map((e) => e.id).toList();
-
-void _dismissModalAndNavigate(BuildContext context, int index) {
-  context.pop();
-  context.go(_mainBranchesNames[index]);
-}
-
-void _showBottomNavBar(BuildContext context) {
-  final customAdaptiveScaffoldState = customAdaptiveScaffoldKey.currentState ??
-      Exception('CustomAdaptiveScaffold state is null')
-          as CustomAdaptiveScaffoldState;
-  final stateWidget = customAdaptiveScaffoldState.widget;
-  showModalBottomSheet<Builder>(
-      context: context,
-      builder: (_) {
-        return CustomAdaptiveScaffold.standardBottomNavigationBar(
-          destinations: stateWidget.destinations,
-          currentIndex: stateWidget.selectedIndex,
-          onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
-          labelBehavior: stateWidget.bottomNavigationBarLabelBehavior,
-        );
-      });
-}
-
-void _showNavigationOverlay(BuildContext context) {
-  final customAdaptiveScaffoldState = customAdaptiveScaffoldKey.currentState ??
-      Exception('CustomAdaptiveScaffold state is null')
-          as CustomAdaptiveScaffoldState;
-  final stateWidget = customAdaptiveScaffoldState.widget;
-  final navRailTheme = Theme.of(context).navigationRailTheme;
-  showModalNavigationRail<Builder>(
-      context: context,
-      builder: (_) {
-        return CustomAdaptiveScaffold.standardNavigationRail(
-          width: stateWidget.navigationRailWidth,
-          leading: stateWidget.leadingUnextendedNavRail,
-          trailing: stateWidget.trailingNavRail,
-          selectedIndex: stateWidget.selectedIndex,
-          extended: stateWidget.largeBreakpoint.isActive(context),
-          destinations: stateWidget.destinations
-              .map((nd) => CustomAdaptiveScaffold.toRailDestination(nd))
-              .toList(),
-          onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
-          backgroundColor: navRailTheme.backgroundColor,
-          selectedIconTheme: navRailTheme.selectedIconTheme,
-          unselectedIconTheme: navRailTheme.unselectedIconTheme,
-          selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
-          unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
-        );
-      });
 }
