@@ -378,7 +378,7 @@ class _WordSelectionButton extends ContextMenuButtonItem {
         );
 
   static void _onPressed(String word) {
-    print('Selected word: $word');
+    //TODO show details
   }
 //
 }
