@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
 /// This is a copy of the [AdaptiveScaffold] widget from the flutter_adaptive_scaffold package.
+/// Based on flutter_adaptive_scaffold 0.2.1
 /// It allows to specify the [bottomNavigationBarLabelBehavior] for the [BottomNavigationBar].
 /// It allows to specify whether to create a [BottomNavigationBar] or not
 class CustomAdaptiveScaffold extends StatefulWidget {
@@ -16,14 +17,20 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     this.trailingNavRail,
     this.smallBody,
     this.body,
+    this.mediumLargeBody,
     this.largeBody,
+    this.extraLargeBody,
     this.smallSecondaryBody,
     this.secondaryBody,
+    this.mediumLargeSecondaryBody,
     this.largeSecondaryBody,
+    this.extraLargeSecondaryBody,
     this.bodyRatio,
     this.smallBreakpoint = Breakpoints.small,
     this.mediumBreakpoint = Breakpoints.medium,
+    this.mediumLargeBreakpoint = Breakpoints.mediumLarge,
     this.largeBreakpoint = Breakpoints.large,
+    this.extraLargeBreakpoint = Breakpoints.extraLarge,
     this.drawerBreakpoint = Breakpoints.smallDesktop,
     this.internalAnimations = true,
     this.transitionDuration = const Duration(seconds: 1),
@@ -34,6 +41,8 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     this.navigationRailWidth = 72,
     this.extendedNavigationRailWidth = 192,
     this.appBarBreakpoint,
+    this.navigationRailDestinationBuilder,
+    this.groupAlignment,
     this.bottomNavigationBarLabelBehavior =
         NavigationDestinationLabelBehavior.onlyShowSelected,
     this.createBottomNavigationBar = true,
@@ -64,6 +73,9 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// navigation rail at the largest breakpoint.
   final Widget? trailingNavRail;
 
+  /// The alignment of the destinations in the navigation rail.
+  final double? groupAlignment;
+
   /// Widget to be displayed in the body slot at the smallest breakpoint.
   ///
   /// If nothing is entered for this property, then the default [body] is
@@ -71,19 +83,33 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// empty.
   final WidgetBuilder? smallBody;
 
-  /// Widget to be displayed in the body slot at the middle breakpoint.
+  /// Widget to be displayed in the body slot at the medium breakpoint.
   ///
   /// The default displayed body.
   final WidgetBuilder? body;
 
-  /// Widget to be displayed in the body slot at the largest breakpoint.
+  /// Widget to be displayed in the body slot at the mediumLarge breakpoint.
+  ///
+  /// If nothing is entered for this property, then the default [body] is
+  /// displayed in the slot. If null is entered for this slot, the slot stays
+  /// empty.
+  final WidgetBuilder? mediumLargeBody;
+
+  /// Widget to be displayed in the body slot at the large breakpoint.
   ///
   /// If nothing is entered for this property, then the default [body] is
   /// displayed in the slot. If null is entered for this slot, the slot stays
   /// empty.
   final WidgetBuilder? largeBody;
 
-  /// Widget to be displayed in the secondaryBody slot at the smallest
+  /// Widget to be displayed in the body slot at the extraLarge breakpoint.
+  ///
+  /// If nothing is entered for this property, then the default [body] is
+  /// displayed in the slot. If null is entered for this slot, the slot stays
+  /// empty.
+  final WidgetBuilder? extraLargeBody;
+
+  /// Widget to be displayed in the secondaryBody slot at the compact
   /// breakpoint.
   ///
   /// If nothing is entered for this property, then the default [secondaryBody]
@@ -91,18 +117,34 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// empty.
   final WidgetBuilder? smallSecondaryBody;
 
-  /// Widget to be displayed in the secondaryBody slot at the middle breakpoint.
+  /// Widget to be displayed in the secondaryBody slot at the medium breakpoint.
   ///
   /// The default displayed secondaryBody.
   final WidgetBuilder? secondaryBody;
 
-  /// Widget to be displayed in the secondaryBody slot at the largest
+  /// Widget to be displayed in the secondaryBody slot at the mediumLarge
+  /// breakpoint.
+  ///
+  /// If nothing is entered for this property, then the default [secondaryBody]
+  /// is displayed in the slot. If null is entered for this slot, the slot stays
+  /// empty.
+  final WidgetBuilder? mediumLargeSecondaryBody;
+
+  /// Widget to be displayed in the secondaryBody slot at the large
   /// breakpoint.
   ///
   /// If nothing is entered for this property, then the default [secondaryBody]
   /// is displayed in the slot. If null is entered for this slot, the slot stays
   /// empty.
   final WidgetBuilder? largeSecondaryBody;
+
+  /// Widget to be displayed in the secondaryBody slot at the extraLarge
+  /// breakpoint.
+  ///
+  /// If nothing is entered for this property, then the default [secondaryBody]
+  /// is displayed in the slot. If null is entered for this slot, the slot stays
+  /// empty.
+  final WidgetBuilder? extraLargeSecondaryBody;
 
   /// Defines the fractional ratio of body to the secondaryBody.
   ///
@@ -113,7 +155,7 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// the center of the screen.
   final double? bodyRatio;
 
-  /// The breakpoint defined for the small size, associated with mobile-like
+  /// The breakpoint defined for the compact size, associated with mobile-like
   /// features.
   ///
   /// Defaults to [Breakpoints.small].
@@ -122,14 +164,26 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// The breakpoint defined for the medium size, associated with tablet-like
   /// features.
   ///
-  /// Defaults to [Breakpoints.mediumBreakpoint].
+  /// Defaults to [Breakpoints.medium].
   final Breakpoint mediumBreakpoint;
+
+  /// The breakpoint defined for the mediumLarge size, associated with desktop-like
+  /// features.
+  ///
+  /// Defaults to [Breakpoints.mediumLarge].
+  final Breakpoint mediumLargeBreakpoint;
 
   /// The breakpoint defined for the large size, associated with desktop-like
   /// features.
   ///
-  /// Defaults to [Breakpoints.largeBreakpoint].
+  /// Defaults to [Breakpoints.large].
   final Breakpoint largeBreakpoint;
+
+  /// The breakpoint defined for the extraLarge size, associated with ultra-wide
+  /// features.
+  ///
+  /// Defaults to [Breakpoints.extraLarge].
+  final Breakpoint extraLargeBreakpoint;
 
   /// Whether or not the developer wants the smooth entering slide transition on
   /// secondaryBody.
@@ -181,6 +235,9 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// [Breakpoint].
   final double extendedNavigationRailWidth;
 
+  /// Used to map NavigationDestination to NavigationRailDestination.
+  final NavigationRailDestinationBuilder? navigationRailDestinationBuilder;
+
   /// The width used for the internal [BottomNavigationBar] at the small [Breakpoint].
   final NavigationDestinationLabelBehavior bottomNavigationBarLabelBehavior;
 
@@ -213,6 +270,9 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// Takes in a [selectedIndex] property for the current selected item in
   /// the [NavigationRail] and [extended] for whether the [NavigationRail]
   /// is extended or not.
+  ///
+  /// If [labelType] is null, then the default value is
+  /// [NavigationRailLabelType.none].
   static Builder standardNavigationRail({
     required List<NavigationRailDestination> destinations,
     double width = 72,
@@ -228,7 +288,7 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     IconThemeData? unselectedIconTheme,
     TextStyle? selectedLabelTextStyle,
     TextStyle? unSelectedLabelTextStyle,
-    NavigationRailLabelType labelType = NavigationRailLabelType.none,
+    NavigationRailLabelType? labelType = NavigationRailLabelType.none,
   }) {
     if (extended && width == 72) {
       width = 192;
@@ -317,7 +377,9 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     List<Breakpoint> breakpoints = const <Breakpoint>[
       Breakpoints.small,
       Breakpoints.medium,
+      Breakpoints.mediumLarge,
       Breakpoints.large,
+      Breakpoints.extraLarge,
     ],
     double margin = 8,
     int itemColumns = 1,
@@ -340,7 +402,7 @@ class CustomAdaptiveScaffold extends StatefulWidget {
         if (thisMargin < kMaterialMediumMinMargin) {
           thisMargin = kMaterialMediumMinMargin;
         }
-      } else if (currentBreakpoint == Breakpoints.large) {
+      } else if (currentBreakpoint == Breakpoints.mediumLarge) {
         if (thisMargin < kMaterialExpandedMinMargin) {
           thisMargin = kMaterialExpandedMinMargin;
         }
@@ -463,6 +525,13 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
     final NavigationRailThemeData navRailTheme =
         Theme.of(context).navigationRailTheme;
 
+    final List<NavigationRailDestination> destinations = widget.destinations
+        .map((NavigationDestination destination) =>
+            widget.navigationRailDestinationBuilder
+                ?.call(widget.destinations.indexOf(destination), destination) ??
+            AdaptiveScaffold.toRailDestination(destination))
+        .toList();
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: widget.drawerBreakpoint.isActive(context) && widget.useDrawer ||
@@ -476,12 +545,16 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                 leading: widget.leadingExtendedNavRail,
                 trailing: widget.trailingNavRail,
                 selectedIndex: widget.selectedIndex,
-                destinations: widget.destinations
-                    .map((NavigationDestination destination) =>
-                        CustomAdaptiveScaffold.toRailDestination(destination))
-                    .toList(),
+                destinations: destinations,
                 onDestinationSelected: _onDrawerDestinationSelected,
-              ),
+                backgroundColor: navRailTheme.backgroundColor,
+                selectedIconTheme: navRailTheme.selectedIconTheme,
+                unselectedIconTheme: navRailTheme.unselectedIconTheme,
+                selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
+                unselectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
+                groupAlignment: widget.groupAlignment,
+                labelType: navRailTheme.labelType,              
+                ),
             )
           : null,
       body: AdaptiveLayout(
@@ -497,6 +570,46 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                   ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
                         width: widget.navigationRailWidth,
                         leading: widget.leadingUnextendedNavRail,
+                trailing: widget.trailingNavRail,
+                selectedIndex: widget.selectedIndex,
+                destinations: destinations,
+                onDestinationSelected: widget.onSelectedIndexChange,
+                backgroundColor: navRailTheme.backgroundColor,
+                selectedIconTheme: navRailTheme.selectedIconTheme,
+                unselectedIconTheme: navRailTheme.unselectedIconTheme,
+                selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
+                unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
+                labelType: navRailTheme.labelType,
+                groupAlignment: widget.groupAlignment,
+              ) : null,
+            ),
+            widget.mediumLargeBreakpoint: SlotLayout.from(
+              key: const Key('primaryNavigation1'),
+              builder: widget.createNavigationRail == true
+                  ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
+                width: widget.extendedNavigationRailWidth,
+                extended: true,
+                leading: widget.leadingExtendedNavRail,
+                trailing: widget.trailingNavRail,
+                selectedIndex: widget.selectedIndex,
+                destinations: destinations,
+                onDestinationSelected: widget.onSelectedIndexChange,
+                backgroundColor: navRailTheme.backgroundColor,
+                selectedIconTheme: navRailTheme.selectedIconTheme,
+                unselectedIconTheme: navRailTheme.unselectedIconTheme,
+                selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
+                unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
+                labelType: navRailTheme.labelType,
+                groupAlignment: widget.groupAlignment,
+              ) : null,
+            ),
+            widget.largeBreakpoint: SlotLayout.from(
+              key: const Key('primaryNavigation2'),
+              builder: widget.createNavigationRail == true
+                  ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
+                width: widget.extendedNavigationRailWidth,
+                extended: true,
+                leading: widget.leadingExtendedNavRail,
                         trailing: widget.trailingNavRail,
                         selectedIndex: widget.selectedIndex,
                         destinations: widget.destinations
@@ -512,11 +625,10 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                             navRailTheme.selectedLabelTextStyle,
                         unSelectedLabelTextStyle:
                             navRailTheme.unselectedLabelTextStyle,
-                      )
-                  : null,
+                      ) : null,
             ),
-            widget.largeBreakpoint: SlotLayout.from(
-              key: const Key('primaryNavigation1'),
+            widget.extraLargeBreakpoint: SlotLayout.from(
+              key: const Key('primaryNavigation3'),
               builder: widget.createNavigationRail == true
                   ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
                         width: widget.extendedNavigationRailWidth,
@@ -588,6 +700,16 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                           builder: widget.body,
                         )
                       : null,
+            if (widget.mediumLargeBody != null)
+              widget.mediumLargeBreakpoint:
+                  (widget.mediumLargeBody != CustomAdaptiveScaffold.emptyBuilder)
+                      ? SlotLayout.from(
+                          key: const Key('mediumLargeBody'),
+                          inAnimation: CustomAdaptiveScaffold.fadeIn,
+                          outAnimation: CustomAdaptiveScaffold.fadeOut,
+                          builder: widget.mediumLargeBody,
+                        )
+                      : null,
             if (widget.largeBody != null)
               widget.largeBreakpoint:
                   (widget.largeBody != CustomAdaptiveScaffold.emptyBuilder)
@@ -596,6 +718,16 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                           inAnimation: CustomAdaptiveScaffold.fadeIn,
                           outAnimation: CustomAdaptiveScaffold.fadeOut,
                           builder: widget.largeBody,
+                        )
+                      : null,
+            if (widget.extraLargeBody != null)
+              widget.extraLargeBreakpoint:
+                  (widget.extraLargeBody != CustomAdaptiveScaffold.emptyBuilder)
+                      ? SlotLayout.from(
+                          key: const Key('extraLargeBody'),
+                          inAnimation: CustomAdaptiveScaffold.fadeIn,
+                          outAnimation: CustomAdaptiveScaffold.fadeOut,
+                          builder: widget.extraLargeBody,
                         )
                       : null,
           },
@@ -625,6 +757,15 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                           builder: widget.secondaryBody,
                         )
                       : null,
+            if (widget.mediumLargeSecondaryBody != null)
+              widget.mediumLargeBreakpoint: (widget.mediumLargeSecondaryBody !=
+                      CustomAdaptiveScaffold.emptyBuilder)
+                  ? SlotLayout.from(
+                      key: const Key('mediumLargeSBody'),
+                      outAnimation: CustomAdaptiveScaffold.stayOnScreen,
+                      builder: widget.mediumLargeSecondaryBody,
+                        )
+                      : null,
             if (widget.largeSecondaryBody != null)
               widget.largeBreakpoint: (widget.largeSecondaryBody !=
                       CustomAdaptiveScaffold.emptyBuilder)
@@ -632,6 +773,15 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                       key: const Key('largeSBody'),
                       outAnimation: CustomAdaptiveScaffold.stayOnScreen,
                       builder: widget.largeSecondaryBody,
+                    )
+                  : null,
+            if (widget.extraLargeSecondaryBody != null)
+              widget.extraLargeBreakpoint: (widget.extraLargeSecondaryBody !=
+                      CustomAdaptiveScaffold.emptyBuilder)
+                  ? SlotLayout.from(
+                      key: const Key('extraLargeSBody'),
+                      outAnimation: CustomAdaptiveScaffold.stayOnScreen,
+                      builder: widget.extraLargeSecondaryBody,
                     )
                   : null,
           },
