@@ -159,7 +159,7 @@ class _LibraryWorkDetailsProviderElement
 }
 
 String _$libraryWorkContentsPartiallyHash() =>
-    r'0af98499f4e1c7e97bcdd0ad3e14994c8f76c31b';
+    r'df1e7aaccb3512530775b64e00a3b5babc42f55c';
 
 /// See also [libraryWorkContentsPartially].
 @ProviderFor(libraryWorkContentsPartially)

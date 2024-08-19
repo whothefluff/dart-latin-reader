@@ -109,6 +109,13 @@ class DataVersionData extends DataClass implements Insertable<DataVersionData> {
         idx: idx ?? this.idx,
         createdAt: createdAt ?? this.createdAt,
       );
+  DataVersionData copyWithCompanion(DataVersionCompanion data) {
+    return DataVersionData(
+      idx: data.idx.present ? data.idx.value : this.idx,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('DataVersionData(')
@@ -317,6 +324,16 @@ class MorphologicalDetail extends DataClass
         item: item ?? this.item,
         dictionaryRef: dictionaryRef ?? this.dictionaryRef,
       );
+  MorphologicalDetail copyWithCompanion(MorphologicalDetailsCompanion data) {
+    return MorphologicalDetail(
+      form: data.form.present ? data.form.value : this.form,
+      item: data.item.present ? data.item.value : this.item,
+      dictionaryRef: data.dictionaryRef.present
+          ? data.dictionaryRef.value
+          : this.dictionaryRef,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('MorphologicalDetail(')
@@ -844,6 +861,30 @@ class MorphologicalDetailInflection extends DataClass
         voice: voice.present ? voice.value : this.voice,
         person: person.present ? person.value : this.person,
       );
+  MorphologicalDetailInflection copyWithCompanion(
+      MorphologicalDetailInflectionsCompanion data) {
+    return MorphologicalDetailInflection(
+      form: data.form.present ? data.form.value : this.form,
+      item: data.item.present ? data.item.value : this.item,
+      cnt: data.cnt.present ? data.cnt.value : this.cnt,
+      term: data.term.present ? data.term.value : this.term,
+      partOfSpeech: data.partOfSpeech.present
+          ? data.partOfSpeech.value
+          : this.partOfSpeech,
+      stem: data.stem.present ? data.stem.value : this.stem,
+      suffix: data.suffix.present ? data.suffix.value : this.suffix,
+      gender: data.gender.present ? data.gender.value : this.gender,
+      number: data.number.present ? data.number.value : this.number,
+      declension:
+          data.declension.present ? data.declension.value : this.declension,
+      grammCase: data.grammCase.present ? data.grammCase.value : this.grammCase,
+      mood: data.mood.present ? data.mood.value : this.mood,
+      tense: data.tense.present ? data.tense.value : this.tense,
+      voice: data.voice.present ? data.voice.value : this.voice,
+      person: data.person.present ? data.person.value : this.person,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('MorphologicalDetailInflection(')
@@ -1278,6 +1319,20 @@ class Macronization extends DataClass implements Insertable<Macronization> {
         macronizedSyllable: macronizedSyllable ?? this.macronizedSyllable,
         isUncertain: isUncertain ?? this.isUncertain,
       );
+  Macronization copyWithCompanion(MacronizationsCompanion data) {
+    return Macronization(
+      form: data.form.present ? data.form.value : this.form,
+      syllableNumber: data.syllableNumber.present
+          ? data.syllableNumber.value
+          : this.syllableNumber,
+      macronizedSyllable: data.macronizedSyllable.present
+          ? data.macronizedSyllable.value
+          : this.macronizedSyllable,
+      isUncertain:
+          data.isUncertain.present ? data.isUncertain.value : this.isUncertain,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Macronization(')
@@ -1537,6 +1592,15 @@ class Author extends DataClass implements Insertable<Author> {
         about: about ?? this.about,
         image: image ?? this.image,
       );
+  Author copyWithCompanion(AuthorsCompanion data) {
+    return Author(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      about: data.about.present ? data.about.value : this.about,
+      image: data.image.present ? data.image.value : this.image,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Author(')
@@ -1775,6 +1839,14 @@ class AuthorAbbreviation extends DataClass
         id: id ?? this.id,
         val: val ?? this.val,
       );
+  AuthorAbbreviation copyWithCompanion(AuthorAbbreviationsCompanion data) {
+    return AuthorAbbreviation(
+      authorId: data.authorId.present ? data.authorId.value : this.authorId,
+      id: data.id.present ? data.id.value : this.id,
+      val: data.val.present ? data.val.value : this.val,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('AuthorAbbreviation(')
@@ -1989,6 +2061,14 @@ class Work extends DataClass implements Insertable<Work> {
         name: name ?? this.name,
         about: about ?? this.about,
       );
+  Work copyWithCompanion(WorksCompanion data) {
+    return Work(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      about: data.about.present ? data.about.value : this.about,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Work(')
@@ -2209,6 +2289,14 @@ class WorkAbbreviation extends DataClass
         id: id ?? this.id,
         val: val ?? this.val,
       );
+  WorkAbbreviation copyWithCompanion(WorkAbbreviationsCompanion data) {
+    return WorkAbbreviation(
+      workId: data.workId.present ? data.workId.value : this.workId,
+      id: data.id.present ? data.id.value : this.id,
+      val: data.val.present ? data.val.value : this.val,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('WorkAbbreviation(')
@@ -2455,6 +2543,17 @@ class WorkContent extends DataClass implements Insertable<WorkContent> {
         word: word ?? this.word,
         sourceReference: sourceReference ?? this.sourceReference,
       );
+  WorkContent copyWithCompanion(WorkContentsCompanion data) {
+    return WorkContent(
+      workId: data.workId.present ? data.workId.value : this.workId,
+      idx: data.idx.present ? data.idx.value : this.idx,
+      word: data.word.present ? data.word.value : this.word,
+      sourceReference: data.sourceReference.present
+          ? data.sourceReference.value
+          : this.sourceReference,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('WorkContent(')
@@ -2729,6 +2828,20 @@ class UserProvidedMacronization extends DataClass
         syllableNumber: syllableNumber ?? this.syllableNumber,
         macronizedSyllable: macronizedSyllable ?? this.macronizedSyllable,
       );
+  UserProvidedMacronization copyWithCompanion(
+      UserProvidedMacronizationsCompanion data) {
+    return UserProvidedMacronization(
+      workId: data.workId.present ? data.workId.value : this.workId,
+      idx: data.idx.present ? data.idx.value : this.idx,
+      syllableNumber: data.syllableNumber.present
+          ? data.syllableNumber.value
+          : this.syllableNumber,
+      macronizedSyllable: data.macronizedSyllable.present
+          ? data.macronizedSyllable.value
+          : this.macronizedSyllable,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('UserProvidedMacronization(')
@@ -3094,6 +3207,20 @@ class WorkContentSubdivision extends DataClass
         fromIndex: fromIndex ?? this.fromIndex,
         toIndex: toIndex ?? this.toIndex,
       );
+  WorkContentSubdivision copyWithCompanion(
+      WorkContentSubdivisionsCompanion data) {
+    return WorkContentSubdivision(
+      workId: data.workId.present ? data.workId.value : this.workId,
+      node: data.node.present ? data.node.value : this.node,
+      typ: data.typ.present ? data.typ.value : this.typ,
+      cnt: data.cnt.present ? data.cnt.value : this.cnt,
+      name: data.name.present ? data.name.value : this.name,
+      parent: data.parent.present ? data.parent.value : this.parent,
+      fromIndex: data.fromIndex.present ? data.fromIndex.value : this.fromIndex,
+      toIndex: data.toIndex.present ? data.toIndex.value : this.toIndex,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('WorkContentSubdivision(')
@@ -3465,6 +3592,18 @@ class WorkContentSupplementaryData extends DataClass
         toIndex: toIndex ?? this.toIndex,
         val: val ?? this.val,
       );
+  WorkContentSupplementaryData copyWithCompanion(
+      WorkContentSupplementaryCompanion data) {
+    return WorkContentSupplementaryData(
+      workId: data.workId.present ? data.workId.value : this.workId,
+      typ: data.typ.present ? data.typ.value : this.typ,
+      cnt: data.cnt.present ? data.cnt.value : this.cnt,
+      fromIndex: data.fromIndex.present ? data.fromIndex.value : this.fromIndex,
+      toIndex: data.toIndex.present ? data.toIndex.value : this.toIndex,
+      val: data.val.present ? data.val.value : this.val,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('WorkContentSupplementaryData(')
@@ -3710,6 +3849,13 @@ class AuthorsAndWork extends DataClass implements Insertable<AuthorsAndWork> {
         authorId: authorId ?? this.authorId,
         workId: workId ?? this.workId,
       );
+  AuthorsAndWork copyWithCompanion(AuthorsAndWorksCompanion data) {
+    return AuthorsAndWork(
+      authorId: data.authorId.present ? data.authorId.value : this.authorId,
+      workId: data.workId.present ? data.workId.value : this.workId,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('AuthorsAndWork(')
@@ -4867,7 +5013,7 @@ class LibraryWorkIndexes extends ViewInfo<LibraryWorkIndexes, LibraryWorkIndexe>
 
 abstract class _$AppDb extends GeneratedDatabase {
   _$AppDb(QueryExecutor e) : super(e);
-  _$AppDbManager get managers => _$AppDbManager(this);
+  $AppDbManager get managers => $AppDbManager(this);
   late final DataVersion dataVersion = DataVersion(this);
   late final MorphologicalDetails morphologicalDetails =
       MorphologicalDetails(this);
@@ -4997,7 +5143,7 @@ abstract class _$AppDb extends GeneratedDatabase {
       ];
 }
 
-typedef $DataVersionInsertCompanionBuilder = DataVersionCompanion Function({
+typedef $DataVersionCreateCompanionBuilder = DataVersionCompanion Function({
   Value<int> idx,
   Value<String> createdAt,
 });
@@ -5005,55 +5151,6 @@ typedef $DataVersionUpdateCompanionBuilder = DataVersionCompanion Function({
   Value<int> idx,
   Value<String> createdAt,
 });
-
-class $DataVersionTableManager extends RootTableManager<
-    _$AppDb,
-    DataVersion,
-    DataVersionData,
-    $DataVersionFilterComposer,
-    $DataVersionOrderingComposer,
-    $DataVersionProcessedTableManager,
-    $DataVersionInsertCompanionBuilder,
-    $DataVersionUpdateCompanionBuilder> {
-  $DataVersionTableManager(_$AppDb db, DataVersion table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $DataVersionFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $DataVersionOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $DataVersionProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<int> idx = const Value.absent(),
-            Value<String> createdAt = const Value.absent(),
-          }) =>
-              DataVersionCompanion(
-            idx: idx,
-            createdAt: createdAt,
-          ),
-          getInsertCompanionBuilder: ({
-            Value<int> idx = const Value.absent(),
-            Value<String> createdAt = const Value.absent(),
-          }) =>
-              DataVersionCompanion.insert(
-            idx: idx,
-            createdAt: createdAt,
-          ),
-        ));
-}
-
-class $DataVersionProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    DataVersion,
-    DataVersionData,
-    $DataVersionFilterComposer,
-    $DataVersionOrderingComposer,
-    $DataVersionProcessedTableManager,
-    $DataVersionInsertCompanionBuilder,
-    $DataVersionUpdateCompanionBuilder> {
-  $DataVersionProcessedTableManager(super.$state);
-}
 
 class $DataVersionFilterComposer extends FilterComposer<_$AppDb, DataVersion> {
   $DataVersionFilterComposer(super.$state);
@@ -5082,7 +5179,60 @@ class $DataVersionOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $MorphologicalDetailsInsertCompanionBuilder
+class $DataVersionTableManager extends RootTableManager<
+    _$AppDb,
+    DataVersion,
+    DataVersionData,
+    $DataVersionFilterComposer,
+    $DataVersionOrderingComposer,
+    $DataVersionCreateCompanionBuilder,
+    $DataVersionUpdateCompanionBuilder,
+    (DataVersionData, BaseReferences<_$AppDb, DataVersion, DataVersionData>),
+    DataVersionData,
+    PrefetchHooks Function()> {
+  $DataVersionTableManager(_$AppDb db, DataVersion table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $DataVersionFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $DataVersionOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> idx = const Value.absent(),
+            Value<String> createdAt = const Value.absent(),
+          }) =>
+              DataVersionCompanion(
+            idx: idx,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> idx = const Value.absent(),
+            Value<String> createdAt = const Value.absent(),
+          }) =>
+              DataVersionCompanion.insert(
+            idx: idx,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $DataVersionProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    DataVersion,
+    DataVersionData,
+    $DataVersionFilterComposer,
+    $DataVersionOrderingComposer,
+    $DataVersionCreateCompanionBuilder,
+    $DataVersionUpdateCompanionBuilder,
+    (DataVersionData, BaseReferences<_$AppDb, DataVersion, DataVersionData>),
+    DataVersionData,
+    PrefetchHooks Function()>;
+typedef $MorphologicalDetailsCreateCompanionBuilder
     = MorphologicalDetailsCompanion Function({
   required String form,
   required int item,
@@ -5094,60 +5244,6 @@ typedef $MorphologicalDetailsUpdateCompanionBuilder
   Value<int> item,
   Value<String> dictionaryRef,
 });
-
-class $MorphologicalDetailsTableManager extends RootTableManager<
-    _$AppDb,
-    MorphologicalDetails,
-    MorphologicalDetail,
-    $MorphologicalDetailsFilterComposer,
-    $MorphologicalDetailsOrderingComposer,
-    $MorphologicalDetailsProcessedTableManager,
-    $MorphologicalDetailsInsertCompanionBuilder,
-    $MorphologicalDetailsUpdateCompanionBuilder> {
-  $MorphologicalDetailsTableManager(_$AppDb db, MorphologicalDetails table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $MorphologicalDetailsFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $MorphologicalDetailsOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $MorphologicalDetailsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> form = const Value.absent(),
-            Value<int> item = const Value.absent(),
-            Value<String> dictionaryRef = const Value.absent(),
-          }) =>
-              MorphologicalDetailsCompanion(
-            form: form,
-            item: item,
-            dictionaryRef: dictionaryRef,
-          ),
-          getInsertCompanionBuilder: ({
-            required String form,
-            required int item,
-            required String dictionaryRef,
-          }) =>
-              MorphologicalDetailsCompanion.insert(
-            form: form,
-            item: item,
-            dictionaryRef: dictionaryRef,
-          ),
-        ));
-}
-
-class $MorphologicalDetailsProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    MorphologicalDetails,
-    MorphologicalDetail,
-    $MorphologicalDetailsFilterComposer,
-    $MorphologicalDetailsOrderingComposer,
-    $MorphologicalDetailsProcessedTableManager,
-    $MorphologicalDetailsInsertCompanionBuilder,
-    $MorphologicalDetailsUpdateCompanionBuilder> {
-  $MorphologicalDetailsProcessedTableManager(super.$state);
-}
 
 class $MorphologicalDetailsFilterComposer
     extends FilterComposer<_$AppDb, MorphologicalDetails> {
@@ -5187,7 +5283,70 @@ class $MorphologicalDetailsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $MorphologicalDetailInflectionsInsertCompanionBuilder
+class $MorphologicalDetailsTableManager extends RootTableManager<
+    _$AppDb,
+    MorphologicalDetails,
+    MorphologicalDetail,
+    $MorphologicalDetailsFilterComposer,
+    $MorphologicalDetailsOrderingComposer,
+    $MorphologicalDetailsCreateCompanionBuilder,
+    $MorphologicalDetailsUpdateCompanionBuilder,
+    (
+      MorphologicalDetail,
+      BaseReferences<_$AppDb, MorphologicalDetails, MorphologicalDetail>
+    ),
+    MorphologicalDetail,
+    PrefetchHooks Function()> {
+  $MorphologicalDetailsTableManager(_$AppDb db, MorphologicalDetails table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $MorphologicalDetailsFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $MorphologicalDetailsOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> form = const Value.absent(),
+            Value<int> item = const Value.absent(),
+            Value<String> dictionaryRef = const Value.absent(),
+          }) =>
+              MorphologicalDetailsCompanion(
+            form: form,
+            item: item,
+            dictionaryRef: dictionaryRef,
+          ),
+          createCompanionCallback: ({
+            required String form,
+            required int item,
+            required String dictionaryRef,
+          }) =>
+              MorphologicalDetailsCompanion.insert(
+            form: form,
+            item: item,
+            dictionaryRef: dictionaryRef,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $MorphologicalDetailsProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    MorphologicalDetails,
+    MorphologicalDetail,
+    $MorphologicalDetailsFilterComposer,
+    $MorphologicalDetailsOrderingComposer,
+    $MorphologicalDetailsCreateCompanionBuilder,
+    $MorphologicalDetailsUpdateCompanionBuilder,
+    (
+      MorphologicalDetail,
+      BaseReferences<_$AppDb, MorphologicalDetails, MorphologicalDetail>
+    ),
+    MorphologicalDetail,
+    PrefetchHooks Function()>;
+typedef $MorphologicalDetailInflectionsCreateCompanionBuilder
     = MorphologicalDetailInflectionsCompanion Function({
   required String form,
   required int item,
@@ -5223,110 +5382,6 @@ typedef $MorphologicalDetailInflectionsUpdateCompanionBuilder
   Value<String?> voice,
   Value<String?> person,
 });
-
-class $MorphologicalDetailInflectionsTableManager extends RootTableManager<
-    _$AppDb,
-    MorphologicalDetailInflections,
-    MorphologicalDetailInflection,
-    $MorphologicalDetailInflectionsFilterComposer,
-    $MorphologicalDetailInflectionsOrderingComposer,
-    $MorphologicalDetailInflectionsProcessedTableManager,
-    $MorphologicalDetailInflectionsInsertCompanionBuilder,
-    $MorphologicalDetailInflectionsUpdateCompanionBuilder> {
-  $MorphologicalDetailInflectionsTableManager(
-      _$AppDb db, MorphologicalDetailInflections table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $MorphologicalDetailInflectionsFilterComposer(
-              ComposerState(db, table)),
-          orderingComposer: $MorphologicalDetailInflectionsOrderingComposer(
-              ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $MorphologicalDetailInflectionsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> form = const Value.absent(),
-            Value<int> item = const Value.absent(),
-            Value<int> cnt = const Value.absent(),
-            Value<String> term = const Value.absent(),
-            Value<String> partOfSpeech = const Value.absent(),
-            Value<String> stem = const Value.absent(),
-            Value<String> suffix = const Value.absent(),
-            Value<String?> gender = const Value.absent(),
-            Value<String?> number = const Value.absent(),
-            Value<String?> declension = const Value.absent(),
-            Value<String?> grammCase = const Value.absent(),
-            Value<String?> mood = const Value.absent(),
-            Value<String?> tense = const Value.absent(),
-            Value<String?> voice = const Value.absent(),
-            Value<String?> person = const Value.absent(),
-          }) =>
-              MorphologicalDetailInflectionsCompanion(
-            form: form,
-            item: item,
-            cnt: cnt,
-            term: term,
-            partOfSpeech: partOfSpeech,
-            stem: stem,
-            suffix: suffix,
-            gender: gender,
-            number: number,
-            declension: declension,
-            grammCase: grammCase,
-            mood: mood,
-            tense: tense,
-            voice: voice,
-            person: person,
-          ),
-          getInsertCompanionBuilder: ({
-            required String form,
-            required int item,
-            required int cnt,
-            required String term,
-            required String partOfSpeech,
-            required String stem,
-            required String suffix,
-            Value<String?> gender = const Value.absent(),
-            Value<String?> number = const Value.absent(),
-            Value<String?> declension = const Value.absent(),
-            Value<String?> grammCase = const Value.absent(),
-            Value<String?> mood = const Value.absent(),
-            Value<String?> tense = const Value.absent(),
-            Value<String?> voice = const Value.absent(),
-            Value<String?> person = const Value.absent(),
-          }) =>
-              MorphologicalDetailInflectionsCompanion.insert(
-            form: form,
-            item: item,
-            cnt: cnt,
-            term: term,
-            partOfSpeech: partOfSpeech,
-            stem: stem,
-            suffix: suffix,
-            gender: gender,
-            number: number,
-            declension: declension,
-            grammCase: grammCase,
-            mood: mood,
-            tense: tense,
-            voice: voice,
-            person: person,
-          ),
-        ));
-}
-
-class $MorphologicalDetailInflectionsProcessedTableManager
-    extends ProcessedTableManager<
-        _$AppDb,
-        MorphologicalDetailInflections,
-        MorphologicalDetailInflection,
-        $MorphologicalDetailInflectionsFilterComposer,
-        $MorphologicalDetailInflectionsOrderingComposer,
-        $MorphologicalDetailInflectionsProcessedTableManager,
-        $MorphologicalDetailInflectionsInsertCompanionBuilder,
-        $MorphologicalDetailInflectionsUpdateCompanionBuilder> {
-  $MorphologicalDetailInflectionsProcessedTableManager(super.$state);
-}
 
 class $MorphologicalDetailInflectionsFilterComposer
     extends FilterComposer<_$AppDb, MorphologicalDetailInflections> {
@@ -5486,7 +5541,122 @@ class $MorphologicalDetailInflectionsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $MacronizationsInsertCompanionBuilder = MacronizationsCompanion
+class $MorphologicalDetailInflectionsTableManager extends RootTableManager<
+    _$AppDb,
+    MorphologicalDetailInflections,
+    MorphologicalDetailInflection,
+    $MorphologicalDetailInflectionsFilterComposer,
+    $MorphologicalDetailInflectionsOrderingComposer,
+    $MorphologicalDetailInflectionsCreateCompanionBuilder,
+    $MorphologicalDetailInflectionsUpdateCompanionBuilder,
+    (
+      MorphologicalDetailInflection,
+      BaseReferences<_$AppDb, MorphologicalDetailInflections,
+          MorphologicalDetailInflection>
+    ),
+    MorphologicalDetailInflection,
+    PrefetchHooks Function()> {
+  $MorphologicalDetailInflectionsTableManager(
+      _$AppDb db, MorphologicalDetailInflections table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $MorphologicalDetailInflectionsFilterComposer(
+              ComposerState(db, table)),
+          orderingComposer: $MorphologicalDetailInflectionsOrderingComposer(
+              ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> form = const Value.absent(),
+            Value<int> item = const Value.absent(),
+            Value<int> cnt = const Value.absent(),
+            Value<String> term = const Value.absent(),
+            Value<String> partOfSpeech = const Value.absent(),
+            Value<String> stem = const Value.absent(),
+            Value<String> suffix = const Value.absent(),
+            Value<String?> gender = const Value.absent(),
+            Value<String?> number = const Value.absent(),
+            Value<String?> declension = const Value.absent(),
+            Value<String?> grammCase = const Value.absent(),
+            Value<String?> mood = const Value.absent(),
+            Value<String?> tense = const Value.absent(),
+            Value<String?> voice = const Value.absent(),
+            Value<String?> person = const Value.absent(),
+          }) =>
+              MorphologicalDetailInflectionsCompanion(
+            form: form,
+            item: item,
+            cnt: cnt,
+            term: term,
+            partOfSpeech: partOfSpeech,
+            stem: stem,
+            suffix: suffix,
+            gender: gender,
+            number: number,
+            declension: declension,
+            grammCase: grammCase,
+            mood: mood,
+            tense: tense,
+            voice: voice,
+            person: person,
+          ),
+          createCompanionCallback: ({
+            required String form,
+            required int item,
+            required int cnt,
+            required String term,
+            required String partOfSpeech,
+            required String stem,
+            required String suffix,
+            Value<String?> gender = const Value.absent(),
+            Value<String?> number = const Value.absent(),
+            Value<String?> declension = const Value.absent(),
+            Value<String?> grammCase = const Value.absent(),
+            Value<String?> mood = const Value.absent(),
+            Value<String?> tense = const Value.absent(),
+            Value<String?> voice = const Value.absent(),
+            Value<String?> person = const Value.absent(),
+          }) =>
+              MorphologicalDetailInflectionsCompanion.insert(
+            form: form,
+            item: item,
+            cnt: cnt,
+            term: term,
+            partOfSpeech: partOfSpeech,
+            stem: stem,
+            suffix: suffix,
+            gender: gender,
+            number: number,
+            declension: declension,
+            grammCase: grammCase,
+            mood: mood,
+            tense: tense,
+            voice: voice,
+            person: person,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $MorphologicalDetailInflectionsProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDb,
+        MorphologicalDetailInflections,
+        MorphologicalDetailInflection,
+        $MorphologicalDetailInflectionsFilterComposer,
+        $MorphologicalDetailInflectionsOrderingComposer,
+        $MorphologicalDetailInflectionsCreateCompanionBuilder,
+        $MorphologicalDetailInflectionsUpdateCompanionBuilder,
+        (
+          MorphologicalDetailInflection,
+          BaseReferences<_$AppDb, MorphologicalDetailInflections,
+              MorphologicalDetailInflection>
+        ),
+        MorphologicalDetailInflection,
+        PrefetchHooks Function()>;
+typedef $MacronizationsCreateCompanionBuilder = MacronizationsCompanion
     Function({
   required String form,
   required int syllableNumber,
@@ -5500,64 +5670,6 @@ typedef $MacronizationsUpdateCompanionBuilder = MacronizationsCompanion
   Value<String> macronizedSyllable,
   Value<int> isUncertain,
 });
-
-class $MacronizationsTableManager extends RootTableManager<
-    _$AppDb,
-    Macronizations,
-    Macronization,
-    $MacronizationsFilterComposer,
-    $MacronizationsOrderingComposer,
-    $MacronizationsProcessedTableManager,
-    $MacronizationsInsertCompanionBuilder,
-    $MacronizationsUpdateCompanionBuilder> {
-  $MacronizationsTableManager(_$AppDb db, Macronizations table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $MacronizationsFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $MacronizationsOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $MacronizationsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> form = const Value.absent(),
-            Value<int> syllableNumber = const Value.absent(),
-            Value<String> macronizedSyllable = const Value.absent(),
-            Value<int> isUncertain = const Value.absent(),
-          }) =>
-              MacronizationsCompanion(
-            form: form,
-            syllableNumber: syllableNumber,
-            macronizedSyllable: macronizedSyllable,
-            isUncertain: isUncertain,
-          ),
-          getInsertCompanionBuilder: ({
-            required String form,
-            required int syllableNumber,
-            required String macronizedSyllable,
-            required int isUncertain,
-          }) =>
-              MacronizationsCompanion.insert(
-            form: form,
-            syllableNumber: syllableNumber,
-            macronizedSyllable: macronizedSyllable,
-            isUncertain: isUncertain,
-          ),
-        ));
-}
-
-class $MacronizationsProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    Macronizations,
-    Macronization,
-    $MacronizationsFilterComposer,
-    $MacronizationsOrderingComposer,
-    $MacronizationsProcessedTableManager,
-    $MacronizationsInsertCompanionBuilder,
-    $MacronizationsUpdateCompanionBuilder> {
-  $MacronizationsProcessedTableManager(super.$state);
-}
 
 class $MacronizationsFilterComposer
     extends FilterComposer<_$AppDb, Macronizations> {
@@ -5607,7 +5719,68 @@ class $MacronizationsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $AuthorsInsertCompanionBuilder = AuthorsCompanion Function({
+class $MacronizationsTableManager extends RootTableManager<
+    _$AppDb,
+    Macronizations,
+    Macronization,
+    $MacronizationsFilterComposer,
+    $MacronizationsOrderingComposer,
+    $MacronizationsCreateCompanionBuilder,
+    $MacronizationsUpdateCompanionBuilder,
+    (Macronization, BaseReferences<_$AppDb, Macronizations, Macronization>),
+    Macronization,
+    PrefetchHooks Function()> {
+  $MacronizationsTableManager(_$AppDb db, Macronizations table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $MacronizationsFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $MacronizationsOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> form = const Value.absent(),
+            Value<int> syllableNumber = const Value.absent(),
+            Value<String> macronizedSyllable = const Value.absent(),
+            Value<int> isUncertain = const Value.absent(),
+          }) =>
+              MacronizationsCompanion(
+            form: form,
+            syllableNumber: syllableNumber,
+            macronizedSyllable: macronizedSyllable,
+            isUncertain: isUncertain,
+          ),
+          createCompanionCallback: ({
+            required String form,
+            required int syllableNumber,
+            required String macronizedSyllable,
+            required int isUncertain,
+          }) =>
+              MacronizationsCompanion.insert(
+            form: form,
+            syllableNumber: syllableNumber,
+            macronizedSyllable: macronizedSyllable,
+            isUncertain: isUncertain,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $MacronizationsProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    Macronizations,
+    Macronization,
+    $MacronizationsFilterComposer,
+    $MacronizationsOrderingComposer,
+    $MacronizationsCreateCompanionBuilder,
+    $MacronizationsUpdateCompanionBuilder,
+    (Macronization, BaseReferences<_$AppDb, Macronizations, Macronization>),
+    Macronization,
+    PrefetchHooks Function()>;
+typedef $AuthorsCreateCompanionBuilder = AuthorsCompanion Function({
   required String id,
   required String name,
   required String about,
@@ -5619,61 +5792,6 @@ typedef $AuthorsUpdateCompanionBuilder = AuthorsCompanion Function({
   Value<String> about,
   Value<Uint8List> image,
 });
-
-class $AuthorsTableManager extends RootTableManager<
-    _$AppDb,
-    Authors,
-    Author,
-    $AuthorsFilterComposer,
-    $AuthorsOrderingComposer,
-    $AuthorsProcessedTableManager,
-    $AuthorsInsertCompanionBuilder,
-    $AuthorsUpdateCompanionBuilder> {
-  $AuthorsTableManager(_$AppDb db, Authors table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $AuthorsFilterComposer(ComposerState(db, table)),
-          orderingComposer: $AuthorsOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $AuthorsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> id = const Value.absent(),
-            Value<String> name = const Value.absent(),
-            Value<String> about = const Value.absent(),
-            Value<Uint8List> image = const Value.absent(),
-          }) =>
-              AuthorsCompanion(
-            id: id,
-            name: name,
-            about: about,
-            image: image,
-          ),
-          getInsertCompanionBuilder: ({
-            required String id,
-            required String name,
-            required String about,
-            required Uint8List image,
-          }) =>
-              AuthorsCompanion.insert(
-            id: id,
-            name: name,
-            about: about,
-            image: image,
-          ),
-        ));
-}
-
-class $AuthorsProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    Authors,
-    Author,
-    $AuthorsFilterComposer,
-    $AuthorsOrderingComposer,
-    $AuthorsProcessedTableManager,
-    $AuthorsInsertCompanionBuilder,
-    $AuthorsUpdateCompanionBuilder> {
-  $AuthorsProcessedTableManager(super.$state);
-}
 
 class $AuthorsFilterComposer extends FilterComposer<_$AppDb, Authors> {
   $AuthorsFilterComposer(super.$state);
@@ -5721,7 +5839,66 @@ class $AuthorsOrderingComposer extends OrderingComposer<_$AppDb, Authors> {
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $AuthorAbbreviationsInsertCompanionBuilder
+class $AuthorsTableManager extends RootTableManager<
+    _$AppDb,
+    Authors,
+    Author,
+    $AuthorsFilterComposer,
+    $AuthorsOrderingComposer,
+    $AuthorsCreateCompanionBuilder,
+    $AuthorsUpdateCompanionBuilder,
+    (Author, BaseReferences<_$AppDb, Authors, Author>),
+    Author,
+    PrefetchHooks Function()> {
+  $AuthorsTableManager(_$AppDb db, Authors table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $AuthorsFilterComposer(ComposerState(db, table)),
+          orderingComposer: $AuthorsOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> about = const Value.absent(),
+            Value<Uint8List> image = const Value.absent(),
+          }) =>
+              AuthorsCompanion(
+            id: id,
+            name: name,
+            about: about,
+            image: image,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String name,
+            required String about,
+            required Uint8List image,
+          }) =>
+              AuthorsCompanion.insert(
+            id: id,
+            name: name,
+            about: about,
+            image: image,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $AuthorsProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    Authors,
+    Author,
+    $AuthorsFilterComposer,
+    $AuthorsOrderingComposer,
+    $AuthorsCreateCompanionBuilder,
+    $AuthorsUpdateCompanionBuilder,
+    (Author, BaseReferences<_$AppDb, Authors, Author>),
+    Author,
+    PrefetchHooks Function()>;
+typedef $AuthorAbbreviationsCreateCompanionBuilder
     = AuthorAbbreviationsCompanion Function({
   required String authorId,
   required int id,
@@ -5733,60 +5910,6 @@ typedef $AuthorAbbreviationsUpdateCompanionBuilder
   Value<int> id,
   Value<String> val,
 });
-
-class $AuthorAbbreviationsTableManager extends RootTableManager<
-    _$AppDb,
-    AuthorAbbreviations,
-    AuthorAbbreviation,
-    $AuthorAbbreviationsFilterComposer,
-    $AuthorAbbreviationsOrderingComposer,
-    $AuthorAbbreviationsProcessedTableManager,
-    $AuthorAbbreviationsInsertCompanionBuilder,
-    $AuthorAbbreviationsUpdateCompanionBuilder> {
-  $AuthorAbbreviationsTableManager(_$AppDb db, AuthorAbbreviations table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $AuthorAbbreviationsFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $AuthorAbbreviationsOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $AuthorAbbreviationsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> authorId = const Value.absent(),
-            Value<int> id = const Value.absent(),
-            Value<String> val = const Value.absent(),
-          }) =>
-              AuthorAbbreviationsCompanion(
-            authorId: authorId,
-            id: id,
-            val: val,
-          ),
-          getInsertCompanionBuilder: ({
-            required String authorId,
-            required int id,
-            required String val,
-          }) =>
-              AuthorAbbreviationsCompanion.insert(
-            authorId: authorId,
-            id: id,
-            val: val,
-          ),
-        ));
-}
-
-class $AuthorAbbreviationsProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    AuthorAbbreviations,
-    AuthorAbbreviation,
-    $AuthorAbbreviationsFilterComposer,
-    $AuthorAbbreviationsOrderingComposer,
-    $AuthorAbbreviationsProcessedTableManager,
-    $AuthorAbbreviationsInsertCompanionBuilder,
-    $AuthorAbbreviationsUpdateCompanionBuilder> {
-  $AuthorAbbreviationsProcessedTableManager(super.$state);
-}
 
 class $AuthorAbbreviationsFilterComposer
     extends FilterComposer<_$AppDb, AuthorAbbreviations> {
@@ -5826,7 +5949,70 @@ class $AuthorAbbreviationsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $WorksInsertCompanionBuilder = WorksCompanion Function({
+class $AuthorAbbreviationsTableManager extends RootTableManager<
+    _$AppDb,
+    AuthorAbbreviations,
+    AuthorAbbreviation,
+    $AuthorAbbreviationsFilterComposer,
+    $AuthorAbbreviationsOrderingComposer,
+    $AuthorAbbreviationsCreateCompanionBuilder,
+    $AuthorAbbreviationsUpdateCompanionBuilder,
+    (
+      AuthorAbbreviation,
+      BaseReferences<_$AppDb, AuthorAbbreviations, AuthorAbbreviation>
+    ),
+    AuthorAbbreviation,
+    PrefetchHooks Function()> {
+  $AuthorAbbreviationsTableManager(_$AppDb db, AuthorAbbreviations table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $AuthorAbbreviationsFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $AuthorAbbreviationsOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> authorId = const Value.absent(),
+            Value<int> id = const Value.absent(),
+            Value<String> val = const Value.absent(),
+          }) =>
+              AuthorAbbreviationsCompanion(
+            authorId: authorId,
+            id: id,
+            val: val,
+          ),
+          createCompanionCallback: ({
+            required String authorId,
+            required int id,
+            required String val,
+          }) =>
+              AuthorAbbreviationsCompanion.insert(
+            authorId: authorId,
+            id: id,
+            val: val,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $AuthorAbbreviationsProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    AuthorAbbreviations,
+    AuthorAbbreviation,
+    $AuthorAbbreviationsFilterComposer,
+    $AuthorAbbreviationsOrderingComposer,
+    $AuthorAbbreviationsCreateCompanionBuilder,
+    $AuthorAbbreviationsUpdateCompanionBuilder,
+    (
+      AuthorAbbreviation,
+      BaseReferences<_$AppDb, AuthorAbbreviations, AuthorAbbreviation>
+    ),
+    AuthorAbbreviation,
+    PrefetchHooks Function()>;
+typedef $WorksCreateCompanionBuilder = WorksCompanion Function({
   required String id,
   required String name,
   required String about,
@@ -5836,57 +6022,6 @@ typedef $WorksUpdateCompanionBuilder = WorksCompanion Function({
   Value<String> name,
   Value<String> about,
 });
-
-class $WorksTableManager extends RootTableManager<
-    _$AppDb,
-    Works,
-    Work,
-    $WorksFilterComposer,
-    $WorksOrderingComposer,
-    $WorksProcessedTableManager,
-    $WorksInsertCompanionBuilder,
-    $WorksUpdateCompanionBuilder> {
-  $WorksTableManager(_$AppDb db, Works table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $WorksFilterComposer(ComposerState(db, table)),
-          orderingComposer: $WorksOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $WorksProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> id = const Value.absent(),
-            Value<String> name = const Value.absent(),
-            Value<String> about = const Value.absent(),
-          }) =>
-              WorksCompanion(
-            id: id,
-            name: name,
-            about: about,
-          ),
-          getInsertCompanionBuilder: ({
-            required String id,
-            required String name,
-            required String about,
-          }) =>
-              WorksCompanion.insert(
-            id: id,
-            name: name,
-            about: about,
-          ),
-        ));
-}
-
-class $WorksProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    Works,
-    Work,
-    $WorksFilterComposer,
-    $WorksOrderingComposer,
-    $WorksProcessedTableManager,
-    $WorksInsertCompanionBuilder,
-    $WorksUpdateCompanionBuilder> {
-  $WorksProcessedTableManager(super.$state);
-}
 
 class $WorksFilterComposer extends FilterComposer<_$AppDb, Works> {
   $WorksFilterComposer(super.$state);
@@ -5924,7 +6059,62 @@ class $WorksOrderingComposer extends OrderingComposer<_$AppDb, Works> {
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $WorkAbbreviationsInsertCompanionBuilder = WorkAbbreviationsCompanion
+class $WorksTableManager extends RootTableManager<
+    _$AppDb,
+    Works,
+    Work,
+    $WorksFilterComposer,
+    $WorksOrderingComposer,
+    $WorksCreateCompanionBuilder,
+    $WorksUpdateCompanionBuilder,
+    (Work, BaseReferences<_$AppDb, Works, Work>),
+    Work,
+    PrefetchHooks Function()> {
+  $WorksTableManager(_$AppDb db, Works table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $WorksFilterComposer(ComposerState(db, table)),
+          orderingComposer: $WorksOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> about = const Value.absent(),
+          }) =>
+              WorksCompanion(
+            id: id,
+            name: name,
+            about: about,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String name,
+            required String about,
+          }) =>
+              WorksCompanion.insert(
+            id: id,
+            name: name,
+            about: about,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $WorksProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    Works,
+    Work,
+    $WorksFilterComposer,
+    $WorksOrderingComposer,
+    $WorksCreateCompanionBuilder,
+    $WorksUpdateCompanionBuilder,
+    (Work, BaseReferences<_$AppDb, Works, Work>),
+    Work,
+    PrefetchHooks Function()>;
+typedef $WorkAbbreviationsCreateCompanionBuilder = WorkAbbreviationsCompanion
     Function({
   required String workId,
   required int id,
@@ -5936,60 +6126,6 @@ typedef $WorkAbbreviationsUpdateCompanionBuilder = WorkAbbreviationsCompanion
   Value<int> id,
   Value<String> val,
 });
-
-class $WorkAbbreviationsTableManager extends RootTableManager<
-    _$AppDb,
-    WorkAbbreviations,
-    WorkAbbreviation,
-    $WorkAbbreviationsFilterComposer,
-    $WorkAbbreviationsOrderingComposer,
-    $WorkAbbreviationsProcessedTableManager,
-    $WorkAbbreviationsInsertCompanionBuilder,
-    $WorkAbbreviationsUpdateCompanionBuilder> {
-  $WorkAbbreviationsTableManager(_$AppDb db, WorkAbbreviations table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $WorkAbbreviationsFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $WorkAbbreviationsOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $WorkAbbreviationsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> workId = const Value.absent(),
-            Value<int> id = const Value.absent(),
-            Value<String> val = const Value.absent(),
-          }) =>
-              WorkAbbreviationsCompanion(
-            workId: workId,
-            id: id,
-            val: val,
-          ),
-          getInsertCompanionBuilder: ({
-            required String workId,
-            required int id,
-            required String val,
-          }) =>
-              WorkAbbreviationsCompanion.insert(
-            workId: workId,
-            id: id,
-            val: val,
-          ),
-        ));
-}
-
-class $WorkAbbreviationsProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    WorkAbbreviations,
-    WorkAbbreviation,
-    $WorkAbbreviationsFilterComposer,
-    $WorkAbbreviationsOrderingComposer,
-    $WorkAbbreviationsProcessedTableManager,
-    $WorkAbbreviationsInsertCompanionBuilder,
-    $WorkAbbreviationsUpdateCompanionBuilder> {
-  $WorkAbbreviationsProcessedTableManager(super.$state);
-}
 
 class $WorkAbbreviationsFilterComposer
     extends FilterComposer<_$AppDb, WorkAbbreviations> {
@@ -6029,7 +6165,70 @@ class $WorkAbbreviationsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $WorkContentsInsertCompanionBuilder = WorkContentsCompanion Function({
+class $WorkAbbreviationsTableManager extends RootTableManager<
+    _$AppDb,
+    WorkAbbreviations,
+    WorkAbbreviation,
+    $WorkAbbreviationsFilterComposer,
+    $WorkAbbreviationsOrderingComposer,
+    $WorkAbbreviationsCreateCompanionBuilder,
+    $WorkAbbreviationsUpdateCompanionBuilder,
+    (
+      WorkAbbreviation,
+      BaseReferences<_$AppDb, WorkAbbreviations, WorkAbbreviation>
+    ),
+    WorkAbbreviation,
+    PrefetchHooks Function()> {
+  $WorkAbbreviationsTableManager(_$AppDb db, WorkAbbreviations table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $WorkAbbreviationsFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $WorkAbbreviationsOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> workId = const Value.absent(),
+            Value<int> id = const Value.absent(),
+            Value<String> val = const Value.absent(),
+          }) =>
+              WorkAbbreviationsCompanion(
+            workId: workId,
+            id: id,
+            val: val,
+          ),
+          createCompanionCallback: ({
+            required String workId,
+            required int id,
+            required String val,
+          }) =>
+              WorkAbbreviationsCompanion.insert(
+            workId: workId,
+            id: id,
+            val: val,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $WorkAbbreviationsProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    WorkAbbreviations,
+    WorkAbbreviation,
+    $WorkAbbreviationsFilterComposer,
+    $WorkAbbreviationsOrderingComposer,
+    $WorkAbbreviationsCreateCompanionBuilder,
+    $WorkAbbreviationsUpdateCompanionBuilder,
+    (
+      WorkAbbreviation,
+      BaseReferences<_$AppDb, WorkAbbreviations, WorkAbbreviation>
+    ),
+    WorkAbbreviation,
+    PrefetchHooks Function()>;
+typedef $WorkContentsCreateCompanionBuilder = WorkContentsCompanion Function({
   required String workId,
   required int idx,
   required String word,
@@ -6041,63 +6240,6 @@ typedef $WorkContentsUpdateCompanionBuilder = WorkContentsCompanion Function({
   Value<String> word,
   Value<String> sourceReference,
 });
-
-class $WorkContentsTableManager extends RootTableManager<
-    _$AppDb,
-    WorkContents,
-    WorkContent,
-    $WorkContentsFilterComposer,
-    $WorkContentsOrderingComposer,
-    $WorkContentsProcessedTableManager,
-    $WorkContentsInsertCompanionBuilder,
-    $WorkContentsUpdateCompanionBuilder> {
-  $WorkContentsTableManager(_$AppDb db, WorkContents table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $WorkContentsFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $WorkContentsOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $WorkContentsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> workId = const Value.absent(),
-            Value<int> idx = const Value.absent(),
-            Value<String> word = const Value.absent(),
-            Value<String> sourceReference = const Value.absent(),
-          }) =>
-              WorkContentsCompanion(
-            workId: workId,
-            idx: idx,
-            word: word,
-            sourceReference: sourceReference,
-          ),
-          getInsertCompanionBuilder: ({
-            required String workId,
-            required int idx,
-            required String word,
-            required String sourceReference,
-          }) =>
-              WorkContentsCompanion.insert(
-            workId: workId,
-            idx: idx,
-            word: word,
-            sourceReference: sourceReference,
-          ),
-        ));
-}
-
-class $WorkContentsProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    WorkContents,
-    WorkContent,
-    $WorkContentsFilterComposer,
-    $WorkContentsOrderingComposer,
-    $WorkContentsProcessedTableManager,
-    $WorkContentsInsertCompanionBuilder,
-    $WorkContentsUpdateCompanionBuilder> {
-  $WorkContentsProcessedTableManager(super.$state);
-}
 
 class $WorkContentsFilterComposer
     extends FilterComposer<_$AppDb, WorkContents> {
@@ -6147,7 +6289,68 @@ class $WorkContentsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $UserProvidedMacronizationsInsertCompanionBuilder
+class $WorkContentsTableManager extends RootTableManager<
+    _$AppDb,
+    WorkContents,
+    WorkContent,
+    $WorkContentsFilterComposer,
+    $WorkContentsOrderingComposer,
+    $WorkContentsCreateCompanionBuilder,
+    $WorkContentsUpdateCompanionBuilder,
+    (WorkContent, BaseReferences<_$AppDb, WorkContents, WorkContent>),
+    WorkContent,
+    PrefetchHooks Function()> {
+  $WorkContentsTableManager(_$AppDb db, WorkContents table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $WorkContentsFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $WorkContentsOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> workId = const Value.absent(),
+            Value<int> idx = const Value.absent(),
+            Value<String> word = const Value.absent(),
+            Value<String> sourceReference = const Value.absent(),
+          }) =>
+              WorkContentsCompanion(
+            workId: workId,
+            idx: idx,
+            word: word,
+            sourceReference: sourceReference,
+          ),
+          createCompanionCallback: ({
+            required String workId,
+            required int idx,
+            required String word,
+            required String sourceReference,
+          }) =>
+              WorkContentsCompanion.insert(
+            workId: workId,
+            idx: idx,
+            word: word,
+            sourceReference: sourceReference,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $WorkContentsProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    WorkContents,
+    WorkContent,
+    $WorkContentsFilterComposer,
+    $WorkContentsOrderingComposer,
+    $WorkContentsCreateCompanionBuilder,
+    $WorkContentsUpdateCompanionBuilder,
+    (WorkContent, BaseReferences<_$AppDb, WorkContents, WorkContent>),
+    WorkContent,
+    PrefetchHooks Function()>;
+typedef $UserProvidedMacronizationsCreateCompanionBuilder
     = UserProvidedMacronizationsCompanion Function({
   required String workId,
   required int idx,
@@ -6161,66 +6364,6 @@ typedef $UserProvidedMacronizationsUpdateCompanionBuilder
   Value<int> syllableNumber,
   Value<String> macronizedSyllable,
 });
-
-class $UserProvidedMacronizationsTableManager extends RootTableManager<
-    _$AppDb,
-    UserProvidedMacronizations,
-    UserProvidedMacronization,
-    $UserProvidedMacronizationsFilterComposer,
-    $UserProvidedMacronizationsOrderingComposer,
-    $UserProvidedMacronizationsProcessedTableManager,
-    $UserProvidedMacronizationsInsertCompanionBuilder,
-    $UserProvidedMacronizationsUpdateCompanionBuilder> {
-  $UserProvidedMacronizationsTableManager(
-      _$AppDb db, UserProvidedMacronizations table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $UserProvidedMacronizationsFilterComposer(
-              ComposerState(db, table)),
-          orderingComposer: $UserProvidedMacronizationsOrderingComposer(
-              ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $UserProvidedMacronizationsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> workId = const Value.absent(),
-            Value<int> idx = const Value.absent(),
-            Value<int> syllableNumber = const Value.absent(),
-            Value<String> macronizedSyllable = const Value.absent(),
-          }) =>
-              UserProvidedMacronizationsCompanion(
-            workId: workId,
-            idx: idx,
-            syllableNumber: syllableNumber,
-            macronizedSyllable: macronizedSyllable,
-          ),
-          getInsertCompanionBuilder: ({
-            required String workId,
-            required int idx,
-            required int syllableNumber,
-            required String macronizedSyllable,
-          }) =>
-              UserProvidedMacronizationsCompanion.insert(
-            workId: workId,
-            idx: idx,
-            syllableNumber: syllableNumber,
-            macronizedSyllable: macronizedSyllable,
-          ),
-        ));
-}
-
-class $UserProvidedMacronizationsProcessedTableManager
-    extends ProcessedTableManager<
-        _$AppDb,
-        UserProvidedMacronizations,
-        UserProvidedMacronization,
-        $UserProvidedMacronizationsFilterComposer,
-        $UserProvidedMacronizationsOrderingComposer,
-        $UserProvidedMacronizationsProcessedTableManager,
-        $UserProvidedMacronizationsInsertCompanionBuilder,
-        $UserProvidedMacronizationsUpdateCompanionBuilder> {
-  $UserProvidedMacronizationsProcessedTableManager(super.$state);
-}
 
 class $UserProvidedMacronizationsFilterComposer
     extends FilterComposer<_$AppDb, UserProvidedMacronizations> {
@@ -6270,7 +6413,78 @@ class $UserProvidedMacronizationsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $WorkContentSubdivisionsInsertCompanionBuilder
+class $UserProvidedMacronizationsTableManager extends RootTableManager<
+    _$AppDb,
+    UserProvidedMacronizations,
+    UserProvidedMacronization,
+    $UserProvidedMacronizationsFilterComposer,
+    $UserProvidedMacronizationsOrderingComposer,
+    $UserProvidedMacronizationsCreateCompanionBuilder,
+    $UserProvidedMacronizationsUpdateCompanionBuilder,
+    (
+      UserProvidedMacronization,
+      BaseReferences<_$AppDb, UserProvidedMacronizations,
+          UserProvidedMacronization>
+    ),
+    UserProvidedMacronization,
+    PrefetchHooks Function()> {
+  $UserProvidedMacronizationsTableManager(
+      _$AppDb db, UserProvidedMacronizations table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $UserProvidedMacronizationsFilterComposer(
+              ComposerState(db, table)),
+          orderingComposer: $UserProvidedMacronizationsOrderingComposer(
+              ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> workId = const Value.absent(),
+            Value<int> idx = const Value.absent(),
+            Value<int> syllableNumber = const Value.absent(),
+            Value<String> macronizedSyllable = const Value.absent(),
+          }) =>
+              UserProvidedMacronizationsCompanion(
+            workId: workId,
+            idx: idx,
+            syllableNumber: syllableNumber,
+            macronizedSyllable: macronizedSyllable,
+          ),
+          createCompanionCallback: ({
+            required String workId,
+            required int idx,
+            required int syllableNumber,
+            required String macronizedSyllable,
+          }) =>
+              UserProvidedMacronizationsCompanion.insert(
+            workId: workId,
+            idx: idx,
+            syllableNumber: syllableNumber,
+            macronizedSyllable: macronizedSyllable,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $UserProvidedMacronizationsProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDb,
+        UserProvidedMacronizations,
+        UserProvidedMacronization,
+        $UserProvidedMacronizationsFilterComposer,
+        $UserProvidedMacronizationsOrderingComposer,
+        $UserProvidedMacronizationsCreateCompanionBuilder,
+        $UserProvidedMacronizationsUpdateCompanionBuilder,
+        (
+          UserProvidedMacronization,
+          BaseReferences<_$AppDb, UserProvidedMacronizations,
+              UserProvidedMacronization>
+        ),
+        UserProvidedMacronization,
+        PrefetchHooks Function()>;
+typedef $WorkContentSubdivisionsCreateCompanionBuilder
     = WorkContentSubdivisionsCompanion Function({
   required String workId,
   required String node,
@@ -6292,82 +6506,6 @@ typedef $WorkContentSubdivisionsUpdateCompanionBuilder
   Value<int> fromIndex,
   Value<int> toIndex,
 });
-
-class $WorkContentSubdivisionsTableManager extends RootTableManager<
-    _$AppDb,
-    WorkContentSubdivisions,
-    WorkContentSubdivision,
-    $WorkContentSubdivisionsFilterComposer,
-    $WorkContentSubdivisionsOrderingComposer,
-    $WorkContentSubdivisionsProcessedTableManager,
-    $WorkContentSubdivisionsInsertCompanionBuilder,
-    $WorkContentSubdivisionsUpdateCompanionBuilder> {
-  $WorkContentSubdivisionsTableManager(
-      _$AppDb db, WorkContentSubdivisions table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $WorkContentSubdivisionsFilterComposer(ComposerState(db, table)),
-          orderingComposer: $WorkContentSubdivisionsOrderingComposer(
-              ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $WorkContentSubdivisionsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> workId = const Value.absent(),
-            Value<String> node = const Value.absent(),
-            Value<String> typ = const Value.absent(),
-            Value<int> cnt = const Value.absent(),
-            Value<String> name = const Value.absent(),
-            Value<String?> parent = const Value.absent(),
-            Value<int> fromIndex = const Value.absent(),
-            Value<int> toIndex = const Value.absent(),
-          }) =>
-              WorkContentSubdivisionsCompanion(
-            workId: workId,
-            node: node,
-            typ: typ,
-            cnt: cnt,
-            name: name,
-            parent: parent,
-            fromIndex: fromIndex,
-            toIndex: toIndex,
-          ),
-          getInsertCompanionBuilder: ({
-            required String workId,
-            required String node,
-            required String typ,
-            required int cnt,
-            required String name,
-            Value<String?> parent = const Value.absent(),
-            required int fromIndex,
-            required int toIndex,
-          }) =>
-              WorkContentSubdivisionsCompanion.insert(
-            workId: workId,
-            node: node,
-            typ: typ,
-            cnt: cnt,
-            name: name,
-            parent: parent,
-            fromIndex: fromIndex,
-            toIndex: toIndex,
-          ),
-        ));
-}
-
-class $WorkContentSubdivisionsProcessedTableManager
-    extends ProcessedTableManager<
-        _$AppDb,
-        WorkContentSubdivisions,
-        WorkContentSubdivision,
-        $WorkContentSubdivisionsFilterComposer,
-        $WorkContentSubdivisionsOrderingComposer,
-        $WorkContentSubdivisionsProcessedTableManager,
-        $WorkContentSubdivisionsInsertCompanionBuilder,
-        $WorkContentSubdivisionsUpdateCompanionBuilder> {
-  $WorkContentSubdivisionsProcessedTableManager(super.$state);
-}
 
 class $WorkContentSubdivisionsFilterComposer
     extends FilterComposer<_$AppDb, WorkContentSubdivisions> {
@@ -6457,7 +6595,91 @@ class $WorkContentSubdivisionsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $WorkContentSupplementaryInsertCompanionBuilder
+class $WorkContentSubdivisionsTableManager extends RootTableManager<
+    _$AppDb,
+    WorkContentSubdivisions,
+    WorkContentSubdivision,
+    $WorkContentSubdivisionsFilterComposer,
+    $WorkContentSubdivisionsOrderingComposer,
+    $WorkContentSubdivisionsCreateCompanionBuilder,
+    $WorkContentSubdivisionsUpdateCompanionBuilder,
+    (
+      WorkContentSubdivision,
+      BaseReferences<_$AppDb, WorkContentSubdivisions, WorkContentSubdivision>
+    ),
+    WorkContentSubdivision,
+    PrefetchHooks Function()> {
+  $WorkContentSubdivisionsTableManager(
+      _$AppDb db, WorkContentSubdivisions table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $WorkContentSubdivisionsFilterComposer(ComposerState(db, table)),
+          orderingComposer: $WorkContentSubdivisionsOrderingComposer(
+              ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> workId = const Value.absent(),
+            Value<String> node = const Value.absent(),
+            Value<String> typ = const Value.absent(),
+            Value<int> cnt = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String?> parent = const Value.absent(),
+            Value<int> fromIndex = const Value.absent(),
+            Value<int> toIndex = const Value.absent(),
+          }) =>
+              WorkContentSubdivisionsCompanion(
+            workId: workId,
+            node: node,
+            typ: typ,
+            cnt: cnt,
+            name: name,
+            parent: parent,
+            fromIndex: fromIndex,
+            toIndex: toIndex,
+          ),
+          createCompanionCallback: ({
+            required String workId,
+            required String node,
+            required String typ,
+            required int cnt,
+            required String name,
+            Value<String?> parent = const Value.absent(),
+            required int fromIndex,
+            required int toIndex,
+          }) =>
+              WorkContentSubdivisionsCompanion.insert(
+            workId: workId,
+            node: node,
+            typ: typ,
+            cnt: cnt,
+            name: name,
+            parent: parent,
+            fromIndex: fromIndex,
+            toIndex: toIndex,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $WorkContentSubdivisionsProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    WorkContentSubdivisions,
+    WorkContentSubdivision,
+    $WorkContentSubdivisionsFilterComposer,
+    $WorkContentSubdivisionsOrderingComposer,
+    $WorkContentSubdivisionsCreateCompanionBuilder,
+    $WorkContentSubdivisionsUpdateCompanionBuilder,
+    (
+      WorkContentSubdivision,
+      BaseReferences<_$AppDb, WorkContentSubdivisions, WorkContentSubdivision>
+    ),
+    WorkContentSubdivision,
+    PrefetchHooks Function()>;
+typedef $WorkContentSupplementaryCreateCompanionBuilder
     = WorkContentSupplementaryCompanion Function({
   required String workId,
   required String typ,
@@ -6475,74 +6697,6 @@ typedef $WorkContentSupplementaryUpdateCompanionBuilder
   Value<int> toIndex,
   Value<String> val,
 });
-
-class $WorkContentSupplementaryTableManager extends RootTableManager<
-    _$AppDb,
-    WorkContentSupplementary,
-    WorkContentSupplementaryData,
-    $WorkContentSupplementaryFilterComposer,
-    $WorkContentSupplementaryOrderingComposer,
-    $WorkContentSupplementaryProcessedTableManager,
-    $WorkContentSupplementaryInsertCompanionBuilder,
-    $WorkContentSupplementaryUpdateCompanionBuilder> {
-  $WorkContentSupplementaryTableManager(
-      _$AppDb db, WorkContentSupplementary table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $WorkContentSupplementaryFilterComposer(ComposerState(db, table)),
-          orderingComposer: $WorkContentSupplementaryOrderingComposer(
-              ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $WorkContentSupplementaryProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> workId = const Value.absent(),
-            Value<String> typ = const Value.absent(),
-            Value<int> cnt = const Value.absent(),
-            Value<int> fromIndex = const Value.absent(),
-            Value<int> toIndex = const Value.absent(),
-            Value<String> val = const Value.absent(),
-          }) =>
-              WorkContentSupplementaryCompanion(
-            workId: workId,
-            typ: typ,
-            cnt: cnt,
-            fromIndex: fromIndex,
-            toIndex: toIndex,
-            val: val,
-          ),
-          getInsertCompanionBuilder: ({
-            required String workId,
-            required String typ,
-            required int cnt,
-            required int fromIndex,
-            required int toIndex,
-            required String val,
-          }) =>
-              WorkContentSupplementaryCompanion.insert(
-            workId: workId,
-            typ: typ,
-            cnt: cnt,
-            fromIndex: fromIndex,
-            toIndex: toIndex,
-            val: val,
-          ),
-        ));
-}
-
-class $WorkContentSupplementaryProcessedTableManager
-    extends ProcessedTableManager<
-        _$AppDb,
-        WorkContentSupplementary,
-        WorkContentSupplementaryData,
-        $WorkContentSupplementaryFilterComposer,
-        $WorkContentSupplementaryOrderingComposer,
-        $WorkContentSupplementaryProcessedTableManager,
-        $WorkContentSupplementaryInsertCompanionBuilder,
-        $WorkContentSupplementaryUpdateCompanionBuilder> {
-  $WorkContentSupplementaryProcessedTableManager(super.$state);
-}
 
 class $WorkContentSupplementaryFilterComposer
     extends FilterComposer<_$AppDb, WorkContentSupplementary> {
@@ -6612,7 +6766,85 @@ class $WorkContentSupplementaryOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $AuthorsAndWorksInsertCompanionBuilder = AuthorsAndWorksCompanion
+class $WorkContentSupplementaryTableManager extends RootTableManager<
+    _$AppDb,
+    WorkContentSupplementary,
+    WorkContentSupplementaryData,
+    $WorkContentSupplementaryFilterComposer,
+    $WorkContentSupplementaryOrderingComposer,
+    $WorkContentSupplementaryCreateCompanionBuilder,
+    $WorkContentSupplementaryUpdateCompanionBuilder,
+    (
+      WorkContentSupplementaryData,
+      BaseReferences<_$AppDb, WorkContentSupplementary,
+          WorkContentSupplementaryData>
+    ),
+    WorkContentSupplementaryData,
+    PrefetchHooks Function()> {
+  $WorkContentSupplementaryTableManager(
+      _$AppDb db, WorkContentSupplementary table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $WorkContentSupplementaryFilterComposer(ComposerState(db, table)),
+          orderingComposer: $WorkContentSupplementaryOrderingComposer(
+              ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> workId = const Value.absent(),
+            Value<String> typ = const Value.absent(),
+            Value<int> cnt = const Value.absent(),
+            Value<int> fromIndex = const Value.absent(),
+            Value<int> toIndex = const Value.absent(),
+            Value<String> val = const Value.absent(),
+          }) =>
+              WorkContentSupplementaryCompanion(
+            workId: workId,
+            typ: typ,
+            cnt: cnt,
+            fromIndex: fromIndex,
+            toIndex: toIndex,
+            val: val,
+          ),
+          createCompanionCallback: ({
+            required String workId,
+            required String typ,
+            required int cnt,
+            required int fromIndex,
+            required int toIndex,
+            required String val,
+          }) =>
+              WorkContentSupplementaryCompanion.insert(
+            workId: workId,
+            typ: typ,
+            cnt: cnt,
+            fromIndex: fromIndex,
+            toIndex: toIndex,
+            val: val,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $WorkContentSupplementaryProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    WorkContentSupplementary,
+    WorkContentSupplementaryData,
+    $WorkContentSupplementaryFilterComposer,
+    $WorkContentSupplementaryOrderingComposer,
+    $WorkContentSupplementaryCreateCompanionBuilder,
+    $WorkContentSupplementaryUpdateCompanionBuilder,
+    (
+      WorkContentSupplementaryData,
+      BaseReferences<_$AppDb, WorkContentSupplementary,
+          WorkContentSupplementaryData>
+    ),
+    WorkContentSupplementaryData,
+    PrefetchHooks Function()>;
+typedef $AuthorsAndWorksCreateCompanionBuilder = AuthorsAndWorksCompanion
     Function({
   required String authorId,
   required String workId,
@@ -6622,56 +6854,6 @@ typedef $AuthorsAndWorksUpdateCompanionBuilder = AuthorsAndWorksCompanion
   Value<String> authorId,
   Value<String> workId,
 });
-
-class $AuthorsAndWorksTableManager extends RootTableManager<
-    _$AppDb,
-    AuthorsAndWorks,
-    AuthorsAndWork,
-    $AuthorsAndWorksFilterComposer,
-    $AuthorsAndWorksOrderingComposer,
-    $AuthorsAndWorksProcessedTableManager,
-    $AuthorsAndWorksInsertCompanionBuilder,
-    $AuthorsAndWorksUpdateCompanionBuilder> {
-  $AuthorsAndWorksTableManager(_$AppDb db, AuthorsAndWorks table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $AuthorsAndWorksFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $AuthorsAndWorksOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $AuthorsAndWorksProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<String> authorId = const Value.absent(),
-            Value<String> workId = const Value.absent(),
-          }) =>
-              AuthorsAndWorksCompanion(
-            authorId: authorId,
-            workId: workId,
-          ),
-          getInsertCompanionBuilder: ({
-            required String authorId,
-            required String workId,
-          }) =>
-              AuthorsAndWorksCompanion.insert(
-            authorId: authorId,
-            workId: workId,
-          ),
-        ));
-}
-
-class $AuthorsAndWorksProcessedTableManager extends ProcessedTableManager<
-    _$AppDb,
-    AuthorsAndWorks,
-    AuthorsAndWork,
-    $AuthorsAndWorksFilterComposer,
-    $AuthorsAndWorksOrderingComposer,
-    $AuthorsAndWorksProcessedTableManager,
-    $AuthorsAndWorksInsertCompanionBuilder,
-    $AuthorsAndWorksUpdateCompanionBuilder> {
-  $AuthorsAndWorksProcessedTableManager(super.$state);
-}
 
 class $AuthorsAndWorksFilterComposer
     extends FilterComposer<_$AppDb, AuthorsAndWorks> {
@@ -6701,9 +6883,63 @@ class $AuthorsAndWorksOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-class _$AppDbManager {
+class $AuthorsAndWorksTableManager extends RootTableManager<
+    _$AppDb,
+    AuthorsAndWorks,
+    AuthorsAndWork,
+    $AuthorsAndWorksFilterComposer,
+    $AuthorsAndWorksOrderingComposer,
+    $AuthorsAndWorksCreateCompanionBuilder,
+    $AuthorsAndWorksUpdateCompanionBuilder,
+    (AuthorsAndWork, BaseReferences<_$AppDb, AuthorsAndWorks, AuthorsAndWork>),
+    AuthorsAndWork,
+    PrefetchHooks Function()> {
+  $AuthorsAndWorksTableManager(_$AppDb db, AuthorsAndWorks table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $AuthorsAndWorksFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $AuthorsAndWorksOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> authorId = const Value.absent(),
+            Value<String> workId = const Value.absent(),
+          }) =>
+              AuthorsAndWorksCompanion(
+            authorId: authorId,
+            workId: workId,
+          ),
+          createCompanionCallback: ({
+            required String authorId,
+            required String workId,
+          }) =>
+              AuthorsAndWorksCompanion.insert(
+            authorId: authorId,
+            workId: workId,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $AuthorsAndWorksProcessedTableManager = ProcessedTableManager<
+    _$AppDb,
+    AuthorsAndWorks,
+    AuthorsAndWork,
+    $AuthorsAndWorksFilterComposer,
+    $AuthorsAndWorksOrderingComposer,
+    $AuthorsAndWorksCreateCompanionBuilder,
+    $AuthorsAndWorksUpdateCompanionBuilder,
+    (AuthorsAndWork, BaseReferences<_$AppDb, AuthorsAndWorks, AuthorsAndWork>),
+    AuthorsAndWork,
+    PrefetchHooks Function()>;
+
+class $AppDbManager {
   final _$AppDb _db;
-  _$AppDbManager(this._db);
+  $AppDbManager(this._db);
   $DataVersionTableManager get dataVersion =>
       $DataVersionTableManager(_db, _db.dataVersion);
   $MorphologicalDetailsTableManager get morphologicalDetails =>
