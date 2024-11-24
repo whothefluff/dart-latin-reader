@@ -89,3 +89,4 @@ analyzer:
     strict-raw-types: true
   exclude:
     - "**/*.g.dart"
+    - "**/*.drift.dart"

@@ -16,8 +16,9 @@ dependencies:
     sdk: flutter
   go_router: ^14.2.3
   flutter_riverpod: ^2.5.1
-  drift: ^2.20.0
-  sqlite3_flutter_libs: ^0.5.24
+  drift: ^2.21.0
+  drift_flutter: ^0.1.0
+  sqlite3_flutter_libs: ^0.5.26
   path_provider: ^2.1.4
   path: ^1.9.0
   collection: ^1.18.0
@@ -38,7 +39,7 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   riverpod_lint: ^2.3.13
   riverpod_generator: ^2.4.3
-  drift_dev: ^2.20.1
+  drift_dev: ^2.21.0
 
 flutter:
   uses-material-design: true

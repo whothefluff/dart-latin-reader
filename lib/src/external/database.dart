@@ -1,22 +1,24 @@
 import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:latin_reader/logger.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
-import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:latin_reader/src/external/data_version.drift.dart';
+import 'package:latin_reader/src/external/database.drift.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
-import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
-
-part 'database.g.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 @DriftDatabase(
-  include: {'db_schema.drift'},
+  include: {'data_version.drift',
+            'library.drift', 
+            'analysis.drift',
+             '../component/dictionary/dictionary.drift'
+  },
 )
-class AppDb extends _$AppDb {
+class AppDb extends $AppDb {
   AppDb._() : super(_openConnection());
 
   static final AppDb _instance = AppDb._();
@@ -38,7 +40,7 @@ class AppDb extends _$AppDb {
   }
 
   Future<LatestDataVersionData?> getLatestDataVersion() =>
-      select(latestDataVersion).getSingleOrNull();
+     select(latestDataVersion).getSingleOrNull();
 
   @override
   int get schemaVersion => 1;

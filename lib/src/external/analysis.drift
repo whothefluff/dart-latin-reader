@@ -1,0 +1,30 @@
+CREATE TABLE "MorphologicalDetails"(
+    "form" TEXT NOT NULL,
+    "item" INTEGER NOT NULL CHECK( item >= 0 ),
+    "dictionaryRef" TEXT NOT NULL,
+    PRIMARY KEY( form, item )
+) 
+STRICT, 
+WITHOUT ROWID;
+
+CREATE TABLE "MorphologicalDetailInflections"(
+    "form" TEXT NOT NULL,
+    "item" INTEGER NOT NULL,
+    "cnt" INTEGER NOT NULL CHECK( cnt >= 0 ),
+    "term" TEXT NOT NULL,
+    "partOfSpeech" TEXT NOT NULL,
+    "stem" TEXT NOT NULL,
+    "suffix" TEXT NOT NULL,
+    "gender" TEXT,
+    "number" TEXT,
+    "declension" TEXT,
+    "gramm_case" TEXT,
+    "mood" TEXT,
+    "tense" TEXT,
+    "voice" TEXT,
+    "person" TEXT,
+    PRIMARY KEY( form, item, cnt ),
+    FOREIGN KEY( form, item ) REFERENCES MorphologicalDetails( form, item )
+) 
+STRICT, 
+WITHOUT ROWID;

@@ -1,0 +1,113 @@
+import 'dart:collection';
+
+import 'package:latin_reader/logger.dart';
+import 'package:latin_reader/src/external/database.dart';
+import 'package:latin_reader/src/external/provider_ext.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'browse_dictionaries.g.dart';
+
+//infrastructure
+
+@riverpod
+Future<UnmodifiableListView<Dictionary>> dictionaries(
+    DictionariesRef ref) async {
+  ref.cacheFor(const Duration(minutes: 2));
+  return await GetDictionariesUseCase(DictionaryRepository(AppDb())).invoke();
+}
+
+// class DictionaryRepository implements IDictionaryRepository {
+//   DictionaryRepository(this.db);
+
+//   final AppDb db;
+
+//   @override
+//   Future<UnmodifiableListView<Dictionary>> getDictionaries() async {
+//     log.info('DictionaryRepository - reading dictionaries from db');
+//     final dbDicts = await db.dictionaryDrift.getBrowserDictionaries().get();
+//     return UnmodifiableListView(dbDicts as Iterable<Dictionary>);
+//   }
+// //
+// }
+
+class DictionaryRepository implements IDictionaryRepository {
+//
+  static DictionaryRepository? _instance;
+  late final AppDb db;
+
+  DictionaryRepository._(this.db);
+
+  factory DictionaryRepository(AppDb db) {
+    _instance ??= DictionaryRepository._(db);
+    return _instance!;
+  }
+
+  @override
+  Future<UnmodifiableListView<Dictionary>> getDictionaries() async {
+    final db = AppDb();
+    log.info(() => 'DictionaryRepository - reading dictionaries from db');
+    final dbDicts = await db.dictionaryDrift.getBrowserDictionaries().get();
+    return UnmodifiableListView(dbDicts as Iterable<Dictionary>);
+  }
+//
+}
+
+//interactors
+
+abstract interface class IDictionaryRepository {
+//
+  Future<UnmodifiableListView<Dictionary>> getDictionaries();
+//
+}
+
+class GetDictionariesUseCase implements IGetDictionariesUseCase {
+  GetDictionariesUseCase(
+    this._repository,
+  );
+
+  final IDictionaryRepository _repository;
+
+  @override
+  Future<UnmodifiableListView<Dictionary>> invoke() async =>
+      await _repository.getDictionaries();
+//
+}
+
+//domain
+
+abstract interface class IGetDictionariesUseCase {
+//
+  Future<UnmodifiableListView<Dictionary>> invoke();
+//
+}
+
+class Dictionary {
+  Dictionary({
+    required this.id,
+    required this.name,
+    required this.language,
+    required this.publisher,
+    required this.publicationDate,
+  });
+
+  final String id;
+  final String name;
+  final String language;
+  final String publisher;
+  final String publicationDate;
+
+  @override
+  String toString() {
+    return 'Dictionary{name: $name}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Dictionary && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+//
+}

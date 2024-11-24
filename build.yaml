@@ -2,5 +2,17 @@ targets:
   $default:
     builders:
       drift_dev:
+        enabled: false
         options:
+      drift_dev:analyzer:
+        enabled: true
+        options: &options
+          store_date_time_values_as_text: true
           fatal_warnings: true
+          sql:
+            dialect: sqlite
+            options:
+              modules: [fts5]
+      drift_dev:modular:
+        enabled: true
+        options: *options
