@@ -1,11 +1,12 @@
 import 'dart:collection';
+
 import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_author_details.dart';
 import 'package:latin_reader/src/component/library/repository_author.dart' as i;
 import 'package:latin_reader/src/component/library/repository_work.dart' as i;
+import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_author_details.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
 import 'package:latin_reader/src/external/database.dart';
 
 class AuthorRepository implements i.AuthorRepository {
@@ -24,7 +25,7 @@ class AuthorRepository implements i.AuthorRepository {
   Future<UnmodifiableListView<AuthorView>> getLibraryAuthors() async {
     final db = AppDb();
     log.info(() => 'AuthorRepository - reading library authors from db');
-    final dbAuthors = await db.getLibraryAuthors().get();
+    final dbAuthors = await db.libraryDrift.getLibraryAuthors().get();
     return UnmodifiableListView(dbAuthors as Iterable<AuthorView>);
   }
 
@@ -32,7 +33,7 @@ class AuthorRepository implements i.AuthorRepository {
   Future<AuthorDetailsView> getLibraryAuthorDetails(String id) async {
     final db = AppDb();
     log.info(() => 'AuthorRepository - reading author details from db');
-    final dbAuthorDetails = await db.getLibraryAuthorDetails(id).get();
+    final dbAuthorDetails = await db.libraryDrift.getLibraryAuthorDetails(id).get();
     final firstLine = dbAuthorDetails.first;
     return AuthorDetailsView(
         id: firstLine.id,
@@ -64,7 +65,7 @@ class WorkRepository implements i.WorkRepository {
   Future<WorkDetailsView> getLibraryWorkDetails(String id) async {
     final db = AppDb();
     log.info(() => 'WorkRepository - reading work details from db');
-    final dbWorkDetails = await db.getLibraryWorkDetails(id).getSingle();
+    final dbWorkDetails = await db.libraryDrift.getLibraryWorkDetails(id).getSingle();
     return dbWorkDetails;
   }
 
@@ -76,7 +77,8 @@ class WorkRepository implements i.WorkRepository {
     log.info(() =>
         'WorkRepository - reading work contents ($fromIndex - $toIndex) from db');
     final dbWorkContents =
-        await db.getLibraryWorkContentsPartial(id, fromIndex, toIndex).get();
+        await db.libraryDrift
+        .getLibraryWorkContentsPartial(id, fromIndex, toIndex).get();
     return UnmodifiableListView(
         dbWorkContents as Iterable<WorkContentsElementView>);
   }

@@ -1,0 +1,62 @@
+
+import 'package:latin_reader/src/component/dictionary/browse_dictionaries.dart';
+
+CREATE TABLE "Dictionaries" (
+    "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
+    "name" TEXT NOT NULL,
+    "language" TEXT NOT NULL,
+    "publisher" TEXT NOT NULL,
+    "publicationDate" TEXT NOT NULL,
+    PRIMARY KEY( id )
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE TABLE "DictionaryEntries" (
+    "dictionary" TEXT NOT NULL,
+    "lemma" TEXT NOT NULL,
+    "partOfSpeech" TEXT NOT NULL,
+    "inflection" TEXT NOT NULL,
+    PRIMARY KEY( dictionary, lemma ),
+    FOREIGN KEY( dictionary ) REFERENCES Dictionaries( id )
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE TABLE "DictEntrySenses" (
+    "dictionary" TEXT NOT NULL,
+    "lemma" TEXT NOT NULL,
+    "lvl" TEXT NOT NULL CHECK( lvl REGEXP '^\d{3}(\.\d{3})*$' ),
+    "prettyLevel" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    PRIMARY KEY( dictionary, lemma, lvl ),
+    FOREIGN KEY( dictionary, lemma ) REFERENCES DictionaryEntries( dictionary, lemma )
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE TABLE "DicEntrySenseQuotes" (
+    "dictionary" TEXT NOT NULL,
+    "lemma" TEXT NOT NULL,
+    "lvl" TEXT NOT NULL,
+    "seq" INTEGER NOT NULL CHECK( seq >= 0 ),
+    "content" TEXT NOT NULL,
+    "translation" TEXT NOT NULL,
+    PRIMARY KEY( dictionary, lemma, lvl, seq ),
+    FOREIGN KEY( dictionary, lemma, lvl ) REFERENCES DictEntrySenses( dictionary, lemma, lvl )
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE VIEW "browser.Dictionaries" AS
+    SELECT Dictionaries.id,
+           Dictionaries.name,
+           Dictionaries.language,
+           Dictionaries.publisher,
+           Dictionaries.publicationDate,
+           COUNT(*) OVER( PARTITION BY DictionaryEntries.dictionary ) AS numberOfEntries
+        FROM Dictionaries
+        LEFT JOIN DictionaryEntries
+            ON Dictionaries.id = DictionaryEntries.dictionary;
+
+getBrowserDictionaries WITH Dictionary: SELECT * FROM browser.Dictionaries;

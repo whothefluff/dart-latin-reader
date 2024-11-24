@@ -3,7 +3,9 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:csv/csv.dart';
 import 'package:drift/drift.dart';
 import 'package:latin_reader/logger.dart';
+import 'package:latin_reader/src/external/data_version.drift.dart';
 import 'package:latin_reader/src/external/database.dart';
+import 'package:latin_reader/src/external/library.drift.dart';
 
 const path = 'assets/preprocessed_data/';
 

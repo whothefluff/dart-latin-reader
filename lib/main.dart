@@ -24,7 +24,9 @@ void main() async {
 //
 }
 
-//implement read page
+//implement dictionary page
+
+
 //feed other instances to the providers adn test performance
 //check errorBuilder for GoRouter and error for Riverpod (both needed?)
 
@@ -37,7 +39,6 @@ void main() async {
 //secondary
 //TODO: add go router type-safe navigation https://pub.dev/documentation/go_router/latest/topics/Type-safe%20routes-topic.html
 //TODO: make state restorable (example RestorableStatefulShellRouteExampleApp)
-//TODO: add adaptive scaffold
 
 //maybe someday
 //add wfs (and builds) for iOS and web
