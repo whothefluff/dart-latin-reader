@@ -5,7 +5,7 @@ import 'package:latin_reader/src/component/library/use_case/entity/view_work_con
 CREATE TABLE "DataVersion" (
     "idx" INTEGER NOT NULL,
     "createdAt" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY(idx)
+    PRIMARY KEY( idx )
 ) 
 -- STRICT
 ;
@@ -45,7 +45,7 @@ CREATE TABLE "Macronizations"(
     "form" TEXT NOT NULL,
     "syllableNumber" INTEGER NOT NULL CHECK( syllableNumber >= 0 ),
     "macronizedSyllable" TEXT NOT NULL,
-    "isUncertain" INTEGER NOT NULL CHECK( isUncertain IN (0, 1) ),
+    "isUncertain" INTEGER NOT NULL CHECK( isUncertain IN (0,1) ),
     PRIMARY KEY( form, syllableNumber )
 ) 
 -- STRICT, 
@@ -224,7 +224,7 @@ CREATE VIEW "LibraryWorkDetails" AS
                                 FROM Aux
                                 INNER JOIN WorkContents AS wc 
                                     ON Aux.id = wc.workId
-                                WHERE word NOT IN ('!', '"', '(', ')', ',', '.', ':', '?', '-')
+                                WHERE word NOT IN ('!','"','(',')',',','.',':','?','-')
                                 GROUP BY wc.workId ),
         SELECT Aux.*,
                wc.numberOfWords,
