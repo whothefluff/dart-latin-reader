@@ -176,41 +176,41 @@ CREATE VIEW "LatestDataVersion" AS
         LIMIT 1;
 
 CREATE VIEW "LibraryAuthors" AS
-    SELECT a.id,
-           a.name,
-           a.about,
-           a.image,
-           COUNT(*) OVER( PARTITION BY aw.workId ) AS numberOfWorks
-        FROM Authors AS a
-        LEFT JOIN AuthorsAndWorks AS aw 
-            ON a.id = aw.authorId;
+    SELECT Authors.id,
+           Authors.name,
+           Authors.about,
+           Authors.image,
+           COUNT(*) OVER( PARTITION BY AuthorsAndWorks.workId ) AS numberOfWorks
+        FROM Authors
+        LEFT JOIN AuthorsAndWorks
+            ON Authors.id = AuthorsAndWorks.authorId;
 
 getLibraryAuthors WITH AuthorView: SELECT * FROM LibraryAuthors;
 
 CREATE VIEW "LibraryAuthorDetails" AS 
-    WITH Aux AS ( SELECT a.id,
-                         a.name,
-                         a.about,
-                         a.image,
-                         aw.workId,
-                         w.name AS workName
-                      FROM Authors AS a
-                      INNER JOIN AuthorsAndWorks AS aw 
-                          ON a.id = aw.authorId
-                      INNER JOIN Works AS w 
-                          ON aw.workId = w.id ),
-         WorksContents AS ( SELECT wc.workId,
+    WITH Aux AS ( SELECT Authors.id,
+                         Authors.name,
+                         Authors.about,
+                         Authors.image,
+                         AuthorsAndWorks.workId,
+                         Works.name AS workName
+                      FROM Authors
+                      INNER JOIN AuthorsAndWorks
+                          ON Authors.id = AuthorsAndWorks.authorId
+                      INNER JOIN Works
+                          ON AuthorsAndWorks.workId = Works.id ),
+         WorksContents AS ( SELECT WorkContents.workId,
                                    COUNT(*) AS numberOfWords
                                 FROM Aux
-                                INNER JOIN WorkContents AS wc 
-                                    ON Aux.workId = wc.workId
-                                WHERE word NOT IN ('!','"','(', ')',',','.',':','?','-')
-                                GROUP BY wc.workId )
+                                INNER JOIN WorkContents
+                                    ON Aux.workId = WorkContents.workId
+                                WHERE WorkContents.word NOT IN ('!','"','(', ')',',','.',':','?','-')
+                                GROUP BY WorkContents.workId )
         SELECT Aux.*,
-               wc.numberOfWords
+               WorksContents.numberOfWords
             FROM Aux
-            INNER JOIN WorksContents AS wc 
-                ON Aux.workId = wc.workId;
+            INNER JOIN WorksContents
+                ON Aux.workId = WorksContents.workId;
 
 getLibraryAuthorDetails: SELECT * FROM LibraryAuthorDetails WHERE id = ?;
 
@@ -219,42 +219,42 @@ CREATE VIEW "LibraryWorkDetails" AS
                          name,
                          about
                       FROM Works ),
-         WorksContents AS ( SELECT wc.workId,
+         WorksContents AS ( SELECT WorkContents.workId,
                                    COUNT(*) AS numberOfWords
                                 FROM Aux
-                                INNER JOIN WorkContents AS wc 
-                                    ON Aux.id = wc.workId
+                                INNER JOIN WorkContents 
+                                    ON Aux.id = WorkContents.workId
                                 WHERE word NOT IN ('!','"','(',')',',','.',':','?','-')
-                                GROUP BY wc.workId ),
+                                GROUP BY WorkContents.workId )
         SELECT Aux.*,
-               wc.numberOfWords,
-               aw.authorId,
-               a.name AS authorName
+               WorksContents.numberOfWords,
+               AuthorsAndWorks.authorId,
+               Authors.name AS authorName
             FROM Aux
-            INNER JOIN WorksContents AS wc 
-                ON Aux.id = wc.workId
-            LEFT OUTER JOIN AuthorsAndWorks AS aw 
-                ON Aux.id = aw.workId
-            LEFT OUTER JOIN Authors AS a 
-                ON aw.authorId = a.id;
+            INNER JOIN WorksContents
+                ON Aux.id = WorksContents.workId
+            LEFT OUTER JOIN AuthorsAndWorks
+                ON Aux.id = AuthorsAndWorks.workId
+            LEFT OUTER JOIN Authors 
+                ON AuthorsAndWorks.authorId = Authors.id;
 
 getLibraryWorkDetails WITH WorkDetailsView: SELECT * FROM LibraryWorkDetails WHERE id = ?;
 
 CREATE VIEW "LibraryWorkContents" AS 
-    WITH ClosestSubdivision AS ( SELECT wc.workId,
-                                        wc.idx,
-                                        wc.word,
-                                        wc.sourceReference,
-                                        sh.node,
-                                        sh.typ,
-                                        sh.parent,
-                                        sh.depth,
-                                        ROW_NUMBER( ) OVER( PARTITION BY wc.workId, wc.idx ORDER BY sh.fromIndex DESC ) AS rn
-                                     FROM WorkContents wc
-                                     INNER JOIN WorkContentSubdivisionsHierarchy AS sh 
-                                         ON wc.workId = sh.workId
-                                            AND wc.idx BETWEEN sh.fromIndex AND sh.toIndex
-                                            AND sh.typ <> 'TITL' )
+    WITH ClosestSubdivision AS ( SELECT WorkContents.workId,
+                                        WorkContents.idx,
+                                        WorkContents.word,
+                                        WorkContents.sourceReference,
+                                        SubdivsHierarchy.node,
+                                        SubdivsHierarchy.typ,
+                                        SubdivsHierarchy.parent,
+                                        SubdivsHierarchy.depth,
+                                        ROW_NUMBER( ) OVER( PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC ) AS rn
+                                     FROM WorkContents
+                                     INNER JOIN WorkContentSubdivisionsHierarchy AS SubdivsHierarchy 
+                                         ON WorkContents.workId = SubdivsHierarchy.workId
+                                            AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex
+                                            AND SubdivsHierarchy.typ <> 'TITL' )
         SELECT workId AS id,
                parent,
                node,
@@ -270,16 +270,16 @@ CREATE VIEW "LibraryWorkContents" AS
 getLibraryWorkContentsPartial WITH WorkContentsElementView: SELECT * FROM LibraryWorkContents WHERE id = ? AND idx BETWEEN ? AND ?;
 
 CREATE VIEW "LibraryWorkIndexes" AS
-    SELECT h.parent,
-           h.node,
-           h.depth,
-           h.typ,
-           h.cnt,
-           h.fromIndex,
-           h.toIndex,
-           t.name
-        FROM WorkContentSubdivisionsHierarchy AS h
-        INNER JOIN WorkContentSubdivisionsHierarchy as t 
-            ON h.node = t.parent
-               AND 'TITL' = t.typ
-        ORDER BY h.fromindex;
+    SELECT SubdivsHierarchy.parent,
+           SubdivsHierarchy.node,
+           SubdivsHierarchy.depth,
+           SubdivsHierarchy.typ,
+           SubdivsHierarchy.cnt,
+           SubdivsHierarchy.fromIndex,
+           SubdivsHierarchy.toIndex,
+           Titles.name
+        FROM WorkContentSubdivisionsHierarchy AS SubdivsHierarchy
+        INNER JOIN WorkContentSubdivisionsHierarchy AS Titles
+            ON SubdivsHierarchy.node = Titles.parent
+               AND 'TITL' = Titles.typ
+        ORDER BY SubdivsHierarchy.fromindex;
