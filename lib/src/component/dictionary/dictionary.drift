@@ -1,4 +1,3 @@
-
 import 'package:latin_reader/src/component/dictionary/browse_dictionaries.dart';
 
 CREATE TABLE "Dictionaries" (
@@ -9,7 +8,7 @@ CREATE TABLE "Dictionaries" (
     "publicationDate" TEXT NOT NULL,
     PRIMARY KEY( id )
 )
-STRICT,
+--STRICT,
 WITHOUT ROWID;
 
 CREATE TABLE "DictionaryEntries" (
@@ -20,19 +19,19 @@ CREATE TABLE "DictionaryEntries" (
     PRIMARY KEY( dictionary, lemma ),
     FOREIGN KEY( dictionary ) REFERENCES Dictionaries( id )
 )
-STRICT,
+--STRICT,
 WITHOUT ROWID;
 
 CREATE TABLE "DictEntrySenses" (
     "dictionary" TEXT NOT NULL,
     "lemma" TEXT NOT NULL,
-    "lvl" TEXT NOT NULL CHECK( lvl REGEXP '^\d{3}(\.\d{3})*$' ),
+    "lvl" TEXT NOT NULL, -- CHECK( lvl REGEXP '^\d{3}(\.\d{3})*$' ),
     "prettyLevel" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     PRIMARY KEY( dictionary, lemma, lvl ),
     FOREIGN KEY( dictionary, lemma ) REFERENCES DictionaryEntries( dictionary, lemma )
 )
-STRICT,
+--STRICT,
 WITHOUT ROWID;
 
 CREATE TABLE "DicEntrySenseQuotes" (
@@ -45,7 +44,7 @@ CREATE TABLE "DicEntrySenseQuotes" (
     PRIMARY KEY( dictionary, lemma, lvl, seq ),
     FOREIGN KEY( dictionary, lemma, lvl ) REFERENCES DictEntrySenses( dictionary, lemma, lvl )
 )
-STRICT,
+--STRICT,
 WITHOUT ROWID;
 
 CREATE VIEW "browser.Dictionaries" AS

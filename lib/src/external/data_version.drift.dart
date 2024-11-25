@@ -189,8 +189,6 @@ class DataVersion extends i0.Table
   }
 
   @override
-  bool get isStrict => true;
-  @override
   List<String> get customConstraints => const ['PRIMARY KEY(idx)'];
   @override
   bool get dontWriteConstraints => true;

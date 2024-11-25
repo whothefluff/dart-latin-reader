@@ -813,8 +813,6 @@ class Dictionaries extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
-  bool get isStrict => true;
-  @override
   List<String> get customConstraints => const ['PRIMARY KEY(id)'];
   @override
   bool get dontWriteConstraints => true;
@@ -1122,8 +1120,6 @@ class DictionaryEntries extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
-  bool get isStrict => true;
-  @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(dictionary, lemma)',
         'FOREIGN KEY(dictionary)REFERENCES Dictionaries(id)'
@@ -1333,8 +1329,7 @@ class DictEntrySenses extends i0.Table
       'lvl', aliasedName, false,
       type: i0.DriftSqlType.string,
       requiredDuringInsert: true,
-      $customConstraints:
-          'NOT NULL CHECK (lvl REGEXP \'^\\d{3}(\\.\\d{3})*\$\')');
+      $customConstraints: 'NOT NULL');
   static const i0.VerificationMeta _prettyLevelMeta =
       const i0.VerificationMeta('prettyLevel');
   late final i0.GeneratedColumn<String> prettyLevel =
@@ -1427,8 +1422,6 @@ class DictEntrySenses extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
-  bool get isStrict => true;
-  @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(dictionary, lemma, lvl)',
         'FOREIGN KEY(dictionary, lemma)REFERENCES DictionaryEntries(dictionary, lemma)'
@@ -1442,6 +1435,8 @@ class DictEntrySense extends i0.DataClass
   final String dictionary;
   final String lemma;
   final String lvl;
+
+  /// CHECK( lvl REGEXP '^\d{3}(\.\d{3})*$' ),
   final String prettyLevel;
   final String content;
   const DictEntrySense(
@@ -1764,8 +1759,6 @@ class DicEntrySenseQuotes extends i0.Table
 
   @override
   bool get withoutRowId => true;
-  @override
-  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(dictionary, lemma, lvl, seq)',
