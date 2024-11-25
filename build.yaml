@@ -12,6 +12,8 @@ targets:
           sql:
             dialect: sqlite
             options:
+              known_functions:
+                regexp: "integer( text, text )"
               modules: [fts5]
           databases:
             AppDb: lib/src/external/database.dart

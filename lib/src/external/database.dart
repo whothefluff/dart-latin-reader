@@ -35,9 +35,11 @@ class AppDb extends $AppDb {
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(onCreate: (m) async {
+      log.info(() => 'DB events - creation migration started');
       await m.createAll();
       await util.populateDatabaseFromCsv(this);
       await util.updateDatabaseVersion(this);
+      log.info(() => 'DB events - creation migration ended');
     });
   }
 
@@ -65,11 +67,13 @@ LazyDatabase _openConnection() {
     if (Platform.isAndroid) {
       await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
     }
-    log.info(() => '_openConnection() - creating database from file');
+    log.info(() => '_openConnection() - handling database file');
     return NativeDatabase.createInBackground(
       file,
       // logStatements: true,
       setup: (db) {
+        log.info(() => '_openConnection() - setting PRAGMAs and functions');
+        util.setupRegExp(db);
         db.execute('PRAGMA journal_mode = WAL;');
       },
     );

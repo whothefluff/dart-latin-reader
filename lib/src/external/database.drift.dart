@@ -6,6 +6,7 @@ import 'package:latin_reader/src/external/analysis.drift.dart' as i2;
 import 'package:latin_reader/src/external/library.drift.dart' as i3;
 import 'package:latin_reader/src/external/data_version.drift.dart' as i4;
 import 'package:drift/internal/modular.dart' as i5;
+import 'package:sqlite3/common.dart' as i6;
 
 abstract class $AppDb extends i0.GeneratedDatabase {
   $AppDb(i0.QueryExecutor e) : super(e);
@@ -14,8 +15,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i1.DictionaryEntries dictionaryEntries =
       i1.DictionaryEntries(this);
   late final i1.DictEntrySenses dictEntrySenses = i1.DictEntrySenses(this);
-  late final i1.DicEntrySenseQuotes dicEntrySenseQuotes =
-      i1.DicEntrySenseQuotes(this);
+  late final i1.DictEntrySenseQuotes dictEntrySenseQuotes =
+      i1.DictEntrySenseQuotes(this);
   late final i1.BrowserDictionaries browserDictionaries =
       i1.BrowserDictionaries(this);
   late final i2.MorphologicalDetails morphologicalDetails =
@@ -66,7 +67,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
         dictionaries,
         dictionaryEntries,
         dictEntrySenses,
-        dicEntrySenseQuotes,
+        dictEntrySenseQuotes,
         browserDictionaries,
         morphologicalDetails,
         morphologicalDetailInflections,
@@ -104,8 +105,8 @@ class $AppDbManager {
       i1.$DictionaryEntriesTableManager(_db, _db.dictionaryEntries);
   i1.$DictEntrySensesTableManager get dictEntrySenses =>
       i1.$DictEntrySensesTableManager(_db, _db.dictEntrySenses);
-  i1.$DicEntrySenseQuotesTableManager get dicEntrySenseQuotes =>
-      i1.$DicEntrySenseQuotesTableManager(_db, _db.dicEntrySenseQuotes);
+  i1.$DictEntrySenseQuotesTableManager get dictEntrySenseQuotes =>
+      i1.$DictEntrySenseQuotesTableManager(_db, _db.dictEntrySenseQuotes);
   i2.$MorphologicalDetailsTableManager get morphologicalDetails =>
       i2.$MorphologicalDetailsTableManager(_db, _db.morphologicalDetails);
   i2.$MorphologicalDetailInflectionsTableManager
@@ -136,4 +137,20 @@ class $AppDbManager {
       i3.$AuthorsAndWorksTableManager(_db, _db.authorsAndWorks);
   i4.$DataVersionTableManager get dataVersion =>
       i4.$DataVersionTableManager(_db, _db.dataVersion);
+}
+
+extension DefineFunctions on i6.CommonDatabase {
+  void defineFunctions({
+    required int Function(String, String) regexp,
+  }) {
+    createFunction(
+      functionName: 'regexp',
+      argumentCount: const i6.AllowedArgumentCount(2),
+      function: (args) {
+        final arg0 = args[0] as String;
+        final arg1 = args[1] as String;
+        return regexp(arg0, arg1);
+      },
+    );
+  }
 }

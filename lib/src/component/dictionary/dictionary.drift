@@ -14,8 +14,8 @@ WITHOUT ROWID;
 CREATE TABLE "DictionaryEntries" (
     "dictionary" TEXT NOT NULL,
     "lemma" TEXT NOT NULL,
-    "partOfSpeech" TEXT NOT NULL,
-    "inflection" TEXT NOT NULL,
+    "partOfSpeech" TEXT,
+    "inflection" TEXT,
     PRIMARY KEY( dictionary, lemma ),
     FOREIGN KEY( dictionary ) REFERENCES Dictionaries( id )
 )
@@ -25,7 +25,7 @@ WITHOUT ROWID;
 CREATE TABLE "DictEntrySenses" (
     "dictionary" TEXT NOT NULL,
     "lemma" TEXT NOT NULL,
-    "lvl" TEXT NOT NULL, -- CHECK( lvl REGEXP '^\d{3}(\.\d{3})*$' ),
+    "lvl" TEXT NOT NULL CHECK( lvl REGEXP '^\d{3}(\.\d{3})*$' ),
     "prettyLevel" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     PRIMARY KEY( dictionary, lemma, lvl ),
@@ -34,13 +34,13 @@ CREATE TABLE "DictEntrySenses" (
 --STRICT,
 WITHOUT ROWID;
 
-CREATE TABLE "DicEntrySenseQuotes" (
+CREATE TABLE "DictEntrySenseQuotes" (
     "dictionary" TEXT NOT NULL,
     "lemma" TEXT NOT NULL,
     "lvl" TEXT NOT NULL,
     "seq" INTEGER NOT NULL CHECK( seq >= 0 ),
     "content" TEXT NOT NULL,
-    "translation" TEXT NOT NULL,
+    "translation" TEXT,
     PRIMARY KEY( dictionary, lemma, lvl, seq ),
     FOREIGN KEY( dictionary, lemma, lvl ) REFERENCES DictEntrySenses( dictionary, lemma, lvl )
 )
