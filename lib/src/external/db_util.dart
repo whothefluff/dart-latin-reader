@@ -1,13 +1,29 @@
 import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
+
 import 'package:csv/csv.dart';
 import 'package:drift/drift.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:latin_reader/logger.dart';
+import 'package:latin_reader/src/component/dictionary/db_util.dart'
+    as dict_util;
 import 'package:latin_reader/src/external/data_version.drift.dart';
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/library.drift.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 const path = 'assets/preprocessed_data/';
+
+void setupRegExp(Database db) {
+  db.createFunction(
+    functionName: 'regexp',
+    argumentCount: const AllowedArgumentCount(2),
+    function: (args) {
+      final regexPattern = args[0] as String;
+      final input = args[1] as String;
+      return RegExp(regexPattern).hasMatch(input) ? 1 : 0;
+    },
+  );
+}
 
 Future<int> getDataVersion() async {
   final data = await rootBundle.loadString('${path}data_version.txt');
@@ -173,6 +189,7 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
             ));
       },
     ),
+    ...dict_util.operations
   ];
   await db.transaction(() async {
     await operations.fold(Future<void>.value(null),

@@ -23,6 +23,11 @@ void main() async {
 }
 
 //implement dictionary page
+//  update py to add empty file AND hardcoded date
+//  design dictionary page with focus on navigability (permanent search bar? index on side bar? more ideas?)
+//  look into parameterizing log bool
+//  update dependencies
+// "Bundling sqlite with your app" necessary?
 
 //check errorBuilder for GoRouter and error for Riverpod (both needed?)
 
