@@ -13,6 +13,8 @@ targets:
             dialect: sqlite
             options:
               modules: [fts5]
+          databases:
+            AppDb: lib/src/external/database.dart
       drift_dev:modular:
         enabled: true
         options: *options

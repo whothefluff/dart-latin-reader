@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/provider_ext.dart';
@@ -11,41 +12,21 @@ part 'browse_dictionaries.g.dart';
 
 @riverpod
 Future<UnmodifiableListView<Dictionary>> dictionaries(
-    DictionariesRef ref) async {
+    Ref ref) async {
+  log.info(() => '@riverpod - dictionaries');
+  final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 2));
-  return await GetDictionariesUseCase(DictionaryRepository(AppDb())).invoke();
+  return await GetDictionariesUseCase(DictionaryRepository(db)).invoke();
 }
 
-// class DictionaryRepository implements IDictionaryRepository {
-//   DictionaryRepository(this.db);
-
-//   final AppDb db;
-
-//   @override
-//   Future<UnmodifiableListView<Dictionary>> getDictionaries() async {
-//     log.info('DictionaryRepository - reading dictionaries from db');
-//     final dbDicts = await db.dictionaryDrift.getBrowserDictionaries().get();
-//     return UnmodifiableListView(dbDicts as Iterable<Dictionary>);
-//   }
-// //
-// }
-
 class DictionaryRepository implements IDictionaryRepository {
-//
-  static DictionaryRepository? _instance;
-  late final AppDb db;
+  DictionaryRepository(this.db);
 
-  DictionaryRepository._(this.db);
-
-  factory DictionaryRepository(AppDb db) {
-    _instance ??= DictionaryRepository._(db);
-    return _instance!;
-  }
+  final AppDb db;
 
   @override
   Future<UnmodifiableListView<Dictionary>> getDictionaries() async {
-    final db = AppDb();
-    log.info(() => 'DictionaryRepository - reading dictionaries from db');
+    log.info('DictionaryRepository - reading dictionaries from db');
     final dbDicts = await db.dictionaryDrift.getBrowserDictionaries().get();
     return UnmodifiableListView(dbDicts as Iterable<Dictionary>);
   }

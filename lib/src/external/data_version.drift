@@ -2,8 +2,8 @@ CREATE TABLE "DataVersion" (
     "idx" INTEGER NOT NULL,
     "createdAt" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY( idx )
-) 
-STRICT;
+);
+--STRICT;
 
 CREATE VIEW "LatestDataVersion" AS
     SELECT *

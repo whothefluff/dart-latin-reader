@@ -6,7 +6,7 @@ part of 'provider_author.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$libraryAuthorsHash() => r'213f68ac8901b640f4d4c8d9ef8d5052df0282a0';
+String _$libraryAuthorsHash() => r'00052032568c17e3a407f1c266ca94c7354258b4';
 
 /// See also [libraryAuthors].
 @ProviderFor(libraryAuthors)
@@ -21,10 +21,12 @@ final libraryAuthorsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef LibraryAuthorsRef
     = AutoDisposeFutureProviderRef<UnmodifiableListView<AuthorView>>;
 String _$libraryAuthorDetailsHash() =>
-    r'537b144746456ba29e0dba56dc0b91bece3c8f5b';
+    r'2b34aaa53aec4fc75f6f31a590299d35fe4810d6';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -162,6 +164,8 @@ class LibraryAuthorDetailsProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin LibraryAuthorDetailsRef
     on AutoDisposeFutureProviderRef<AuthorDetailsView> {
   /// The parameter `id` of this provider.
@@ -177,4 +181,4 @@ class _LibraryAuthorDetailsProviderElement
   String get id => (origin as LibraryAuthorDetailsProvider).id;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

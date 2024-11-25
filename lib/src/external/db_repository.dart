@@ -10,20 +10,12 @@ import 'package:latin_reader/src/component/library/use_case/entity/view_work_det
 import 'package:latin_reader/src/external/database.dart';
 
 class AuthorRepository implements i.AuthorRepository {
-//
-  static AuthorRepository? _instance;
-  late final AppDb db;
+  AuthorRepository(this.db);
 
-  AuthorRepository._(this.db);
-
-  factory AuthorRepository(AppDb db) {
-    _instance ??= AuthorRepository._(db);
-    return _instance!;
-  }
+  final AppDb db;
 
   @override
   Future<UnmodifiableListView<AuthorView>> getLibraryAuthors() async {
-    final db = AppDb();
     log.info(() => 'AuthorRepository - reading library authors from db');
     final dbAuthors = await db.libraryDrift.getLibraryAuthors().get();
     return UnmodifiableListView(dbAuthors as Iterable<AuthorView>);
@@ -31,9 +23,9 @@ class AuthorRepository implements i.AuthorRepository {
 
   @override
   Future<AuthorDetailsView> getLibraryAuthorDetails(String id) async {
-    final db = AppDb();
     log.info(() => 'AuthorRepository - reading author details from db');
-    final dbAuthorDetails = await db.libraryDrift.getLibraryAuthorDetails(id).get();
+    final dbAuthorDetails =
+        await db.libraryDrift.getLibraryAuthorDetails(id).get();
     final firstLine = dbAuthorDetails.first;
     return AuthorDetailsView(
         id: firstLine.id,
@@ -50,22 +42,15 @@ class AuthorRepository implements i.AuthorRepository {
 }
 
 class WorkRepository implements i.WorkRepository {
-//
-  static WorkRepository? _instance;
-  late final AppDb db;
+  WorkRepository(this.db);
 
-  WorkRepository._(this.db);
-
-  factory WorkRepository(AppDb db) {
-    _instance ??= WorkRepository._(db);
-    return _instance!;
-  }
+  final AppDb db;
 
   @override
   Future<WorkDetailsView> getLibraryWorkDetails(String id) async {
-    final db = AppDb();
     log.info(() => 'WorkRepository - reading work details from db');
-    final dbWorkDetails = await db.libraryDrift.getLibraryWorkDetails(id).getSingle();
+    final dbWorkDetails =
+        await db.libraryDrift.getLibraryWorkDetails(id).getSingle();
     return dbWorkDetails;
   }
 
@@ -73,12 +58,11 @@ class WorkRepository implements i.WorkRepository {
   Future<UnmodifiableListView<WorkContentsElementView>>
       getLibraryWorkContentsPartially(
           String id, int fromIndex, int toIndex) async {
-    final db = AppDb();
     log.info(() =>
         'WorkRepository - reading work contents ($fromIndex - $toIndex) from db');
-    final dbWorkContents =
-        await db.libraryDrift
-        .getLibraryWorkContentsPartial(id, fromIndex, toIndex).get();
+    final dbWorkContents = await db.libraryDrift
+        .getLibraryWorkContentsPartial(id, fromIndex, toIndex)
+        .get();
     return UnmodifiableListView(
         dbWorkContents as Iterable<WorkContentsElementView>);
   }

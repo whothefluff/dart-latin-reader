@@ -7,7 +7,7 @@ part of 'provider_work.dart';
 // **************************************************************************
 
 String _$libraryWorkDetailsHash() =>
-    r'a4747e9b2a754bb028a66032bbb13f1b8de03237';
+    r'0925834f747c8c24f3e4b4b74cb5f5ae9e273f67';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -144,6 +144,8 @@ class LibraryWorkDetailsProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin LibraryWorkDetailsRef on AutoDisposeFutureProviderRef<WorkDetailsView> {
   /// The parameter `id` of this provider.
   String get id;
@@ -159,7 +161,7 @@ class _LibraryWorkDetailsProviderElement
 }
 
 String _$libraryWorkContentsPartiallyHash() =>
-    r'df1e7aaccb3512530775b64e00a3b5babc42f55c';
+    r'c3421277e1e48d89e23779883426a413c5065377';
 
 /// See also [libraryWorkContentsPartially].
 @ProviderFor(libraryWorkContentsPartially)
@@ -303,6 +305,8 @@ class LibraryWorkContentsPartiallyProvider extends AutoDisposeFutureProvider<
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin LibraryWorkContentsPartiallyRef on AutoDisposeFutureProviderRef<
     UnmodifiableListView<WorkContentsElementView>> {
   /// The parameter `id` of this provider.
@@ -330,4 +334,4 @@ class _LibraryWorkContentsPartiallyProviderElement
   int get toIndex => (origin as LibraryWorkContentsPartiallyProvider).toIndex;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
