@@ -4,7 +4,7 @@ CREATE TABLE "MorphologicalDetails"(
     "dictionaryRef" TEXT NOT NULL,
     PRIMARY KEY( form, item )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "MorphologicalDetailInflections"(
@@ -26,5 +26,5 @@ CREATE TABLE "MorphologicalDetailInflections"(
     PRIMARY KEY( form, item, cnt ),
     FOREIGN KEY( form, item ) REFERENCES MorphologicalDetails( form, item )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;

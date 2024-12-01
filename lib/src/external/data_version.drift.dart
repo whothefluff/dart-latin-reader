@@ -1,3 +1,4 @@
+// dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/external/data_version.drift.dart' as i1;
@@ -188,6 +189,8 @@ class DataVersion extends i0.Table
     return DataVersion(attachedDatabase, alias);
   }
 
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const ['PRIMARY KEY(idx)'];
   @override

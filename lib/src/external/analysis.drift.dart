@@ -1,3 +1,4 @@
+// dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/external/analysis.drift.dart' as i1;
@@ -561,6 +562,8 @@ class MorphologicalDetails extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
+  bool get isStrict => true;
+  @override
   List<String> get customConstraints => const ['PRIMARY KEY(form, item)'];
   @override
   bool get dontWriteConstraints => true;
@@ -982,6 +985,8 @@ class MorphologicalDetailInflections extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(form, item, cnt)',

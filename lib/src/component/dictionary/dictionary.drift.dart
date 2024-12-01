@@ -1,3 +1,4 @@
+// dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/component/dictionary/dictionary.drift.dart'
@@ -813,6 +814,8 @@ class Dictionaries extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
+  bool get isStrict => true;
+  @override
   List<String> get customConstraints => const ['PRIMARY KEY(id)'];
   @override
   bool get dontWriteConstraints => true;
@@ -1115,6 +1118,8 @@ class DictionaryEntries extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(dictionary, lemma)',
@@ -1425,6 +1430,8 @@ class DictEntrySenses extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(dictionary, lemma, lvl)',
@@ -1759,6 +1766,8 @@ class DictEntrySenseQuotes extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(dictionary, lemma, lvl, seq)',
