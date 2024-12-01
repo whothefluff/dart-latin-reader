@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
+		"dart.additionalAnalyzerFileExtensions": ["drift"],
 		"sqltools.useNodeRuntime": true,
 		"sqltools.connections": [
 			{
@@ -13,7 +14,7 @@
 				"name": "library",
 				"database": "C:\\Users\\whothefluff\\AppData\\Roaming\\com.example\\latin_reader\\latin_reader\\library.db"
 			}
-		]
+		],
 	},
 	"launch": {
 		"version": "0.2.0",

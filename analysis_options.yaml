@@ -83,6 +83,7 @@ analyzer:
   # https://dart.dev/guides/language/analysis-options
   plugins:
     - custom_lint
+    - drift
   language:
     strict-casts: true
     strict-inference: true
