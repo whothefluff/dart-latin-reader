@@ -53,9 +53,12 @@ CREATE VIEW "browser.Dictionaries" AS
            Dictionaries.language,
            Dictionaries.publisher,
            Dictionaries.publicationDate,
-           COUNT(*) OVER( PARTITION BY DictionaryEntries.dictionary ) AS numberOfEntries
+           COALESCE( DictionaryCounts.numberOfEntries, 0 ) AS numberOfEntries
         FROM Dictionaries
-        LEFT JOIN DictionaryEntries
-            ON Dictionaries.id = DictionaryEntries.dictionary;
+        LEFT JOIN ( SELECT dictionary, 
+                           COUNT(*) AS numberOfEntries 
+                        FROM DictionaryEntries 
+                        GROUP BY dictionary ) AS DictionaryCounts
+            ON Dictionaries.id = DictionaryCounts.dictionary;
 
-getBrowserDictionaries WITH Dictionary: SELECT * FROM browser.Dictionaries;
+getBrowserDictionaries WITH Dictionary: SELECT * FROM "browser.Dictionaries";

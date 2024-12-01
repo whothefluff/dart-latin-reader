@@ -39,7 +39,6 @@ class AppDb extends $AppDb {
       await m.createAll();
       await util.populateDatabaseFromCsv(this);
       await util.updateDatabaseVersion(this);
-      log.info(() => 'DB events - creation migration ended');
     });
   }
 
