@@ -2091,7 +2091,7 @@ class BrowserDictionaries
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW "browser.Dictionaries" AS SELECT Dictionaries.id, Dictionaries.name, Dictionaries.language, Dictionaries.publisher, Dictionaries.publicationDate, COUNT(*)OVER (PARTITION BY DictionaryEntries.dictionary RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfEntries FROM Dictionaries LEFT JOIN DictionaryEntries ON Dictionaries.id = DictionaryEntries.dictionary',
+            'CREATE VIEW "browser.Dictionaries" AS SELECT Dictionaries.id, Dictionaries.name, Dictionaries.language, Dictionaries.publisher, Dictionaries.publicationDate, COALESCE(DictionaryCounts.numberOfEntries, 0) AS numberOfEntries FROM Dictionaries LEFT JOIN (SELECT dictionary, COUNT(*) AS numberOfEntries FROM DictionaryEntries GROUP BY dictionary) AS DictionaryCounts ON Dictionaries.id = DictionaryCounts.dictionary',
       };
   @override
   BrowserDictionaries get asDslTable => this;
@@ -2146,19 +2146,27 @@ class BrowserDictionaries
 class DictionaryDrift extends i2.ModularAccessor {
   DictionaryDrift(i0.GeneratedDatabase db) : super(db);
   i0.Selectable<i3.Dictionary> getBrowserDictionaries() {
-    return customSelect('SELECT * FROM browser.Dictionaries',
+    return customSelect('SELECT * FROM "browser.Dictionaries"',
         variables: [],
         readsFrom: {
           dictionaries,
+          dictionaryEntries,
         }).map((i0.QueryRow row) => i3.Dictionary(
           id: row.read<String>('id'),
           name: row.read<String>('name'),
           language: row.read<String>('language'),
           publisher: row.read<String>('publisher'),
           publicationDate: row.read<String>('publicationDate'),
+          numberOfEntries: row.read<int>('numberOfEntries'),
         ));
   }
 
+  i1.BrowserDictionaries get browserDictionaries =>
+      i2.ReadDatabaseContainer(attachedDatabase)
+          .resultSet<i1.BrowserDictionaries>('browser.Dictionaries');
   i1.Dictionaries get dictionaries => i2.ReadDatabaseContainer(attachedDatabase)
       .resultSet<i1.Dictionaries>('Dictionaries');
+  i1.DictionaryEntries get dictionaryEntries =>
+      i2.ReadDatabaseContainer(attachedDatabase)
+          .resultSet<i1.DictionaryEntries>('DictionaryEntries');
 }

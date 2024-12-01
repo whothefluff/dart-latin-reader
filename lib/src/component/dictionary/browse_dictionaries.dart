@@ -11,8 +11,7 @@ part 'browse_dictionaries.g.dart';
 //infrastructure
 
 @riverpod
-Future<UnmodifiableListView<Dictionary>> dictionaries(
-    Ref ref) async {
+Future<UnmodifiableListView<Dictionary>> dictionaries(Ref ref) async {
   log.info(() => '@riverpod - dictionaries');
   final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 2));
@@ -69,6 +68,7 @@ class Dictionary {
     required this.language,
     required this.publisher,
     required this.publicationDate,
+    required this.numberOfEntries,
   });
 
   final String id;
@@ -76,6 +76,7 @@ class Dictionary {
   final String language;
   final String publisher;
   final String publicationDate;
+  final int numberOfEntries;
 
   @override
   String toString() {
