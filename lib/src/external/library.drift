@@ -10,7 +10,7 @@ CREATE TABLE "Authors"(
     "image" BLOB NOT NULL,
     PRIMARY KEY( id )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "AuthorAbbreviations"(
@@ -20,7 +20,7 @@ CREATE TABLE "AuthorAbbreviations"(
     PRIMARY KEY( authorId, id ),
     FOREIGN KEY( authorId ) REFERENCES Authors( id  )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "Works"(
@@ -29,7 +29,7 @@ CREATE TABLE "Works"(
     "about" TEXT NOT NULL,
     PRIMARY KEY( id )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "WorkAbbreviations"(
@@ -39,7 +39,7 @@ CREATE TABLE "WorkAbbreviations"(
     PRIMARY KEY( workId, id ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "WorkContents"(
@@ -50,7 +50,7 @@ CREATE TABLE "WorkContents"(
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "WorkContentSubdivisions"(
@@ -67,7 +67,7 @@ CREATE TABLE "WorkContentSubdivisions"(
     FOREIGN KEY( workId, fromIndex ) REFERENCES WorkContents( workId, idx ),
     FOREIGN KEY( workId, toIndex ) REFERENCES WorkContents( workId, idx )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "WorkContentSupplementary"(
@@ -80,7 +80,7 @@ CREATE TABLE "WorkContentSupplementary"(
     PRIMARY KEY( workId, typ, cnt ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "Macronizations"(
@@ -89,7 +89,7 @@ CREATE TABLE "Macronizations"(
     "isUncertain" INTEGER NOT NULL CHECK( isUncertain IN (0,1) ),
     PRIMARY KEY( word, macronizedWord )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "WorkMacronizations"(
@@ -99,7 +99,7 @@ CREATE TABLE "WorkMacronizations"(
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId, idx ) REFERENCES WorkContents( workId, idx )
 )
---STRICT,
+STRICT,
 WITHOUT ROWID;
 
 CREATE TABLE "UserProvidedMacronizations"(
@@ -109,7 +109,7 @@ CREATE TABLE "UserProvidedMacronizations"(
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId, idx ) REFERENCES WorkContents( workId, idx )
 )
---STRICT,
+STRICT,
 WITHOUT ROWID;
 
 CREATE TABLE "AuthorsAndWorks"(
@@ -119,7 +119,7 @@ CREATE TABLE "AuthorsAndWorks"(
     FOREIGN KEY( authorId ) REFERENCES Authors( id ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
 ) 
---STRICT, 
+STRICT, 
 WITHOUT ROWID;
 
 CREATE VIEW "WorkContentSubdivisionsHierarchy" AS 

@@ -1,3 +1,4 @@
+// dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/external/library.drift.dart' as i1;
@@ -1776,6 +1777,8 @@ class Authors extends i0.Table with i0.TableInfo<Authors, i1.Author> {
   @override
   bool get withoutRowId => true;
   @override
+  bool get isStrict => true;
+  @override
   List<String> get customConstraints => const ['PRIMARY KEY(id)'];
   @override
   bool get dontWriteConstraints => true;
@@ -2032,6 +2035,8 @@ class AuthorAbbreviations extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
+  bool get isStrict => true;
+  @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(authorId, id)',
         'FOREIGN KEY(authorId)REFERENCES Authors(id)'
@@ -2263,6 +2268,8 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
   @override
   bool get withoutRowId => true;
   @override
+  bool get isStrict => true;
+  @override
   List<String> get customConstraints => const ['PRIMARY KEY(id)'];
   @override
   bool get dontWriteConstraints => true;
@@ -2486,6 +2493,8 @@ class WorkAbbreviations extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(workId, id)',
@@ -2736,6 +2745,8 @@ class WorkContents extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(workId, idx)',
@@ -3074,6 +3085,8 @@ class WorkContentSubdivisions extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(workId, node)',
@@ -3486,6 +3499,8 @@ class WorkContentSupplementary extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
+  bool get isStrict => true;
+  @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(workId, typ, cnt)',
         'FOREIGN KEY(workId)REFERENCES Works(id)'
@@ -3801,6 +3816,8 @@ class Macronizations extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
+  bool get isStrict => true;
+  @override
   List<String> get customConstraints =>
       const ['PRIMARY KEY(word, macronizedWord)'];
   @override
@@ -4040,6 +4057,8 @@ class WorkMacronizations extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(workId, idx)',
@@ -4283,6 +4302,8 @@ class UserProvidedMacronizations extends i0.Table
   @override
   bool get withoutRowId => true;
   @override
+  bool get isStrict => true;
+  @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(workId, idx)',
         'FOREIGN KEY(workId, idx)REFERENCES WorkContents(workId, idx)'
@@ -4507,6 +4528,8 @@ class AuthorsAndWorks extends i0.Table
 
   @override
   bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(authorId, workId)',
