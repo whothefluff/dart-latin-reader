@@ -61,4 +61,4 @@ CREATE VIEW "browser.Dictionaries" AS
                         GROUP BY dictionary ) AS DictionaryCounts
             ON Dictionaries.id = DictionaryCounts.dictionary;
 
-getBrowserDictionaries WITH Dictionary: SELECT * FROM "browser.Dictionaries";
+getBrowserDictionaries WITH Dictionary: SELECT id, name, language, publisher, CAST( publicationDate AS DATETIME ) AS publicationDate, numberOfEntries FROM "browser.Dictionaries";

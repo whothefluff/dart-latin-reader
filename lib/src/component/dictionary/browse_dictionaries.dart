@@ -75,7 +75,7 @@ class Dictionary {
   final String name;
   final String language;
   final String publisher;
-  final String publicationDate;
+  final DateTime publicationDate;
   final int numberOfEntries;
 
   @override

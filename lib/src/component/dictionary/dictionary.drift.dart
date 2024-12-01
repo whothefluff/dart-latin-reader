@@ -2146,7 +2146,8 @@ class BrowserDictionaries
 class DictionaryDrift extends i2.ModularAccessor {
   DictionaryDrift(i0.GeneratedDatabase db) : super(db);
   i0.Selectable<i3.Dictionary> getBrowserDictionaries() {
-    return customSelect('SELECT * FROM "browser.Dictionaries"',
+    return customSelect(
+        'SELECT id, name, language, publisher, CAST(publicationDate AS TEXT) AS publicationDate, numberOfEntries FROM "browser.Dictionaries"',
         variables: [],
         readsFrom: {
           dictionaries,
@@ -2156,7 +2157,7 @@ class DictionaryDrift extends i2.ModularAccessor {
           name: row.read<String>('name'),
           language: row.read<String>('language'),
           publisher: row.read<String>('publisher'),
-          publicationDate: row.read<String>('publicationDate'),
+          publicationDate: row.read<DateTime>('publicationDate'),
           numberOfEntries: row.read<int>('numberOfEntries'),
         ));
   }

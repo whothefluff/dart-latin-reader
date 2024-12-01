@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' as int;
 import 'package:latin_reader/src/component/dictionary/browse_dictionaries.dart';
 import 'package:latin_reader/src/ui/widget/searchable_app_bar.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
@@ -38,7 +39,7 @@ class DictionariesPage extends ConsumerWidget {
                     _row(context, dictionaries[index].name, entriesData);
                 final publisherData = _row(
                   context,
-                  '${dictionaries[index].publisher} (${dictionaries[index].publicationDate.substring(0, 10)})',
+                  '${dictionaries[index].publisher} (${int.DateFormat.yMMMMd().format(dictionaries[index].publicationDate.toLocal())})',
                   SizedBox(
                     width: _tWidth(entriesData.data!, entriesData.style!),
                   ),
