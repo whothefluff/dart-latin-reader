@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'browse_dictionaries.dart';
+part of 'dictionaries_api.dart';
 
 // **************************************************************************
 // RiverpodGenerator
