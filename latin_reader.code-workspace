@@ -5,7 +5,7 @@
 		}
 	],
 	"settings": {
-		"dart.additionalAnalyzerFileExtensions": ["drift"],
+		//"dart.additionalAnalyzerFileExtensions": ["drift"], doesn't seem to work correctly for .drift files
 		"sqltools.useNodeRuntime": true,
 		"sqltools.connections": [
 			{

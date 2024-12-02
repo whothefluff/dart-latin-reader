@@ -18,8 +18,10 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i1.DictEntrySenses dictEntrySenses = i1.DictEntrySenses(this);
   late final i1.DictEntrySenseQuotes dictEntrySenseQuotes =
       i1.DictEntrySenseQuotes(this);
-  late final i1.BrowserDictionaries browserDictionaries =
-      i1.BrowserDictionaries(this);
+  late final i1.DictionaryDictionaries dictionaryDictionaries =
+      i1.DictionaryDictionaries(this);
+  late final i1.DictionaryDictionaryEntries dictionaryDictionaryEntries =
+      i1.DictionaryDictionaryEntries(this);
   late final i2.MorphologicalDetails morphologicalDetails =
       i2.MorphologicalDetails(this);
   late final i2.MorphologicalDetailInflections morphologicalDetailInflections =
@@ -69,7 +71,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
         dictionaryEntries,
         dictEntrySenses,
         dictEntrySenseQuotes,
-        browserDictionaries,
+        dictionaryDictionaries,
+        dictionaryDictionaryEntries,
         morphologicalDetails,
         morphologicalDetailInflections,
         authors,

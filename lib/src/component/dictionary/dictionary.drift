@@ -1,4 +1,5 @@
-import 'package:latin_reader/src/component/dictionary/browse_dictionaries.dart';
+import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart';
+import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart';
 
 CREATE TABLE "Dictionaries" (
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
@@ -47,18 +48,29 @@ CREATE TABLE "DictEntrySenseQuotes" (
 STRICT,
 WITHOUT ROWID;
 
-CREATE VIEW "browser.Dictionaries" AS
-    SELECT Dictionaries.id,
-           Dictionaries.name,
-           Dictionaries.language,
-           Dictionaries.publisher,
-           Dictionaries.publicationDate,
+CREATE VIEW "dictionary.Dictionaries" AS
+    SELECT Dictionaries.*,
            COALESCE( DictionaryCounts.numberOfEntries, 0 ) AS numberOfEntries
         FROM Dictionaries
-        LEFT JOIN ( SELECT dictionary, 
-                           COUNT(*) AS numberOfEntries 
-                        FROM DictionaryEntries 
-                        GROUP BY dictionary ) AS DictionaryCounts
+        LEFT OUTER JOIN ( SELECT dictionary, 
+                                 COUNT(*) AS numberOfEntries 
+                              FROM DictionaryEntries 
+                              GROUP BY dictionary ) AS DictionaryCounts
             ON Dictionaries.id = DictionaryCounts.dictionary;
 
-getBrowserDictionaries WITH Dictionary: SELECT id, name, language, publisher, CAST( publicationDate AS DATETIME ) AS publicationDate, numberOfEntries FROM "browser.Dictionaries";
+getDictionaries WITH Dictionary: SELECT id, name, language, publisher, CAST( publicationDate AS DATETIME ) AS publicationDate, numberOfEntries FROM "dictionary.Dictionaries";
+
+CREATE VIEW "dictionary.DictionaryEntries" AS
+    SELECT DictionaryEntries.*,
+           SenseCounts.numberOfSenses
+        FROM DictionaryEntries
+        LEFT OUTER JOIN ( SELECT dictionary, 
+                                 lemma,
+                                 COUNT(*) AS numberOfSenses 
+                              FROM DictEntrySenses 
+                              WHERE lvl BETWEEN '000' AND '999'
+                              GROUP BY dictionary, lemma ) AS SenseCounts
+            ON DictionaryEntries.dictionary = SenseCounts.dictionary
+               AND DictionaryEntries.lemma = SenseCounts.lemma;
+
+getDictionaryEntries WITH Entry: SELECT * FROM "dictionary.DictionaryEntries" WHERE dictionary = ?;

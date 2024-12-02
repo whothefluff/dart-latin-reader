@@ -4,8 +4,10 @@ import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/component/dictionary/dictionary.drift.dart'
     as i1;
 import 'package:drift/internal/modular.dart' as i2;
-import 'package:latin_reader/src/component/dictionary/browse_dictionaries.dart'
+import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart'
     as i3;
+import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart'
+    as i4;
 
 typedef $DictionariesCreateCompanionBuilder = i1.DictionariesCompanion
     Function({
@@ -2001,24 +2003,24 @@ class DictEntrySenseQuotesCompanion
   }
 }
 
-class BrowserDictionary extends i0.DataClass {
+class DictionaryDictionary extends i0.DataClass {
   final String id;
   final String name;
   final String language;
   final String publisher;
   final String publicationDate;
   final int numberOfEntries;
-  const BrowserDictionary(
+  const DictionaryDictionary(
       {required this.id,
       required this.name,
       required this.language,
       required this.publisher,
       required this.publicationDate,
       required this.numberOfEntries});
-  factory BrowserDictionary.fromJson(Map<String, dynamic> json,
+  factory DictionaryDictionary.fromJson(Map<String, dynamic> json,
       {i0.ValueSerializer? serializer}) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return BrowserDictionary(
+    return DictionaryDictionary(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       language: serializer.fromJson<String>(json['language']),
@@ -2040,14 +2042,14 @@ class BrowserDictionary extends i0.DataClass {
     };
   }
 
-  i1.BrowserDictionary copyWith(
+  i1.DictionaryDictionary copyWith(
           {String? id,
           String? name,
           String? language,
           String? publisher,
           String? publicationDate,
           int? numberOfEntries}) =>
-      i1.BrowserDictionary(
+      i1.DictionaryDictionary(
         id: id ?? this.id,
         name: name ?? this.name,
         language: language ?? this.language,
@@ -2057,7 +2059,7 @@ class BrowserDictionary extends i0.DataClass {
       );
   @override
   String toString() {
-    return (StringBuffer('BrowserDictionary(')
+    return (StringBuffer('DictionaryDictionary(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('language: $language, ')
@@ -2074,7 +2076,7 @@ class BrowserDictionary extends i0.DataClass {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is i1.BrowserDictionary &&
+      (other is i1.DictionaryDictionary &&
           other.id == this.id &&
           other.name == this.name &&
           other.language == this.language &&
@@ -2083,31 +2085,32 @@ class BrowserDictionary extends i0.DataClass {
           other.numberOfEntries == this.numberOfEntries);
 }
 
-class BrowserDictionaries
-    extends i0.ViewInfo<i1.BrowserDictionaries, i1.BrowserDictionary>
+class DictionaryDictionaries
+    extends i0.ViewInfo<i1.DictionaryDictionaries, i1.DictionaryDictionary>
     implements i0.HasResultSet {
   final String? _alias;
   @override
   final i0.GeneratedDatabase attachedDatabase;
-  BrowserDictionaries(this.attachedDatabase, [this._alias]);
+  DictionaryDictionaries(this.attachedDatabase, [this._alias]);
   @override
   List<i0.GeneratedColumn> get $columns =>
       [id, name, language, publisher, publicationDate, numberOfEntries];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
-  String get entityName => 'browser.Dictionaries';
+  String get entityName => 'dictionary.Dictionaries';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW "browser.Dictionaries" AS SELECT Dictionaries.id, Dictionaries.name, Dictionaries.language, Dictionaries.publisher, Dictionaries.publicationDate, COALESCE(DictionaryCounts.numberOfEntries, 0) AS numberOfEntries FROM Dictionaries LEFT JOIN (SELECT dictionary, COUNT(*) AS numberOfEntries FROM DictionaryEntries GROUP BY dictionary) AS DictionaryCounts ON Dictionaries.id = DictionaryCounts.dictionary',
+            'CREATE VIEW "dictionary.Dictionaries" AS SELECT Dictionaries.*, COALESCE(DictionaryCounts.numberOfEntries, 0) AS numberOfEntries FROM Dictionaries LEFT OUTER JOIN (SELECT dictionary, COUNT(*) AS numberOfEntries FROM DictionaryEntries GROUP BY dictionary) AS DictionaryCounts ON Dictionaries.id = DictionaryCounts.dictionary',
       };
   @override
-  BrowserDictionaries get asDslTable => this;
+  DictionaryDictionaries get asDslTable => this;
   @override
-  i1.BrowserDictionary map(Map<String, dynamic> data, {String? tablePrefix}) {
+  i1.DictionaryDictionary map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return i1.BrowserDictionary(
+    return i1.DictionaryDictionary(
       id: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
@@ -2142,8 +2145,8 @@ class BrowserDictionaries
       'numberOfEntries', aliasedName, false,
       type: i0.DriftSqlType.int);
   @override
-  BrowserDictionaries createAlias(String alias) {
-    return BrowserDictionaries(attachedDatabase, alias);
+  DictionaryDictionaries createAlias(String alias) {
+    return DictionaryDictionaries(attachedDatabase, alias);
   }
 
   @override
@@ -2152,11 +2155,152 @@ class BrowserDictionaries
   Set<String> get readTables => const {'Dictionaries', 'DictionaryEntries'};
 }
 
+class DictionaryDictionaryEntry extends i0.DataClass {
+  final String dictionary;
+  final String lemma;
+  final String? partOfSpeech;
+  final String? inflection;
+  final int? numberOfSenses;
+  const DictionaryDictionaryEntry(
+      {required this.dictionary,
+      required this.lemma,
+      this.partOfSpeech,
+      this.inflection,
+      this.numberOfSenses});
+  factory DictionaryDictionaryEntry.fromJson(Map<String, dynamic> json,
+      {i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return DictionaryDictionaryEntry(
+      dictionary: serializer.fromJson<String>(json['dictionary']),
+      lemma: serializer.fromJson<String>(json['lemma']),
+      partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
+      inflection: serializer.fromJson<String?>(json['inflection']),
+      numberOfSenses: serializer.fromJson<int?>(json['numberOfSenses']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'dictionary': serializer.toJson<String>(dictionary),
+      'lemma': serializer.toJson<String>(lemma),
+      'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
+      'inflection': serializer.toJson<String?>(inflection),
+      'numberOfSenses': serializer.toJson<int?>(numberOfSenses),
+    };
+  }
+
+  i1.DictionaryDictionaryEntry copyWith(
+          {String? dictionary,
+          String? lemma,
+          i0.Value<String?> partOfSpeech = const i0.Value.absent(),
+          i0.Value<String?> inflection = const i0.Value.absent(),
+          i0.Value<int?> numberOfSenses = const i0.Value.absent()}) =>
+      i1.DictionaryDictionaryEntry(
+        dictionary: dictionary ?? this.dictionary,
+        lemma: lemma ?? this.lemma,
+        partOfSpeech:
+            partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
+        inflection: inflection.present ? inflection.value : this.inflection,
+        numberOfSenses:
+            numberOfSenses.present ? numberOfSenses.value : this.numberOfSenses,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('DictionaryDictionaryEntry(')
+          ..write('dictionary: $dictionary, ')
+          ..write('lemma: $lemma, ')
+          ..write('partOfSpeech: $partOfSpeech, ')
+          ..write('inflection: $inflection, ')
+          ..write('numberOfSenses: $numberOfSenses')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(dictionary, lemma, partOfSpeech, inflection, numberOfSenses);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.DictionaryDictionaryEntry &&
+          other.dictionary == this.dictionary &&
+          other.lemma == this.lemma &&
+          other.partOfSpeech == this.partOfSpeech &&
+          other.inflection == this.inflection &&
+          other.numberOfSenses == this.numberOfSenses);
+}
+
+class DictionaryDictionaryEntries extends i0
+    .ViewInfo<i1.DictionaryDictionaryEntries, i1.DictionaryDictionaryEntry>
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  DictionaryDictionaryEntries(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns =>
+      [dictionary, lemma, partOfSpeech, inflection, numberOfSenses];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'dictionary.DictionaryEntries';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+        i0.SqlDialect.sqlite:
+            'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, SenseCounts.numberOfSenses FROM DictionaryEntries LEFT OUTER JOIN (SELECT dictionary, lemma, COUNT(*) AS numberOfSenses FROM DictEntrySenses WHERE lvl BETWEEN \'000\' AND \'999\' GROUP BY dictionary, lemma) AS SenseCounts ON DictionaryEntries.dictionary = SenseCounts.dictionary AND DictionaryEntries.lemma = SenseCounts.lemma',
+      };
+  @override
+  DictionaryDictionaryEntries get asDslTable => this;
+  @override
+  i1.DictionaryDictionaryEntry map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.DictionaryDictionaryEntry(
+      dictionary: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}dictionary'])!,
+      lemma: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}lemma'])!,
+      partOfSpeech: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}partOfSpeech']),
+      inflection: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}inflection']),
+      numberOfSenses: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.int, data['${effectivePrefix}numberOfSenses']),
+    );
+  }
+
+  late final i0.GeneratedColumn<String> dictionary = i0.GeneratedColumn<String>(
+      'dictionary', aliasedName, false,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> lemma = i0.GeneratedColumn<String>(
+      'lemma', aliasedName, false,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> partOfSpeech =
+      i0.GeneratedColumn<String>('partOfSpeech', aliasedName, true,
+          type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> inflection = i0.GeneratedColumn<String>(
+      'inflection', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<int> numberOfSenses = i0.GeneratedColumn<int>(
+      'numberOfSenses', aliasedName, true,
+      type: i0.DriftSqlType.int);
+  @override
+  DictionaryDictionaryEntries createAlias(String alias) {
+    return DictionaryDictionaryEntries(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {'DictionaryEntries', 'DictEntrySenses'};
+}
+
 class DictionaryDrift extends i2.ModularAccessor {
   DictionaryDrift(i0.GeneratedDatabase db) : super(db);
-  i0.Selectable<i3.Dictionary> getBrowserDictionaries() {
+  i0.Selectable<i3.Dictionary> getDictionaries() {
     return customSelect(
-        'SELECT id, name, language, publisher, CAST(publicationDate AS TEXT) AS publicationDate, numberOfEntries FROM "browser.Dictionaries"',
+        'SELECT id, name, language, publisher, CAST(publicationDate AS TEXT) AS publicationDate, numberOfEntries FROM "dictionary.Dictionaries"',
         variables: [],
         readsFrom: {
           dictionaries,
@@ -2171,12 +2315,37 @@ class DictionaryDrift extends i2.ModularAccessor {
         ));
   }
 
-  i1.BrowserDictionaries get browserDictionaries =>
+  i0.Selectable<i4.Entry> getDictionaryEntries(String var1) {
+    return customSelect(
+        'SELECT * FROM "dictionary.DictionaryEntries" WHERE dictionary = ?1',
+        variables: [
+          i0.Variable<String>(var1)
+        ],
+        readsFrom: {
+          dictionaryEntries,
+          dictEntrySenses,
+        }).map((i0.QueryRow row) => i4.Entry(
+          dictionary: row.read<String>('dictionary'),
+          lemma: row.read<String>('lemma'),
+          inflection: row.readNullable<String>('inflection'),
+          partOfSpeech: row.readNullable<String>('partOfSpeech'),
+          numberOfSenses: row.readNullable<int>('numberOfSenses'),
+        ));
+  }
+
+  i1.DictionaryDictionaries get dictionaryDictionaries =>
       i2.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.BrowserDictionaries>('browser.Dictionaries');
+          .resultSet<i1.DictionaryDictionaries>('dictionary.Dictionaries');
   i1.Dictionaries get dictionaries => i2.ReadDatabaseContainer(attachedDatabase)
       .resultSet<i1.Dictionaries>('Dictionaries');
   i1.DictionaryEntries get dictionaryEntries =>
       i2.ReadDatabaseContainer(attachedDatabase)
           .resultSet<i1.DictionaryEntries>('DictionaryEntries');
+  i1.DictionaryDictionaryEntries get dictionaryDictionaryEntries =>
+      i2.ReadDatabaseContainer(attachedDatabase)
+          .resultSet<i1.DictionaryDictionaryEntries>(
+              'dictionary.DictionaryEntries');
+  i1.DictEntrySenses get dictEntrySenses =>
+      i2.ReadDatabaseContainer(attachedDatabase)
+          .resultSet<i1.DictEntrySenses>('DictEntrySenses');
 }

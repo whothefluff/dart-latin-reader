@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/component/dictionary/dictionaries_page.dart';
-import 'package:latin_reader/src/component/dictionary/dictionary_contents_page.dart';
+import 'package:latin_reader/src/component/dictionary/dictionary_entries_page.dart';
 import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
@@ -77,7 +77,7 @@ final _dictionaryRoutes = [
         path: ':id',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
-          return DictionaryContentsPage(dictionaryId: id);
+          return DictionaryEntriesPage(dictionaryId: id);
         },
       ),
     ],

@@ -6,7 +6,7 @@ import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'browse_dictionaries.g.dart';
+part 'dictionaries_api.g.dart';
 
 //infrastructure
 
@@ -26,7 +26,7 @@ class DictionaryRepository implements IDictionaryRepository {
   @override
   Future<UnmodifiableListView<Dictionary>> getDictionaries() async {
     log.info('DictionaryRepository - reading dictionaries from db');
-    final dbDicts = await db.dictionaryDrift.getBrowserDictionaries().get();
+    final dbDicts = await db.dictionaryDrift.getDictionaries().get();
     return UnmodifiableListView(dbDicts as Iterable<Dictionary>);
   }
 //
