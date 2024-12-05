@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 class SearchableAppBar extends AppBar {
   SearchableAppBar({
     super.key,
-    required this.onFilterPressed,
+    this.onFilterPressed,
     required this.searchSuggestionsBuilder,
     required this.onSortPressed,
     required this.onSettingsPressed,
   }) : super(
-          leading: IconButton(
+          leading: onFilterPressed != null ? IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: onFilterPressed,
-          ),
+          ) : null,
           title: Row(
             children: [
               Expanded(
@@ -35,7 +35,7 @@ class SearchableAppBar extends AppBar {
           ],
         );
 
-  final VoidCallback onFilterPressed;
+  final VoidCallback? onFilterPressed;
   final VoidCallback onSortPressed;
   final VoidCallback onSettingsPressed;
   final FutureOr<Iterable<Widget>> Function(BuildContext, SearchController)
