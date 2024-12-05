@@ -2160,13 +2160,13 @@ class DictionaryDictionaryEntry extends i0.DataClass {
   final String lemma;
   final String? partOfSpeech;
   final String? inflection;
-  final int? numberOfSenses;
+  final int numberOfSenses;
   const DictionaryDictionaryEntry(
       {required this.dictionary,
       required this.lemma,
       this.partOfSpeech,
       this.inflection,
-      this.numberOfSenses});
+      required this.numberOfSenses});
   factory DictionaryDictionaryEntry.fromJson(Map<String, dynamic> json,
       {i0.ValueSerializer? serializer}) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
@@ -2175,7 +2175,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
       lemma: serializer.fromJson<String>(json['lemma']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
       inflection: serializer.fromJson<String?>(json['inflection']),
-      numberOfSenses: serializer.fromJson<int?>(json['numberOfSenses']),
+      numberOfSenses: serializer.fromJson<int>(json['numberOfSenses']),
     );
   }
   @override
@@ -2186,7 +2186,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
       'lemma': serializer.toJson<String>(lemma),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
       'inflection': serializer.toJson<String?>(inflection),
-      'numberOfSenses': serializer.toJson<int?>(numberOfSenses),
+      'numberOfSenses': serializer.toJson<int>(numberOfSenses),
     };
   }
 
@@ -2195,15 +2195,14 @@ class DictionaryDictionaryEntry extends i0.DataClass {
           String? lemma,
           i0.Value<String?> partOfSpeech = const i0.Value.absent(),
           i0.Value<String?> inflection = const i0.Value.absent(),
-          i0.Value<int?> numberOfSenses = const i0.Value.absent()}) =>
+          int? numberOfSenses}) =>
       i1.DictionaryDictionaryEntry(
         dictionary: dictionary ?? this.dictionary,
         lemma: lemma ?? this.lemma,
         partOfSpeech:
             partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
         inflection: inflection.present ? inflection.value : this.inflection,
-        numberOfSenses:
-            numberOfSenses.present ? numberOfSenses.value : this.numberOfSenses,
+        numberOfSenses: numberOfSenses ?? this.numberOfSenses,
       );
   @override
   String toString() {
@@ -2248,7 +2247,7 @@ class DictionaryDictionaryEntries extends i0
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, SenseCounts.numberOfSenses FROM DictionaryEntries LEFT OUTER JOIN (SELECT dictionary, lemma, COUNT(*) AS numberOfSenses FROM DictEntrySenses WHERE lvl BETWEEN \'000\' AND \'999\' GROUP BY dictionary, lemma) AS SenseCounts ON DictionaryEntries.dictionary = SenseCounts.dictionary AND DictionaryEntries.lemma = SenseCounts.lemma',
+            'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, COALESCE(SenseCounts.numberOfSenses, 0) AS numberOfSenses FROM DictionaryEntries LEFT OUTER JOIN (SELECT dictionary, lemma, COUNT(*) AS numberOfSenses FROM DictEntrySenses WHERE lvl BETWEEN \'000\' AND \'999\' GROUP BY dictionary, lemma) AS SenseCounts ON DictionaryEntries.dictionary = SenseCounts.dictionary AND DictionaryEntries.lemma = SenseCounts.lemma',
       };
   @override
   DictionaryDictionaryEntries get asDslTable => this;
@@ -2266,7 +2265,7 @@ class DictionaryDictionaryEntries extends i0
       inflection: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.string, data['${effectivePrefix}inflection']),
       numberOfSenses: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}numberOfSenses']),
+          .read(i0.DriftSqlType.int, data['${effectivePrefix}numberOfSenses'])!,
     );
   }
 
@@ -2283,7 +2282,7 @@ class DictionaryDictionaryEntries extends i0
       'inflection', aliasedName, true,
       type: i0.DriftSqlType.string);
   late final i0.GeneratedColumn<int> numberOfSenses = i0.GeneratedColumn<int>(
-      'numberOfSenses', aliasedName, true,
+      'numberOfSenses', aliasedName, false,
       type: i0.DriftSqlType.int);
   @override
   DictionaryDictionaryEntries createAlias(String alias) {
@@ -2329,7 +2328,7 @@ class DictionaryDrift extends i2.ModularAccessor {
           lemma: row.read<String>('lemma'),
           inflection: row.readNullable<String>('inflection'),
           partOfSpeech: row.readNullable<String>('partOfSpeech'),
-          numberOfSenses: row.readNullable<int>('numberOfSenses'),
+          numberOfSenses: row.read<int>('numberOfSenses'),
         ));
   }
 

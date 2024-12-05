@@ -62,7 +62,7 @@ getDictionaries WITH Dictionary: SELECT id, name, language, publisher, CAST( pub
 
 CREATE VIEW "dictionary.DictionaryEntries" AS
     SELECT DictionaryEntries.*,
-           SenseCounts.numberOfSenses
+           COALESCE( SenseCounts.numberOfSenses, 0 ) AS numberOfSenses
         FROM DictionaryEntries
         LEFT OUTER JOIN ( SELECT dictionary, 
                                  lemma,

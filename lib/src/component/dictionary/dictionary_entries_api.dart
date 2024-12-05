@@ -78,8 +78,8 @@ class Entry {
 
   final String dictionary;
   final String lemma;
-  final String inflection;
-  final String partOfSpeech;
+  final String? inflection;
+  final String? partOfSpeech;
   final int numberOfSenses;
 
   @override
