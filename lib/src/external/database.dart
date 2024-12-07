@@ -33,14 +33,12 @@ class AppDb extends $AppDb {
   AppDb() : super(_openConnection());
 
   @override
-  MigrationStrategy get migration {
-    return MigrationStrategy(onCreate: (m) async {
-      log.info(() => 'DB events - creation migration started');
-      await m.createAll();
-      await util.populateDatabaseFromCsv(this);
-      await util.updateDatabaseVersion(this);
-    });
-  }
+  MigrationStrategy get migration => MigrationStrategy(onCreate: (m) async {
+        log.info(() => 'DB events - creation migration started');
+        await m.createAll();
+        await util.populateDatabaseFromCsv(this);
+        await util.updateDatabaseVersion(this);
+      });
 
   Future<LatestDataVersionData?> getLatestDataVersion() =>
       select(latestDataVersion).getSingleOrNull();
@@ -50,31 +48,29 @@ class AppDb extends $AppDb {
 //
 }
 
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    log.info(() => '_openConnection() - getting path');
-    final dbFolder = await getApplicationSupportDirectory();
-    final packageInfo = await PackageInfo.fromPlatform();
-    final folderPath = p.join(dbFolder.path, packageInfo.appName);
-    final directory = Directory(folderPath);
-    if (!await directory.exists()) {
-      log.info(() => '_openConnection() - creating directory at $folderPath');
-      await directory.create(recursive: true);
-    }
-    final filePath = p.join(folderPath, 'library.db');
-    final file = File(filePath);
-    if (Platform.isAndroid) {
-      await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
-    }
-    log.info(() => '_openConnection() - handling database file');
-    return NativeDatabase.createInBackground(
-      file,
-      // logStatements: true,
-      setup: (db) {
-        log.info(() => '_openConnection() - setting PRAGMAs and functions');
-        util.setupRegExp(db);
-        db.execute('PRAGMA journal_mode = WAL;');
-      },
-    );
-  });
-}
+LazyDatabase _openConnection() => LazyDatabase(() async {
+      log.info(() => '_openConnection() - getting path');
+      final dbFolder = await getApplicationSupportDirectory();
+      final packageInfo = await PackageInfo.fromPlatform();
+      final folderPath = p.join(dbFolder.path, packageInfo.appName);
+      final directory = Directory(folderPath);
+      if (directory.existsSync()) {
+        log.info(() => '_openConnection() - creating directory at $folderPath');
+        await directory.create(recursive: true);
+      }
+      final filePath = p.join(folderPath, 'library.db');
+      final file = File(filePath);
+      if (Platform.isAndroid) {
+        await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
+      }
+      log.info(() => '_openConnection() - handling database file');
+      return NativeDatabase.createInBackground(
+        file,
+        // logStatements: true,
+        setup: (db) {
+          log.info(() => '_openConnection() - setting PRAGMAs and functions');
+          util.setupRegExp(db);
+          db.execute('PRAGMA journal_mode = WAL;');
+        },
+      );
+    });

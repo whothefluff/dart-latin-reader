@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/abbreviation.dart';
 
+@immutable
 class Abbreviations {
   Abbreviations({
     required List<Abbreviation> list,
@@ -11,9 +13,7 @@ class Abbreviations {
   UnmodifiableListView<Abbreviation> list() => _list;
 
   @override
-  String toString() {
-    return 'Abbreviations{${_list.join(',')}}';
-  }
+  String toString() => 'Abbreviations{${_list.join(',')}}';
 
   @override
   bool operator ==(Object other) {

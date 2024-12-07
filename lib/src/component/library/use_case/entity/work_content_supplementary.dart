@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/work_content_supplementary_entry.dart';
 
+@immutable
 class WorkContentSupplementary {
   WorkContentSupplementary({
     required List<WorkContentSupplementaryEntry> list,
@@ -11,9 +13,7 @@ class WorkContentSupplementary {
   UnmodifiableListView<WorkContentSupplementaryEntry> list() => _list;
 
   @override
-  String toString() {
-    return 'WorkNotes{${list().join(',')}}';
-  }
+  String toString() => 'WorkNotes{${list().join(',')}}';
 
   @override
   bool operator ==(Object other) {

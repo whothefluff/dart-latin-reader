@@ -40,7 +40,7 @@ final _authorRoutes = [
   ),
   GoRoute(
     path: '/works',
-    //TODO: (someday) implement
+    // TODO(whothefluff): (someday) implement
     builder: (context, state) => const WorksPage(authorIndex: 0),
     routes: [
       GoRoute(
@@ -54,14 +54,12 @@ final _authorRoutes = [
   ),
   GoRoute(
     path: '/reader/:workId',
-    pageBuilder: (context, state) {
-      return MaterialPage(
-        fullscreenDialog: true,
-        child: TextPage(
-          workId: state.pathParameters['workId']!,
-        ),
-      );
-    },
+    pageBuilder: (context, state) => MaterialPage(
+      fullscreenDialog: true,
+      child: TextPage(
+        workId: state.pathParameters['workId']!,
+      ),
+    ),
   ),
 ];
 const _dictionariesDest = NavigationDestination(
@@ -171,11 +169,9 @@ class MyAppState extends ConsumerState<MyApp> {
   }
 
   @override
-  Widget build(context) {
-    return ListenableBuilder(
-      listenable: widget.settingsController,
-      builder: (context, child) {
-        return MaterialApp.router(
+  Widget build(context) => ListenableBuilder(
+        listenable: widget.settingsController,
+        builder: (context, child) => MaterialApp.router(
           routerConfig: _router,
           restorationScopeId: 'app',
           localizationsDelegates: const [
@@ -191,10 +187,8 @@ class MyAppState extends ConsumerState<MyApp> {
           theme: ThemeData(),
           darkTheme: ThemeData.dark(),
           themeMode: widget.settingsController.themeMode,
-        );
-      },
-    );
-  }
+        ),
+      );
 //
 }
 
@@ -211,18 +205,16 @@ class ScaffoldWithNavBar extends StatelessWidget {
   final bool createNavRail;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomAdaptiveScaffold(
-      key: customAdaptiveScaffoldKey,
-      selectedIndex: navigationShell.currentIndex,
-      destinations: mainBranchesDests,
-      body: (_) => navigationShell,
-      onSelectedIndexChange: _goToBranch,
-      useDrawer: false,
-      createBottomNavigationBar: createBottomNavBar,
-      createNavigationRail: createNavRail,
-    );
-  }
+  Widget build(BuildContext context) => CustomAdaptiveScaffold(
+        key: customAdaptiveScaffoldKey,
+        selectedIndex: navigationShell.currentIndex,
+        destinations: mainBranchesDests,
+        body: (_) => navigationShell,
+        onSelectedIndexChange: _goToBranch,
+        useDrawer: false,
+        createBottomNavigationBar: createBottomNavBar,
+        createNavigationRail: createNavRail,
+      );
 
   void _goToBranch(int index) {
     navigationShell.goBranch(

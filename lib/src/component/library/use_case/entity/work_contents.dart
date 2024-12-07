@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/work_contents_segment.dart';
 
+@immutable
 class WorkContents {
   WorkContents({
     required List<WorkContentsSegment> list,
@@ -11,9 +13,7 @@ class WorkContents {
   UnmodifiableListView<WorkContentsSegment> list() => _list;
 
   @override
-  String toString() {
-    return 'WorkContentsSegments{${_list.join(',')}}';
-  }
+  String toString() => 'WorkContentsSegments{${_list.join(',')}}';
 
   @override
   bool operator ==(Object other) {

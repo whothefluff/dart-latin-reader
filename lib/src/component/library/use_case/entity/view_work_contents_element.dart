@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
+
 /// Represents a part of the contents of a work as seen from the library page
+@immutable
 class WorkContentsElementView {
-  WorkContentsElementView({
+  const WorkContentsElementView({
     required this.id,
     required this.parent,
     required this.node,
@@ -21,9 +24,7 @@ class WorkContentsElementView {
   final String sourceReference;
 
   @override
-  String toString() {
-    return 'WorkContentsElementView{work: $word, index: $idx}';
-  }
+  String toString() => 'WorkContentsElementView{work: $word, index: $idx}';
 
   @override
   bool operator ==(Object other) {

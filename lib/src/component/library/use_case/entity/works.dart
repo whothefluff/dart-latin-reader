@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/work.dart';
 
+@immutable
 class Works {
   Works({
     required List<Work> list,
@@ -11,9 +13,7 @@ class Works {
   UnmodifiableListView<Work> list() => _list;
 
   @override
-  String toString() {
-    return 'Works{${_list.join(',')}}';
-  }
+  String toString() => 'Works{${_list.join(',')}}';
 
   @override
   bool operator ==(Object other) {

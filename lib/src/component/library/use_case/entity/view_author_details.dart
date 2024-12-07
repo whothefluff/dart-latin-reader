@@ -1,9 +1,11 @@
 import 'dart:collection';
-import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 
 /// Represents an author details as seen from the library page
+@immutable
 class AuthorDetailsView {
-  AuthorDetailsView({
+  const AuthorDetailsView({
     required this.id,
     required this.name,
     required this.about,
@@ -19,9 +21,7 @@ class AuthorDetailsView {
       works;
 
   @override
-  String toString() {
-    return 'AuthorDetails{name: $name}';
-  }
+  String toString() => 'AuthorDetails{name: $name}';
 
   @override
   bool operator ==(Object other) {

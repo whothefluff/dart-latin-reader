@@ -18,8 +18,6 @@ const _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
 const _blank = ' ';
 final _lineTerminator = Platform.lineTerminator;
 
-typedef _LastVisibleIndexCallback = void Function(int first, int last);
-
 enum _PageFlow { previous, next }
 
 class TextPage extends ConsumerStatefulWidget {
@@ -68,7 +66,7 @@ class TextPageState extends ConsumerState<TextPage> {
       body: segmentsProvider.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
-        data: (segments) => _buildResponsiveContent(segments),
+        data: _buildResponsiveContent,
       ),
     );
   }
@@ -174,7 +172,7 @@ class _TextRenderer {
   }
 
   List<InlineSpan> createSpans() {
-    List<InlineSpan> spans = [];
+    final spans = <InlineSpan>[];
     String? prevStyle;
     String? prevNode;
     for (var index = 0; index < workSegments.length; index++) {
@@ -234,55 +232,54 @@ class _GestureHandler {
   }
 
   void _dismissModalAndNavigate(BuildContext context, int index) {
-    context.pop();
-    context.go(_mainBranchesNames[index]);
+    context
+      ..pop()
+      ..go(_mainBranchesNames[index]);
   }
 
-  void _showBottomNavBar(BuildContext context) {
+  Future<void> _showBottomNavBar(BuildContext context) async {
     final customAdaptiveScaffoldState =
         customAdaptiveScaffoldKey.currentState ??
             Exception('CustomAdaptiveScaffold state is null')
                 as CustomAdaptiveScaffoldState;
     final stateWidget = customAdaptiveScaffoldState.widget;
-    showModalBottomSheet<Builder>(
+    await showModalBottomSheet<Builder>(
         context: context,
-        builder: (_) {
-          return CustomAdaptiveScaffold.standardBottomNavigationBar(
-            destinations: stateWidget.destinations,
-            currentIndex: stateWidget.selectedIndex,
-            onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
-            labelBehavior: stateWidget.bottomNavigationBarLabelBehavior,
-          );
-        });
+        builder: (_) => CustomAdaptiveScaffold.standardBottomNavigationBar(
+              destinations: stateWidget.destinations,
+              currentIndex: stateWidget.selectedIndex,
+              onDestinationSelected: (i) =>
+                  _dismissModalAndNavigate(context, i),
+              labelBehavior: stateWidget.bottomNavigationBarLabelBehavior,
+            ));
   }
 
-  void _showNavigationOverlay(BuildContext context) {
+  Future<void> _showNavigationOverlay(BuildContext context) async {
     final customAdaptiveScaffoldState =
         customAdaptiveScaffoldKey.currentState ??
             Exception('CustomAdaptiveScaffold state is null')
                 as CustomAdaptiveScaffoldState;
     final stateWidget = customAdaptiveScaffoldState.widget;
     final navRailTheme = Theme.of(context).navigationRailTheme;
-    showModalNavigationRail<Builder>(
+    await showModalNavigationRail<Builder>(
         context: context,
-        builder: (_) {
-          return CustomAdaptiveScaffold.standardNavigationRail(
-            width: stateWidget.navigationRailWidth,
-            leading: stateWidget.leadingUnextendedNavRail,
-            trailing: stateWidget.trailingNavRail,
-            selectedIndex: stateWidget.selectedIndex,
-            extended: stateWidget.largeBreakpoint.isActive(context),
-            destinations: stateWidget.destinations
-                .map((nd) => CustomAdaptiveScaffold.toRailDestination(nd))
-                .toList(),
-            onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
-            backgroundColor: navRailTheme.backgroundColor,
-            selectedIconTheme: navRailTheme.selectedIconTheme,
-            unselectedIconTheme: navRailTheme.unselectedIconTheme,
-            selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
-            unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
-          );
-        });
+        builder: (_) => CustomAdaptiveScaffold.standardNavigationRail(
+              width: stateWidget.navigationRailWidth,
+              leading: stateWidget.leadingUnextendedNavRail,
+              trailing: stateWidget.trailingNavRail,
+              selectedIndex: stateWidget.selectedIndex,
+              extended: stateWidget.largeBreakpoint.isActive(context),
+              destinations: stateWidget.destinations
+                  .map(CustomAdaptiveScaffold.toRailDestination)
+                  .toList(),
+              onDestinationSelected: (i) =>
+                  _dismissModalAndNavigate(context, i),
+              backgroundColor: navRailTheme.backgroundColor,
+              selectedIconTheme: navRailTheme.selectedIconTheme,
+              unselectedIconTheme: navRailTheme.unselectedIconTheme,
+              selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
+              unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
+            ));
   }
 //
 }
@@ -358,14 +355,12 @@ class _WordSelector {
     final endIsValid = nextChar == null ||
         nextChar == _blank ||
         _closingPunctSigns.contains(nextChar);
-    final middleIsValid = (!selectedText.contains(_blank) &&
-        !_closingPunctSigns.any((sign) => selectedText.contains(sign)));
+    final middleIsValid = !selectedText.contains(_blank) &&
+        !_closingPunctSigns.any(selectedText.contains);
     return startIsValid && endIsValid && middleIsValid;
   }
 
-  bool fullSingleWordSelected() {
-    return selected != null;
-  }
+  bool fullSingleWordSelected() => selected != null;
 //
 }
 
@@ -378,7 +373,7 @@ class _WordSelectionButton extends ContextMenuButtonItem {
         );
 
   static void _onPressed(String word) {
-    //TODO show details
+    // TODO(whothefluff): show details
   }
 //
 }
@@ -388,6 +383,7 @@ class _VisibleSegmentRange {
   final int first;
   final int last;
 
+  // ignore: sort_constructors_first
   _VisibleSegmentRange.build(
     TextPainter txtPainter,
     List<InlineSpan> allSpans,
@@ -411,9 +407,10 @@ class _VisibleSegmentRange {
     var low = 0;
     var firstFittingIndex = high + 1;
     while (low <= high) {
-      var mid = (low + high) ~/ 2;
-      textPainter.text = TextSpan(children: allSpans.sublist(mid));
-      textPainter.layout(maxWidth: textConstraints.maxWidth);
+      final mid = (low + high) ~/ 2;
+      textPainter
+        ..text = TextSpan(children: allSpans.sublist(mid))
+        ..layout(maxWidth: textConstraints.maxWidth);
       if (textPainter.height <= textConstraints.maxHeight) {
         firstFittingIndex = mid;
         high = mid - 1;
@@ -423,10 +420,10 @@ class _VisibleSegmentRange {
     }
     // Adjust firstFittingIndex to start of next verse if necessary
     if (firstFittingIndex > 0 && firstFittingIndex < segments.length) {
-      var firstElement = segments[firstFittingIndex];
+      final firstElement = segments[firstFittingIndex];
       if (firstElement.typ == 'VERS') {
-        var currentNode = firstElement.node;
-        var previousNode =
+        final currentNode = firstElement.node;
+        final previousNode =
             firstFittingIndex > 0 ? segments[firstFittingIndex - 1].node : null;
         if (currentNode != previousNode) {
           return firstFittingIndex;
@@ -456,9 +453,10 @@ class _VisibleSegmentRange {
     var high = allSpans.length - 1;
     var lastFittingIndex = low - 1;
     while (low <= high) {
-      var mid = (low + high) ~/ 2;
-      textPainter.text = TextSpan(children: allSpans.sublist(0, mid + 1));
-      textPainter.layout(maxWidth: textConstraints.maxWidth);
+      final mid = (low + high) ~/ 2;
+      textPainter
+        ..text = TextSpan(children: allSpans.sublist(0, mid + 1))
+        ..layout(maxWidth: textConstraints.maxWidth);
       if (textPainter.height <= textConstraints.maxHeight) {
         lastFittingIndex = mid;
         low = mid + 1;
@@ -468,10 +466,10 @@ class _VisibleSegmentRange {
     }
     // Adjust lastFittingIndex to end of previous verse if necessary
     if (lastFittingIndex < segments.length - 1) {
-      var lastElement = segments[lastFittingIndex];
+      final lastElement = segments[lastFittingIndex];
       if (lastElement.typ == 'VERS') {
-        var currentNode = lastElement.node;
-        var nextNode = lastFittingIndex + 1 < segments.length
+        final currentNode = lastElement.node;
+        final nextNode = lastFittingIndex + 1 < segments.length
             ? segments[lastFittingIndex + 1].node
             : null;
         // If the next word is from a different verse (node), we're good
@@ -498,10 +496,9 @@ class _VisibleSegmentRange {
     return lastFittingIndex;
   }
 
-  static bool _isPunctuation(String word) {
-    return _closingPunctSigns.contains(word) ||
-        _closingPunctSigns.any((sign) => word.startsWith(sign));
-  }
+  static bool _isPunctuation(String word) =>
+      _closingPunctSigns.contains(word) ||
+      _closingPunctSigns.any((sign) => word.startsWith(sign));
 //
 }
 
@@ -520,7 +517,7 @@ class _StyledWordList extends StatefulWidget {
   final UnmodifiableListView<WorkContentsElementView> segments;
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
-  final _LastVisibleIndexCallback onVisibleIndicesChanged;
+  final void Function(int, int) onVisibleIndicesChanged;
   final _PageFlow pageFlow;
   final bool isLargeScreen;
   final BoxConstraints pageConstraints;
@@ -565,29 +562,27 @@ class _StyledWordListState extends State<_StyledWordList> {
         : _buildSmallScreenLayout(context);
   }
 
-  void _handleNavMenuToggle(BuildContext context) {
+  Future<void> _handleNavMenuToggle(BuildContext context) async {
     Breakpoints.smallDesktop.isActive(context)
-        ? _gestureHandler._showBottomNavBar(context)
-        : _gestureHandler._showNavigationOverlay(context);
+        ? await _gestureHandler._showBottomNavBar(context)
+        : await _gestureHandler._showNavigationOverlay(context);
   }
 
-  Widget _buildSmallScreenLayout(BuildContext context) {
-    return Row(children: [
-      Expanded(
-        child: SizedBox.expand(
-          child: GestureDetector(
-            onHorizontalDragEnd: (details) =>
-                _gestureHandler.handleSwipe(details.primaryVelocity),
-            onDoubleTap: () => _gestureHandler.onNavMenuToggle(context),
-            child: Container(
-              padding: const EdgeInsets.only(left: 20, right: 20),
-              child: _buildSelectionArea(context, widget.pageConstraints),
+  Widget _buildSmallScreenLayout(BuildContext context) => Row(children: [
+        Expanded(
+          child: SizedBox.expand(
+            child: GestureDetector(
+              onHorizontalDragEnd: (details) =>
+                  _gestureHandler.handleSwipe(details.primaryVelocity),
+              onDoubleTap: () => _gestureHandler.onNavMenuToggle(context),
+              child: Container(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: _buildSelectionArea(context, widget.pageConstraints),
+              ),
             ),
           ),
         ),
-      ),
-    ]);
-  }
+      ]);
 
   Widget _buildLargeScreenLayout(BuildContext context) {
     final availableWidth = widget.pageConstraints.maxWidth;
@@ -620,27 +615,24 @@ class _StyledWordListState extends State<_StyledWordList> {
   }
 
   Widget _buildStylizedTextArea() {
-    const padding = EdgeInsets.only(
-        left: 24, right: BorderSide.strokeAlignCenter, top: 0, bottom: 14);
+    const padding = EdgeInsets.only(left: 24, bottom: 14);
     return Card(
       child: Padding(
         padding: padding,
         child: LayoutBuilder(
-          builder: (context, textAreaConstraints) {
-            return _buildSelectionArea(context, textAreaConstraints);
-          },
+          builder: _buildSelectionArea,
         ),
       ),
     );
   }
 
-  Widget _buildSelectionArea(BuildContext context, BoxConstraints constraints) {
-    return SelectionArea(
-      onSelectionChanged: _handleSelectionChanged,
-      contextMenuBuilder: _buildContextMenu,
-      child: _buildTextWithOverflowDetection(context, constraints),
-    );
-  }
+  Widget _buildSelectionArea(
+          BuildContext context, BoxConstraints constraints) =>
+      SelectionArea(
+        onSelectionChanged: _handleSelectionChanged,
+        contextMenuBuilder: _buildContextMenu,
+        child: _buildTextWithOverflowDetection(context, constraints),
+      );
 
   void _handleSelectionChanged(SelectedContent? content) {
     _wordSelector.synchronize(content);
@@ -654,15 +646,14 @@ class _StyledWordListState extends State<_StyledWordList> {
     });
   }
 
-  Widget _buildContextMenu(BuildContext context, SelectableRegionState state) {
-    return AdaptiveTextSelectionToolbar.buttonItems(
-      anchors: state.contextMenuAnchors,
-      buttonItems: [
-        ...state.contextMenuButtonItems,
-        ..._wordSelectionButtons,
-      ],
-    );
-  }
+  Widget _buildContextMenu(BuildContext context, SelectableRegionState state) =>
+      AdaptiveTextSelectionToolbar.buttonItems(
+        anchors: state.contextMenuAnchors,
+        buttonItems: [
+          ...state.contextMenuButtonItems,
+          ..._wordSelectionButtons,
+        ],
+      );
 
   void _rebuildOnScreenSizeChange(BuildContext context) {
     MediaQuery.of(context);
@@ -675,8 +666,9 @@ class _StyledWordListState extends State<_StyledWordList> {
       Theme.of(context).textTheme,
       widget.segments,
     ).createSpans();
-    textPainter.text = TextSpan(children: allSpans);
-    textPainter.layout(maxWidth: constraints.maxWidth);
+    textPainter
+      ..text = TextSpan(children: allSpans)
+      ..layout(maxWidth: constraints.maxWidth);
     final visible = _VisibleSegmentRange.build(
       textPainter,
       allSpans,

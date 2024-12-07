@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
+
 /// Represents an author details as seen from the library page
+@immutable
 class WorkDetailsView {
-  WorkDetailsView({
+  const WorkDetailsView({
     required this.id,
     required this.name,
     required this.about,
@@ -17,9 +20,7 @@ class WorkDetailsView {
   final String? authorName;
 
   @override
-  String toString() {
-    return 'WorkDetails{name: $name}';
-  }
+  String toString() => 'WorkDetails{name: $name}';
 
   @override
   bool operator ==(Object other) {

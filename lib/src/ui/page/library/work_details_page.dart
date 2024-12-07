@@ -12,10 +12,9 @@ class WorkDetailsPage extends ConsumerWidget {
   final String workId;
 
   @override
-  Widget build(context, ref) {
-    return ref.watch(libraryWorkDetailsProvider(workId)).when(
-          data: (workDetails) {
-            return Scaffold(
+  Widget build(context, ref) =>
+      ref.watch(libraryWorkDetailsProvider(workId)).when(
+            data: (workDetails) => Scaffold(
               appBar: AppBar(
                 title: Text(workDetails.name),
               ),
@@ -43,24 +42,22 @@ class WorkDetailsPage extends ConsumerWidget {
                   ),
                 ],
               ),
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stackTrace) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Error: $error'),
-                TextButton(
-                  onPressed: () =>
-                      ref.refresh(libraryWorkDetailsProvider(workId)),
-                  child: const Text('Retry'),
-                ),
-              ],
             ),
-          ),
-        );
-  }
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stackTrace) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error: $error'),
+                  TextButton(
+                    onPressed: () =>
+                        ref.refresh(libraryWorkDetailsProvider(workId)),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
 //
 }
 
@@ -88,7 +85,6 @@ class BookThingy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cover = Flexible(
-      flex: 1,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Center(
@@ -97,7 +93,7 @@ class BookThingy extends StatelessWidget {
       ),
     );
 
-    var basicInfo = Flexible(
+    final basicInfo = Flexible(
       flex: 2,
       child: Padding(
         padding: const EdgeInsets.all(8),
@@ -115,7 +111,6 @@ class BookThingy extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               cover,
               basicInfo,
@@ -207,41 +202,39 @@ class Details extends StatelessWidget {
   final int numberOfWords;
 
   @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BookThingy.boxConstraints,
-      child: AspectRatio(
-        aspectRatio: 3 / 2,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Number of words: $numberOfWords'),
-              ],
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FilledButton(
-                  onPressed: () => context.push('/reader/$workId'),
-                  child: const Text('Read'),
-                ),
-                if (authorId != null) ...{
-                  TextButton(
-                    //TODO: push('/author/id'), if prev stack is different author
-                    onPressed: () => context.pop(),
-                    child: const Text('Go to author'),
+  Widget build(BuildContext context) => ConstrainedBox(
+        constraints: BookThingy.boxConstraints,
+        child: AspectRatio(
+          aspectRatio: 3 / 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Number of words: $numberOfWords'),
+                ],
+              ),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FilledButton(
+                    onPressed: () async => context.push('/reader/$workId'),
+                    child: const Text('Read'),
                   ),
-                }
-              ],
-            )
-          ],
+                  if (authorId != null) ...{
+                    TextButton(
+                      // TODO(whothefluff): push('/author/id'), if prev stack is different author
+                      onPressed: () => context.pop(),
+                      child: const Text('Go to author'),
+                    ),
+                  }
+                ],
+              )
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
