@@ -1,3 +1,5 @@
+// ignore_for_file: type=lint
+
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
@@ -295,41 +297,41 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     }
     return Builder(
         builder: (BuildContext context) {
-          return Padding(
-            padding: padding,
-            child: SizedBox(
-              width: width,
-              height: MediaQuery.of(context).size.height,
-              child: LayoutBuilder(
+      return Padding(
+        padding: padding,
+        child: SizedBox(
+          width: width,
+          height: MediaQuery.of(context).size.height,
+          child: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
+              return SingleChildScrollView(
+                child: ConstrainedBox(
                       constraints:
                           BoxConstraints(minHeight: constraints.maxHeight),
-                      child: IntrinsicHeight(
-                        child: NavigationRail(
-                          labelType: labelType,
-                          leading: leading,
-                          trailing: trailing,
-                          onDestinationSelected: onDestinationSelected,
-                          groupAlignment: groupAlignment,
-                          backgroundColor: backgroundColor,
-                          extended: extended,
-                          selectedIndex: selectedIndex,
-                          selectedIconTheme: selectedIconTheme,
-                          unselectedIconTheme: unselectedIconTheme,
-                          selectedLabelTextStyle: selectedLabelTextStyle,
-                          unselectedLabelTextStyle: unSelectedLabelTextStyle,
-                          destinations: destinations,
-                        ),
-                      ),
+                  child: IntrinsicHeight(
+                    child: NavigationRail(
+                      labelType: labelType,
+                      leading: leading,
+                      trailing: trailing,
+                      onDestinationSelected: onDestinationSelected,
+                      groupAlignment: groupAlignment,
+                      backgroundColor: backgroundColor,
+                      extended: extended,
+                      selectedIndex: selectedIndex,
+                      selectedIconTheme: selectedIconTheme,
+                      unselectedIconTheme: unselectedIconTheme,
+                      selectedLabelTextStyle: selectedLabelTextStyle,
+                      unselectedLabelTextStyle: unSelectedLabelTextStyle,
+                      destinations: destinations,
                     ),
-                  );
-                },
-              ),
-            ),
-          );
-        });
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    });
   }
 
   /// Public helper method to be used for creating a [BottomNavigationBar] from
@@ -553,8 +555,8 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                 selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
                 unselectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
                 groupAlignment: widget.groupAlignment,
-                labelType: navRailTheme.labelType,              
-                ),
+                labelType: navRailTheme.labelType,
+              ),
             )
           : null,
       body: AdaptiveLayout(
@@ -570,46 +572,46 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                   ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
                         width: widget.navigationRailWidth,
                         leading: widget.leadingUnextendedNavRail,
-                trailing: widget.trailingNavRail,
-                selectedIndex: widget.selectedIndex,
-                destinations: destinations,
-                onDestinationSelected: widget.onSelectedIndexChange,
-                backgroundColor: navRailTheme.backgroundColor,
-                selectedIconTheme: navRailTheme.selectedIconTheme,
-                unselectedIconTheme: navRailTheme.unselectedIconTheme,
+                        trailing: widget.trailingNavRail,
+                        selectedIndex: widget.selectedIndex,
+                        destinations: destinations,
+                        onDestinationSelected: widget.onSelectedIndexChange,
+                        backgroundColor: navRailTheme.backgroundColor,
+                        selectedIconTheme: navRailTheme.selectedIconTheme,
+                        unselectedIconTheme: navRailTheme.unselectedIconTheme,
                 selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
                 unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
-                labelType: navRailTheme.labelType,
-                groupAlignment: widget.groupAlignment,
+                        labelType: navRailTheme.labelType,
+                        groupAlignment: widget.groupAlignment,
               ) : null,
             ),
             widget.mediumLargeBreakpoint: SlotLayout.from(
               key: const Key('primaryNavigation1'),
               builder: widget.createNavigationRail == true
                   ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
-                width: widget.extendedNavigationRailWidth,
-                extended: true,
-                leading: widget.leadingExtendedNavRail,
-                trailing: widget.trailingNavRail,
-                selectedIndex: widget.selectedIndex,
-                destinations: destinations,
-                onDestinationSelected: widget.onSelectedIndexChange,
-                backgroundColor: navRailTheme.backgroundColor,
-                selectedIconTheme: navRailTheme.selectedIconTheme,
-                unselectedIconTheme: navRailTheme.unselectedIconTheme,
+                        width: widget.extendedNavigationRailWidth,
+                        extended: true,
+                        leading: widget.leadingExtendedNavRail,
+                        trailing: widget.trailingNavRail,
+                        selectedIndex: widget.selectedIndex,
+                        destinations: destinations,
+                        onDestinationSelected: widget.onSelectedIndexChange,
+                        backgroundColor: navRailTheme.backgroundColor,
+                        selectedIconTheme: navRailTheme.selectedIconTheme,
+                        unselectedIconTheme: navRailTheme.unselectedIconTheme,
                 selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
                 unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
-                labelType: navRailTheme.labelType,
-                groupAlignment: widget.groupAlignment,
+                        labelType: navRailTheme.labelType,
+                        groupAlignment: widget.groupAlignment,
               ) : null,
             ),
             widget.largeBreakpoint: SlotLayout.from(
               key: const Key('primaryNavigation2'),
               builder: widget.createNavigationRail == true
                   ? (_) => CustomAdaptiveScaffold.standardNavigationRail(
-                width: widget.extendedNavigationRailWidth,
-                extended: true,
-                leading: widget.leadingExtendedNavRail,
+                        width: widget.extendedNavigationRailWidth,
+                        extended: true,
+                        leading: widget.leadingExtendedNavRail,
                         trailing: widget.trailingNavRail,
                         selectedIndex: widget.selectedIndex,
                         destinations: widget.destinations
@@ -703,13 +705,13 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
             if (widget.mediumLargeBody != null)
               widget.mediumLargeBreakpoint:
                   (widget.mediumLargeBody != CustomAdaptiveScaffold.emptyBuilder)
-                      ? SlotLayout.from(
-                          key: const Key('mediumLargeBody'),
-                          inAnimation: CustomAdaptiveScaffold.fadeIn,
-                          outAnimation: CustomAdaptiveScaffold.fadeOut,
-                          builder: widget.mediumLargeBody,
-                        )
-                      : null,
+                  ? SlotLayout.from(
+                      key: const Key('mediumLargeBody'),
+                      inAnimation: CustomAdaptiveScaffold.fadeIn,
+                      outAnimation: CustomAdaptiveScaffold.fadeOut,
+                      builder: widget.mediumLargeBody,
+                    )
+                  : null,
             if (widget.largeBody != null)
               widget.largeBreakpoint:
                   (widget.largeBody != CustomAdaptiveScaffold.emptyBuilder)
@@ -764,8 +766,8 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                       key: const Key('mediumLargeSBody'),
                       outAnimation: CustomAdaptiveScaffold.stayOnScreen,
                       builder: widget.mediumLargeSecondaryBody,
-                        )
-                      : null,
+                    )
+                  : null,
             if (widget.largeSecondaryBody != null)
               widget.largeBreakpoint: (widget.largeSecondaryBody !=
                       CustomAdaptiveScaffold.emptyBuilder)

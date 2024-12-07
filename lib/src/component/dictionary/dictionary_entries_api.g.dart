@@ -6,7 +6,7 @@ part of 'dictionary_entries_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dictionaryEntriesHash() => r'd5cc7e31627b079b3f51224a087170836946e9a1';
+String _$dictionaryEntriesHash() => r'aca1a064c138de720d8dd7a55d451356ffb6e050';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
+
+@immutable
 class WorkContentsSegment {
-  WorkContentsSegment({
+  const WorkContentsSegment({
     required this.index,
     required this.value,
     required this.sourceReference,
@@ -10,9 +13,8 @@ class WorkContentsSegment {
   final String sourceReference;
 
   @override
-  String toString() {
-    return 'WorkContentsSegment{ref: $sourceReference, idx: $index}';
-  }
+  String toString() =>
+      'WorkContentsSegment{ref: $sourceReference, idx: $index}';
 
   @override
   bool operator ==(Object other) {

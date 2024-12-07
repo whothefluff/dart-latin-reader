@@ -1,8 +1,10 @@
-import 'package:latin_reader/src/component/library/use_case/entity/authors.dart';
+import 'package:flutter/foundation.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/abbreviations.dart';
+import 'package:latin_reader/src/component/library/use_case/entity/authors.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/work_contents.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/works.dart';
 
+@immutable
 class Work {
   Work({
     required this.id,
@@ -11,16 +13,16 @@ class Work {
     Abbreviations? abbreviations,
     Authors? authors,
     WorkContents? contents,
-  })  : _abbreviations = abbreviations ?? Abbreviations(list: []),
-        _authors = authors ?? Authors(list: []),
-        _contents = contents ?? WorkContents(list: []);
+  })  : _abbreviations = abbreviations ?? Abbreviations(list: const []),
+        _authors = authors ?? Authors(list: const []),
+        _contents = contents ?? WorkContents(list: const []);
 
   final String id;
   final String name;
   final String about;
-  Abbreviations _abbreviations;
-  Authors _authors;
-  WorkContents _contents;
+  late final Abbreviations _abbreviations;
+  late final Authors _authors;
+  late final WorkContents _contents;
 
   Abbreviations get abbreviations => _abbreviations;
 
@@ -54,9 +56,7 @@ class Work {
   }
 
   @override
-  String toString() {
-    return 'Work{name: $name}';
-  }
+  String toString() => 'Work{name: $name}';
 
   @override
   bool operator ==(Object other) {

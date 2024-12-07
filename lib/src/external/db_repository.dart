@@ -32,11 +32,11 @@ class AuthorRepository implements i.AuthorRepository {
         name: firstLine.name,
         about: firstLine.about,
         image: firstLine.image,
-        works: UnmodifiableListView(dbAuthorDetails.map((e) => ((
+        works: UnmodifiableListView(dbAuthorDetails.map((e) => (
               id: e.workId,
               name: e.workName,
               numberOfWords: e.numberOfWords,
-            )))));
+            ))));
   }
 //
 }

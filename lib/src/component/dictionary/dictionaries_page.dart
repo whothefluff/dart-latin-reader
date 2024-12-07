@@ -11,24 +11,21 @@ class DictionariesPage extends ConsumerWidget {
   const DictionariesPage({super.key});
 
   @override
-  Widget build(context, ref) {
-    return Scaffold(
-      appBar: SearchableAppBar(
-        onFilterPressed: () {},
-        onSortPressed: () {},
-        onSettingsPressed: () {
-          context.push('/settings');
-        },
-        searchSuggestionsBuilder: (context, controller) async => [],
-      ),
-      body: dictionariesList(ref),
-    );
-  }
+  Widget build(context, ref) => Scaffold(
+        appBar: SearchableAppBar(
+          onFilterPressed: () {},
+          onSortPressed: () {},
+          onSettingsPressed: () async {
+            await context.push('/settings');
+          },
+          searchSuggestionsBuilder: (context, controller) async => [],
+        ),
+        body: dictionariesList(ref),
+      );
 
-  Widget dictionariesList(WidgetRef ref) {
-    return ref.watch(dictionariesProvider).when(
-          data: (dictionaries) {
-            return ListView.builder(
+  Widget dictionariesList(WidgetRef ref) =>
+      ref.watch(dictionariesProvider).when(
+            data: (dictionaries) => ListView.builder(
               itemCount: dictionaries.length,
               itemBuilder: (context, index) {
                 final entriesData = Text(
@@ -48,24 +45,23 @@ class DictionariesPage extends ConsumerWidget {
                   title: nameAndEntries,
                   subtitle: publisherData,
                   isThreeLine: true,
-                  onTap: () {
-                    context.push('/dictionaries/${dictionaries[index].id}');
+                  onTap: () async {
+                    await context
+                        .push('/dictionaries/${dictionaries[index].id}');
                   },
                 );
               },
-            );
-          },
-          loading: showLoading,
-          error: showError(ref, dictionariesProvider),
-        );
-  }
+            ),
+            loading: showLoading,
+            error: showError(ref, dictionariesProvider),
+          );
 
   double _tWidth(String text, TextStyle style) {
-    final TextPainter textPainter = TextPainter(
+    final textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
       maxLines: 1,
       textDirection: TextDirection.ltr,
-    )..layout(minWidth: 0, maxWidth: double.infinity);
+    )..layout();
     return textPainter.width;
   }
 

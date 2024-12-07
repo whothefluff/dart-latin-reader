@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/external/database.dart';
@@ -18,7 +19,7 @@ Future<UnmodifiableListView<Entry>> dictionaryEntries(
   log.info(() => '@riverpod - dictionaryEntries');
   final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 2));
-  return await GetEntriesUseCase(DictionaryRepository(db), dictionary).invoke();
+  return GetEntriesUseCase(DictionaryRepository(db), dictionary).invoke();
 }
 
 class DictionaryRepository implements IDictionaryRepository {
@@ -55,7 +56,7 @@ class GetEntriesUseCase implements IGetEntriesUseCase {
 
   @override
   Future<UnmodifiableListView<Entry>> invoke() async =>
-      await _repository.getEntriesOf(_dictionary);
+      _repository.getEntriesOf(_dictionary);
 //
 }
 
@@ -67,8 +68,9 @@ abstract interface class IGetEntriesUseCase {
 //
 }
 
+@immutable
 class Entry {
-  Entry({
+  const Entry({
     required this.dictionary,
     required this.lemma,
     required this.inflection,
@@ -83,9 +85,7 @@ class Entry {
   final int numberOfSenses;
 
   @override
-  String toString() {
-    return 'DictionaryEntry{lemma: $lemma}';
-  }
+  String toString() => 'DictionaryEntry{lemma: $lemma}';
 
   @override
   bool operator ==(Object other) {

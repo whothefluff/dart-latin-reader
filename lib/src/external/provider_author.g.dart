@@ -6,7 +6,7 @@ part of 'provider_author.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$libraryAuthorsHash() => r'00052032568c17e3a407f1c266ca94c7354258b4';
+String _$libraryAuthorsHash() => r'4f3a0a8e35936be354427955669e0d1249d7ebe6';
 
 /// See also [libraryAuthors].
 @ProviderFor(libraryAuthors)
@@ -26,7 +26,7 @@ final libraryAuthorsProvider =
 typedef LibraryAuthorsRef
     = AutoDisposeFutureProviderRef<UnmodifiableListView<AuthorView>>;
 String _$libraryAuthorDetailsHash() =>
-    r'2b34aaa53aec4fc75f6f31a590299d35fe4810d6';
+    r'bbede3436ecc2de7e4e50eca8a21a797d49acbc5';
 
 /// Copied from Dart SDK
 class _SystemHash {

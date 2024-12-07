@@ -4,17 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 Widget Function(Object error, StackTrace _) showError(
   WidgetRef ref,
   ProviderBase<Object> provider,
-) {
-  return (Object e, StackTrace _) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(e.toString()),
-            TextButton(
-              onPressed: () => ref.refresh(provider),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
-}
+) =>
+    (e, _) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(e.toString()),
+              TextButton(
+                onPressed: () => ref.refresh(provider),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        );

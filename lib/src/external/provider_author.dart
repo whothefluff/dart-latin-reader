@@ -19,7 +19,7 @@ Future<UnmodifiableListView<AuthorView>> libraryAuthors(Ref ref) async {
   final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 2));
   final repo = AuthorRepository(db);
-  return await GetLibraryAuthorsUseCase(repo).invoke();
+  return GetLibraryAuthorsUseCase(repo).invoke();
 }
 
 @riverpod
@@ -27,6 +27,5 @@ Future<AuthorDetailsView> libraryAuthorDetails(Ref ref, String id) async {
   log.info(() => '@riverpod - libraryAuthorDetails');
   final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 2));
-  return await GetLibraryAuthorDetailsUseCase(AuthorRepository(db), id)
-      .invoke();
+  return GetLibraryAuthorDetailsUseCase(AuthorRepository(db), id).invoke();
 }

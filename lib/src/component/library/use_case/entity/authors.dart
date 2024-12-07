@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/author.dart';
 
+@immutable
 class Authors {
   Authors({
     required List<Author> list,
@@ -11,9 +13,7 @@ class Authors {
   UnmodifiableListView<Author> list() => _list;
 
   @override
-  String toString() {
-    return 'Authors{${list().join(',')}}';
-  }
+  String toString() => 'Authors{${list().join(',')}}';
 
   @override
   bool operator ==(Object other) {

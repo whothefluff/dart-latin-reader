@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
+
+@immutable
 class WorkContentSupplementaryEntry {
-  WorkContentSupplementaryEntry({
+  const WorkContentSupplementaryEntry({
     required this.id,
     required this.fromIndex,
     required this.toIndex,
@@ -12,9 +15,7 @@ class WorkContentSupplementaryEntry {
   final String value;
 
   @override
-  String toString() {
-    return 'WorkNote{value: $value}';
-  }
+  String toString() => 'WorkNote{value: $value}';
 
   @override
   bool operator ==(Object other) {

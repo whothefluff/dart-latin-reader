@@ -7,7 +7,7 @@ part of 'provider_work.dart';
 // **************************************************************************
 
 String _$libraryWorkDetailsHash() =>
-    r'0925834f747c8c24f3e4b4b74cb5f5ae9e273f67';
+    r'424e01227f57f420e871c8abb2c1f94949e857df';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -161,7 +161,7 @@ class _LibraryWorkDetailsProviderElement
 }
 
 String _$libraryWorkContentsPartiallyHash() =>
-    r'c3421277e1e48d89e23779883426a413c5065377';
+    r'ec66616fc8f0dca84e054ca4c04a0067fb843c2e';
 
 /// See also [libraryWorkContentsPartially].
 @ProviderFor(libraryWorkContentsPartially)

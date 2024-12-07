@@ -1,14 +1,15 @@
+import 'package:flutter/foundation.dart';
+
+@immutable
 class Abbreviation {
-  Abbreviation({
+  const Abbreviation({
     required this.value,
   });
 
   final String value;
 
   @override
-  String toString() {
-    return 'Abbreviation{value: $value}';
-  }
+  String toString() => 'Abbreviation{value: $value}';
 
   @override
   bool operator ==(Object other) {

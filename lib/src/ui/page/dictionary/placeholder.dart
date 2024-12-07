@@ -6,14 +6,12 @@ class PlaceholderDict extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: const Center(
-        child: Text('Placeholder'),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: const Center(
+          child: Text('Placeholder'),
+        ),
+      );
 }

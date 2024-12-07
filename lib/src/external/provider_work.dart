@@ -18,7 +18,7 @@ Future<WorkDetailsView> libraryWorkDetails(Ref ref, String id) async {
   log.info(() => '@riverpod - libraryWorkDetails');
   final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 2));
-  return await GetLibraryWorkDetailsUseCase(WorkRepository(db), id).invoke();
+  return GetLibraryWorkDetailsUseCase(WorkRepository(db), id).invoke();
 }
 
 @riverpod
@@ -28,7 +28,7 @@ Future<UnmodifiableListView<WorkContentsElementView>>
   log.info(() => '@riverpod - libraryWorkContentsPartially');
   final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 3));
-  return await GetLibraryWorkContentsPartiallyUseCase(
+  return GetLibraryWorkContentsPartiallyUseCase(
           WorkRepository(db), id, fromIndex, toIndex)
       .invoke();
 }

@@ -1,9 +1,9 @@
 import 'dart:collection';
 
+import 'package:latin_reader/src/component/library/repository_work.dart' as i;
 import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
 import 'package:latin_reader/src/component/library/use_case/get_library_work_content_partially.dart'
     as i;
-import 'package:latin_reader/src/component/library/repository_work.dart' as i;
 
 class GetLibraryWorkContentsPartiallyUseCase
     implements i.GetLibraryWorkContentPartiallyUseCase {
@@ -21,7 +21,6 @@ class GetLibraryWorkContentsPartiallyUseCase
 
   @override
   Future<UnmodifiableListView<WorkContentsElementView>> invoke() async =>
-      await _repository.getLibraryWorkContentsPartially(
-          _id, _fromIndex, _toIndex);
+      _repository.getLibraryWorkContentsPartially(_id, _fromIndex, _toIndex);
 //
 }

@@ -1,8 +1,9 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/abbreviations.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/authors.dart';
 import 'package:latin_reader/src/component/library/use_case/entity/works.dart';
 
+@immutable
 class Author {
   Author({
     required this.id,
@@ -11,15 +12,15 @@ class Author {
     required this.image,
     Abbreviations? abbreviations,
     Works? works,
-  })  : _abbreviations = abbreviations ?? Abbreviations(list: []),
-        _works = works ?? Works(list: []);
+  })  : _abbreviations = abbreviations ?? Abbreviations(list: const []),
+        _works = works ?? Works(list: const []);
 
   final String id;
   final String name;
   final String about;
   final Uint8List image;
-  Abbreviations _abbreviations;
-  Works _works;
+  late final Abbreviations _abbreviations;
+  late final Works _works;
 
   Abbreviations get abbreviations => _abbreviations;
 
@@ -43,9 +44,7 @@ class Author {
   }
 
   @override
-  String toString() {
-    return 'Author{name: $name}';
-  }
+  String toString() => 'Author{name: $name}';
 
   @override
   bool operator ==(Object other) {

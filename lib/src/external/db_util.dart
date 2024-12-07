@@ -18,8 +18,8 @@ void setupRegExp(Database db) {
     functionName: 'regexp',
     argumentCount: const AllowedArgumentCount(2),
     function: (args) {
-      final regexPattern = args[0] as String;
-      final input = args[1] as String;
+      final regexPattern = args[0]! as String;
+      final input = args[1]! as String;
       return RegExp(regexPattern).hasMatch(input) ? 1 : 0;
     },
   );
@@ -37,7 +37,7 @@ Future<bool> shouldPopulate(AppDb db) async {
 }
 
 Future<int> getDbDataVersion(AppDb db) async {
-  var latest = await db.getLatestDataVersion();
+  final latest = await db.getLatestDataVersion();
   return latest?.idx ?? 0;
 }
 
@@ -192,15 +192,16 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
     ...dict_util.operations
   ];
   await db.transaction(() async {
-    await operations.fold(Future<void>.value(null),
-        (previousFuture, operation) {
-      return previousFuture.then((_) async {
-        log.info(() => 'populateDatabaseFromCsv() - deleting ${operation.id}');
-        await operation.delete(db);
-        log.info(() => 'populateDatabaseFromCsv() - inserting ${operation.id}');
-        await operation.insert(db);
-      });
-    });
+    await operations.fold(
+        Future<void>.value(),
+        (previousFuture, operation) => previousFuture.then((_) async {
+              log.info(
+                  () => 'populateDatabaseFromCsv() - deleting ${operation.id}');
+              await operation.delete(db);
+              log.info(() =>
+                  'populateDatabaseFromCsv() - inserting ${operation.id}');
+              await operation.insert(db);
+            }));
   });
 }
 
