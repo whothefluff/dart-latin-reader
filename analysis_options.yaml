@@ -127,9 +127,14 @@ linter:
     - unnecessary_null_checks
     - use_late_for_private_fields_and_variables
 
+
+
 analyzer:
   # Additional information about this file can be found at
   # https://dart.dev/guides/language/analysis-options
+
+  errors:
+    unnecessary_this: ignore
   plugins:
     - custom_lint
     # - drift more than one plugins not allowed
