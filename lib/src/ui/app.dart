@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/component/dictionary/dictionaries_page.dart';
 import 'package:latin_reader/src/component/dictionary/dictionary_entries_page.dart';
+import 'package:latin_reader/src/component/dictionary/dictionary_entry_page.dart';
 import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
@@ -69,14 +70,27 @@ const _dictionariesDest = NavigationDestination(
 final _dictionaryRoutes = [
   GoRoute(
     path: '/dictionaries',
-    builder: (context, state) => const DictionariesPage(),
+    pageBuilder: (context, state) =>
+        const MaterialPage(child: DictionariesPage()),
     routes: [
       GoRoute(
         path: ':id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
-          return DictionaryEntriesPage(dictionaryId: id);
+          return MaterialPage(child: DictionaryEntriesPage(dictionaryId: id));
         },
+        routes: [
+          GoRoute(
+            path: 'entries/:lemma',
+            pageBuilder: (context, state) {
+              final dictionaryId = state.pathParameters['id']!;
+              final lemma = state.pathParameters['lemma']!;
+              return MaterialPage(
+                child: DictionaryEntryPage(dictionaryId, lemma),
+              );
+            },
+          ),
+        ],
       ),
     ],
   ),
