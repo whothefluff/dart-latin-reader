@@ -14,11 +14,24 @@ WITHOUT ROWID;
 
 CREATE TABLE "DictionaryEntries" (
     "dictionary" TEXT NOT NULL,
-    "lemma" TEXT NOT NULL,
+    "lemma" TEXT NOT NULL, --not primary key but should still used to join with DictEntrySenses
     "partOfSpeech" TEXT,
     "inflection" TEXT,
-    PRIMARY KEY( dictionary, lemma ),
-    FOREIGN KEY( dictionary ) REFERENCES Dictionaries( id )
+    "idx" INTEGER NOT NULL CHECK( idx >= 0 ),
+    PRIMARY KEY( dictionary, idx ), -- idx is the order of the entry in the dictionary
+    FOREIGN KEY( dictionary ) REFERENCES Dictionaries( id ),
+    UNIQUE( lemma, dictionary ) --should create an index to filter dictionaries by lemma
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE TABLE "DictionaryAlphabets" (
+    "dictionary" TEXT NOT NULL,
+    "letter" TEXT NOT NULL,
+    "firstEntryIndex" INTEGER NOT NULL,
+    PRIMARY KEY( dictionary, letter ),
+    FOREIGN KEY( dictionary, firstEntryIndex ) REFERENCES DictionaryEntries( dictionary, idx ),
+    UNIQUE( dictionary, firstEntryIndex )
 )
 STRICT,
 WITHOUT ROWID;
@@ -30,7 +43,7 @@ CREATE TABLE "DictEntrySenses" (
     "prettyLevel" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     PRIMARY KEY( dictionary, lemma, lvl ),
-    FOREIGN KEY( dictionary, lemma ) REFERENCES DictionaryEntries( dictionary, lemma )
+    FOREIGN KEY( lemma, dictionary ) REFERENCES DictionaryEntries( lemma, dictionary ) -- matches the modified foreign key
 )
 STRICT,
 WITHOUT ROWID;
@@ -47,6 +60,8 @@ CREATE TABLE "DictEntrySenseQuotes" (
 )
 STRICT,
 WITHOUT ROWID;
+
+fillDictionaryAlphabets: INSERT INTO "DictionaryAlphabets" SELECT dictionary, UPPER( SUBSTR( lemma, 1, 1 ) ), MIN( idx ) FROM DictionaryEntries GROUP BY dictionary, UPPER( SUBSTR( lemma, 1, 1 ) );
 
 CREATE VIEW "dictionary.Dictionaries" AS
     SELECT Dictionaries.*,
@@ -71,6 +86,33 @@ CREATE VIEW "dictionary.DictionaryEntries" AS
                               WHERE lvl BETWEEN '000' AND '999'
                               GROUP BY dictionary, lemma ) AS SenseCounts
             ON DictionaryEntries.dictionary = SenseCounts.dictionary
-               AND DictionaryEntries.lemma = SenseCounts.lemma;
+               AND DictionaryEntries.lemma = SenseCounts.lemma
+        ORDER BY DictionaryEntries.dictionary, DictionaryEntries.idx;
 
 getDictionaryEntries WITH Entry: SELECT * FROM "dictionary.DictionaryEntries" WHERE dictionary = ?;
+
+getDictionaryAlphabetLetterPosition: SELECT firstEntryIndex FROM "DictionaryAlphabets" WHERE dictionary = ? AND letter = ? LIMIT 1;
+
+-- CREATE VIRTUAL TABLE SearchableDictionaryEntries USING fts5(
+--     lemma,
+--     dictionary UNINDEXED
+-- );
+
+-- INSERT INTO SearchableDictionaryEntries 
+--     SELECT lemma, 
+--            dictionary 
+--         FROM DictionaryEntries;
+
+-- INSERT INTO SearchableDictionaryEntries( SearchableDictionaryEntries ) 
+--     VALUES('optimize');
+
+-- searchEntries: SELECT dictionary, lemma FROM SearchableDictionaryEntries(?);
+
+-- searchDictionaryEntries:
+--     SELECT DictionaryEntries.dictionary, 
+--            DictionaryEntries.lemma
+--         FROM SearchableDictionaryEntries(?)
+--         INNER JOIN DictionaryEntries 
+--             ON SearchableDictionaryEntries.lemma = DictionaryEntries.lemma 
+--                AND SearchableDictionaryEntries.dictionary = DictionaryEntries.dictionary
+--                AND DictionaryEntries.dictionary = ?;
