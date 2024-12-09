@@ -185,6 +185,7 @@ typedef $DictionaryEntriesCreateCompanionBuilder = i1.DictionaryEntriesCompanion
   required String lemma,
   i0.Value<String?> partOfSpeech,
   i0.Value<String?> inflection,
+  required int idx,
 });
 typedef $DictionaryEntriesUpdateCompanionBuilder = i1.DictionaryEntriesCompanion
     Function({
@@ -192,6 +193,7 @@ typedef $DictionaryEntriesUpdateCompanionBuilder = i1.DictionaryEntriesCompanion
   i0.Value<String> lemma,
   i0.Value<String?> partOfSpeech,
   i0.Value<String?> inflection,
+  i0.Value<int> idx,
 });
 
 class $DictionaryEntriesFilterComposer
@@ -215,6 +217,9 @@ class $DictionaryEntriesFilterComposer
 
   i0.ColumnFilters<String> get inflection => $composableBuilder(
       column: $table.inflection, builder: (column) => i0.ColumnFilters(column));
+
+  i0.ColumnFilters<int> get idx => $composableBuilder(
+      column: $table.idx, builder: (column) => i0.ColumnFilters(column));
 }
 
 class $DictionaryEntriesOrderingComposer
@@ -240,6 +245,9 @@ class $DictionaryEntriesOrderingComposer
   i0.ColumnOrderings<String> get inflection => $composableBuilder(
       column: $table.inflection,
       builder: (column) => i0.ColumnOrderings(column));
+
+  i0.ColumnOrderings<int> get idx => $composableBuilder(
+      column: $table.idx, builder: (column) => i0.ColumnOrderings(column));
 }
 
 class $DictionaryEntriesAnnotationComposer
@@ -262,6 +270,9 @@ class $DictionaryEntriesAnnotationComposer
 
   i0.GeneratedColumn<String> get inflection => $composableBuilder(
       column: $table.inflection, builder: (column) => column);
+
+  i0.GeneratedColumn<int> get idx =>
+      $composableBuilder(column: $table.idx, builder: (column) => column);
 }
 
 class $DictionaryEntriesTableManager extends i0.RootTableManager<
@@ -296,24 +307,28 @@ class $DictionaryEntriesTableManager extends i0.RootTableManager<
             i0.Value<String> lemma = const i0.Value.absent(),
             i0.Value<String?> partOfSpeech = const i0.Value.absent(),
             i0.Value<String?> inflection = const i0.Value.absent(),
+            i0.Value<int> idx = const i0.Value.absent(),
           }) =>
               i1.DictionaryEntriesCompanion(
             dictionary: dictionary,
             lemma: lemma,
             partOfSpeech: partOfSpeech,
             inflection: inflection,
+            idx: idx,
           ),
           createCompanionCallback: ({
             required String dictionary,
             required String lemma,
             i0.Value<String?> partOfSpeech = const i0.Value.absent(),
             i0.Value<String?> inflection = const i0.Value.absent(),
+            required int idx,
           }) =>
               i1.DictionaryEntriesCompanion.insert(
             dictionary: dictionary,
             lemma: lemma,
             partOfSpeech: partOfSpeech,
             inflection: inflection,
+            idx: idx,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -337,6 +352,149 @@ typedef $DictionaryEntriesProcessedTableManager = i0.ProcessedTableManager<
           i1.DictionaryEntry>
     ),
     i1.DictionaryEntry,
+    i0.PrefetchHooks Function()>;
+typedef $DictionaryAlphabetsCreateCompanionBuilder
+    = i1.DictionaryAlphabetsCompanion Function({
+  required String dictionary,
+  required String letter,
+  required int firstEntryIndex,
+});
+typedef $DictionaryAlphabetsUpdateCompanionBuilder
+    = i1.DictionaryAlphabetsCompanion Function({
+  i0.Value<String> dictionary,
+  i0.Value<String> letter,
+  i0.Value<int> firstEntryIndex,
+});
+
+class $DictionaryAlphabetsFilterComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.DictionaryAlphabets> {
+  $DictionaryAlphabetsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnFilters<String> get dictionary => $composableBuilder(
+      column: $table.dictionary, builder: (column) => i0.ColumnFilters(column));
+
+  i0.ColumnFilters<String> get letter => $composableBuilder(
+      column: $table.letter, builder: (column) => i0.ColumnFilters(column));
+
+  i0.ColumnFilters<int> get firstEntryIndex => $composableBuilder(
+      column: $table.firstEntryIndex,
+      builder: (column) => i0.ColumnFilters(column));
+}
+
+class $DictionaryAlphabetsOrderingComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.DictionaryAlphabets> {
+  $DictionaryAlphabetsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnOrderings<String> get dictionary => $composableBuilder(
+      column: $table.dictionary,
+      builder: (column) => i0.ColumnOrderings(column));
+
+  i0.ColumnOrderings<String> get letter => $composableBuilder(
+      column: $table.letter, builder: (column) => i0.ColumnOrderings(column));
+
+  i0.ColumnOrderings<int> get firstEntryIndex => $composableBuilder(
+      column: $table.firstEntryIndex,
+      builder: (column) => i0.ColumnOrderings(column));
+}
+
+class $DictionaryAlphabetsAnnotationComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.DictionaryAlphabets> {
+  $DictionaryAlphabetsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.GeneratedColumn<String> get dictionary => $composableBuilder(
+      column: $table.dictionary, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get letter =>
+      $composableBuilder(column: $table.letter, builder: (column) => column);
+
+  i0.GeneratedColumn<int> get firstEntryIndex => $composableBuilder(
+      column: $table.firstEntryIndex, builder: (column) => column);
+}
+
+class $DictionaryAlphabetsTableManager extends i0.RootTableManager<
+    i0.GeneratedDatabase,
+    i1.DictionaryAlphabets,
+    i1.DictionaryAlphabet,
+    i1.$DictionaryAlphabetsFilterComposer,
+    i1.$DictionaryAlphabetsOrderingComposer,
+    i1.$DictionaryAlphabetsAnnotationComposer,
+    $DictionaryAlphabetsCreateCompanionBuilder,
+    $DictionaryAlphabetsUpdateCompanionBuilder,
+    (
+      i1.DictionaryAlphabet,
+      i0.BaseReferences<i0.GeneratedDatabase, i1.DictionaryAlphabets,
+          i1.DictionaryAlphabet>
+    ),
+    i1.DictionaryAlphabet,
+    i0.PrefetchHooks Function()> {
+  $DictionaryAlphabetsTableManager(
+      i0.GeneratedDatabase db, i1.DictionaryAlphabets table)
+      : super(i0.TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              i1.$DictionaryAlphabetsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              i1.$DictionaryAlphabetsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              i1.$DictionaryAlphabetsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            i0.Value<String> dictionary = const i0.Value.absent(),
+            i0.Value<String> letter = const i0.Value.absent(),
+            i0.Value<int> firstEntryIndex = const i0.Value.absent(),
+          }) =>
+              i1.DictionaryAlphabetsCompanion(
+            dictionary: dictionary,
+            letter: letter,
+            firstEntryIndex: firstEntryIndex,
+          ),
+          createCompanionCallback: ({
+            required String dictionary,
+            required String letter,
+            required int firstEntryIndex,
+          }) =>
+              i1.DictionaryAlphabetsCompanion.insert(
+            dictionary: dictionary,
+            letter: letter,
+            firstEntryIndex: firstEntryIndex,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $DictionaryAlphabetsProcessedTableManager = i0.ProcessedTableManager<
+    i0.GeneratedDatabase,
+    i1.DictionaryAlphabets,
+    i1.DictionaryAlphabet,
+    i1.$DictionaryAlphabetsFilterComposer,
+    i1.$DictionaryAlphabetsOrderingComposer,
+    i1.$DictionaryAlphabetsAnnotationComposer,
+    $DictionaryAlphabetsCreateCompanionBuilder,
+    $DictionaryAlphabetsUpdateCompanionBuilder,
+    (
+      i1.DictionaryAlphabet,
+      i0.BaseReferences<i0.GeneratedDatabase, i1.DictionaryAlphabets,
+          i1.DictionaryAlphabet>
+    ),
+    i1.DictionaryAlphabet,
     i0.PrefetchHooks Function()>;
 typedef $DictEntrySensesCreateCompanionBuilder = i1.DictEntrySensesCompanion
     Function({
@@ -1053,9 +1211,15 @@ class DictionaryEntries extends i0.Table
       type: i0.DriftSqlType.string,
       requiredDuringInsert: false,
       $customConstraints: '');
+  static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
+      'idx', aliasedName, false,
+      type: i0.DriftSqlType.int,
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL CHECK (idx >= 0)');
   @override
   List<i0.GeneratedColumn> get $columns =>
-      [dictionary, lemma, partOfSpeech, inflection];
+      [dictionary, lemma, partOfSpeech, inflection, idx];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1093,11 +1257,21 @@ class DictionaryEntries extends i0.Table
           inflection.isAcceptableOrUnknown(
               data['inflection']!, _inflectionMeta));
     }
+    if (data.containsKey('idx')) {
+      context.handle(
+          _idxMeta, idx.isAcceptableOrUnknown(data['idx']!, _idxMeta));
+    } else if (isInserting) {
+      context.missing(_idxMeta);
+    }
     return context;
   }
 
   @override
-  Set<i0.GeneratedColumn> get $primaryKey => {dictionary, lemma};
+  Set<i0.GeneratedColumn> get $primaryKey => {dictionary, idx};
+  @override
+  List<Set<i0.GeneratedColumn>> get uniqueKeys => [
+        {lemma, dictionary},
+      ];
   @override
   i1.DictionaryEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1110,6 +1284,8 @@ class DictionaryEntries extends i0.Table
           .read(i0.DriftSqlType.string, data['${effectivePrefix}partOfSpeech']),
       inflection: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.string, data['${effectivePrefix}inflection']),
+      idx: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.int, data['${effectivePrefix}idx'])!,
     );
   }
 
@@ -1124,8 +1300,9 @@ class DictionaryEntries extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(dictionary, lemma)',
-        'FOREIGN KEY(dictionary)REFERENCES Dictionaries(id)'
+        'PRIMARY KEY(dictionary, idx)',
+        'FOREIGN KEY(dictionary)REFERENCES Dictionaries(id)',
+        'UNIQUE(lemma, dictionary)'
       ];
   @override
   bool get dontWriteConstraints => true;
@@ -1135,13 +1312,17 @@ class DictionaryEntry extends i0.DataClass
     implements i0.Insertable<i1.DictionaryEntry> {
   final String dictionary;
   final String lemma;
+
+  ///not primary key but should still used to join with DictEntrySenses
   final String? partOfSpeech;
   final String? inflection;
+  final int idx;
   const DictionaryEntry(
       {required this.dictionary,
       required this.lemma,
       this.partOfSpeech,
-      this.inflection});
+      this.inflection,
+      required this.idx});
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -1153,6 +1334,7 @@ class DictionaryEntry extends i0.DataClass
     if (!nullToAbsent || inflection != null) {
       map['inflection'] = i0.Variable<String>(inflection);
     }
+    map['idx'] = i0.Variable<int>(idx);
     return map;
   }
 
@@ -1166,6 +1348,7 @@ class DictionaryEntry extends i0.DataClass
       inflection: inflection == null && nullToAbsent
           ? const i0.Value.absent()
           : i0.Value(inflection),
+      idx: i0.Value(idx),
     );
   }
 
@@ -1177,6 +1360,7 @@ class DictionaryEntry extends i0.DataClass
       lemma: serializer.fromJson<String>(json['lemma']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
       inflection: serializer.fromJson<String?>(json['inflection']),
+      idx: serializer.fromJson<int>(json['idx']),
     );
   }
   @override
@@ -1187,6 +1371,7 @@ class DictionaryEntry extends i0.DataClass
       'lemma': serializer.toJson<String>(lemma),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
       'inflection': serializer.toJson<String?>(inflection),
+      'idx': serializer.toJson<int>(idx),
     };
   }
 
@@ -1194,13 +1379,15 @@ class DictionaryEntry extends i0.DataClass
           {String? dictionary,
           String? lemma,
           i0.Value<String?> partOfSpeech = const i0.Value.absent(),
-          i0.Value<String?> inflection = const i0.Value.absent()}) =>
+          i0.Value<String?> inflection = const i0.Value.absent(),
+          int? idx}) =>
       i1.DictionaryEntry(
         dictionary: dictionary ?? this.dictionary,
         lemma: lemma ?? this.lemma,
         partOfSpeech:
             partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
         inflection: inflection.present ? inflection.value : this.inflection,
+        idx: idx ?? this.idx,
       );
   DictionaryEntry copyWithCompanion(i1.DictionaryEntriesCompanion data) {
     return DictionaryEntry(
@@ -1212,6 +1399,7 @@ class DictionaryEntry extends i0.DataClass
           : this.partOfSpeech,
       inflection:
           data.inflection.present ? data.inflection.value : this.inflection,
+      idx: data.idx.present ? data.idx.value : this.idx,
     );
   }
 
@@ -1221,13 +1409,15 @@ class DictionaryEntry extends i0.DataClass
           ..write('dictionary: $dictionary, ')
           ..write('lemma: $lemma, ')
           ..write('partOfSpeech: $partOfSpeech, ')
-          ..write('inflection: $inflection')
+          ..write('inflection: $inflection, ')
+          ..write('idx: $idx')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(dictionary, lemma, partOfSpeech, inflection);
+  int get hashCode =>
+      Object.hash(dictionary, lemma, partOfSpeech, inflection, idx);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1235,7 +1425,8 @@ class DictionaryEntry extends i0.DataClass
           other.dictionary == this.dictionary &&
           other.lemma == this.lemma &&
           other.partOfSpeech == this.partOfSpeech &&
-          other.inflection == this.inflection);
+          other.inflection == this.inflection &&
+          other.idx == this.idx);
 }
 
 class DictionaryEntriesCompanion
@@ -1244,30 +1435,36 @@ class DictionaryEntriesCompanion
   final i0.Value<String> lemma;
   final i0.Value<String?> partOfSpeech;
   final i0.Value<String?> inflection;
+  final i0.Value<int> idx;
   const DictionaryEntriesCompanion({
     this.dictionary = const i0.Value.absent(),
     this.lemma = const i0.Value.absent(),
     this.partOfSpeech = const i0.Value.absent(),
     this.inflection = const i0.Value.absent(),
+    this.idx = const i0.Value.absent(),
   });
   DictionaryEntriesCompanion.insert({
     required String dictionary,
     required String lemma,
     this.partOfSpeech = const i0.Value.absent(),
     this.inflection = const i0.Value.absent(),
+    required int idx,
   })  : dictionary = i0.Value(dictionary),
-        lemma = i0.Value(lemma);
+        lemma = i0.Value(lemma),
+        idx = i0.Value(idx);
   static i0.Insertable<i1.DictionaryEntry> custom({
     i0.Expression<String>? dictionary,
     i0.Expression<String>? lemma,
     i0.Expression<String>? partOfSpeech,
     i0.Expression<String>? inflection,
+    i0.Expression<int>? idx,
   }) {
     return i0.RawValuesInsertable({
       if (dictionary != null) 'dictionary': dictionary,
       if (lemma != null) 'lemma': lemma,
       if (partOfSpeech != null) 'partOfSpeech': partOfSpeech,
       if (inflection != null) 'inflection': inflection,
+      if (idx != null) 'idx': idx,
     });
   }
 
@@ -1275,12 +1472,14 @@ class DictionaryEntriesCompanion
       {i0.Value<String>? dictionary,
       i0.Value<String>? lemma,
       i0.Value<String?>? partOfSpeech,
-      i0.Value<String?>? inflection}) {
+      i0.Value<String?>? inflection,
+      i0.Value<int>? idx}) {
     return i1.DictionaryEntriesCompanion(
       dictionary: dictionary ?? this.dictionary,
       lemma: lemma ?? this.lemma,
       partOfSpeech: partOfSpeech ?? this.partOfSpeech,
       inflection: inflection ?? this.inflection,
+      idx: idx ?? this.idx,
     );
   }
 
@@ -1299,6 +1498,9 @@ class DictionaryEntriesCompanion
     if (inflection.present) {
       map['inflection'] = i0.Variable<String>(inflection.value);
     }
+    if (idx.present) {
+      map['idx'] = i0.Variable<int>(idx.value);
+    }
     return map;
   }
 
@@ -1308,7 +1510,262 @@ class DictionaryEntriesCompanion
           ..write('dictionary: $dictionary, ')
           ..write('lemma: $lemma, ')
           ..write('partOfSpeech: $partOfSpeech, ')
-          ..write('inflection: $inflection')
+          ..write('inflection: $inflection, ')
+          ..write('idx: $idx')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class DictionaryAlphabets extends i0.Table
+    with i0.TableInfo<DictionaryAlphabets, i1.DictionaryAlphabet> {
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  DictionaryAlphabets(this.attachedDatabase, [this._alias]);
+  static const i0.VerificationMeta _dictionaryMeta =
+      const i0.VerificationMeta('dictionary');
+  late final i0.GeneratedColumn<String> dictionary = i0.GeneratedColumn<String>(
+      'dictionary', aliasedName, false,
+      type: i0.DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL');
+  static const i0.VerificationMeta _letterMeta =
+      const i0.VerificationMeta('letter');
+  late final i0.GeneratedColumn<String> letter = i0.GeneratedColumn<String>(
+      'letter', aliasedName, false,
+      type: i0.DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL');
+  static const i0.VerificationMeta _firstEntryIndexMeta =
+      const i0.VerificationMeta('firstEntryIndex');
+  late final i0.GeneratedColumn<int> firstEntryIndex = i0.GeneratedColumn<int>(
+      'firstEntryIndex', aliasedName, false,
+      type: i0.DriftSqlType.int,
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL');
+  @override
+  List<i0.GeneratedColumn> get $columns =>
+      [dictionary, letter, firstEntryIndex];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'DictionaryAlphabets';
+  @override
+  i0.VerificationContext validateIntegrity(
+      i0.Insertable<i1.DictionaryAlphabet> instance,
+      {bool isInserting = false}) {
+    final context = i0.VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('dictionary')) {
+      context.handle(
+          _dictionaryMeta,
+          dictionary.isAcceptableOrUnknown(
+              data['dictionary']!, _dictionaryMeta));
+    } else if (isInserting) {
+      context.missing(_dictionaryMeta);
+    }
+    if (data.containsKey('letter')) {
+      context.handle(_letterMeta,
+          letter.isAcceptableOrUnknown(data['letter']!, _letterMeta));
+    } else if (isInserting) {
+      context.missing(_letterMeta);
+    }
+    if (data.containsKey('firstEntryIndex')) {
+      context.handle(
+          _firstEntryIndexMeta,
+          firstEntryIndex.isAcceptableOrUnknown(
+              data['firstEntryIndex']!, _firstEntryIndexMeta));
+    } else if (isInserting) {
+      context.missing(_firstEntryIndexMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<i0.GeneratedColumn> get $primaryKey => {dictionary, letter};
+  @override
+  List<Set<i0.GeneratedColumn>> get uniqueKeys => [
+        {dictionary, firstEntryIndex},
+      ];
+  @override
+  i1.DictionaryAlphabet map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.DictionaryAlphabet(
+      dictionary: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}dictionary'])!,
+      letter: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}letter'])!,
+      firstEntryIndex: attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.int, data['${effectivePrefix}firstEntryIndex'])!,
+    );
+  }
+
+  @override
+  DictionaryAlphabets createAlias(String alias) {
+    return DictionaryAlphabets(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
+  @override
+  List<String> get customConstraints => const [
+        'PRIMARY KEY(dictionary, letter)',
+        'FOREIGN KEY(dictionary, firstEntryIndex)REFERENCES DictionaryEntries(dictionary, idx)',
+        'UNIQUE(dictionary, firstEntryIndex)'
+      ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class DictionaryAlphabet extends i0.DataClass
+    implements i0.Insertable<i1.DictionaryAlphabet> {
+  final String dictionary;
+  final String letter;
+  final int firstEntryIndex;
+  const DictionaryAlphabet(
+      {required this.dictionary,
+      required this.letter,
+      required this.firstEntryIndex});
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    map['dictionary'] = i0.Variable<String>(dictionary);
+    map['letter'] = i0.Variable<String>(letter);
+    map['firstEntryIndex'] = i0.Variable<int>(firstEntryIndex);
+    return map;
+  }
+
+  i1.DictionaryAlphabetsCompanion toCompanion(bool nullToAbsent) {
+    return i1.DictionaryAlphabetsCompanion(
+      dictionary: i0.Value(dictionary),
+      letter: i0.Value(letter),
+      firstEntryIndex: i0.Value(firstEntryIndex),
+    );
+  }
+
+  factory DictionaryAlphabet.fromJson(Map<String, dynamic> json,
+      {i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return DictionaryAlphabet(
+      dictionary: serializer.fromJson<String>(json['dictionary']),
+      letter: serializer.fromJson<String>(json['letter']),
+      firstEntryIndex: serializer.fromJson<int>(json['firstEntryIndex']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'dictionary': serializer.toJson<String>(dictionary),
+      'letter': serializer.toJson<String>(letter),
+      'firstEntryIndex': serializer.toJson<int>(firstEntryIndex),
+    };
+  }
+
+  i1.DictionaryAlphabet copyWith(
+          {String? dictionary, String? letter, int? firstEntryIndex}) =>
+      i1.DictionaryAlphabet(
+        dictionary: dictionary ?? this.dictionary,
+        letter: letter ?? this.letter,
+        firstEntryIndex: firstEntryIndex ?? this.firstEntryIndex,
+      );
+  DictionaryAlphabet copyWithCompanion(i1.DictionaryAlphabetsCompanion data) {
+    return DictionaryAlphabet(
+      dictionary:
+          data.dictionary.present ? data.dictionary.value : this.dictionary,
+      letter: data.letter.present ? data.letter.value : this.letter,
+      firstEntryIndex: data.firstEntryIndex.present
+          ? data.firstEntryIndex.value
+          : this.firstEntryIndex,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DictionaryAlphabet(')
+          ..write('dictionary: $dictionary, ')
+          ..write('letter: $letter, ')
+          ..write('firstEntryIndex: $firstEntryIndex')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(dictionary, letter, firstEntryIndex);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.DictionaryAlphabet &&
+          other.dictionary == this.dictionary &&
+          other.letter == this.letter &&
+          other.firstEntryIndex == this.firstEntryIndex);
+}
+
+class DictionaryAlphabetsCompanion
+    extends i0.UpdateCompanion<i1.DictionaryAlphabet> {
+  final i0.Value<String> dictionary;
+  final i0.Value<String> letter;
+  final i0.Value<int> firstEntryIndex;
+  const DictionaryAlphabetsCompanion({
+    this.dictionary = const i0.Value.absent(),
+    this.letter = const i0.Value.absent(),
+    this.firstEntryIndex = const i0.Value.absent(),
+  });
+  DictionaryAlphabetsCompanion.insert({
+    required String dictionary,
+    required String letter,
+    required int firstEntryIndex,
+  })  : dictionary = i0.Value(dictionary),
+        letter = i0.Value(letter),
+        firstEntryIndex = i0.Value(firstEntryIndex);
+  static i0.Insertable<i1.DictionaryAlphabet> custom({
+    i0.Expression<String>? dictionary,
+    i0.Expression<String>? letter,
+    i0.Expression<int>? firstEntryIndex,
+  }) {
+    return i0.RawValuesInsertable({
+      if (dictionary != null) 'dictionary': dictionary,
+      if (letter != null) 'letter': letter,
+      if (firstEntryIndex != null) 'firstEntryIndex': firstEntryIndex,
+    });
+  }
+
+  i1.DictionaryAlphabetsCompanion copyWith(
+      {i0.Value<String>? dictionary,
+      i0.Value<String>? letter,
+      i0.Value<int>? firstEntryIndex}) {
+    return i1.DictionaryAlphabetsCompanion(
+      dictionary: dictionary ?? this.dictionary,
+      letter: letter ?? this.letter,
+      firstEntryIndex: firstEntryIndex ?? this.firstEntryIndex,
+    );
+  }
+
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    if (dictionary.present) {
+      map['dictionary'] = i0.Variable<String>(dictionary.value);
+    }
+    if (letter.present) {
+      map['letter'] = i0.Variable<String>(letter.value);
+    }
+    if (firstEntryIndex.present) {
+      map['firstEntryIndex'] = i0.Variable<int>(firstEntryIndex.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DictionaryAlphabetsCompanion(')
+          ..write('dictionary: $dictionary, ')
+          ..write('letter: $letter, ')
+          ..write('firstEntryIndex: $firstEntryIndex')
           ..write(')'))
         .toString();
   }
@@ -1437,7 +1894,7 @@ class DictEntrySenses extends i0.Table
   @override
   List<String> get customConstraints => const [
         'PRIMARY KEY(dictionary, lemma, lvl)',
-        'FOREIGN KEY(dictionary, lemma)REFERENCES DictionaryEntries(dictionary, lemma)'
+        'FOREIGN KEY(lemma, dictionary)REFERENCES DictionaryEntries(lemma, dictionary)'
       ];
   @override
   bool get dontWriteConstraints => true;
@@ -2160,12 +2617,14 @@ class DictionaryDictionaryEntry extends i0.DataClass {
   final String lemma;
   final String? partOfSpeech;
   final String? inflection;
+  final int idx;
   final int numberOfSenses;
   const DictionaryDictionaryEntry(
       {required this.dictionary,
       required this.lemma,
       this.partOfSpeech,
       this.inflection,
+      required this.idx,
       required this.numberOfSenses});
   factory DictionaryDictionaryEntry.fromJson(Map<String, dynamic> json,
       {i0.ValueSerializer? serializer}) {
@@ -2175,6 +2634,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
       lemma: serializer.fromJson<String>(json['lemma']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
       inflection: serializer.fromJson<String?>(json['inflection']),
+      idx: serializer.fromJson<int>(json['idx']),
       numberOfSenses: serializer.fromJson<int>(json['numberOfSenses']),
     );
   }
@@ -2186,6 +2646,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
       'lemma': serializer.toJson<String>(lemma),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
       'inflection': serializer.toJson<String?>(inflection),
+      'idx': serializer.toJson<int>(idx),
       'numberOfSenses': serializer.toJson<int>(numberOfSenses),
     };
   }
@@ -2195,6 +2656,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
           String? lemma,
           i0.Value<String?> partOfSpeech = const i0.Value.absent(),
           i0.Value<String?> inflection = const i0.Value.absent(),
+          int? idx,
           int? numberOfSenses}) =>
       i1.DictionaryDictionaryEntry(
         dictionary: dictionary ?? this.dictionary,
@@ -2202,6 +2664,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
         partOfSpeech:
             partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
         inflection: inflection.present ? inflection.value : this.inflection,
+        idx: idx ?? this.idx,
         numberOfSenses: numberOfSenses ?? this.numberOfSenses,
       );
   @override
@@ -2211,14 +2674,15 @@ class DictionaryDictionaryEntry extends i0.DataClass {
           ..write('lemma: $lemma, ')
           ..write('partOfSpeech: $partOfSpeech, ')
           ..write('inflection: $inflection, ')
+          ..write('idx: $idx, ')
           ..write('numberOfSenses: $numberOfSenses')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(dictionary, lemma, partOfSpeech, inflection, numberOfSenses);
+  int get hashCode => Object.hash(
+      dictionary, lemma, partOfSpeech, inflection, idx, numberOfSenses);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2227,6 +2691,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
           other.lemma == this.lemma &&
           other.partOfSpeech == this.partOfSpeech &&
           other.inflection == this.inflection &&
+          other.idx == this.idx &&
           other.numberOfSenses == this.numberOfSenses);
 }
 
@@ -2239,7 +2704,7 @@ class DictionaryDictionaryEntries extends i0
   DictionaryDictionaryEntries(this.attachedDatabase, [this._alias]);
   @override
   List<i0.GeneratedColumn> get $columns =>
-      [dictionary, lemma, partOfSpeech, inflection, numberOfSenses];
+      [dictionary, lemma, partOfSpeech, inflection, idx, numberOfSenses];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
@@ -2247,7 +2712,7 @@ class DictionaryDictionaryEntries extends i0
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, COALESCE(SenseCounts.numberOfSenses, 0) AS numberOfSenses FROM DictionaryEntries LEFT OUTER JOIN (SELECT dictionary, lemma, COUNT(*) AS numberOfSenses FROM DictEntrySenses WHERE lvl BETWEEN \'000\' AND \'999\' GROUP BY dictionary, lemma) AS SenseCounts ON DictionaryEntries.dictionary = SenseCounts.dictionary AND DictionaryEntries.lemma = SenseCounts.lemma',
+            'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, COALESCE(SenseCounts.numberOfSenses, 0) AS numberOfSenses FROM DictionaryEntries LEFT OUTER JOIN (SELECT dictionary, lemma, COUNT(*) AS numberOfSenses FROM DictEntrySenses WHERE lvl BETWEEN \'000\' AND \'999\' GROUP BY dictionary, lemma) AS SenseCounts ON DictionaryEntries.dictionary = SenseCounts.dictionary AND DictionaryEntries.lemma = SenseCounts.lemma ORDER BY DictionaryEntries.dictionary, DictionaryEntries.idx',
       };
   @override
   DictionaryDictionaryEntries get asDslTable => this;
@@ -2264,6 +2729,8 @@ class DictionaryDictionaryEntries extends i0
           .read(i0.DriftSqlType.string, data['${effectivePrefix}partOfSpeech']),
       inflection: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.string, data['${effectivePrefix}inflection']),
+      idx: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.int, data['${effectivePrefix}idx'])!,
       numberOfSenses: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.int, data['${effectivePrefix}numberOfSenses'])!,
     );
@@ -2281,6 +2748,9 @@ class DictionaryDictionaryEntries extends i0
   late final i0.GeneratedColumn<String> inflection = i0.GeneratedColumn<String>(
       'inflection', aliasedName, true,
       type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
+      'idx', aliasedName, false,
+      type: i0.DriftSqlType.int);
   late final i0.GeneratedColumn<int> numberOfSenses = i0.GeneratedColumn<int>(
       'numberOfSenses', aliasedName, false,
       type: i0.DriftSqlType.int);
@@ -2297,6 +2767,14 @@ class DictionaryDictionaryEntries extends i0
 
 class DictionaryDrift extends i2.ModularAccessor {
   DictionaryDrift(i0.GeneratedDatabase db) : super(db);
+  Future<int> fillDictionaryAlphabets() {
+    return customInsert(
+      'INSERT INTO DictionaryAlphabets SELECT dictionary, UPPER(SUBSTR(lemma, 1, 1)), MIN(idx) FROM DictionaryEntries GROUP BY dictionary, UPPER(SUBSTR(lemma, 1, 1))',
+      variables: [],
+      updates: {dictionaryAlphabets},
+    );
+  }
+
   i0.Selectable<i3.Dictionary> getDictionaries() {
     return customSelect(
         'SELECT id, name, language, publisher, CAST(publicationDate AS TEXT) AS publicationDate, numberOfEntries FROM "dictionary.Dictionaries"',
@@ -2332,14 +2810,30 @@ class DictionaryDrift extends i2.ModularAccessor {
         ));
   }
 
+  i0.Selectable<int> getDictionaryAlphabetLetterPosition(
+      String var1, String var2) {
+    return customSelect(
+        'SELECT firstEntryIndex FROM DictionaryAlphabets WHERE dictionary = ?1 AND letter = ?2 LIMIT 1',
+        variables: [
+          i0.Variable<String>(var1),
+          i0.Variable<String>(var2)
+        ],
+        readsFrom: {
+          dictionaryAlphabets,
+        }).map((i0.QueryRow row) => row.read<int>('firstEntryIndex'));
+  }
+
+  i1.DictionaryAlphabets get dictionaryAlphabets =>
+      i2.ReadDatabaseContainer(attachedDatabase)
+          .resultSet<i1.DictionaryAlphabets>('DictionaryAlphabets');
+  i1.DictionaryEntries get dictionaryEntries =>
+      i2.ReadDatabaseContainer(attachedDatabase)
+          .resultSet<i1.DictionaryEntries>('DictionaryEntries');
   i1.DictionaryDictionaries get dictionaryDictionaries =>
       i2.ReadDatabaseContainer(attachedDatabase)
           .resultSet<i1.DictionaryDictionaries>('dictionary.Dictionaries');
   i1.Dictionaries get dictionaries => i2.ReadDatabaseContainer(attachedDatabase)
       .resultSet<i1.Dictionaries>('Dictionaries');
-  i1.DictionaryEntries get dictionaryEntries =>
-      i2.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.DictionaryEntries>('DictionaryEntries');
   i1.DictionaryDictionaryEntries get dictionaryDictionaryEntries =>
       i2.ReadDatabaseContainer(attachedDatabase)
           .resultSet<i1.DictionaryDictionaryEntries>(

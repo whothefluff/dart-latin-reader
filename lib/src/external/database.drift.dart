@@ -15,6 +15,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i1.Dictionaries dictionaries = i1.Dictionaries(this);
   late final i1.DictionaryEntries dictionaryEntries =
       i1.DictionaryEntries(this);
+  late final i1.DictionaryAlphabets dictionaryAlphabets =
+      i1.DictionaryAlphabets(this);
   late final i1.DictEntrySenses dictEntrySenses = i1.DictEntrySenses(this);
   late final i1.DictEntrySenseQuotes dictEntrySenseQuotes =
       i1.DictEntrySenseQuotes(this);
@@ -69,6 +71,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   List<i0.DatabaseSchemaEntity> get allSchemaEntities => [
         dictionaries,
         dictionaryEntries,
+        dictionaryAlphabets,
         dictEntrySenses,
         dictEntrySenseQuotes,
         dictionaryDictionaries,
@@ -107,6 +110,8 @@ class $AppDbManager {
       i1.$DictionariesTableManager(_db, _db.dictionaries);
   i1.$DictionaryEntriesTableManager get dictionaryEntries =>
       i1.$DictionaryEntriesTableManager(_db, _db.dictionaryEntries);
+  i1.$DictionaryAlphabetsTableManager get dictionaryAlphabets =>
+      i1.$DictionaryAlphabetsTableManager(_db, _db.dictionaryAlphabets);
   i1.$DictEntrySensesTableManager get dictEntrySenses =>
       i1.$DictEntrySensesTableManager(_db, _db.dictEntrySenses);
   i1.$DictEntrySenseQuotesTableManager get dictEntrySenseQuotes =>

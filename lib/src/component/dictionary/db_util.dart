@@ -43,6 +43,7 @@ final operations = [
                   lemma: Value(row[1].toString()),
                   partOfSpeech: Value.absentIfNull(row[2].toString()),
                   inflection: Value.absentIfNull(row[3].toString()),
+                  idx: Value(row[4] as int),
                 )),
             mode: InsertMode.insertOrRollback,
           ));
@@ -94,6 +95,15 @@ final operations = [
                 )),
             mode: InsertMode.insertOrRollback,
           ));
+    },
+  ),
+  (
+    id: 'DictionaryAlphabets',
+    delete: (AppDb db) async {
+      await db.delete(db.dictionaryAlphabets).go();
+    },
+    insert: (AppDb db) async {
+      await db.dictionaryDrift.fillDictionaryAlphabets();
     },
   ),
 ];
