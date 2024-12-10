@@ -68,3 +68,5 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+
+%USERPROFILE%/AppData/Roaming/com.magnetys/latin_reader/data.db

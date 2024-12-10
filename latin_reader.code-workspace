@@ -11,8 +11,8 @@
 			{
 				"previewLimit": 250,
 				"driver": "SQLite",
-				"name": "library",
-				"database": "C:\\Users\\whothefluff\\AppData\\Roaming\\com.example\\latin_reader\\latin_reader\\library.db"
+				"name": "data",
+				"database": "%USERPROFILE%\\AppData\\Roaming\\com.magnetys\\latin_reader\\data.db"
 			}
 		],
 	},

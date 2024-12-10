@@ -1,4 +1,4 @@
-package com.example.latin_reader
+package com.magnetys.latin_reader
 
 import io.flutter.embedding.android.FlutterActivity
 
