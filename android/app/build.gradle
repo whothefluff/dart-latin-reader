@@ -23,7 +23,7 @@ if (pubspecFile.exists()) {
 }
 
 android {
-    namespace = "com.example.latin_reader"
+    namespace = "com.magnetys.latin_reader"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.latin_reader"
+        applicationId = "com.magnetys.latin_reader"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
