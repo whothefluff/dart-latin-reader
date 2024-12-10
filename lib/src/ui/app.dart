@@ -77,7 +77,7 @@ final _dictionaryRoutes = [
         path: ':id',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
-          return MaterialPage(child: DictionaryEntriesPage(dictionaryId: id));
+          return MaterialPage(child: DictionaryEntriesPage(dictionary: id));
         },
         routes: [
           GoRoute(
