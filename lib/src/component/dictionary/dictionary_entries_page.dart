@@ -4,103 +4,176 @@ import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latin_reader/src/component/dictionary/dictionary_alphabets_api.dart';
 import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart';
 import 'package:latin_reader/src/ui/widget/searchable_app_bar.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
-class DictionaryEntriesPage extends ConsumerWidget {
-  const DictionaryEntriesPage({super.key, required this.dictionaryId});
+class DictionaryEntriesPage extends ConsumerStatefulWidget {
+  const DictionaryEntriesPage({
+    required this.dictionary,
+    super.key,
+  });
 
-  final String dictionaryId;
+  final String dictionary;
 
   @override
-  Widget build(context, ref) => Scaffold(
+  ConsumerState<DictionaryEntriesPage> createState() =>
+      _DictionaryEntriesPageState();
+//
+}
+
+class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
+//
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  Widget build(context) => Scaffold(
         appBar: SearchableAppBar(
           onSortPressed: () {},
           onSettingsPressed: () async => context.push('/settings'),
           searchSuggestionsBuilder: (context, controller) async => [],
         ),
-        body: entriesList(ref),
+        body: entriesList(ref, context),
       );
 
-  Widget entriesList(WidgetRef ref) =>
-      ref.watch(dictionaryEntriesProvider(dictionaryId)).when(
-            data: (entries) => Row(children: [
-              ScrollableEntries(dictionaryId: dictionaryId, data: entries),
-              const AlphabetNavigation(),
-            ]),
+  Widget entriesList(WidgetRef ref, BuildContext context) =>
+      ref.watch(dictionaryEntriesProvider(widget.dictionary)).when(
+            data: (entries) => Row(
+              children: [
+                ScrollableEntries(
+                  dictId: widget.dictionary,
+                  data: entries,
+                  scrollController: _scrollController,
+                ),
+                AlphabetNavigation(
+                  dictId: widget.dictionary,
+                  scrollController: _scrollController,
+                ),
+              ],
+            ),
             loading: showLoading,
-            error: showError(ref, dictionaryEntriesProvider(dictionaryId)),
+            error: showError(
+              ref,
+              dictionaryEntriesProvider(widget.dictionary),
+            ),
           );
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 //
 }
 
-class ScrollableEntries extends StatelessWidget {
+class ScrollableEntries extends ConsumerStatefulWidget {
   const ScrollableEntries({
     super.key,
-    required this.dictionaryId,
+    required this.dictId,
     required this.data,
+    required this.scrollController,
   });
 
-  final String dictionaryId;
+  final String dictId;
   final UnmodifiableListView<Entry> data;
+  final ScrollController scrollController;
+
+  @override
+  ConsumerState<ScrollableEntries> createState() => _ScrollableEntriesState();
+//
+}
+
+class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
+//
   @override
   Widget build(context) => Expanded(
         child: ListView.builder(
-          itemCount: data.length,
-          itemBuilder: (context, index) {
-            final entry = data[index];
-            final entryPage =
-                '/dictionaries/$dictionaryId/entries/${entry.lemma}';
-            final inflection =
-                entry.inflection != null ? removeQuotes(entry.inflection!) : '';
-            final subtitleStyleBecauseFuckFlutter =
-                ListTileTheme.of(context).subtitleTextStyle ??
-                    _LisTileDefaultsM3(context).subtitleTextStyle!;
-            return ListTile(
-              title: Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: removeDigits(entry.lemma),
-                      style: Theme.of(context).listTileTheme.titleTextStyle,
-                    ),
-                    const TextSpan(text: ' '),
-                    TextSpan(
-                      text: inflection,
-                      style: subtitleStyleBecauseFuckFlutter,
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () async => context.push(entryPage),
-            );
-          },
+          controller: widget.scrollController,
+          itemCount: widget.data.length,
+          prototypeItem: ListTile(
+            title: Text(widget.data.first.lemma),
+          ),
+          addAutomaticKeepAlives: false,
+          itemBuilder: tile(),
         ),
       );
+
+  Widget Function(BuildContext, int) tile() => (context, index) {
+        final subtitleStyleBecauseFuckFlutter = subtitleTextStyle(context);
+        final entry = widget.data[index];
+        final entryPage = StringBuffer()
+          ..writeAll([
+            '/dictionaries/',
+            widget.dictId,
+            '/entries/',
+            entry.lemma,
+          ]);
+        final inflection = removeQuotes(entry.inflection);
+        return ListTile(
+          title: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: removeDigits(entry.lemma),
+                  style: Theme.of(context).listTileTheme.titleTextStyle,
+                ),
+                const TextSpan(text: ' '),
+                TextSpan(
+                  text: inflection,
+                  style: subtitleStyleBecauseFuckFlutter,
+                ),
+              ],
+            ),
+          ),
+          onTap: () async => context.push(entryPage.toString()),
+        );
+      };
 
   String removeDigits(String original) =>
       original.replaceAll(RegExp(r'\d'), '');
 
-  String removeQuotes(String original) => original.replaceAll(RegExp('"'), '');
+  String? removeQuotes(String? original) =>
+      original?.replaceAll(RegExp('"'), '');
 //
 }
 
-class AlphabetNavigation extends StatelessWidget {
-  const AlphabetNavigation({super.key});
+class AlphabetNavigation extends ConsumerStatefulWidget {
+  const AlphabetNavigation({
+    super.key,
+    required this.dictId,
+    required this.scrollController,
+  });
 
+  final String dictId;
+  final ScrollController scrollController;
+
+  @override
+  ConsumerState<AlphabetNavigation> createState() => _AlphabetNavigationState();
+//
+}
+
+class _AlphabetNavigationState extends ConsumerState<AlphabetNavigation> {
+//
   @override
   Widget build(context) => LayoutBuilder(
         builder: (context, constraints) => this.fits(context, constraints)
             ? sidebar(constraints)
-            : const AlphabetDropdown(alphabet),
+            : AlphabetDropdown(alphabet, onLetterSelected: scrollToLetter),
       );
 
   Widget sidebar(BoxConstraints constraints) =>
       constraints.maxHeight < Breakpoints.large.beginHeight!
-          ? MagnifiableAlphabetSidebar(alphabet, constraints)
-          : const TappableAlphabetSidebar(alphabet);
+          ? MagnifiableAlphabetSidebar(
+              alphabet,
+              constraints,
+              onLetterSelected: scrollToLetter,
+            )
+          : TappableAlphabetSidebar(
+              alphabet,
+              onLetterSelected: scrollToLetter,
+            );
 
   bool fits(BuildContext context, BoxConstraints constraints) {
     final textStyle = Theme.of(context).textTheme.bodyMedium;
@@ -115,13 +188,34 @@ class AlphabetNavigation extends StatelessWidget {
     final totalHeightNeeded = letterHeight * alphabet.length;
     return constraints.maxHeight >= totalHeightNeeded;
   }
+
+  Future<void> scrollToLetter(String letter) async {
+    const listTileHeight = 48.0;
+    final index = await ref.read(
+      dictionaryAlphabetLetterPositionProvider(
+        widget.dictId,
+        letter,
+      ).future,
+    );
+    await widget.scrollController.animateTo(
+      index.calculateHeight(listTileHeight),
+      duration: const Duration(milliseconds: 100),
+      curve: Easing.linear,
+    );
+    // _scrollController.jumpTo((index * listTileHeight).toDouble());
+  }
 //
 }
 
 class TappableAlphabetSidebar extends StatelessWidget {
-  const TappableAlphabetSidebar(this.alphabet, {super.key});
+  const TappableAlphabetSidebar(
+    this.alphabet, {
+    super.key,
+    required this.onLetterSelected,
+  });
 
   final Alphabet alphabet;
+  final void Function(String letter) onLetterSelected;
 
   @override
   Widget build(context) => SizedBox(
@@ -131,8 +225,7 @@ class TappableAlphabetSidebar extends StatelessWidget {
           children: alphabet
               .map((letter) => Expanded(
                     child: InkWell(
-                      // onTap: () => _browseTo(letter),
-                      onLongPress: () => const Magnifier(),
+                      onTap: () => onLetterSelected(letter),
                       customBorder: const CircleBorder(),
                       child: Container(
                         alignment: Alignment.center,
@@ -151,10 +244,12 @@ class MagnifiableAlphabetSidebar extends StatefulWidget {
     this.alphabet,
     this.constraints, {
     super.key,
+    required this.onLetterSelected,
   });
 
   final BoxConstraints constraints;
   final Alphabet alphabet;
+  final void Function(String letter) onLetterSelected;
 
   @override
   State<MagnifiableAlphabetSidebar> createState() =>
@@ -175,16 +270,9 @@ class _MagnifiableAlphabetSidebarState
   Widget build(context) => SizedBox(
         width: 30,
         child: GestureDetector(
-          onLongPressStart: (details) {
-            _showMagnifier(details.localPosition);
-          },
-          onLongPressMoveUpdate: (details) {
-            _updateMagnifierPosition(details.localPosition);
-          },
-          onLongPressEnd: (details) {
-            _hideMagnifier();
-            // _browseTo(_currentLetter);
-          },
+          onLongPressStart: (details) => showMagnifier(details.localPosition),
+          onLongPressMoveUpdate: (det) => updateMagnifier(det.localPosition),
+          onLongPressEnd: (_) => hideMagnifier(and: widget.onLetterSelected),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: widget.alphabet
@@ -199,7 +287,7 @@ class _MagnifiableAlphabetSidebarState
         ),
       );
 
-  OverlayEntry _createOverlayEntry() => OverlayEntry(
+  OverlayEntry createOverlayEntry() => OverlayEntry(
         builder: (context) => Positioned(
           right: 0,
           top: _magnifierPosition.dy,
@@ -210,42 +298,48 @@ class _MagnifiableAlphabetSidebarState
         ),
       );
 
-  void _showMagnifier(Offset position) {
+  void showMagnifier(Offset position) {
     setState(() {
-      _currentLetter = _getLetterAtPosition(position.dy);
+      _currentLetter = getLetterAtPosition(position.dy);
       _magnifierPosition = position;
-      _overlayEntry = _createOverlayEntry();
+      _overlayEntry = createOverlayEntry();
     });
     Overlay.of(context).insert(_overlayEntry!);
   }
 
-  void _updateMagnifierPosition(Offset position) {
+  void updateMagnifier(Offset position) {
     setState(() {
-      _currentLetter = _getLetterAtPosition(position.dy);
+      _currentLetter = getLetterAtPosition(position.dy);
       _magnifierPosition = position;
       _overlayEntry?.markNeedsBuild();
     });
   }
 
-  void _hideMagnifier() {
+  void hideMagnifier({required void Function(String letter) and}) {
     setState(() {
       _overlayEntry?.remove();
       _overlayEntry = null;
     });
+    and(_currentLetter);
   }
 
-  String _getLetterAtPosition(double yPosition) {
+  String getLetterAtPosition(double yPosition) {
     final index =
         (yPosition / letterHeight).clamp(0, widget.alphabet.length - 1).toInt();
     return widget.alphabet[index];
   }
-  //
+//
 }
 
 class AlphabetDropdown extends StatelessWidget {
-  const AlphabetDropdown(this.alphabet, {super.key});
+  const AlphabetDropdown(
+    this.alphabet, {
+    super.key,
+    required this.onLetterSelected,
+  });
 
   final Alphabet alphabet;
+  final void Function(String letter) onLetterSelected;
 
   @override
   Widget build(context) => Align(
@@ -258,9 +352,7 @@ class AlphabetDropdown extends StatelessWidget {
                     child: Text(letter),
                   ))
               .toList(),
-          onSelected: (letter) {
-            //_browseTo(letter);
-          },
+          onSelected: onLetterSelected,
         ),
       );
 //
@@ -338,3 +430,7 @@ class _LisTileDefaultsM3 extends ListTileThemeData {
   @override
   Color? get iconColor => _colors.onSurfaceVariant;
 }
+
+TextStyle subtitleTextStyle(BuildContext context) =>
+    ListTileTheme.of(context).subtitleTextStyle ??
+    _LisTileDefaultsM3(context).subtitleTextStyle!;
