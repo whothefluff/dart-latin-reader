@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latin_reader/app_config.dart';
 import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/external/data_version.drift.dart';
 import 'package:latin_reader/src/external/database.drift.dart';
@@ -69,7 +70,7 @@ LazyDatabase _openConnection() => LazyDatabase(() async {
       log.info(() => '_openConnection() - handling database file');
       return NativeDatabase.createInBackground(
         file,
-        // logStatements: true,
+        logStatements: AppConfig.instance.logDbStatements,
         setup: (db) {
           log.info(() => '_openConnection() - setting functions');
           util.setupRegExp(db);
