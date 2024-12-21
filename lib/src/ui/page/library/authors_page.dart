@@ -9,7 +9,7 @@ class AuthorsPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) => Scaffold(
-    // TODO(whothefluff): add fts5 encompasing Authors.name, AuthorAbbreviations.val, Works.name, WorkAbbreviations.val
+        // TODO(whothefluff): add fts5 encompasing Authors.name, AuthorAbbreviations.val, Works.name, WorkAbbreviations.val
         appBar: SearchableAppBar(
           onFilterPressed: () {},
           onSortPressed: () {},
@@ -40,8 +40,10 @@ class AuthorsPage extends ConsumerWidget {
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.vertical(
                           bottom: Radius.circular(12)),
-                      color:
-                          Theme.of(context).colorScheme.shadow.withOpacity(0.2),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .shadow
+                          .withValues(alpha: 0.2),
                     ),
                     child: GridTileBar(
                       title: Row(
