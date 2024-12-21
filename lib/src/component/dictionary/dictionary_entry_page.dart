@@ -74,19 +74,22 @@ class DictionaryEntryPage extends ConsumerWidget {
 
   Widget subsenses(List<EntrySense> senses) {
     final subsenses = groupSenses(senses).values.toList();
+    const interline = EdgeInsets.symmetric(vertical: 8.0);
     return Container(
         alignment: Alignment.centerLeft,
         child: SelectionArea(
             child: Column(
                 children: subsenses
                     .map((senses) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: senses
-                              .map(
-                                (sense) => TabulatedText(
-                                  prettyLevel: sense.prettyLevel,
-                                  content: sense.content,
-                                ),
-                              )
+                              .map((sense) => Padding(
+                                    padding: interline,
+                                    child: TabulatedText(
+                                      prettyLevel: sense.prettyLevel,
+                                      content: sense.content,
+                                    ),
+                                  ))
                               .toList(),
                         ))
                     .toList())));
