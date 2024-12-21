@@ -96,6 +96,6 @@ class Entry {
   }
 
   @override
-  int get hashCode => dictionary.hashCode ^ lemma.hashCode;
+  int get hashCode => Object.hash(dictionary, lemma);
 //
 }

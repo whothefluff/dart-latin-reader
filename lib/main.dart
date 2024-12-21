@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latin_reader/app_config.dart';
 import 'package:latin_reader/logger.dart';
 
 import 'src/ui/app.dart';
@@ -13,6 +14,7 @@ void main() async {
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
   WidgetsFlutterBinding.ensureInitialized();
+  await AppConfig.instance.load();
   log.info(() => 'main() - calling first widget');
   runApp(
     ProviderScope(

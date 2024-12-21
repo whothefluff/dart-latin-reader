@@ -9,7 +9,7 @@ class AuthorsPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) => Scaffold(
-    // TODO(whothefluff) add fts5 encompasing Authors.name, AuthorAbbreviations.val, Works.name, WorkAbbreviations.val
+    // TODO(whothefluff): add fts5 encompasing Authors.name, AuthorAbbreviations.val, Works.name, WorkAbbreviations.val
         appBar: SearchableAppBar(
           onFilterPressed: () {},
           onSortPressed: () {},
