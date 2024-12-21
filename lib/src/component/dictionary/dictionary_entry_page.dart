@@ -16,6 +16,10 @@ class DictionaryEntryPage extends ConsumerWidget {
 
   final String dictionary;
   final String lemma;
+  static final _toggle = {
+    true: (textOverflow: TextOverflow.visible, maxLines: null),
+    false: (textOverflow: TextOverflow.ellipsis, maxLines: 1),
+  };
 
   @override
   Widget build(context, ref) => Scaffold(
@@ -47,13 +51,13 @@ class DictionaryEntryPage extends ConsumerWidget {
     LinkedHashMap<String, List<EntrySense>> groupedSenses,
   ) =>
       groupedSenses
-          .map((senseLevel, senseData) => MapEntry(
-                senseLevel,
+          .map((level, hierarchy) => MapEntry(
+                level,
                 ExpansionPanelRadio(
                   canTapOnHeader: true,
-                  value: senseLevel,
-                  headerBuilder: topSense(senseData.first),
-                  body: subsenses(senseData),
+                  value: level,
+                  headerBuilder: topSense(hierarchy.first),
+                  body: subsenses(hierarchy.sublist(1)),
                 ),
               ))
           .values
@@ -61,11 +65,11 @@ class DictionaryEntryPage extends ConsumerWidget {
 
   // ignore: avoid_positional_boolean_parameters
   Widget Function(BuildContext, bool) topSense(EntrySense topSense) =>
-      (_, expanded) => TabulatedText(
-            textOverflow: TextOverflow.ellipsis,
+      (_, isExpanded) => TabulatedText(
+            textOverflow: _toggle[isExpanded]!.textOverflow,
             prettyLevel: topSense.prettyLevel,
             content: topSense.content,
-            maxLines: 1,
+            maxLines: _toggle[isExpanded]!.maxLines,
           );
 
   Widget subsenses(List<EntrySense> senses) {
