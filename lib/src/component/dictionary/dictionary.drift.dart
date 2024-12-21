@@ -8,6 +8,8 @@ import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart'
     as i3;
 import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart'
     as i4;
+import 'package:latin_reader/src/component/dictionary/dictionary_entry_api.dart'
+    as i5;
 
 typedef $DictionariesCreateCompanionBuilder = i1.DictionariesCompanion
     Function({
@@ -2823,6 +2825,40 @@ class DictionaryDrift extends i2.ModularAccessor {
         }).map((i0.QueryRow row) => row.read<int>('firstEntryIndex'));
   }
 
+  i0.Selectable<i5.EntrySense> getDictionaryEntrySenses(
+      String var1, String var2) {
+    return customSelect(
+        'SELECT prettyLevel, content, Senses.dictionary AS "\$n_0", Senses.lvl AS "\$n_1", Senses.lvl AS "\$n_2" FROM DictEntrySenses AS Senses WHERE dictionary = ?1 AND lemma = ?2 ORDER BY dictionary, lemma, lvl',
+        variables: [
+          i0.Variable<String>(var1),
+          i0.Variable<String>(var2)
+        ],
+        readsFrom: {
+          dictEntrySenses,
+          dictEntrySenseQuotes,
+        }).asyncMap((i0.QueryRow row) async => i5.EntrySense(
+          prettyLevel: row.read<String>('prettyLevel'),
+          content: row.read<String>('content'),
+          quotes: await customSelect(
+                  'SELECT seq, content, translation FROM DictEntrySenseQuotes WHERE dictionary = ?1 AND lemma = ?2 AND lemma = ?3 ORDER BY dictionary, lemma, lvl, seq',
+                  variables: [
+                i0.Variable<String>(row.read('\$n_0')),
+                i0.Variable<String>(row.read('\$n_1')),
+                i0.Variable<String>(row.read('\$n_2'))
+              ],
+                  readsFrom: {
+                dictEntrySenseQuotes,
+                dictEntrySenses,
+              })
+              .map((i0.QueryRow row) => i5.EntrySenseQuote(
+                    seq: row.read<int>('seq'),
+                    content: row.read<String>('content'),
+                    translation: row.readNullable<String>('translation'),
+                  ))
+              .get(),
+        ));
+  }
+
   i1.DictionaryAlphabets get dictionaryAlphabets =>
       i2.ReadDatabaseContainer(attachedDatabase)
           .resultSet<i1.DictionaryAlphabets>('DictionaryAlphabets');
@@ -2841,4 +2877,7 @@ class DictionaryDrift extends i2.ModularAccessor {
   i1.DictEntrySenses get dictEntrySenses =>
       i2.ReadDatabaseContainer(attachedDatabase)
           .resultSet<i1.DictEntrySenses>('DictEntrySenses');
+  i1.DictEntrySenseQuotes get dictEntrySenseQuotes =>
+      i2.ReadDatabaseContainer(attachedDatabase)
+          .resultSet<i1.DictEntrySenseQuotes>('DictEntrySenseQuotes');
 }

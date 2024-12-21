@@ -27,5 +27,5 @@ Future<DictionaryAlphabetLetterPosition> dictionaryAlphabetLetterPosition(
 //domain
 
 extension type const DictionaryAlphabetLetterPosition(int index) {
-  double calculateHeight( double height) => index * height;
+  double calculateHeight(double height) => index * height;
 }

@@ -1,5 +1,6 @@
 import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart';
 import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart';
+import 'package:latin_reader/src/component/dictionary/dictionary_entry_api.dart';
 
 CREATE TABLE "Dictionaries" (
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
@@ -92,6 +93,20 @@ CREATE VIEW "dictionary.DictionaryEntries" AS
 getDictionaryEntries WITH Entry: SELECT * FROM "dictionary.DictionaryEntries" WHERE dictionary = ?;
 
 getDictionaryAlphabetLetterPosition: SELECT firstEntryIndex FROM "DictionaryAlphabets" WHERE dictionary = ? AND letter = ? LIMIT 1;
+
+getDictionaryEntrySenses WITH EntrySense: SELECT prettyLevel, 
+                                                 content,
+                                                 LIST( SELECT seq,
+                                                              content, 
+                                                              translation 
+                                                           FROM DictEntrySenseQuotes 
+                                                           WHERE dictionary = Senses.dictionary 
+                                                                 AND lemma = Senses.lvl 
+                                                                 AND lemma = Senses.lvl
+                                                           ORDER BY dictionary, lemma, lvl, seq ) AS Quotes
+                                              FROM DictEntrySenses AS Senses 
+                                              WHERE dictionary = ? AND lemma = ?
+                                              ORDER BY dictionary, lemma, lvl;
 
 -- CREATE VIRTUAL TABLE SearchableDictionaryEntries USING fts5(
 --     lemma,
