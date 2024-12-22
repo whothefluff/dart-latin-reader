@@ -9,12 +9,12 @@ import 'src/ui/settings/settings_service.dart';
 
 void main() async {
 //
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppConfig.instance.load();
   configureLogging();
   log.info(() => 'main() - loading settings');
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
-  WidgetsFlutterBinding.ensureInitialized();
-  await AppConfig.instance.load();
   log.info(() => 'main() - calling first widget');
   runApp(
     ProviderScope(
