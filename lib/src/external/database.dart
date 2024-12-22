@@ -60,7 +60,7 @@ class AppDb extends $AppDb {
 
 LazyDatabase _openConnection() => LazyDatabase(() async {
       log.info(() => '_openConnection() - getting path');
-      final supportDirectory = await getApplicationSupportDirectory();
+      final supportDirectory = await getApplicationCacheDirectory();
       final filePath = p.join(supportDirectory.path, 'data.db');
       log.info(() => '_openConnection() - using directory at $filePath');
       final file = File(filePath);
