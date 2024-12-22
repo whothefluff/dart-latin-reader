@@ -1,1 +1,6 @@
 database.log_statements: false
+log:
+  console:
+    level: ALL
+  file:
+     level: SEVERE
