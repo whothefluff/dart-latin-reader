@@ -24,8 +24,8 @@ if (pubspecFile.exists()) {
 
 android {
     namespace = "com.magnetys.latin_reader"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35
+    ndkVersion = "27.2.12479018"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -39,7 +39,7 @@ android {
     defaultConfig {
         applicationId = "com.magnetys.latin_reader"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
