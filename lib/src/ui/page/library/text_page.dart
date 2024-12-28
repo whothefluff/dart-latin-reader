@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:io';
 import 'dart:math';
 
@@ -8,11 +7,13 @@ import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
-import 'package:latin_reader/src/external/provider_work.dart';
+import 'package:latin_reader/src/component/library/work_contents_api.dart';
+import 'package:latin_reader/src/component/library/work_details_api.dart';
 import 'package:latin_reader/src/ui/app.dart';
 import 'package:latin_reader/src/ui/widget/custom_adaptive_scaffold.dart';
 import 'package:latin_reader/src/ui/widget/navigation_rail.dart';
+import 'package:latin_reader/src/ui/widget/show_error.dart';
+import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
 const _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
 const _blank = ' ';
@@ -45,34 +46,34 @@ class TextPageState extends ConsumerState<TextPage> {
 
   @override
   Widget build(BuildContext context) {
-    final workSizeProvider = ref.watch(libraryWorkDetailsProvider(widget.workId)
+    final workSizeProvider = ref.watch(workDetailsProvider(widget.workId)
         .select((model) => model.whenData((work) => work.numberOfWords)));
     return workSizeProvider.when(
       data: (workSize) {
         _workSize = workSize;
         return _scaffold();
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Error: $error')),
+      loading: showLoading,
+      error: (error, _) => Center(child: Text('Error: $error')),
     );
   }
 
   Widget _scaffold() {
     final segmentsProvider = ref.watch(
-      libraryWorkContentsPartiallyProvider(widget.workId, _fromIndex, _toIndex),
+      workContentsProvider(widget.workId, _fromIndex, _toIndex),
     );
     return Scaffold(
       appBar: AppBar(),
       body: segmentsProvider.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
         data: _buildResponsiveContent,
+        loading: showLoading,
+        error: error(ref),
       ),
     );
   }
 
   Widget _buildResponsiveContent(
-    UnmodifiableListView<WorkContentsElementView> segments,
+    WorkContentsSegments segments,
   ) {
     const a4Width = 595.0;
     const marginsSpace = 200;
@@ -123,6 +124,9 @@ class TextPageState extends ConsumerState<TextPage> {
       }
     });
   }
+
+  Widget Function(Object error, StackTrace _) error(WidgetRef ref) =>
+      showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex));
 //
 }
 
@@ -147,10 +151,10 @@ class _TextRenderer {
     'VERS': textTheme.bodyLarge!,
     'default': textTheme.bodyMedium!,
   };
-  final UnmodifiableListView<WorkContentsElementView> workSegments;
+  final WorkContentsSegments workSegments;
   static const _empty = '';
 
-  String _getSpace(int index, WorkContentsElementView segment) {
+  String _getSpace(int index, WorkContentsSegment segment) {
     final nextIsPunctuation = index + 1 < workSegments.length &&
         _closingPunctSigns
             .any((sign) => workSegments[index + 1].word.startsWith(sign));
@@ -290,7 +294,7 @@ class _WordSelector {
     required this.textKey,
   });
 
-  final UnmodifiableListView<WorkContentsElementView> segments;
+  final WorkContentsSegments segments;
   final GlobalKey textKey;
   String? _cachedVisibleText;
   String? selected;
@@ -317,7 +321,7 @@ class _WordSelector {
   }
 
   void invalidateCacheWhenElementsChange(
-    UnmodifiableListView<WorkContentsElementView> oldSegments,
+    WorkContentsSegments oldSegments,
   ) {
     if (segments != oldSegments) {
       _cachedVisibleText = null;
@@ -387,7 +391,7 @@ class _VisibleSegmentRange {
   _VisibleSegmentRange.build(
     TextPainter txtPainter,
     List<InlineSpan> allSpans,
-    UnmodifiableListView<WorkContentsElementView> segments,
+    WorkContentsSegments segments,
     _PageFlow pageFlow,
     BoxConstraints textConstraints,
   )   : first = pageFlow == _PageFlow.previous
@@ -400,7 +404,7 @@ class _VisibleSegmentRange {
   static int _firstVisibleWord(
     TextPainter textPainter,
     List<InlineSpan> allSpans,
-    UnmodifiableListView<WorkContentsElementView> segments,
+    WorkContentsSegments segments,
     BoxConstraints textConstraints,
   ) {
     var high = allSpans.length - 1;
@@ -446,7 +450,7 @@ class _VisibleSegmentRange {
   static int _lastVisibleWord(
     TextPainter textPainter,
     List<InlineSpan> allSpans,
-    UnmodifiableListView<WorkContentsElementView> segments,
+    WorkContentsSegments segments,
     BoxConstraints textConstraints,
   ) {
     var low = 0;
@@ -514,7 +518,7 @@ class _StyledWordList extends StatefulWidget {
     required this.textAreaConstraints,
   });
 
-  final UnmodifiableListView<WorkContentsElementView> segments;
+  final WorkContentsSegments segments;
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
   final void Function(int, int) onVisibleIndicesChanged;

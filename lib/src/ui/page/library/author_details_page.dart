@@ -3,8 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_author_details.dart';
-import 'package:latin_reader/src/external/provider_author.dart';
+import 'package:latin_reader/src/component/library/author_details_api.dart';
+import 'package:latin_reader/src/ui/widget/show_error.dart';
+import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
 class AuthorDetailsPage extends ConsumerWidget {
   const AuthorDetailsPage({super.key, required this.authorId});
@@ -12,31 +13,18 @@ class AuthorDetailsPage extends ConsumerWidget {
   final String authorId;
 
   @override
-  Widget build(context, ref) =>
-      ref.watch(LibraryAuthorDetailsProvider(authorId)).when(
-            data: (authorDetails) => Scaffold(
-              appBar: AppBar(
-                title: Text(authorDetails.name),
-              ),
-              body: worksList(context, authorDetails),
-            ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(error.toString()),
-                  TextButton(
-                    onPressed: () =>
-                        ref.refresh(libraryAuthorDetailsProvider(authorId)),
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            ),
-          );
+  Widget build(context, ref) => ref.watch(authorDetailsProvider(authorId)).when(
+        data: (authorDetails) => Scaffold(
+          appBar: AppBar(
+            title: Text(authorDetails.name),
+          ),
+          body: worksList(context, authorDetails),
+        ),
+        loading: showLoading,
+        error: showError(ref, authorDetailsProvider(authorId)),
+      );
 
-  Widget worksList(BuildContext context, AuthorDetailsView authorDetails) {
+  Widget worksList(BuildContext context, AuthorDetails authorDetails) {
     final allItems = [
       authorItem(context, authorDetails),
       ...workItems(context, authorDetails),
@@ -48,7 +36,7 @@ class AuthorDetailsPage extends ConsumerWidget {
   }
 
   Iterable<ListTile> workItems(
-          BuildContext context, AuthorDetailsView authorDetails) =>
+          BuildContext context, AuthorDetails authorDetails) =>
       authorDetails.works.map(
         (work) => ListTile(
           title: Row(
@@ -61,7 +49,7 @@ class AuthorDetailsPage extends ConsumerWidget {
         ),
       );
 
-  Widget authorItem(BuildContext context, AuthorDetailsView author) => Padding(
+  Widget authorItem(BuildContext context, AuthorDetails author) => Padding(
         padding: const EdgeInsets.all(8.0),
         child: Card(
           child: Padding(

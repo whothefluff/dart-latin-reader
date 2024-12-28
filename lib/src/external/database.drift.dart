@@ -1,10 +1,11 @@
 // dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
-import 'package:latin_reader/src/component/dictionary/dictionary.drift.dart'
+import 'package:latin_reader/src/component/morph_analysis/morph_analysis.drift.dart'
     as i1;
-import 'package:latin_reader/src/external/analysis.drift.dart' as i2;
-import 'package:latin_reader/src/external/library.drift.dart' as i3;
+import 'package:latin_reader/src/component/dictionary/dictionary.drift.dart'
+    as i2;
+import 'package:latin_reader/src/component/library/library.drift.dart' as i3;
 import 'package:latin_reader/src/external/data_version.drift.dart' as i4;
 import 'package:drift/internal/modular.dart' as i5;
 import 'package:sqlite3/common.dart' as i6;
@@ -12,22 +13,22 @@ import 'package:sqlite3/common.dart' as i6;
 abstract class $AppDb extends i0.GeneratedDatabase {
   $AppDb(i0.QueryExecutor e) : super(e);
   $AppDbManager get managers => $AppDbManager(this);
-  late final i1.Dictionaries dictionaries = i1.Dictionaries(this);
-  late final i1.DictionaryEntries dictionaryEntries =
-      i1.DictionaryEntries(this);
-  late final i1.DictionaryAlphabets dictionaryAlphabets =
-      i1.DictionaryAlphabets(this);
-  late final i1.DictEntrySenses dictEntrySenses = i1.DictEntrySenses(this);
-  late final i1.DictEntrySenseQuotes dictEntrySenseQuotes =
-      i1.DictEntrySenseQuotes(this);
-  late final i1.DictionaryDictionaries dictionaryDictionaries =
-      i1.DictionaryDictionaries(this);
-  late final i1.DictionaryDictionaryEntries dictionaryDictionaryEntries =
-      i1.DictionaryDictionaryEntries(this);
-  late final i2.MorphologicalDetails morphologicalDetails =
-      i2.MorphologicalDetails(this);
-  late final i2.MorphologicalDetailInflections morphologicalDetailInflections =
-      i2.MorphologicalDetailInflections(this);
+  late final i1.MorphologicalDetails morphologicalDetails =
+      i1.MorphologicalDetails(this);
+  late final i1.MorphologicalDetailInflections morphologicalDetailInflections =
+      i1.MorphologicalDetailInflections(this);
+  late final i2.Dictionaries dictionaries = i2.Dictionaries(this);
+  late final i2.DictionaryEntries dictionaryEntries =
+      i2.DictionaryEntries(this);
+  late final i2.DictionaryAlphabets dictionaryAlphabets =
+      i2.DictionaryAlphabets(this);
+  late final i2.DictEntrySenses dictEntrySenses = i2.DictEntrySenses(this);
+  late final i2.DictEntrySenseQuotes dictEntrySenseQuotes =
+      i2.DictEntrySenseQuotes(this);
+  late final i2.DictionaryDictionaries dictionaryDictionaries =
+      i2.DictionaryDictionaries(this);
+  late final i2.DictionaryDictionaryEntries dictionaryDictionaryEntries =
+      i2.DictionaryDictionaryEntries(this);
   late final i3.Authors authors = i3.Authors(this);
   late final i3.AuthorAbbreviations authorAbbreviations =
       i3.AuthorAbbreviations(this);
@@ -62,13 +63,15 @@ abstract class $AppDb extends i0.GeneratedDatabase {
       i4.LatestDataVersion(this);
   i3.LibraryDrift get libraryDrift => i5.ReadDatabaseContainer(this)
       .accessor<i3.LibraryDrift>(i3.LibraryDrift.new);
-  i1.DictionaryDrift get dictionaryDrift => i5.ReadDatabaseContainer(this)
-      .accessor<i1.DictionaryDrift>(i1.DictionaryDrift.new);
+  i2.DictionaryDrift get dictionaryDrift => i5.ReadDatabaseContainer(this)
+      .accessor<i2.DictionaryDrift>(i2.DictionaryDrift.new);
   @override
   Iterable<i0.TableInfo<i0.Table, Object?>> get allTables =>
       allSchemaEntities.whereType<i0.TableInfo<i0.Table, Object?>>();
   @override
   List<i0.DatabaseSchemaEntity> get allSchemaEntities => [
+        morphologicalDetails,
+        morphologicalDetailInflections,
         dictionaries,
         dictionaryEntries,
         dictionaryAlphabets,
@@ -76,8 +79,6 @@ abstract class $AppDb extends i0.GeneratedDatabase {
         dictEntrySenseQuotes,
         dictionaryDictionaries,
         dictionaryDictionaryEntries,
-        morphologicalDetails,
-        morphologicalDetailInflections,
         authors,
         authorAbbreviations,
         works,
@@ -106,22 +107,22 @@ abstract class $AppDb extends i0.GeneratedDatabase {
 class $AppDbManager {
   final $AppDb _db;
   $AppDbManager(this._db);
-  i1.$DictionariesTableManager get dictionaries =>
-      i1.$DictionariesTableManager(_db, _db.dictionaries);
-  i1.$DictionaryEntriesTableManager get dictionaryEntries =>
-      i1.$DictionaryEntriesTableManager(_db, _db.dictionaryEntries);
-  i1.$DictionaryAlphabetsTableManager get dictionaryAlphabets =>
-      i1.$DictionaryAlphabetsTableManager(_db, _db.dictionaryAlphabets);
-  i1.$DictEntrySensesTableManager get dictEntrySenses =>
-      i1.$DictEntrySensesTableManager(_db, _db.dictEntrySenses);
-  i1.$DictEntrySenseQuotesTableManager get dictEntrySenseQuotes =>
-      i1.$DictEntrySenseQuotesTableManager(_db, _db.dictEntrySenseQuotes);
-  i2.$MorphologicalDetailsTableManager get morphologicalDetails =>
-      i2.$MorphologicalDetailsTableManager(_db, _db.morphologicalDetails);
-  i2.$MorphologicalDetailInflectionsTableManager
+  i1.$MorphologicalDetailsTableManager get morphologicalDetails =>
+      i1.$MorphologicalDetailsTableManager(_db, _db.morphologicalDetails);
+  i1.$MorphologicalDetailInflectionsTableManager
       get morphologicalDetailInflections =>
-          i2.$MorphologicalDetailInflectionsTableManager(
+          i1.$MorphologicalDetailInflectionsTableManager(
               _db, _db.morphologicalDetailInflections);
+  i2.$DictionariesTableManager get dictionaries =>
+      i2.$DictionariesTableManager(_db, _db.dictionaries);
+  i2.$DictionaryEntriesTableManager get dictionaryEntries =>
+      i2.$DictionaryEntriesTableManager(_db, _db.dictionaryEntries);
+  i2.$DictionaryAlphabetsTableManager get dictionaryAlphabets =>
+      i2.$DictionaryAlphabetsTableManager(_db, _db.dictionaryAlphabets);
+  i2.$DictEntrySensesTableManager get dictEntrySenses =>
+      i2.$DictEntrySensesTableManager(_db, _db.dictEntrySenses);
+  i2.$DictEntrySenseQuotesTableManager get dictEntrySenseQuotes =>
+      i2.$DictEntrySenseQuotesTableManager(_db, _db.dictEntrySenseQuotes);
   i3.$AuthorsTableManager get authors =>
       i3.$AuthorsTableManager(_db, _db.authors);
   i3.$AuthorAbbreviationsTableManager get authorAbbreviations =>

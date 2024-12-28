@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'dictionaries_api.dart';
+part of 'authors_api.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dictionariesHash() => r'8edffb15c5641f93c3e843b8e659936bbcd41a1d';
+String _$authorsHash() => r'a564a2d33686e6f415456d1730467d01a94e505b';
 
-/// See also [dictionaries].
-@ProviderFor(dictionaries)
-final dictionariesProvider = AutoDisposeFutureProvider<Dictionaries>.internal(
-  dictionaries,
-  name: r'dictionariesProvider',
+/// See also [authors].
+@ProviderFor(authors)
+final authorsProvider = AutoDisposeFutureProvider<Authors>.internal(
+  authors,
+  name: r'authorsProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$dictionariesHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$authorsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef DictionariesRef = AutoDisposeFutureProviderRef<Dictionaries>;
+typedef AuthorsRef = AutoDisposeFutureProviderRef<Authors>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

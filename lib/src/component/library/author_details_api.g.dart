@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'dictionary_entries_api.dart';
+part of 'author_details_api.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dictionaryEntriesHash() => r'840a918f92130dd89ff66d8cd6f2f8cb60727ad6';
+String _$authorDetailsHash() => r'f27cc1fc375443fcd2fce8e8beaf5ff332cfd286';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,30 +29,30 @@ class _SystemHash {
   }
 }
 
-/// See also [dictionaryEntries].
-@ProviderFor(dictionaryEntries)
-const dictionaryEntriesProvider = DictionaryEntriesFamily();
+/// See also [authorDetails].
+@ProviderFor(authorDetails)
+const authorDetailsProvider = AuthorDetailsFamily();
 
-/// See also [dictionaryEntries].
-class DictionaryEntriesFamily extends Family<AsyncValue<DictionaryEntries>> {
-  /// See also [dictionaryEntries].
-  const DictionaryEntriesFamily();
+/// See also [authorDetails].
+class AuthorDetailsFamily extends Family<AsyncValue<AuthorDetails>> {
+  /// See also [authorDetails].
+  const AuthorDetailsFamily();
 
-  /// See also [dictionaryEntries].
-  DictionaryEntriesProvider call(
-    String dictionary,
+  /// See also [authorDetails].
+  AuthorDetailsProvider call(
+    String author,
   ) {
-    return DictionaryEntriesProvider(
-      dictionary,
+    return AuthorDetailsProvider(
+      author,
     );
   }
 
   @override
-  DictionaryEntriesProvider getProviderOverride(
-    covariant DictionaryEntriesProvider provider,
+  AuthorDetailsProvider getProviderOverride(
+    covariant AuthorDetailsProvider provider,
   ) {
     return call(
-      provider.dictionary,
+      provider.author,
     );
   }
 
@@ -68,76 +68,75 @@ class DictionaryEntriesFamily extends Family<AsyncValue<DictionaryEntries>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'dictionaryEntriesProvider';
+  String? get name => r'authorDetailsProvider';
 }
 
-/// See also [dictionaryEntries].
-class DictionaryEntriesProvider
-    extends AutoDisposeFutureProvider<DictionaryEntries> {
-  /// See also [dictionaryEntries].
-  DictionaryEntriesProvider(
-    String dictionary,
+/// See also [authorDetails].
+class AuthorDetailsProvider extends AutoDisposeFutureProvider<AuthorDetails> {
+  /// See also [authorDetails].
+  AuthorDetailsProvider(
+    String author,
   ) : this._internal(
-          (ref) => dictionaryEntries(
-            ref as DictionaryEntriesRef,
-            dictionary,
+          (ref) => authorDetails(
+            ref as AuthorDetailsRef,
+            author,
           ),
-          from: dictionaryEntriesProvider,
-          name: r'dictionaryEntriesProvider',
+          from: authorDetailsProvider,
+          name: r'authorDetailsProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$dictionaryEntriesHash,
-          dependencies: DictionaryEntriesFamily._dependencies,
+                  : _$authorDetailsHash,
+          dependencies: AuthorDetailsFamily._dependencies,
           allTransitiveDependencies:
-              DictionaryEntriesFamily._allTransitiveDependencies,
-          dictionary: dictionary,
+              AuthorDetailsFamily._allTransitiveDependencies,
+          author: author,
         );
 
-  DictionaryEntriesProvider._internal(
+  AuthorDetailsProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.dictionary,
+    required this.author,
   }) : super.internal();
 
-  final String dictionary;
+  final String author;
 
   @override
   Override overrideWith(
-    FutureOr<DictionaryEntries> Function(DictionaryEntriesRef provider) create,
+    FutureOr<AuthorDetails> Function(AuthorDetailsRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: DictionaryEntriesProvider._internal(
-        (ref) => create(ref as DictionaryEntriesRef),
+      override: AuthorDetailsProvider._internal(
+        (ref) => create(ref as AuthorDetailsRef),
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        dictionary: dictionary,
+        author: author,
       ),
     );
   }
 
   @override
-  AutoDisposeFutureProviderElement<DictionaryEntries> createElement() {
-    return _DictionaryEntriesProviderElement(this);
+  AutoDisposeFutureProviderElement<AuthorDetails> createElement() {
+    return _AuthorDetailsProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is DictionaryEntriesProvider && other.dictionary == dictionary;
+    return other is AuthorDetailsProvider && other.author == author;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, dictionary.hashCode);
+    hash = _SystemHash.combine(hash, author.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -145,18 +144,18 @@ class DictionaryEntriesProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin DictionaryEntriesRef on AutoDisposeFutureProviderRef<DictionaryEntries> {
-  /// The parameter `dictionary` of this provider.
-  String get dictionary;
+mixin AuthorDetailsRef on AutoDisposeFutureProviderRef<AuthorDetails> {
+  /// The parameter `author` of this provider.
+  String get author;
 }
 
-class _DictionaryEntriesProviderElement
-    extends AutoDisposeFutureProviderElement<DictionaryEntries>
-    with DictionaryEntriesRef {
-  _DictionaryEntriesProviderElement(super.provider);
+class _AuthorDetailsProviderElement
+    extends AutoDisposeFutureProviderElement<AuthorDetails>
+    with AuthorDetailsRef {
+  _AuthorDetailsProviderElement(super.provider);
 
   @override
-  String get dictionary => (origin as DictionaryEntriesProvider).dictionary;
+  String get author => (origin as AuthorDetailsProvider).author;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

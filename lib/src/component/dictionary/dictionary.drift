@@ -1,6 +1,6 @@
 import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart';
 import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart';
-import 'package:latin_reader/src/component/dictionary/dictionary_entry_api.dart';
+import 'package:latin_reader/src/component/dictionary/dictionary_entry_senses_api.dart';
 
 CREATE TABLE "Dictionaries" (
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),

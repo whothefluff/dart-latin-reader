@@ -8,7 +8,7 @@ import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart'
     as i3;
 import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart'
     as i4;
-import 'package:latin_reader/src/component/dictionary/dictionary_entry_api.dart'
+import 'package:latin_reader/src/component/dictionary/dictionary_entry_senses_api.dart'
     as i5;
 
 typedef $DictionariesCreateCompanionBuilder = i1.DictionariesCompanion

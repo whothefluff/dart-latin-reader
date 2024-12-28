@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,10 +52,7 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
               ],
             ),
             loading: showLoading,
-            error: showError(
-              ref,
-              dictionaryEntriesProvider(widget.dictionary),
-            ),
+            error: error(ref),
           );
 
   @override
@@ -65,6 +60,9 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
     _scrollController.dispose();
     super.dispose();
   }
+
+  Widget Function(Object error, StackTrace _) error(WidgetRef ref) =>
+      showError(ref, dictionaryEntriesProvider(widget.dictionary));
 //
 }
 
@@ -77,7 +75,7 @@ class ScrollableEntries extends ConsumerStatefulWidget {
   });
 
   final String dictId;
-  final UnmodifiableListView<Entry> data;
+  final DictionaryEntries data;
   final ScrollController scrollController;
 
   @override

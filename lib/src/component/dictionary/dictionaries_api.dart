@@ -12,23 +12,26 @@ part 'dictionaries_api.g.dart';
 //infrastructure
 
 @riverpod
-Future<UnmodifiableListView<Dictionary>> dictionaries(Ref ref) async {
+Future<Dictionaries> dictionaries(Ref ref) async {
   log.info(() => '@riverpod - dictionaries');
-  final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 2));
-  return GetDictionariesUseCase(DictionaryRepository(db)).invoke();
+  final db = await ref.watch(dbProvider.future);
+  final repo = DictionaryRepository(db);
+  return GetDictionariesUseCase(repo).invoke();
 }
 
 class DictionaryRepository implements IDictionaryRepository {
-  DictionaryRepository(this.db);
+  DictionaryRepository(
+    this._db,
+  );
 
-  final AppDb db;
+  final AppDb _db;
 
   @override
-  Future<UnmodifiableListView<Dictionary>> getDictionaries() async {
+  Future<Dictionaries> getDictionaries() async {
     log.info('DictionaryRepository - reading dictionaries from db');
-    final dbDicts = await db.dictionaryDrift.getDictionaries().get();
-    return UnmodifiableListView(dbDicts as Iterable<Dictionary>);
+    final dbData = await _db.dictionaryDrift.getDictionaries().get();
+    return Dictionaries(dbData);
   }
 //
 }
@@ -37,7 +40,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
 abstract interface class IDictionaryRepository {
 //
-  Future<UnmodifiableListView<Dictionary>> getDictionaries();
+  Future<Dictionaries> getDictionaries();
 //
 }
 
@@ -49,8 +52,7 @@ class GetDictionariesUseCase implements IGetDictionariesUseCase {
   final IDictionaryRepository _repository;
 
   @override
-  Future<UnmodifiableListView<Dictionary>> invoke() async =>
-      _repository.getDictionaries();
+  Future<Dictionaries> invoke() async => _repository.getDictionaries();
 //
 }
 
@@ -58,8 +60,14 @@ class GetDictionariesUseCase implements IGetDictionariesUseCase {
 
 abstract interface class IGetDictionariesUseCase {
 //
-  Future<UnmodifiableListView<Dictionary>> invoke();
+  Future<Dictionaries> invoke();
 //
+}
+
+@immutable
+extension type const Dictionaries._(UnmodifiableListView<Dictionary> unm)
+    implements UnmodifiableListView<Dictionary> {
+  Dictionaries(Iterable<Dictionary> iter) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
