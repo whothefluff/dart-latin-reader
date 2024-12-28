@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'dictionary_entries_api.dart';
+part of 'work_details_api.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dictionaryEntriesHash() => r'840a918f92130dd89ff66d8cd6f2f8cb60727ad6';
+String _$workDetailsHash() => r'ea6616e5a7a7dfb60128ecd387e6a2dae5bfc223';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,30 +29,30 @@ class _SystemHash {
   }
 }
 
-/// See also [dictionaryEntries].
-@ProviderFor(dictionaryEntries)
-const dictionaryEntriesProvider = DictionaryEntriesFamily();
+/// See also [workDetails].
+@ProviderFor(workDetails)
+const workDetailsProvider = WorkDetailsFamily();
 
-/// See also [dictionaryEntries].
-class DictionaryEntriesFamily extends Family<AsyncValue<DictionaryEntries>> {
-  /// See also [dictionaryEntries].
-  const DictionaryEntriesFamily();
+/// See also [workDetails].
+class WorkDetailsFamily extends Family<AsyncValue<WorkDetails>> {
+  /// See also [workDetails].
+  const WorkDetailsFamily();
 
-  /// See also [dictionaryEntries].
-  DictionaryEntriesProvider call(
-    String dictionary,
+  /// See also [workDetails].
+  WorkDetailsProvider call(
+    String work,
   ) {
-    return DictionaryEntriesProvider(
-      dictionary,
+    return WorkDetailsProvider(
+      work,
     );
   }
 
   @override
-  DictionaryEntriesProvider getProviderOverride(
-    covariant DictionaryEntriesProvider provider,
+  WorkDetailsProvider getProviderOverride(
+    covariant WorkDetailsProvider provider,
   ) {
     return call(
-      provider.dictionary,
+      provider.work,
     );
   }
 
@@ -68,76 +68,75 @@ class DictionaryEntriesFamily extends Family<AsyncValue<DictionaryEntries>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'dictionaryEntriesProvider';
+  String? get name => r'workDetailsProvider';
 }
 
-/// See also [dictionaryEntries].
-class DictionaryEntriesProvider
-    extends AutoDisposeFutureProvider<DictionaryEntries> {
-  /// See also [dictionaryEntries].
-  DictionaryEntriesProvider(
-    String dictionary,
+/// See also [workDetails].
+class WorkDetailsProvider extends AutoDisposeFutureProvider<WorkDetails> {
+  /// See also [workDetails].
+  WorkDetailsProvider(
+    String work,
   ) : this._internal(
-          (ref) => dictionaryEntries(
-            ref as DictionaryEntriesRef,
-            dictionary,
+          (ref) => workDetails(
+            ref as WorkDetailsRef,
+            work,
           ),
-          from: dictionaryEntriesProvider,
-          name: r'dictionaryEntriesProvider',
+          from: workDetailsProvider,
+          name: r'workDetailsProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$dictionaryEntriesHash,
-          dependencies: DictionaryEntriesFamily._dependencies,
+                  : _$workDetailsHash,
+          dependencies: WorkDetailsFamily._dependencies,
           allTransitiveDependencies:
-              DictionaryEntriesFamily._allTransitiveDependencies,
-          dictionary: dictionary,
+              WorkDetailsFamily._allTransitiveDependencies,
+          work: work,
         );
 
-  DictionaryEntriesProvider._internal(
+  WorkDetailsProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.dictionary,
+    required this.work,
   }) : super.internal();
 
-  final String dictionary;
+  final String work;
 
   @override
   Override overrideWith(
-    FutureOr<DictionaryEntries> Function(DictionaryEntriesRef provider) create,
+    FutureOr<WorkDetails> Function(WorkDetailsRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: DictionaryEntriesProvider._internal(
-        (ref) => create(ref as DictionaryEntriesRef),
+      override: WorkDetailsProvider._internal(
+        (ref) => create(ref as WorkDetailsRef),
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        dictionary: dictionary,
+        work: work,
       ),
     );
   }
 
   @override
-  AutoDisposeFutureProviderElement<DictionaryEntries> createElement() {
-    return _DictionaryEntriesProviderElement(this);
+  AutoDisposeFutureProviderElement<WorkDetails> createElement() {
+    return _WorkDetailsProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is DictionaryEntriesProvider && other.dictionary == dictionary;
+    return other is WorkDetailsProvider && other.work == work;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, dictionary.hashCode);
+    hash = _SystemHash.combine(hash, work.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -145,18 +144,17 @@ class DictionaryEntriesProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin DictionaryEntriesRef on AutoDisposeFutureProviderRef<DictionaryEntries> {
-  /// The parameter `dictionary` of this provider.
-  String get dictionary;
+mixin WorkDetailsRef on AutoDisposeFutureProviderRef<WorkDetails> {
+  /// The parameter `work` of this provider.
+  String get work;
 }
 
-class _DictionaryEntriesProviderElement
-    extends AutoDisposeFutureProviderElement<DictionaryEntries>
-    with DictionaryEntriesRef {
-  _DictionaryEntriesProviderElement(super.provider);
+class _WorkDetailsProviderElement
+    extends AutoDisposeFutureProviderElement<WorkDetails> with WorkDetailsRef {
+  _WorkDetailsProviderElement(super.provider);
 
   @override
-  String get dictionary => (origin as DictionaryEntriesProvider).dictionary;
+  String get work => (origin as WorkDetailsProvider).work;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

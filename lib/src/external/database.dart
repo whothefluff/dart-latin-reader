@@ -24,9 +24,9 @@ Future<AppDb> db(Ref ref) async {
 @DriftDatabase(
   include: {
     'data_version.drift',
-    'library.drift',
-    'analysis.drift',
-    '../component/dictionary/dictionary.drift'
+    '../component/library/library.drift',
+    '../component/dictionary/dictionary.drift',
+    '../component/morph_analysis/morph_analysis.drift',
   },
 )
 class AppDb extends $AppDb {

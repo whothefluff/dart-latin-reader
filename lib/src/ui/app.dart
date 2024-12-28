@@ -3,16 +3,16 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/component/dictionary/dictionaries_page.dart';
-import 'package:latin_reader/src/component/dictionary/dictionary_entries_page.dart';
-import 'package:latin_reader/src/component/dictionary/dictionary_entry_page.dart';
+import 'package:latin_reader/src/ui/page/dictionary/dictionaries_page.dart';
+import 'package:latin_reader/src/ui/page/dictionary/dictionary_entries_page.dart';
+import 'package:latin_reader/src/ui/page/dictionary/dictionary_entry_page.dart';
 import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
+import 'package:latin_reader/src/ui/page/word_frequency_page.dart';
+import 'package:latin_reader/src/ui/page/word_lookup_page.dart';
 
-import 'page/dictionary/placeholder.dart';
 import 'page/library/text_page.dart';
-import 'page/library/works_page.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 import 'widget/custom_adaptive_scaffold.dart';
@@ -42,7 +42,7 @@ final _authorRoutes = [
   GoRoute(
     path: '/works',
     // TODO(whothefluff): (someday) implement
-    builder: (context, state) => const WorksPage(authorIndex: 0),
+    builder: (_, __) => const Icon(Icons.error),
     routes: [
       GoRoute(
         path: ':id',
@@ -102,7 +102,7 @@ const _wordFreqDest = NavigationDestination(
 final _wordFrequencyRoutes = [
   GoRoute(
     path: '/word-frequency',
-    builder: (context, state) => const PlaceholderDict(title: 'testing'),
+    builder: (context, state) => const WordFrequencyPage(),
   ),
 ];
 const _wordLookupDest = NavigationDestination(
@@ -112,7 +112,7 @@ const _wordLookupDest = NavigationDestination(
 final _wordLookupRoutes = [
   GoRoute(
     path: '/word-lookup',
-    builder: (context, state) => const PlaceholderDict(title: 'testing'),
+    builder: (context, state) => const WordLookupPage(),
   ),
 ];
 final mainBranches = [

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/external/provider_work.dart';
+import 'package:latin_reader/src/component/library/work_details_api.dart';
+import 'package:latin_reader/src/ui/widget/show_error.dart';
+import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
 class WorkDetailsPage extends ConsumerWidget {
   const WorkDetailsPage({
@@ -12,52 +14,39 @@ class WorkDetailsPage extends ConsumerWidget {
   final String workId;
 
   @override
-  Widget build(context, ref) =>
-      ref.watch(libraryWorkDetailsProvider(workId)).when(
-            data: (workDetails) => Scaffold(
-              appBar: AppBar(
-                title: Text(workDetails.name),
+  Widget build(context, ref) => ref.watch(workDetailsProvider(workId)).when(
+        data: (workDetails) => Scaffold(
+          appBar: AppBar(
+            title: Text(workDetails.name),
+          ),
+          body: ListView(
+            children: [
+              BookThingy(
+                id: workDetails.id,
+                title: workDetails.name,
+                numberOfWords: workDetails.numberOfWords,
+                authorId: workDetails.authorId,
+                authorName: workDetails.authorName,
               ),
-              body: ListView(
-                children: [
-                  BookThingy(
-                    id: workDetails.id,
-                    title: workDetails.name,
-                    numberOfWords: workDetails.numberOfWords,
-                    authorId: workDetails.authorId,
-                    authorName: workDetails.authorName,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            text: workDetails.about,
-                            style: DefaultTextStyle.of(context).style,
-                          ),
-                        ),
-                      ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        text: workDetails.about,
+                        style: DefaultTextStyle.of(context).style,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Error: $error'),
-                  TextButton(
-                    onPressed: () =>
-                        ref.refresh(libraryWorkDetailsProvider(workId)),
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            ),
-          );
+            ],
+          ),
+        ),
+        loading: showLoading,
+        error: showError(ref, workDetailsProvider(workId)),
+      );
 //
 }
 

@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/src/component/dictionary/dictionary_entry_api.dart';
+import 'package:latin_reader/src/component/dictionary/dictionary_entry_senses_api.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 

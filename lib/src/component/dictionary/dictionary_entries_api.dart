@@ -12,27 +12,27 @@ part 'dictionary_entries_api.g.dart';
 //infrastructure
 
 @riverpod
-Future<UnmodifiableListView<Entry>> dictionaryEntries(
-  Ref ref,
-  String dictionary,
-) async {
+Future<DictionaryEntries> dictionaryEntries(Ref ref, String dictionary) async {
   log.info(() => '@riverpod - dictionaryEntries');
-  final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 2));
-  return GetEntriesUseCase(DictionaryRepository(db), dictionary).invoke();
+  final db = await ref.watch(dbProvider.future);
+  final repo = DictionaryRepository(db);
+  return GetEntriesUseCase(repo, dictionary).invoke();
 }
 
 class DictionaryRepository implements IDictionaryRepository {
-  DictionaryRepository(this.db);
+  DictionaryRepository(
+    this._db,
+  );
 
-  final AppDb db;
+  final AppDb _db;
 
   @override
-  Future<UnmodifiableListView<Entry>> getEntriesOf(String dictionary) async {
+  Future<DictionaryEntries> getEntriesOf(String dictionary) async {
     log.info('DictionaryRepository - reading dictionary entries from db');
     final dbData =
-        await db.dictionaryDrift.getDictionaryEntries(dictionary).get();
-    return UnmodifiableListView(dbData as Iterable<Entry>);
+        await _db.dictionaryDrift.getDictionaryEntries(dictionary).get();
+    return DictionaryEntries(dbData);
   }
 //
 }
@@ -41,7 +41,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
 abstract interface class IDictionaryRepository {
 //
-  Future<UnmodifiableListView<Entry>> getEntriesOf(String dictionary);
+  Future<DictionaryEntries> getEntriesOf(String dictionary);
 //
 }
 
@@ -55,7 +55,7 @@ class GetEntriesUseCase implements IGetEntriesUseCase {
   final String _dictionary;
 
   @override
-  Future<UnmodifiableListView<Entry>> invoke() async =>
+  Future<DictionaryEntries> invoke() async =>
       _repository.getEntriesOf(_dictionary);
 //
 }
@@ -64,8 +64,14 @@ class GetEntriesUseCase implements IGetEntriesUseCase {
 
 abstract interface class IGetEntriesUseCase {
 //
-  Future<UnmodifiableListView<Entry>> invoke();
+  Future<DictionaryEntries> invoke();
 //
+}
+
+@immutable
+extension type const DictionaryEntries._(UnmodifiableListView<Entry> unm)
+    implements UnmodifiableListView<Entry> {
+  DictionaryEntries(Iterable<Entry> iter) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
@@ -85,7 +91,7 @@ class Entry {
   final int numberOfSenses;
 
   @override
-  String toString() => 'DictionaryEntry{lemma: $lemma}';
+  String toString() => 'Entry{lemma: $lemma}';
 
   @override
   bool operator ==(Object other) {

@@ -10,17 +10,14 @@ part 'dictionary_alphabets_api.g.dart';
 
 @riverpod
 Future<DictionaryAlphabetLetterPosition> dictionaryAlphabetLetterPosition(
-  Ref ref,
-  String dictionary,
-  String letter,
-) async {
+    Ref ref, String dictionary, String letter) async {
   log.info(() => '@riverpod - dictionaryAlphabetLetterPosition');
-  final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 120));
-  return db.dictionaryDrift
+  final db = await ref.watch(dbProvider.future);
+  final dbData = await db.dictionaryDrift
       .getDictionaryAlphabetLetterPosition(dictionary, letter)
-      .getSingle()
-      .then(DictionaryAlphabetLetterPosition.new);
+      .getSingle();
+  return DictionaryAlphabetLetterPosition(dbData);
 //
 }
 

@@ -1,6 +1,7 @@
-import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart';
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart';
+import 'package:latin_reader/src/component/library/authors_api.dart';
+import 'package:latin_reader/src/component/library/author_details_api.dart';
+import 'package:latin_reader/src/component/library/work_details_api.dart';
+import 'package:latin_reader/src/component/library/work_contents_api.dart';
 
 CREATE TABLE "Authors"(
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
@@ -138,7 +139,7 @@ CREATE VIEW "WorkContentSubdivisionsHierarchy" AS
             FROM Subsets
             ORDER BY fromindex, depth, toindex;
 
-CREATE VIEW "LibraryAuthors" AS
+CREATE VIEW "library.Authors" AS
     SELECT Authors.id,
            Authors.name,
            Authors.about,
@@ -148,9 +149,9 @@ CREATE VIEW "LibraryAuthors" AS
         LEFT JOIN AuthorsAndWorks
             ON Authors.id = AuthorsAndWorks.authorId;
 
-getLibraryAuthors WITH AuthorView: SELECT * FROM LibraryAuthors;
+getLibraryAuthors WITH Author: SELECT * FROM "library.Authors";
 
-CREATE VIEW "LibraryAuthorDetails" AS 
+CREATE VIEW "library.AuthorDetails" AS 
     WITH Aux AS ( SELECT Authors.id,
                          Authors.name,
                          Authors.about,
@@ -175,9 +176,9 @@ CREATE VIEW "LibraryAuthorDetails" AS
             INNER JOIN WorksContents
                 ON Aux.workId = WorksContents.workId;
 
-getLibraryAuthorDetails: SELECT * FROM LibraryAuthorDetails WHERE id = ?;
+getLibraryAuthorDetails: SELECT * FROM "library.AuthorDetails" WHERE id = ?;
 
-CREATE VIEW "LibraryWorkDetails" AS 
+CREATE VIEW "library.WorkDetails" AS 
     WITH Aux AS ( SELECT id,
                          name,
                          about
@@ -201,9 +202,9 @@ CREATE VIEW "LibraryWorkDetails" AS
             LEFT OUTER JOIN Authors 
                 ON AuthorsAndWorks.authorId = Authors.id;
 
-getLibraryWorkDetails WITH WorkDetailsView: SELECT * FROM LibraryWorkDetails WHERE id = ?;
+getLibraryWorkDetails WITH WorkDetails: SELECT * FROM "library.WorkDetails" WHERE id = ?;
 
-CREATE VIEW "LibraryWorkContents" AS 
+CREATE VIEW "library.WorkContents" AS 
     WITH ClosestSubdivision AS ( SELECT WorkContents.workId,
                                         WorkContents.idx,
                                         WorkContents.word,
@@ -218,7 +219,7 @@ CREATE VIEW "LibraryWorkContents" AS
                                          ON WorkContents.workId = SubdivsHierarchy.workId
                                             AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex
                                             AND SubdivsHierarchy.typ <> 'TITL' )
-        SELECT workId AS id,
+        SELECT workId,
                parent,
                node,
                idx,
@@ -230,9 +231,9 @@ CREATE VIEW "LibraryWorkContents" AS
             WHERE rn = 1
             ORDER BY idx;
 
-getLibraryWorkContentsPartial WITH WorkContentsElementView: SELECT * FROM LibraryWorkContents WHERE id = ? AND idx BETWEEN ? AND ?;
+getLibraryWorkContentsPartial WITH WorkContentsSegment: SELECT * FROM "library.WorkContents" WHERE workId = ? AND idx BETWEEN ? AND ?;
 
-CREATE VIEW "LibraryWorkIndexes" AS
+CREATE VIEW "library.WorkIndexes" AS
     SELECT SubdivsHierarchy.parent,
            SubdivsHierarchy.node,
            SubdivsHierarchy.depth,

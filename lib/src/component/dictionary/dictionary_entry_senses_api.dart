@@ -7,36 +7,35 @@ import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'dictionary_entry_api.g.dart';
+part 'dictionary_entry_senses_api.g.dart';
 
 //infrastructure
 
 @riverpod
-Future<UnmodifiableListView<EntrySense>> dictionaryEntrySenses(
-  Ref ref,
-  String dictionary,
-  String lemma,
-) async {
+Future<DictionaryEntrySenses> dictionaryEntrySenses(
+    Ref ref, String dictionary, String lemma) async {
   log.info(() => '@riverpod - dictionaryEntrySenses');
-  final db = await ref.watch(dbProvider.future);
   ref.cacheFor(const Duration(minutes: 5));
-  return GetEntrySensesUseCase(DictionaryRepository(db), dictionary, lemma)
-      .invoke();
+  final db = await ref.watch(dbProvider.future);
+  final repo = DictionaryRepository(db);
+  return GetEntrySensesUseCase(repo, dictionary, lemma).invoke();
 }
 
 class DictionaryRepository implements IDictionaryRepository {
-  DictionaryRepository(this.db);
+  DictionaryRepository(
+    this._db,
+  );
 
-  final AppDb db;
+  final AppDb _db;
 
   @override
-  Future<UnmodifiableListView<EntrySense>> getEntrySensesOf(
+  Future<DictionaryEntrySenses> getEntrySensesOf(
       String dictionary, String lemma) async {
     log.info('DictionaryRepository - reading dictionary entry senses from db');
-    final dbData = await db.dictionaryDrift
+    final dbData = await _db.dictionaryDrift
         .getDictionaryEntrySenses(dictionary, lemma)
         .get();
-    return UnmodifiableListView(dbData as Iterable<EntrySense>);
+    return DictionaryEntrySenses(dbData);
   }
 //
 }
@@ -45,7 +44,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
 abstract interface class IDictionaryRepository {
 //
-  Future<UnmodifiableListView<EntrySense>> getEntrySensesOf(
+  Future<DictionaryEntrySenses> getEntrySensesOf(
       String dictionary, String lemma);
 //
 }
@@ -62,7 +61,7 @@ class GetEntrySensesUseCase implements IGetEntrySensesUseCase {
   final String _lemma;
 
   @override
-  Future<UnmodifiableListView<EntrySense>> invoke() async =>
+  Future<DictionaryEntrySenses> invoke() async =>
       _repository.getEntrySensesOf(_dictionary, _lemma);
 //
 }
@@ -71,8 +70,16 @@ class GetEntrySensesUseCase implements IGetEntrySensesUseCase {
 
 abstract interface class IGetEntrySensesUseCase {
 //
-  Future<UnmodifiableListView<EntrySense>> invoke();
+  Future<DictionaryEntrySenses> invoke();
 //
+}
+
+@immutable
+extension type const DictionaryEntrySenses._(
+        UnmodifiableListView<EntrySense> unm)
+    implements UnmodifiableListView<EntrySense> {
+  DictionaryEntrySenses(Iterable<EntrySense> iter)
+      : this._(UnmodifiableListView(iter));
 }
 
 @immutable

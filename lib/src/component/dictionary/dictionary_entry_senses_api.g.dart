@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'dictionary_entry_api.dart';
+part of 'dictionary_entry_senses_api.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
 String _$dictionaryEntrySensesHash() =>
-    r'a9ea19aa00e118be9f68ff9d8bb4b19e7d7ef24d';
+    r'f10688de0c23510ad74366583abe7ffd7c3fb0ad';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -36,7 +36,7 @@ const dictionaryEntrySensesProvider = DictionaryEntrySensesFamily();
 
 /// See also [dictionaryEntrySenses].
 class DictionaryEntrySensesFamily
-    extends Family<AsyncValue<UnmodifiableListView<EntrySense>>> {
+    extends Family<AsyncValue<DictionaryEntrySenses>> {
   /// See also [dictionaryEntrySenses].
   const DictionaryEntrySensesFamily();
 
@@ -78,7 +78,7 @@ class DictionaryEntrySensesFamily
 
 /// See also [dictionaryEntrySenses].
 class DictionaryEntrySensesProvider
-    extends AutoDisposeFutureProvider<UnmodifiableListView<EntrySense>> {
+    extends AutoDisposeFutureProvider<DictionaryEntrySenses> {
   /// See also [dictionaryEntrySenses].
   DictionaryEntrySensesProvider(
     String dictionary,
@@ -118,8 +118,7 @@ class DictionaryEntrySensesProvider
 
   @override
   Override overrideWith(
-    FutureOr<UnmodifiableListView<EntrySense>> Function(
-            DictionaryEntrySensesRef provider)
+    FutureOr<DictionaryEntrySenses> Function(DictionaryEntrySensesRef provider)
         create,
   ) {
     return ProviderOverride(
@@ -138,8 +137,7 @@ class DictionaryEntrySensesProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<UnmodifiableListView<EntrySense>>
-      createElement() {
+  AutoDisposeFutureProviderElement<DictionaryEntrySenses> createElement() {
     return _DictionaryEntrySensesProviderElement(this);
   }
 
@@ -163,7 +161,7 @@ class DictionaryEntrySensesProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin DictionaryEntrySensesRef
-    on AutoDisposeFutureProviderRef<UnmodifiableListView<EntrySense>> {
+    on AutoDisposeFutureProviderRef<DictionaryEntrySenses> {
   /// The parameter `dictionary` of this provider.
   String get dictionary;
 
@@ -172,7 +170,7 @@ mixin DictionaryEntrySensesRef
 }
 
 class _DictionaryEntrySensesProviderElement
-    extends AutoDisposeFutureProviderElement<UnmodifiableListView<EntrySense>>
+    extends AutoDisposeFutureProviderElement<DictionaryEntrySenses>
     with DictionaryEntrySensesRef {
   _DictionaryEntrySensesProviderElement(super.provider);
 

@@ -1,14 +1,12 @@
 // dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
-import 'package:latin_reader/src/external/library.drift.dart' as i1;
+import 'package:latin_reader/src/component/library/library.drift.dart' as i1;
 import 'dart:typed_data' as i2;
 import 'package:drift/internal/modular.dart' as i3;
-import 'package:latin_reader/src/component/library/use_case/entity/view_author.dart'
-    as i4;
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_details.dart'
-    as i5;
-import 'package:latin_reader/src/component/library/use_case/entity/view_work_contents_element.dart'
+import 'package:latin_reader/src/component/library/authors_api.dart' as i4;
+import 'package:latin_reader/src/component/library/work_details_api.dart' as i5;
+import 'package:latin_reader/src/component/library/work_contents_api.dart'
     as i6;
 
 typedef $AuthorsCreateCompanionBuilder = i1.AuthorsCompanion Function({
@@ -4938,11 +4936,11 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
   @override
   String get aliasedName => _alias ?? entityName;
   @override
-  String get entityName => 'LibraryAuthors';
+  String get entityName => 'library.Authors';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW LibraryAuthors AS SELECT Authors.id, Authors.name, Authors.about, Authors.image, COUNT(*)OVER (PARTITION BY AuthorsAndWorks.workId RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfWorks FROM Authors LEFT JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId',
+            'CREATE VIEW "library.Authors" AS SELECT Authors.id, Authors.name, Authors.about, Authors.image, COUNT(*)OVER (PARTITION BY AuthorsAndWorks.workId RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfWorks FROM Authors LEFT JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId',
       };
   @override
   LibraryAuthors get asDslTable => this;
@@ -5092,11 +5090,11 @@ class LibraryAuthorDetails
   @override
   String get aliasedName => _alias ?? entityName;
   @override
-  String get entityName => 'LibraryAuthorDetails';
+  String get entityName => 'library.AuthorDetails';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW LibraryAuthorDetails AS WITH Aux AS (SELECT Authors.id, Authors.name, Authors.about, Authors.image, AuthorsAndWorks.workId, Works.name AS workName FROM Authors INNER JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId INNER JOIN Works ON AuthorsAndWorks.workId = Works.id), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.workId = WorkContents.workId WHERE WorkContents.word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords FROM Aux INNER JOIN WorksContents ON Aux.workId = WorksContents.workId',
+            'CREATE VIEW "library.AuthorDetails" AS WITH Aux AS (SELECT Authors.id, Authors.name, Authors.about, Authors.image, AuthorsAndWorks.workId, Works.name AS workName FROM Authors INNER JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId INNER JOIN Works ON AuthorsAndWorks.workId = Works.id), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.workId = WorkContents.workId WHERE WorkContents.word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords FROM Aux INNER JOIN WorksContents ON Aux.workId = WorksContents.workId',
       };
   @override
   LibraryAuthorDetails get asDslTable => this;
@@ -5249,11 +5247,11 @@ class LibraryWorkDetails
   @override
   String get aliasedName => _alias ?? entityName;
   @override
-  String get entityName => 'LibraryWorkDetails';
+  String get entityName => 'library.WorkDetails';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW LibraryWorkDetails AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.id = WorkContents.workId WHERE word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords, AuthorsAndWorks.authorId, Authors.name AS authorName FROM Aux INNER JOIN WorksContents ON Aux.id = WorksContents.workId LEFT OUTER JOIN AuthorsAndWorks ON Aux.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id',
+            'CREATE VIEW "library.WorkDetails" AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.id = WorkContents.workId WHERE word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords, AuthorsAndWorks.authorId, Authors.name AS authorName FROM Aux INNER JOIN WorksContents ON Aux.id = WorksContents.workId LEFT OUTER JOIN AuthorsAndWorks ON Aux.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id',
       };
   @override
   LibraryWorkDetails get asDslTable => this;
@@ -5307,7 +5305,7 @@ class LibraryWorkDetails
 }
 
 class LibraryWorkContent extends i0.DataClass {
-  final String id;
+  final String workId;
   final String? parent;
   final String node;
   final int idx;
@@ -5316,7 +5314,7 @@ class LibraryWorkContent extends i0.DataClass {
   final int depth;
   final String sourceReference;
   const LibraryWorkContent(
-      {required this.id,
+      {required this.workId,
       this.parent,
       required this.node,
       required this.idx,
@@ -5328,7 +5326,7 @@ class LibraryWorkContent extends i0.DataClass {
       {i0.ValueSerializer? serializer}) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LibraryWorkContent(
-      id: serializer.fromJson<String>(json['id']),
+      workId: serializer.fromJson<String>(json['workId']),
       parent: serializer.fromJson<String?>(json['parent']),
       node: serializer.fromJson<String>(json['node']),
       idx: serializer.fromJson<int>(json['idx']),
@@ -5342,7 +5340,7 @@ class LibraryWorkContent extends i0.DataClass {
   Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
+      'workId': serializer.toJson<String>(workId),
       'parent': serializer.toJson<String?>(parent),
       'node': serializer.toJson<String>(node),
       'idx': serializer.toJson<int>(idx),
@@ -5354,7 +5352,7 @@ class LibraryWorkContent extends i0.DataClass {
   }
 
   i1.LibraryWorkContent copyWith(
-          {String? id,
+          {String? workId,
           i0.Value<String?> parent = const i0.Value.absent(),
           String? node,
           int? idx,
@@ -5363,7 +5361,7 @@ class LibraryWorkContent extends i0.DataClass {
           int? depth,
           String? sourceReference}) =>
       i1.LibraryWorkContent(
-        id: id ?? this.id,
+        workId: workId ?? this.workId,
         parent: parent.present ? parent.value : this.parent,
         node: node ?? this.node,
         idx: idx ?? this.idx,
@@ -5375,7 +5373,7 @@ class LibraryWorkContent extends i0.DataClass {
   @override
   String toString() {
     return (StringBuffer('LibraryWorkContent(')
-          ..write('id: $id, ')
+          ..write('workId: $workId, ')
           ..write('parent: $parent, ')
           ..write('node: $node, ')
           ..write('idx: $idx, ')
@@ -5389,12 +5387,12 @@ class LibraryWorkContent extends i0.DataClass {
 
   @override
   int get hashCode =>
-      Object.hash(id, parent, node, idx, word, typ, depth, sourceReference);
+      Object.hash(workId, parent, node, idx, word, typ, depth, sourceReference);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.LibraryWorkContent &&
-          other.id == this.id &&
+          other.workId == this.workId &&
           other.parent == this.parent &&
           other.node == this.node &&
           other.idx == this.idx &&
@@ -5413,15 +5411,15 @@ class LibraryWorkContents
   LibraryWorkContents(this.attachedDatabase, [this._alias]);
   @override
   List<i0.GeneratedColumn> get $columns =>
-      [id, parent, node, idx, word, typ, depth, sourceReference];
+      [workId, parent, node, idx, word, typ, depth, sourceReference];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
-  String get entityName => 'LibraryWorkContents';
+  String get entityName => 'library.WorkContents';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW LibraryWorkContents AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN WorkContentSubdivisionsHierarchy AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId AS id, parent, node, idx, word, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+            'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN WorkContentSubdivisionsHierarchy AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
       };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -5429,8 +5427,8 @@ class LibraryWorkContents
   i1.LibraryWorkContent map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.LibraryWorkContent(
-      id: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}id'])!,
+      workId: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
       parent: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.string, data['${effectivePrefix}parent']),
       node: attachedDatabase.typeMapping
@@ -5448,8 +5446,8 @@ class LibraryWorkContents
     );
   }
 
-  late final i0.GeneratedColumn<String> id = i0.GeneratedColumn<String>(
-      'id', aliasedName, false,
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+      'workId', aliasedName, false,
       type: i0.DriftSqlType.string);
   late final i0.GeneratedColumn<String> parent = i0.GeneratedColumn<String>(
       'parent', aliasedName, true,
@@ -5595,11 +5593,11 @@ class LibraryWorkIndexes
   @override
   String get aliasedName => _alias ?? entityName;
   @override
-  String get entityName => 'LibraryWorkIndexes';
+  String get entityName => 'library.WorkIndexes';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW LibraryWorkIndexes AS SELECT SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name FROM WorkContentSubdivisionsHierarchy AS SubdivsHierarchy INNER JOIN WorkContentSubdivisionsHierarchy AS Titles ON SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ ORDER BY SubdivsHierarchy.fromindex',
+            'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name FROM WorkContentSubdivisionsHierarchy AS SubdivsHierarchy INNER JOIN WorkContentSubdivisionsHierarchy AS Titles ON SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ ORDER BY SubdivsHierarchy.fromindex',
       };
   @override
   LibraryWorkIndexes get asDslTable => this;
@@ -5663,13 +5661,13 @@ class LibraryWorkIndexes
 
 class LibraryDrift extends i3.ModularAccessor {
   LibraryDrift(i0.GeneratedDatabase db) : super(db);
-  i0.Selectable<i4.AuthorView> getLibraryAuthors() {
-    return customSelect('SELECT * FROM LibraryAuthors',
+  i0.Selectable<i4.Author> getLibraryAuthors() {
+    return customSelect('SELECT * FROM "library.Authors"',
         variables: [],
         readsFrom: {
           authors,
           authorsAndWorks,
-        }).map((i0.QueryRow row) => i4.AuthorView(
+        }).map((i0.QueryRow row) => i4.Author(
           id: row.read<String>('id'),
           name: row.read<String>('name'),
           about: row.read<String>('about'),
@@ -5679,7 +5677,7 @@ class LibraryDrift extends i3.ModularAccessor {
   }
 
   i0.Selectable<i1.LibraryAuthorDetail> getLibraryAuthorDetails(String var1) {
-    return customSelect('SELECT * FROM LibraryAuthorDetails WHERE id = ?1',
+    return customSelect('SELECT * FROM "library.AuthorDetails" WHERE id = ?1',
         variables: [
           i0.Variable<String>(var1)
         ],
@@ -5691,8 +5689,8 @@ class LibraryDrift extends i3.ModularAccessor {
         }).asyncMap(libraryAuthorDetails.mapFromRow);
   }
 
-  i0.Selectable<i5.WorkDetailsView> getLibraryWorkDetails(String var1) {
-    return customSelect('SELECT * FROM LibraryWorkDetails WHERE id = ?1',
+  i0.Selectable<i5.WorkDetails> getLibraryWorkDetails(String var1) {
+    return customSelect('SELECT * FROM "library.WorkDetails" WHERE id = ?1',
         variables: [
           i0.Variable<String>(var1)
         ],
@@ -5701,7 +5699,7 @@ class LibraryDrift extends i3.ModularAccessor {
           workContents,
           authorsAndWorks,
           authors,
-        }).map((i0.QueryRow row) => i5.WorkDetailsView(
+        }).map((i0.QueryRow row) => i5.WorkDetails(
           id: row.read<String>('id'),
           name: row.read<String>('name'),
           about: row.read<String>('about'),
@@ -5711,10 +5709,10 @@ class LibraryDrift extends i3.ModularAccessor {
         ));
   }
 
-  i0.Selectable<i6.WorkContentsElementView> getLibraryWorkContentsPartial(
+  i0.Selectable<i6.WorkContentsSegment> getLibraryWorkContentsPartial(
       String var1, int var2, int var3) {
     return customSelect(
-        'SELECT * FROM LibraryWorkContents WHERE id = ?1 AND idx BETWEEN ?2 AND ?3',
+        'SELECT * FROM "library.WorkContents" WHERE workId = ?1 AND idx BETWEEN ?2 AND ?3',
         variables: [
           i0.Variable<String>(var1),
           i0.Variable<int>(var2),
@@ -5723,8 +5721,8 @@ class LibraryDrift extends i3.ModularAccessor {
         readsFrom: {
           workContents,
           workContentSubdivisions,
-        }).map((i0.QueryRow row) => i6.WorkContentsElementView(
-          id: row.read<String>('id'),
+        }).map((i0.QueryRow row) => i6.WorkContentsSegment(
+          workId: row.read<String>('workId'),
           parent: row.readNullable<String>('parent'),
           node: row.read<String>('node'),
           idx: row.read<int>('idx'),
@@ -5737,7 +5735,7 @@ class LibraryDrift extends i3.ModularAccessor {
 
   i1.LibraryAuthors get libraryAuthors =>
       i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.LibraryAuthors>('LibraryAuthors');
+          .resultSet<i1.LibraryAuthors>('library.Authors');
   i1.Authors get authors => i3.ReadDatabaseContainer(attachedDatabase)
       .resultSet<i1.Authors>('Authors');
   i1.AuthorsAndWorks get authorsAndWorks =>
@@ -5745,17 +5743,17 @@ class LibraryDrift extends i3.ModularAccessor {
           .resultSet<i1.AuthorsAndWorks>('AuthorsAndWorks');
   i1.LibraryAuthorDetails get libraryAuthorDetails =>
       i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.LibraryAuthorDetails>('LibraryAuthorDetails');
+          .resultSet<i1.LibraryAuthorDetails>('library.AuthorDetails');
   i1.Works get works =>
       i3.ReadDatabaseContainer(attachedDatabase).resultSet<i1.Works>('Works');
   i1.WorkContents get workContents => i3.ReadDatabaseContainer(attachedDatabase)
       .resultSet<i1.WorkContents>('WorkContents');
   i1.LibraryWorkDetails get libraryWorkDetails =>
       i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.LibraryWorkDetails>('LibraryWorkDetails');
+          .resultSet<i1.LibraryWorkDetails>('library.WorkDetails');
   i1.LibraryWorkContents get libraryWorkContents =>
       i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.LibraryWorkContents>('LibraryWorkContents');
+          .resultSet<i1.LibraryWorkContents>('library.WorkContents');
   i1.WorkContentSubdivisions get workContentSubdivisions =>
       i3.ReadDatabaseContainer(attachedDatabase)
           .resultSet<i1.WorkContentSubdivisions>('WorkContentSubdivisions');

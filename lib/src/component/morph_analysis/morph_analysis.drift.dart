@@ -1,7 +1,8 @@
 // dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
-import 'package:latin_reader/src/external/analysis.drift.dart' as i1;
+import 'package:latin_reader/src/component/morph_analysis/morph_analysis.drift.dart'
+    as i1;
 
 typedef $MorphologicalDetailsCreateCompanionBuilder
     = i1.MorphologicalDetailsCompanion Function({
