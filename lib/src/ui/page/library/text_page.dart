@@ -10,6 +10,7 @@ import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/component/library/work_contents_api.dart';
 import 'package:latin_reader/src/component/library/work_details_api.dart';
 import 'package:latin_reader/src/ui/app.dart';
+import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/custom_adaptive_scaffold.dart';
 import 'package:latin_reader/src/ui/widget/navigation_rail.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
@@ -22,9 +23,9 @@ final _lineTerminator = Platform.lineTerminator;
 enum _PageFlow { previous, next }
 
 class TextPage extends ConsumerStatefulWidget {
-  const TextPage({
+  const TextPage(
+    this.workId, {
     super.key,
-    required this.workId,
   });
 
   final String workId;

@@ -1,6 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latin_reader/logger.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'settings_service.dart';
+
+part 'settings_controller.g.dart';
+
+@riverpod
+SettingsService settingsService(Ref ref) => SettingsService();
+
+final settingsControllerProvider = Provider<SettingsController>((ref) {
+  log.info(() => '@riverpod - settingsController');
+  final settingsService = ref.watch(settingsServiceProvider);
+  return SettingsController(settingsService);
+});
+
+final settingsInitializerProvider = FutureProvider<void>((ref) async {
+  log.info(() => '@riverpod - settingsInitializer');
+  final controller = ref.watch(settingsControllerProvider);
+  await controller.loadSettings();
+});
 
 /// A class that many Widgets can interact with to read user settings, update
 /// user settings, or listen to user settings changes.

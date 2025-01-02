@@ -3,204 +3,100 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/ui/page/dictionary/dictionaries_page.dart';
-import 'package:latin_reader/src/ui/page/dictionary/dictionary_entries_page.dart';
-import 'package:latin_reader/src/ui/page/dictionary/dictionary_entry_page.dart';
-import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
-import 'package:latin_reader/src/ui/page/library/authors_page.dart';
-import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
-import 'package:latin_reader/src/ui/page/word_frequency_page.dart';
-import 'package:latin_reader/src/ui/page/word_lookup_page.dart';
+import 'package:latin_reader/src/ui/router/config.dart';
+import 'package:latin_reader/src/ui/settings/settings_controller.dart';
+import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
-import 'page/library/text_page.dart';
-import 'settings/settings_controller.dart';
-import 'settings/settings_view.dart';
 import 'widget/custom_adaptive_scaffold.dart';
 
-const _homeDestination = NavigationDestination(
-  icon: Icon(Icons.auto_stories),
-  label: 'Home',
-);
-final _authorRoutes = [
-  GoRoute(
-    path: '/',
-    redirect: (_, __) => '/authors',
-  ),
-  GoRoute(
-    path: '/authors',
-    builder: (context, state) => const AuthorsPage(),
-    routes: [
-      GoRoute(
-        path: ':id',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return AuthorDetailsPage(authorId: id);
-        },
-      ),
-    ],
-  ),
-  GoRoute(
-    path: '/works',
-    // TODO(whothefluff): (someday) implement
-    builder: (_, __) => const Icon(Icons.error),
-    routes: [
-      GoRoute(
-        path: ':id',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return WorkDetailsPage(workId: id);
-        },
-      ),
-    ],
-  ),
-  GoRoute(
-    path: '/reader/:workId',
-    pageBuilder: (context, state) => MaterialPage(
-      fullscreenDialog: true,
-      child: TextPage(
-        workId: state.pathParameters['workId']!,
-      ),
-    ),
-  ),
-];
-const _dictionariesDest = NavigationDestination(
-  icon: Icon(Icons.book),
-  label: 'Dictionaries',
-);
-final _dictionaryRoutes = [
-  GoRoute(
-    path: '/dictionaries',
-    pageBuilder: (context, state) =>
-        const MaterialPage(child: DictionariesPage()),
-    routes: [
-      GoRoute(
-        path: ':id',
-        pageBuilder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return MaterialPage(child: DictionaryEntriesPage(dictionary: id));
-        },
-        routes: [
-          GoRoute(
-            path: 'entries/:lemma',
-            pageBuilder: (context, state) {
-              final dictionaryId = state.pathParameters['id']!;
-              final lemma = state.pathParameters['lemma']!;
-              return MaterialPage(
-                child: DictionaryEntryPage(dictionaryId, lemma),
-              );
-            },
-          ),
-        ],
-      ),
-    ],
-  ),
-];
-const _wordFreqDest = NavigationDestination(
-  icon: Icon(Icons.bar_chart),
-  label: 'Word Frequency',
-);
-final _wordFrequencyRoutes = [
-  GoRoute(
-    path: '/word-frequency',
-    builder: (context, state) => const WordFrequencyPage(),
-  ),
-];
-const _wordLookupDest = NavigationDestination(
-  icon: Icon(Icons.plagiarism),
-  label: 'Word Lookup',
-);
-final _wordLookupRoutes = [
-  GoRoute(
-    path: '/word-lookup',
-    builder: (context, state) => const WordLookupPage(),
-  ),
-];
-final mainBranches = [
-  (id: '/authors', navDest: _homeDestination, routes: _authorRoutes),
-  (id: '/dictionaries', navDest: _dictionariesDest, routes: _dictionaryRoutes),
-  (id: '/word-frequency', navDest: _wordFreqDest, routes: _wordFrequencyRoutes),
-  (id: '/word-lookup', navDest: _wordLookupDest, routes: _wordLookupRoutes),
-];
-final mainBranchesDests = mainBranches.map((e) => e.navDest).toList();
-const _pagesWithoutNavBar = ['/reader/:workId'];
-const _pagesWithoutNavRail = [..._pagesWithoutNavBar];
 final customAdaptiveScaffoldKey = GlobalKey<CustomAdaptiveScaffoldState>();
 
-class MyApp extends ConsumerStatefulWidget {
-  const MyApp({
+class App extends ConsumerStatefulWidget {
+  const App({
     super.key,
-    required this.settingsController,
   });
 
-  final SettingsController settingsController;
-
   @override
-  MyAppState createState() => MyAppState();
+  AppState createState() => AppState();
 //
 }
 
-class MyAppState extends ConsumerState<MyApp> {
+class AppState extends ConsumerState<App> {
 //
   late final GoRouter _router;
+  final _generatedRoute = $mainRoute is StatefulShellRoute
+      ? $mainRoute as StatefulShellRoute
+      : throw AssertionError('Not a StatefulShellRoute');
+
+  @override
+  Widget build(context) => ref.watch(settingsInitializerProvider).when(
+        loading: showLoading,
+        data: (_) {
+          final settingsController = ref.watch(settingsControllerProvider);
+          return ListenableBuilder(
+            listenable: settingsController,
+            builder: (_, __) => MaterialApp.router(
+              key: ValueKey(settingsController.themeMode),
+              routerConfig: _router,
+              restorationScopeId: 'app',
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en', ''), // English, no country code
+              ],
+              onGenerateTitle: (context) =>
+                  AppLocalizations.of(context)!.appTitle,
+              theme: ThemeData(),
+              darkTheme: ThemeData.dark(),
+              themeMode: settingsController.themeMode,
+            ),
+          );
+        },
+        error: (error, stack) => MaterialApp(
+          home: Scaffold(
+            body: Center(child: Text('Error: $error')),
+          ),
+        ),
+      );
 
   @override
   void initState() {
     super.initState();
     _router = GoRouter(
-      initialLocation: '/',
+      initialLocation: const LibraryRoute().location,
       routes: [
-        StatefulShellRoute.indexedStack(
-          builder: (_, state, navShell) => ScaffoldWithNavBar(
-            navigationShell: navShell,
-            createBottomNavBar: !_pagesWithoutNavBar.contains(state.fullPath),
-            createNavRail: !_pagesWithoutNavRail.contains(state.fullPath),
-          ),
-          branches: mainBranches
-              .map((e) => StatefulShellBranch(routes: e.routes))
-              .toList(),
-        ),
-        GoRoute(
-          path: '/settings',
-          builder: (context, state) =>
-              SettingsView(controller: widget.settingsController),
-        ),
+        mainRoute(),
+        $settingsRoute,
       ],
-      errorBuilder: (context, state) => Scaffold(
+      errorBuilder: backToHome,
+    );
+  }
+
+  StatefulShellRoute mainRoute() => StatefulShellRoute.indexedStack(
+        builder: (_, state, navShell) => ScaffoldWithNavBar(
+          navigationShell: navShell,
+          createBottomNavBar: !pagesWithoutNavBar.contains(state.fullPath),
+          createNavRail: !pagesWithoutNavRail.contains(state.fullPath),
+        ),
+        branches: _generatedRoute.branches,
+      );
+
+  Widget backToHome(BuildContext context, GoRouterState state) => Scaffold(
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SelectableText(state.error!.message),
               TextButton(
-                onPressed: () => context.go('/'),
+                onPressed: () => const LibraryRoute().go(context),
                 child: const Text('Home'),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(context) => ListenableBuilder(
-        listenable: widget.settingsController,
-        builder: (context, child) => MaterialApp.router(
-          routerConfig: _router,
-          restorationScopeId: 'app',
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en', ''), // English, no country code
-          ],
-          onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-          theme: ThemeData(),
-          darkTheme: ThemeData.dark(),
-          themeMode: widget.settingsController.themeMode,
         ),
       );
 //
@@ -219,20 +115,27 @@ class ScaffoldWithNavBar extends StatelessWidget {
   final bool createNavRail;
 
   @override
-  Widget build(BuildContext context) => CustomAdaptiveScaffold(
-        key: customAdaptiveScaffoldKey,
-        selectedIndex: navigationShell.currentIndex,
-        destinations: mainBranchesDests,
-        body: (_) => navigationShell,
-        onSelectedIndexChange: _goToBranch,
-        useDrawer: false,
-        createBottomNavigationBar: createBottomNavBar,
-        createNavigationRail: createNavRail,
+  Widget build(context) => MediaQuery(
+        key: ValueKey(
+          '${MediaQuery.sizeOf(context).width}_${MediaQuery.sizeOf(context).height}',
+        ),
+        data: MediaQuery.of(context),
+        child: CustomAdaptiveScaffold(
+          key: customAdaptiveScaffoldKey,
+          selectedIndex: navigationShell.currentIndex,
+          destinations: mainBranches.map((b) => b.navDest).toList(),
+          body: (_) => navigationShell,
+          onSelectedIndexChange: _goToBranch,
+          useDrawer: false,
+          createBottomNavigationBar: createBottomNavBar,
+          createNavigationRail: createNavRail,
+        ),
       );
 
   void _goToBranch(int index) {
     navigationShell.goBranch(
       index,
+      //navigate to the initial location when tapping the item that is already active
       initialLocation: index == navigationShell.currentIndex,
     );
   }

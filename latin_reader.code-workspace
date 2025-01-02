@@ -15,6 +15,8 @@
 				"database": "%USERPROFILE%\\AppData\\Roaming\\com.magnetys\\latin_reader\\data.db"
 			}
 		],
+		"editor.inlayHints.maximumLength": 0,
+		"editor.inlayHints.padding": true,
 	},
 	"launch": {
 		"version": "0.2.0",

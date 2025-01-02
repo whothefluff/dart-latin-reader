@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/component/library/authors_api.dart';
+import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/searchable_app_bar.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
 class AuthorsPage extends ConsumerWidget {
-  const AuthorsPage({super.key});
+  const AuthorsPage({
+    super.key,
+  });
 
   @override
   Widget build(context, ref) => Scaffold(
@@ -16,7 +18,7 @@ class AuthorsPage extends ConsumerWidget {
           onFilterPressed: () {},
           onSortPressed: () {},
           onSettingsPressed: () async {
-            await context.push('/settings');
+            await const SettingsRoute().push<void>(context);
           },
           searchSuggestionsBuilder: (context, controller) async => [],
         ),
@@ -31,10 +33,11 @@ class AuthorsPage extends ConsumerWidget {
             itemCount: authors.length,
             itemBuilder: (context, index) {
               final cardBorderRadius = BorderRadius.circular(12);
+              final author = authors[index];
               return Card(
                 child: InkWell(
                   onTap: () async {
-                    await context.push('/authors/${authors[index].id}');
+                    await AuthorDetailsRoute(author.id).push<void>(context);
                   },
                   borderRadius: cardBorderRadius,
                   child: GridTile(
