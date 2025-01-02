@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/component/dictionary/dictionary_alphabets_api.dart';
 import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart';
+import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/searchable_app_bar.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
 class DictionaryEntriesPage extends ConsumerStatefulWidget {
-  const DictionaryEntriesPage({
-    required this.dictionary,
+  const DictionaryEntriesPage(
+    this.dictionary, {
     super.key,
   });
 
@@ -30,7 +30,9 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
   Widget build(context) => Scaffold(
         appBar: SearchableAppBar(
           onSortPressed: () {},
-          onSettingsPressed: () async => context.push('/settings'),
+          onSettingsPressed: () async {
+            await const SettingsRoute().push<void>(context);
+          },
           searchSuggestionsBuilder: (context, controller) async => [],
         ),
         body: entriesList(ref, context),
@@ -101,13 +103,6 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
   Widget Function(BuildContext, int) tile() => (context, index) {
         final subtitleStyleBecauseFuckFlutter = subtitleTextStyle(context);
         final entry = widget.data[index];
-        final entryPage = StringBuffer()
-          ..writeAll([
-            '/dictionaries/',
-            widget.dictId,
-            '/entries/',
-            entry.lemma,
-          ]);
         final inflection = removeQuotes(entry.inflection);
         return ListTile(
           title: Text.rich(
@@ -125,7 +120,10 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
               ],
             ),
           ),
-          onTap: () async => context.push(entryPage.toString()),
+          onTap: () async {
+            await DictionaryEntryRoute(widget.dictId, entry.lemma)
+                .push<void>(context);
+          },
         );
       };
 

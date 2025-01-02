@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' as int;
 import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart';
+import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/searchable_app_bar.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
 class DictionariesPage extends ConsumerWidget {
-  const DictionariesPage({super.key});
+  const DictionariesPage({
+    super.key,
+  });
 
   @override
   Widget build(context, ref) => Scaffold(
@@ -16,7 +18,7 @@ class DictionariesPage extends ConsumerWidget {
           onFilterPressed: () {},
           onSortPressed: () {},
           onSettingsPressed: () async {
-            await context.push('/settings');
+            await const SettingsRoute().push<void>(context);
           },
           searchSuggestionsBuilder: (context, controller) async => [],
         ),
@@ -41,13 +43,13 @@ class DictionariesPage extends ConsumerWidget {
                     width: _tWidth(entriesData.data!, entriesData.style!),
                   ),
                 );
+                final dict = dictionaries[index];
                 return ListTile(
                   title: nameAndEntries,
                   subtitle: publisherData,
                   isThreeLine: true,
                   onTap: () async {
-                    await context
-                        .push('/dictionaries/${dictionaries[index].id}');
+                    await DictionaryEntriesRoute(dict.id).push<void>(context);
                   },
                 );
               },

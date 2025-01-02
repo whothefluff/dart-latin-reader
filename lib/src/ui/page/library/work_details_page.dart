@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/component/library/work_details_api.dart';
+import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
 class WorkDetailsPage extends ConsumerWidget {
-  const WorkDetailsPage({
+  const WorkDetailsPage(
+    this.workId, {
     super.key,
-    required this.workId,
   });
 
   final String workId;
@@ -210,7 +211,9 @@ class Details extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   FilledButton(
-                    onPressed: () async => context.push('/reader/$workId'),
+                    onPressed: () async {
+                      await ReaderRoute(workId).push<void>(context);
+                    },
                     child: const Text('Read'),
                   ),
                   if (authorId != null) ...{

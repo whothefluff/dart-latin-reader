@@ -2,13 +2,16 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latin_reader/src/component/library/author_details_api.dart';
+import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
 class AuthorDetailsPage extends ConsumerWidget {
-  const AuthorDetailsPage({super.key, required this.authorId});
+  const AuthorDetailsPage(
+    this.authorId, {
+    super.key,
+  });
 
   final String authorId;
 
@@ -45,7 +48,9 @@ class AuthorDetailsPage extends ConsumerWidget {
               Text('${(work.numberOfWords / 1000).round()}k words'),
             ],
           ),
-          onTap: () async => context.push('/works/${work.id}'),
+          onTap: () async {
+            await WorkDetailsRoute(work.id).push<void>(context);
+          },
         ),
       );
 
