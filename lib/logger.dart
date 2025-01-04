@@ -5,14 +5,14 @@ import 'package:latin_reader/app_config.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 
-final Logger log = Logger('MyApp');
+final Logger log = Logger('');
 
 void configureLogging() {
   var writeSuccessful = true;
   Logger.root.onRecord.listen((r) async {
     final identifier = '${r.time} | ${r.level.name}';
     final content = '${r.loggerName}: ${r.message}';
-    final message = '$identifier -> $content';
+    final message = '$identifier$content';
     if (kDebugMode) {
       print(message);
       if (r.error != null) print('Error: ${r.error}');
