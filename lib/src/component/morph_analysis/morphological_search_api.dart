@@ -44,8 +44,8 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   @override
   Future<Results> getSearchResults(String form) async {
     if (form.isNotEmpty) {
-      log.info('MorphologicalDataRepository - searching form in db');
       final parsedInput = form.replaceAll('*', '%').replaceAll('?', '_');
+      log.info('MorphologicalDataRepository - searching $parsedInput in db');
       final key = (
         hasMacrons: _hasMacrons(parsedInput),
         useLike: _useLikeLogic(parsedInput)
