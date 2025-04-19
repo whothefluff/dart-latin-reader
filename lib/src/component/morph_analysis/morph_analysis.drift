@@ -1,3 +1,5 @@
+import 'package:latin_reader/src/component/morph_analysis/morphological_search_api.dart';
+
 CREATE TABLE "MorphologicalDetails"(
     "form" TEXT NOT NULL,
     "item" INTEGER NOT NULL CHECK( item >= 0 ),
@@ -13,12 +15,12 @@ CREATE TABLE "MorphologicalDetailInflections"(
     "cnt" INTEGER NOT NULL CHECK( cnt >= 0 ),
     "partOfSpeech" TEXT NOT NULL,
     "stem" TEXT NOT NULL,
-    "suffix" TEXT NOT NULL,
+    "suffix" TEXT,
     "segmentsInfo" TEXT,
     "gender" TEXT,
     "number" TEXT,
     "declension" TEXT,
-    "case" TEXT,
+    "gramCase" TEXT,
     "verbForm" TEXT,
     "tense" TEXT,
     "voice" TEXT,
@@ -28,3 +30,169 @@ CREATE TABLE "MorphologicalDetailInflections"(
 ) 
 STRICT, 
 WITHOUT ROWID;
+
+CREATE VIRTUAL TABLE SearchableMorphDetInflections USING fts5(
+    form,
+    macronizedForm,
+    item UNINDEXED,
+    cnt UNINDEXED,
+    tokenize = "trigram remove_diacritics 0 case_sensitive 0"
+);
+
+CREATE VIEW "morphology.Peek" AS
+    WITH InflectionData AS ( SELECT Infl.form,
+                                    IIF( Infl.verbForm IS NULL, Infl.partOfSpeech, NULL ) AS partOfSpeech,
+                                    MorphologicalDetails.dictionaryRef,
+                                    COALESCE( IIF( Infl.verbForm IS NULL AND Infl.segmentsInfo IN ( 'irregular', 'indeclinable' ), 
+                                                   Infl.segmentsInfo, 
+                                                   NULL ),
+                                              Infl.verbForm ) AS additional,
+                                    Infl.item,
+                                    Infl.cnt,
+                                    Infl.stem,
+                                    Infl.suffix
+                                 FROM main.MorphologicalDetailInflections AS Infl
+                                 INNER JOIN main.MorphologicalDetails
+                                     ON Infl.form = MorphologicalDetails.form
+                                        AND Infl.item = MorphologicalDetails.item
+                                 WHERE Infl.partOfSpeech = 'adjective'
+                             UNION ALL
+                             SELECT Infl.form,
+                                    Infl.partOfSpeech,
+                                    MorphologicalDetails.dictionaryRef,
+                                    IIF( Infl.suffix IS NOT NULL, '-' || Infl.suffix || ' suffix', NULL ) AS additional,
+                                    Infl.item,
+                                    Infl.cnt,
+                                    Infl.stem,
+                                    Infl.suffix
+                                 FROM MorphologicalDetailInflections AS Infl
+                                 INNER JOIN main.MorphologicalDetails
+                                     ON Infl.form = MorphologicalDetails.form
+                                        AND Infl.item = MorphologicalDetails.item
+                                 WHERE Infl.partOfSpeech = 'adverb'
+                             UNION ALL
+                             SELECT Infl.form,
+                                    Infl.partOfSpeech,
+                                    MorphologicalDetails.dictionaryRef,
+                                    NULL AS additional,
+                                    Infl.item,
+                                    Infl.cnt,
+                                    Infl.stem,
+                                    Infl.suffix
+                                 FROM MorphologicalDetailInflections as Infl
+                                 INNER JOIN main.MorphologicalDetails
+                                     ON Infl.form = MorphologicalDetails.form
+                                        AND Infl.item = MorphologicalDetails.item
+                                 WHERE Infl.partOfSpeech = 'conjunction'
+                             UNION ALL
+                             SELECT Infl.form,
+                                    Infl.partOfSpeech,
+                                    MorphologicalDetails.dictionaryRef,
+                                    NULL AS additional,
+                                    Infl.item,
+                                    Infl.cnt,
+                                    Infl.stem,
+                                    Infl.suffix
+                                 FROM MorphologicalDetailInflections AS Infl
+                                 INNER JOIN MorphologicalDetails
+                                     ON Infl.form = MorphologicalDetails.form
+                                        AND Infl.item = MorphologicalDetails.item
+                                 WHERE Infl.partOfSpeech = 'interjection'
+                             UNION ALL
+                             SELECT Infl.form,
+                                    IIF( Infl.verbForm IS NULL, Infl.partOfSpeech, NULL ) AS partOfSpeech,
+                                    MorphologicalDetails.dictionaryRef,
+                                    COALESCE( Infl.verbForm, Infl.declension || ' declension' ) AS additional,
+                                    Infl.item,
+                                    Infl.cnt,
+                                    Infl.stem,
+                                    Infl.suffix
+                                 FROM MorphologicalDetailInflections as Infl
+                                 INNER JOIN main.MorphologicalDetails
+                                     ON Infl.form = MorphologicalDetails.form
+                                        AND Infl.item = MorphologicalDetails.item
+                                 WHERE Infl.partOfSpeech = 'noun'
+                             UNION ALL
+                             SELECT Infl.form,
+                                    Infl.partOfSpeech,
+                                    MorphologicalDetails.dictionaryRef,
+                                    NULL AS additional,
+                                    Infl.item,
+                                    Infl.cnt,
+                                    Infl.stem,
+                                    Infl.suffix
+                                 FROM MorphologicalDetailInflections AS Infl
+                                 INNER JOIN main.MorphologicalDetails
+                                     ON Infl.form = MorphologicalDetails.form
+                                        AND Infl.item = MorphologicalDetails.item
+                                 WHERE Infl.partOfSpeech = 'preposition'
+                             UNION ALL
+                             SELECT Infl.form,
+                                    Infl.partOfSpeech,
+                                    MorphologicalDetails.dictionaryRef,
+                                    Infl.segmentsInfo AS additional,
+                                    Infl.item,
+                                    Infl.cnt,
+                                    Infl.stem,
+                                    Infl.suffix
+                                 FROM MorphologicalDetailInflections AS Infl
+                                 INNER JOIN main.MorphologicalDetails
+                                     ON Infl.form = MorphologicalDetails.form
+                                        AND Infl.item = MorphologicalDetails.item
+                                 WHERE Infl.partOfSpeech = 'verb' ),
+         InflDataWithCleanDictRef AS ( SELECT form,
+                                              stem,
+                                              partOfSpeech,
+                                              suffix,
+                                              "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(dictionaryRef, '1', ''), '2', ''), '3', ''), '4', ''), '5', ''), '6', ''), '7', ''), '8', ''), '9', '') AS dictionaryRef,
+                                              additional,
+                                              item,
+                                              cnt
+                                           FROM InflectionData )
+        SELECT form,
+               "REPLACE"( stem, '-', '' ) || suffix AS macronizedForm,
+               partOfSpeech,
+               dictionaryRef,
+               --this can't be done robustly because the dictionaryRef does not contain macrons (eg. rosā gets mixed with rosa)
+               --IIF( form != dictionaryRef, dictionaryRef, NULL ) AS dictionaryRef,
+               additional,
+               item,
+               cnt
+            FROM InflDataWithCleanDictRef
+            ORDER BY form, item, cnt;
+
+searchMorphologicalDataDefault WITH Result: SELECT Peek.* 
+                                                FROM SearchableMorphDetInflections AS Search
+                                                INNER JOIN "morphology.Peek" AS Peek
+                                                    ON Search.form = Peek.form 
+                                                       AND Search.item = Peek.item
+                                                       AND Search.cnt = Peek.cnt
+                                                WHERE Search.form MATCH ?
+                                                ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
+
+searchMorphologicalData WITH Result: SELECT Peek.* 
+                                         FROM SearchableMorphDetInflections AS Search
+                                         INNER JOIN "morphology.Peek" AS Peek
+                                             ON Search.form = Peek.form 
+                                                AND Search.item = Peek.item
+                                                AND Search.cnt = Peek.cnt
+                                         WHERE Search.form LIKE ?
+                                         ORDER BY Peek.form, Peek.item, Peek.cnt;
+
+searchMacronizedMorphologicalDataDefault WITH Result: SELECT Peek.* 
+                                                          FROM SearchableMorphDetInflections AS Search
+                                                          INNER JOIN "morphology.Peek" AS Peek
+                                                              ON Search.form = Peek.form
+                                                                 AND Search.item = Peek.item
+                                                                 AND Search.cnt = Peek.cnt
+                                                          WHERE Search.macronizedForm MATCH ?
+                                                          ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
+
+searchMacronizedMorphologicalData WITH Result: SELECT Peek.*
+                                                   FROM SearchableMorphDetInflections AS Search
+                                                   INNER JOIN "morphology.Peek" AS Peek
+                                                       ON Search.form = Peek.form
+                                                          AND Search.item = Peek.item
+                                                          AND Search.cnt = Peek.cnt
+                                                   WHERE Search.macronizedForm LIKE ?
+                                                   ORDER BY Peek.form, Peek.item, Peek.cnt;

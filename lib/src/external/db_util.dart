@@ -4,6 +4,8 @@ import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/component/dictionary/db_util.dart'
     as dict_util;
 import 'package:latin_reader/src/component/library/db_util.dart' as libr_util;
+import 'package:latin_reader/src/component/morph_analysis/db_util.dart'
+    as morp_util;
 import 'package:latin_reader/src/external/data_version.drift.dart';
 import 'package:latin_reader/src/external/database.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -42,17 +44,16 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
   final operations = [
     ...libr_util.operations,
     ...dict_util.operations,
+    ...morp_util.operations,
   ];
   await db.transaction(() async {
     await operations.fold(
         Future<void>.value(),
-        (previousFuture, operation) => previousFuture.then((_) async {
-              log.info(
-                  () => 'populateDatabaseFromCsv() - deleting ${operation.id}');
-              await operation.delete(db);
-              log.info(() =>
-                  'populateDatabaseFromCsv() - inserting ${operation.id}');
-              await operation.insert(db);
+        (previousFuture, op) => previousFuture.then((_) async {
+              log.info(() => 'populateDatabaseFromCsv() - deleting ${op.id}');
+              await op.delete(db);
+              log.info(() => 'populateDatabaseFromCsv() - inserting ${op.id}');
+              await op.insert(db);
             }));
   });
 }
