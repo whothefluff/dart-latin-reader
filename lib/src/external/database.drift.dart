@@ -17,6 +17,9 @@ abstract class $AppDb extends i0.GeneratedDatabase {
       i1.MorphologicalDetails(this);
   late final i1.MorphologicalDetailInflections morphologicalDetailInflections =
       i1.MorphologicalDetailInflections(this);
+  late final i1.SearchableMorphDetInflections searchableMorphDetInflections =
+      i1.SearchableMorphDetInflections(this);
+  late final i1.MorphologyPeek morphologyPeek = i1.MorphologyPeek(this);
   late final i2.Dictionaries dictionaries = i2.Dictionaries(this);
   late final i2.DictionaryEntries dictionaryEntries =
       i2.DictionaryEntries(this);
@@ -65,6 +68,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
       .accessor<i3.LibraryDrift>(i3.LibraryDrift.new);
   i2.DictionaryDrift get dictionaryDrift => i5.ReadDatabaseContainer(this)
       .accessor<i2.DictionaryDrift>(i2.DictionaryDrift.new);
+  i1.MorphAnalysisDrift get morphAnalysisDrift => i5.ReadDatabaseContainer(this)
+      .accessor<i1.MorphAnalysisDrift>(i1.MorphAnalysisDrift.new);
   @override
   Iterable<i0.TableInfo<i0.Table, Object?>> get allTables =>
       allSchemaEntities.whereType<i0.TableInfo<i0.Table, Object?>>();
@@ -72,6 +77,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   List<i0.DatabaseSchemaEntity> get allSchemaEntities => [
         morphologicalDetails,
         morphologicalDetailInflections,
+        searchableMorphDetInflections,
+        morphologyPeek,
         dictionaries,
         dictionaryEntries,
         dictionaryAlphabets,
@@ -113,6 +120,10 @@ class $AppDbManager {
       get morphologicalDetailInflections =>
           i1.$MorphologicalDetailInflectionsTableManager(
               _db, _db.morphologicalDetailInflections);
+  i1.$SearchableMorphDetInflectionsTableManager
+      get searchableMorphDetInflections =>
+          i1.$SearchableMorphDetInflectionsTableManager(
+              _db, _db.searchableMorphDetInflections);
   i2.$DictionariesTableManager get dictionaries =>
       i2.$DictionariesTableManager(_db, _db.dictionaries);
   i2.$DictionaryEntriesTableManager get dictionaryEntries =>
