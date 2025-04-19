@@ -9945,9 +9945,9 @@ granum,0,0,noun,grān,ūm,"us, -i",neuter,plural,2nd,genitive,,,,
 granum,0,1,noun,grān,um,"us, -i",neuter,singular,2nd,nominative,,,,
 granum,0,2,noun,grān,um,"us, -i",neuter,singular,2nd,vocative,,,,
 granum,0,3,noun,grān,um,"us, -i",neuter,singular,2nd,accusative,,,,
-celeri,0,0,adjective,celer,ī,", is, e",masculine,singular,3rd,dative,,,,
-celeri,0,1,adjective,celer,ī,", is, e",feminine,singular,3rd,dative,,,,
-celeri,0,2,adjective,celer,ī,", is, e",neuter,singular,3rd,dative,,,,
+celeri,0,0,adjective,celer,ī,", -is, -e",masculine,singular,3rd,dative,,,,
+celeri,0,1,adjective,celer,ī,", -is, -e",feminine,singular,3rd,dative,,,,
+celeri,0,2,adjective,celer,ī,", -is, -e",neuter,singular,3rd,dative,,,,
 celavi,0,0,verb,cēl,āvī,v-perfect,,singular,,,indicative,perfect,active,1st
 venient,0,0,verb,ven,ient,4th conjugation,,plural,,,indicative,future,active,3rd
 deflexit,0,0,verb,dēflex,it,perfect stem,,singular,,,indicative,perfect,active,3rd
