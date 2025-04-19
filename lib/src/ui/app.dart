@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latin_reader/l10n/app_localizations.dart';
 import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/settings/settings_controller.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
@@ -45,9 +45,7 @@ class AppState extends ConsumerState<App> {
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              supportedLocales: const [
-                Locale('en', ''), // English, no country code
-              ],
+              supportedLocales: const [Locale('en'), Locale('es')],
               onGenerateTitle: (context) =>
                   AppLocalizations.of(context)!.appTitle,
               theme: ThemeData(),
