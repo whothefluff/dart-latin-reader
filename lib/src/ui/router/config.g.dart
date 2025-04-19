@@ -101,6 +101,14 @@ RouteBase get $mainRoute => StatefulShellRouteData.$route(
         StatefulShellBranchData.$branch(
           routes: [
             GoRouteData.$route(
+              path: '/morph-analysis',
+              factory: $MorphologyRouteExtension._fromState,
+            ),
+          ],
+        ),
+        StatefulShellBranchData.$branch(
+          routes: [
+            GoRouteData.$route(
               path: '/word-lookup',
               factory: $WordLookupRouteExtension._fromState,
             ),
@@ -287,6 +295,24 @@ extension $WordFrequencyRouteExtension on WordFrequencyRoute {
 
   String get location => GoRouteData.$location(
         '/word-frequency',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $MorphologyRouteExtension on MorphologyRoute {
+  static MorphologyRoute _fromState(GoRouterState state) =>
+      const MorphologyRoute();
+
+  String get location => GoRouteData.$location(
+        '/morph-analysis',
       );
 
   void go(BuildContext context) => context.go(location);
