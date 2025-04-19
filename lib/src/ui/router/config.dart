@@ -8,6 +8,7 @@ import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:latin_reader/src/ui/page/library/text_page.dart';
 import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
+import 'package:latin_reader/src/ui/page/morphology/morphology_page.dart';
 import 'package:latin_reader/src/ui/page/word_frequency_page.dart';
 import 'package:latin_reader/src/ui/page/word_lookup_page.dart';
 import 'package:latin_reader/src/ui/settings/settings_controller.dart';
@@ -20,13 +21,13 @@ const mainBranches = [
     id: '/library',
     navDest: NavigationDestination(
       icon: Icon(Icons.auto_stories),
-      label: 'Home',
+      label: 'Library',
     ),
   ),
   (
     id: '/dictionaries',
     navDest: NavigationDestination(
-      icon: Icon(Icons.book),
+      icon: Icon(Icons.translate),
       label: 'Dictionaries',
     ),
   ),
@@ -34,14 +35,24 @@ const mainBranches = [
     id: '/word-frequency',
     navDest: NavigationDestination(
       icon: Icon(Icons.bar_chart),
-      label: 'Word Frequency',
+      label: 'Frequency',
+      tooltip: 'Word Frequency',
+    ),
+  ),
+  (
+    id: '/morph-analysis',
+    navDest: NavigationDestination(
+      icon: Icon(Icons.edit_note),
+      label: 'Morphology',
+      tooltip: 'Morphological Analysis',
     ),
   ),
   (
     id: '/word-lookup',
     navDest: NavigationDestination(
-      icon: Icon(Icons.plagiarism),
-      label: 'Word Lookup',
+      icon: Icon(Icons.find_in_page),
+      label: 'Usage',
+      tooltip: 'Corpus Usage',
     ),
   ),
 ];
@@ -103,6 +114,11 @@ class SettingsRoute extends GoRouteData {
         TypedGoRoute<WordFrequencyRoute>(path: '/word-frequency'),
       ],
     ),
+    TypedStatefulShellBranch<MorphologyBranch>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<MorphologyRoute>(path: '/morph-analysis'),
+      ],
+    ),
     TypedStatefulShellBranch<WordLookupBranch>(
       routes: <TypedRoute<RouteData>>[
         TypedGoRoute<WordLookupRoute>(path: '/word-lookup'),
@@ -131,6 +147,10 @@ class DictionariesBranch extends StatefulShellBranchData {
 
 class WordFrequencyBranch extends StatefulShellBranchData {
   const WordFrequencyBranch();
+}
+
+class MorphologyBranch extends StatefulShellBranchData {
+  const MorphologyBranch();
 }
 
 class WordLookupBranch extends StatefulShellBranchData {
@@ -248,6 +268,14 @@ class WordFrequencyRoute extends GoRouteData {
 
   @override
   Widget build(context, state) => const WordFrequencyPage();
+//
+}
+
+class MorphologyRoute extends GoRouteData {
+  const MorphologyRoute();
+
+  @override
+  Widget build(context, state) => const MorphologyPage();
 //
 }
 
