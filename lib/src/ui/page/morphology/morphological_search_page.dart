@@ -6,17 +6,18 @@ import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
-class MorphologyPage extends ConsumerStatefulWidget {
-  const MorphologyPage({
+class MorphologicalSearchPage extends ConsumerStatefulWidget {
+  const MorphologicalSearchPage({
     super.key,
   });
 
   @override
-  ConsumerState<MorphologyPage> createState() => _MorphologyPageState();
+  ConsumerState<MorphologicalSearchPage> createState() =>
+      _MorphologyPageState();
 //
 }
 
-class _MorphologyPageState extends ConsumerState<MorphologyPage> {
+class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
 //
   final SearchController _searchController = SearchController();
   Result? _selectedResult;
