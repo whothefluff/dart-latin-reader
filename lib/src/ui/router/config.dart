@@ -8,7 +8,7 @@ import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:latin_reader/src/ui/page/library/text_page.dart';
 import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
-import 'package:latin_reader/src/ui/page/morphology/morphology_page.dart';
+import 'package:latin_reader/src/ui/page/morphology/morphological_search_page.dart';
 import 'package:latin_reader/src/ui/page/word_frequency_page.dart';
 import 'package:latin_reader/src/ui/page/word_lookup_page.dart';
 import 'package:latin_reader/src/ui/settings/settings_controller.dart';
@@ -275,7 +275,7 @@ class MorphologyRoute extends GoRouteData {
   const MorphologyRoute();
 
   @override
-  Widget build(context, state) => const MorphologyPage();
+  Widget build(context, state) => const MorphologicalSearchPage();
 //
 }
 
