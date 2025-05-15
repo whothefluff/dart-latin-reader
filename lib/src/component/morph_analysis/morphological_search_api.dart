@@ -27,13 +27,13 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   ) {
     _runnableQueries = {
       (hasMacrons: true, useLike: true): (String form) =>
-          _db.morphAnalysisDrift.searchMacronizedMorphologicalData(form),
+          _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithLike(form),
       (hasMacrons: true, useLike: false): (String form) =>
-          _db.morphAnalysisDrift.searchMacronizedMorphologicalDataDefault(form),
+          _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithFts(form),
       (hasMacrons: false, useLike: true): (String form) =>
-          _db.morphAnalysisDrift.searchMorphologicalData(form),
+          _db.morphAnalysisDrift.searchMorphologicalDataWithLike(form),
       (hasMacrons: false, useLike: false): (String form) =>
-          _db.morphAnalysisDrift.searchMorphologicalDataDefault(form),
+          _db.morphAnalysisDrift.searchMorphologicalDataWithFts(form),
     };
   }
 

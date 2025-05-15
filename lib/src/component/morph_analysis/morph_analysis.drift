@@ -1,4 +1,5 @@
 import 'package:latin_reader/src/component/morph_analysis/morphological_search_api.dart';
+import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
 
 CREATE TABLE "MorphologicalDetails"(
     "form" TEXT NOT NULL,
@@ -51,8 +52,8 @@ CREATE VIEW "morphology.Peek" AS
                                     Infl.cnt,
                                     Infl.stem,
                                     Infl.suffix
-                                 FROM main.MorphologicalDetailInflections AS Infl
-                                 INNER JOIN main.MorphologicalDetails
+                                 FROM MorphologicalDetailInflections AS Infl
+                                 INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
                                         AND Infl.item = MorphologicalDetails.item
                                  WHERE Infl.partOfSpeech = 'adjective'
@@ -66,7 +67,7 @@ CREATE VIEW "morphology.Peek" AS
                                     Infl.stem,
                                     Infl.suffix
                                  FROM MorphologicalDetailInflections AS Infl
-                                 INNER JOIN main.MorphologicalDetails
+                                 INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
                                         AND Infl.item = MorphologicalDetails.item
                                  WHERE Infl.partOfSpeech = 'adverb'
@@ -80,7 +81,7 @@ CREATE VIEW "morphology.Peek" AS
                                     Infl.stem,
                                     Infl.suffix
                                  FROM MorphologicalDetailInflections as Infl
-                                 INNER JOIN main.MorphologicalDetails
+                                 INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
                                         AND Infl.item = MorphologicalDetails.item
                                  WHERE Infl.partOfSpeech = 'conjunction'
@@ -108,7 +109,7 @@ CREATE VIEW "morphology.Peek" AS
                                     Infl.stem,
                                     Infl.suffix
                                  FROM MorphologicalDetailInflections as Infl
-                                 INNER JOIN main.MorphologicalDetails
+                                 INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
                                         AND Infl.item = MorphologicalDetails.item
                                  WHERE Infl.partOfSpeech = 'noun'
@@ -122,7 +123,7 @@ CREATE VIEW "morphology.Peek" AS
                                     Infl.stem,
                                     Infl.suffix
                                  FROM MorphologicalDetailInflections AS Infl
-                                 INNER JOIN main.MorphologicalDetails
+                                 INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
                                         AND Infl.item = MorphologicalDetails.item
                                  WHERE Infl.partOfSpeech = 'preposition'
@@ -136,7 +137,7 @@ CREATE VIEW "morphology.Peek" AS
                                     Infl.stem,
                                     Infl.suffix
                                  FROM MorphologicalDetailInflections AS Infl
-                                 INNER JOIN main.MorphologicalDetails
+                                 INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
                                         AND Infl.item = MorphologicalDetails.item
                                  WHERE Infl.partOfSpeech = 'verb' ),
@@ -161,7 +162,7 @@ CREATE VIEW "morphology.Peek" AS
             FROM InflDataWithCleanDictRef
             ORDER BY form, item, cnt;
 
-searchMorphologicalDataDefault WITH Result: SELECT Peek.* 
+searchMorphologicalDataWithFts WITH Result: SELECT Peek.* 
                                                 FROM SearchableMorphDetInflections AS Search
                                                 INNER JOIN "morphology.Peek" AS Peek
                                                     ON Search.form = Peek.form 
@@ -170,29 +171,63 @@ searchMorphologicalDataDefault WITH Result: SELECT Peek.*
                                                 WHERE Search.form MATCH ?
                                                 ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
 
-searchMorphologicalData WITH Result: SELECT Peek.* 
-                                         FROM SearchableMorphDetInflections AS Search
-                                         INNER JOIN "morphology.Peek" AS Peek
-                                             ON Search.form = Peek.form 
-                                                AND Search.item = Peek.item
-                                                AND Search.cnt = Peek.cnt
-                                         WHERE Search.form LIKE ?
-                                         ORDER BY Peek.form, Peek.item, Peek.cnt;
+searchMorphologicalDataWithLike WITH Result: SELECT Peek.* 
+                                                 FROM SearchableMorphDetInflections AS Search
+                                                 INNER JOIN "morphology.Peek" AS Peek
+                                                      ON Search.form = Peek.form 
+                                                         AND Search.item = Peek.item
+                                                         AND Search.cnt = Peek.cnt
+                                                 WHERE Search.form LIKE ?
+                                                 ORDER BY Peek.form, Peek.item, Peek.cnt;
 
-searchMacronizedMorphologicalDataDefault WITH Result: SELECT Peek.* 
-                                                          FROM SearchableMorphDetInflections AS Search
-                                                          INNER JOIN "morphology.Peek" AS Peek
-                                                              ON Search.form = Peek.form
-                                                                 AND Search.item = Peek.item
-                                                                 AND Search.cnt = Peek.cnt
-                                                          WHERE Search.macronizedForm MATCH ?
-                                                          ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
+searchMacronizedMorphologicalDataWithFts WITH Result: SELECT Peek.* 
+                                                              FROM SearchableMorphDetInflections AS Search
+                                                              INNER JOIN "morphology.Peek" AS Peek
+                                                                  ON Search.form = Peek.form
+                                                                     AND Search.item = Peek.item
+                                                                     AND Search.cnt = Peek.cnt
+                                                              WHERE Search.macronizedForm MATCH ?
+                                                              ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
 
-searchMacronizedMorphologicalData WITH Result: SELECT Peek.*
-                                                   FROM SearchableMorphDetInflections AS Search
-                                                   INNER JOIN "morphology.Peek" AS Peek
-                                                       ON Search.form = Peek.form
-                                                          AND Search.item = Peek.item
-                                                          AND Search.cnt = Peek.cnt
-                                                   WHERE Search.macronizedForm LIKE ?
-                                                   ORDER BY Peek.form, Peek.item, Peek.cnt;
+searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*
+                                                           FROM SearchableMorphDetInflections AS Search
+                                                           INNER JOIN "morphology.Peek" AS Peek
+                                                               ON Search.form = Peek.form
+                                                                  AND Search.item = Peek.item
+                                                                  AND Search.cnt = Peek.cnt
+                                                           WHERE Search.macronizedForm LIKE ?
+                                                           ORDER BY Peek.form, Peek.item, Peek.cnt;
+
+CREATE VIEW "morphology.Analyses" AS morphologyAnalysis AS
+    SELECT Infl.form,
+           Infl.item,
+           Infl.cnt,
+           MorphologicalDetails.dictionaryRef,
+           Infl.partOfSpeech,
+           Infl.stem,
+           Infl.suffix,
+           Infl.segmentsInfo,
+           Infl.gender,
+           Infl.number,
+           Infl.declension,
+           Infl.gramCase,
+           Infl.verbForm,
+           Infl.tense,
+           Infl.voice,
+           Infl.person
+        FROM MorphologicalDetailInflections AS Infl
+        INNER JOIN MorphologicalDetails
+            ON Infl.form = MorphologicalDetails.form
+               AND Infl.item = MorphologicalDetails.item;
+
+getMorphologicalDetailsOfForm WITH Analysis: SELECT Analyses.* 
+                                                 FROM SearchableMorphDetInflections AS Infl
+                                                 INNER JOIN "morphology.Analyses" AS Analyses
+                                                     ON Infl.form = Analyses.form
+                                                 WHERE Infl.form LIKE ? ORDER BY Analyses.form, Analyses.item, Analyses.cnt;
+
+getMorphologicalDetailsOfMacronizedForm WITH Analysis: SELECT Analyses.* 
+                                                           FROM SearchableMorphDetInflections AS Infl
+                                                           INNER JOIN "morphology.Analyses" AS Analyses
+                                                               ON Infl.form = Analyses.form
+                                                           WHERE Infl.macronizedForm LIKE ? ORDER BY Analyses.form, Analyses.item, Analyses.cnt;

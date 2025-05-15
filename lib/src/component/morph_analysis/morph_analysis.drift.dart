@@ -6,6 +6,8 @@ import 'package:latin_reader/src/component/morph_analysis/morph_analysis.drift.d
 import 'package:drift/internal/modular.dart' as i2;
 import 'package:latin_reader/src/component/morph_analysis/morphological_search_api.dart'
     as i3;
+import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart'
+    as i4;
 
 typedef $MorphologicalDetailsCreateCompanionBuilder
     = i1.MorphologicalDetailsCompanion Function({
@@ -2051,7 +2053,7 @@ class MorphologyPeek
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW "morphology.Peek" AS WITH InflectionData AS (SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(IIF(Infl.verbForm IS NULL AND Infl.segmentsInfo IN (\'irregular\', \'indeclinable\'), Infl.segmentsInfo, NULL), Infl.verbForm) AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM main.MorphologicalDetailInflections AS Infl INNER JOIN main.MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adjective\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, IIF(Infl.suffix IS NOT NULL, \'-\' || Infl.suffix || \' suffix\', NULL) AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN main.MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adverb\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN main.MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'conjunction\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'interjection\' UNION ALL SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(Infl.verbForm, Infl.declension || \' declension\') AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN main.MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'noun\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN main.MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'preposition\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, Infl.segmentsInfo AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN main.MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'verb\'), InflDataWithCleanDictRef AS (SELECT form, stem, partOfSpeech, suffix, "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(dictionaryRef, \'1\', \'\'), \'2\', \'\'), \'3\', \'\'), \'4\', \'\'), \'5\', \'\'), \'6\', \'\'), \'7\', \'\'), \'8\', \'\'), \'9\', \'\') AS dictionaryRef, additional, item, cnt FROM InflectionData) SELECT form, "REPLACE"(stem, \'-\', \'\') || suffix AS macronizedForm, partOfSpeech, dictionaryRef, additional, item, cnt FROM InflDataWithCleanDictRef ORDER BY form, item, cnt',
+            'CREATE VIEW "morphology.Peek" AS WITH InflectionData AS (SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(IIF(Infl.verbForm IS NULL AND Infl.segmentsInfo IN (\'irregular\', \'indeclinable\'), Infl.segmentsInfo, NULL), Infl.verbForm) AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adjective\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, IIF(Infl.suffix IS NOT NULL, \'-\' || Infl.suffix || \' suffix\', NULL) AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adverb\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'conjunction\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'interjection\' UNION ALL SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(Infl.verbForm, Infl.declension || \' declension\') AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'noun\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'preposition\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, Infl.segmentsInfo AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'verb\'), InflDataWithCleanDictRef AS (SELECT form, stem, partOfSpeech, suffix, "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(dictionaryRef, \'1\', \'\'), \'2\', \'\'), \'3\', \'\'), \'4\', \'\'), \'5\', \'\'), \'6\', \'\'), \'7\', \'\'), \'8\', \'\'), \'9\', \'\') AS dictionaryRef, additional, item, cnt FROM InflectionData) SELECT form, "REPLACE"(stem, \'-\', \'\') || suffix AS macronizedForm, partOfSpeech, dictionaryRef, additional, item, cnt FROM InflDataWithCleanDictRef ORDER BY form, item, cnt',
       };
   @override
   MorphologyPeek get asDslTable => this;
@@ -2109,9 +2111,323 @@ class MorphologyPeek
       const {'MorphologicalDetailInflections', 'MorphologicalDetails'};
 }
 
+class morphologyAnalysis extends i0.DataClass {
+  final String form;
+  final int item;
+  final int cnt;
+  final String dictionaryRef;
+  final String partOfSpeech;
+  final String stem;
+  final String? suffix;
+  final String? segmentsInfo;
+  final String? gender;
+  final String? number;
+  final String? declension;
+  final String? gramCase;
+  final String? verbForm;
+  final String? tense;
+  final String? voice;
+  final String? person;
+  const morphologyAnalysis(
+      {required this.form,
+      required this.item,
+      required this.cnt,
+      required this.dictionaryRef,
+      required this.partOfSpeech,
+      required this.stem,
+      this.suffix,
+      this.segmentsInfo,
+      this.gender,
+      this.number,
+      this.declension,
+      this.gramCase,
+      this.verbForm,
+      this.tense,
+      this.voice,
+      this.person});
+  factory morphologyAnalysis.fromJson(Map<String, dynamic> json,
+      {i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return morphologyAnalysis(
+      form: serializer.fromJson<String>(json['form']),
+      item: serializer.fromJson<int>(json['item']),
+      cnt: serializer.fromJson<int>(json['cnt']),
+      dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      partOfSpeech: serializer.fromJson<String>(json['partOfSpeech']),
+      stem: serializer.fromJson<String>(json['stem']),
+      suffix: serializer.fromJson<String?>(json['suffix']),
+      segmentsInfo: serializer.fromJson<String?>(json['segmentsInfo']),
+      gender: serializer.fromJson<String?>(json['gender']),
+      number: serializer.fromJson<String?>(json['number']),
+      declension: serializer.fromJson<String?>(json['declension']),
+      gramCase: serializer.fromJson<String?>(json['gramCase']),
+      verbForm: serializer.fromJson<String?>(json['verbForm']),
+      tense: serializer.fromJson<String?>(json['tense']),
+      voice: serializer.fromJson<String?>(json['voice']),
+      person: serializer.fromJson<String?>(json['person']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'form': serializer.toJson<String>(form),
+      'item': serializer.toJson<int>(item),
+      'cnt': serializer.toJson<int>(cnt),
+      'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'partOfSpeech': serializer.toJson<String>(partOfSpeech),
+      'stem': serializer.toJson<String>(stem),
+      'suffix': serializer.toJson<String?>(suffix),
+      'segmentsInfo': serializer.toJson<String?>(segmentsInfo),
+      'gender': serializer.toJson<String?>(gender),
+      'number': serializer.toJson<String?>(number),
+      'declension': serializer.toJson<String?>(declension),
+      'gramCase': serializer.toJson<String?>(gramCase),
+      'verbForm': serializer.toJson<String?>(verbForm),
+      'tense': serializer.toJson<String?>(tense),
+      'voice': serializer.toJson<String?>(voice),
+      'person': serializer.toJson<String?>(person),
+    };
+  }
+
+  i1.morphologyAnalysis copyWith(
+          {String? form,
+          int? item,
+          int? cnt,
+          String? dictionaryRef,
+          String? partOfSpeech,
+          String? stem,
+          i0.Value<String?> suffix = const i0.Value.absent(),
+          i0.Value<String?> segmentsInfo = const i0.Value.absent(),
+          i0.Value<String?> gender = const i0.Value.absent(),
+          i0.Value<String?> number = const i0.Value.absent(),
+          i0.Value<String?> declension = const i0.Value.absent(),
+          i0.Value<String?> gramCase = const i0.Value.absent(),
+          i0.Value<String?> verbForm = const i0.Value.absent(),
+          i0.Value<String?> tense = const i0.Value.absent(),
+          i0.Value<String?> voice = const i0.Value.absent(),
+          i0.Value<String?> person = const i0.Value.absent()}) =>
+      i1.morphologyAnalysis(
+        form: form ?? this.form,
+        item: item ?? this.item,
+        cnt: cnt ?? this.cnt,
+        dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+        partOfSpeech: partOfSpeech ?? this.partOfSpeech,
+        stem: stem ?? this.stem,
+        suffix: suffix.present ? suffix.value : this.suffix,
+        segmentsInfo:
+            segmentsInfo.present ? segmentsInfo.value : this.segmentsInfo,
+        gender: gender.present ? gender.value : this.gender,
+        number: number.present ? number.value : this.number,
+        declension: declension.present ? declension.value : this.declension,
+        gramCase: gramCase.present ? gramCase.value : this.gramCase,
+        verbForm: verbForm.present ? verbForm.value : this.verbForm,
+        tense: tense.present ? tense.value : this.tense,
+        voice: voice.present ? voice.value : this.voice,
+        person: person.present ? person.value : this.person,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('morphologyAnalysis(')
+          ..write('form: $form, ')
+          ..write('item: $item, ')
+          ..write('cnt: $cnt, ')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('partOfSpeech: $partOfSpeech, ')
+          ..write('stem: $stem, ')
+          ..write('suffix: $suffix, ')
+          ..write('segmentsInfo: $segmentsInfo, ')
+          ..write('gender: $gender, ')
+          ..write('number: $number, ')
+          ..write('declension: $declension, ')
+          ..write('gramCase: $gramCase, ')
+          ..write('verbForm: $verbForm, ')
+          ..write('tense: $tense, ')
+          ..write('voice: $voice, ')
+          ..write('person: $person')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      form,
+      item,
+      cnt,
+      dictionaryRef,
+      partOfSpeech,
+      stem,
+      suffix,
+      segmentsInfo,
+      gender,
+      number,
+      declension,
+      gramCase,
+      verbForm,
+      tense,
+      voice,
+      person);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.morphologyAnalysis &&
+          other.form == this.form &&
+          other.item == this.item &&
+          other.cnt == this.cnt &&
+          other.dictionaryRef == this.dictionaryRef &&
+          other.partOfSpeech == this.partOfSpeech &&
+          other.stem == this.stem &&
+          other.suffix == this.suffix &&
+          other.segmentsInfo == this.segmentsInfo &&
+          other.gender == this.gender &&
+          other.number == this.number &&
+          other.declension == this.declension &&
+          other.gramCase == this.gramCase &&
+          other.verbForm == this.verbForm &&
+          other.tense == this.tense &&
+          other.voice == this.voice &&
+          other.person == this.person);
+}
+
+class MorphologyAnalyses
+    extends i0.ViewInfo<i1.MorphologyAnalyses, i1.morphologyAnalysis>
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  MorphologyAnalyses(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+        form,
+        item,
+        cnt,
+        dictionaryRef,
+        partOfSpeech,
+        stem,
+        suffix,
+        segmentsInfo,
+        gender,
+        number,
+        declension,
+        gramCase,
+        verbForm,
+        tense,
+        voice,
+        person
+      ];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'morphology.Analyses';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+        i0.SqlDialect.sqlite:
+            'CREATE VIEW "morphology.Analyses" AS SELECT Infl.form, Infl.item, Infl.cnt, MorphologicalDetails.dictionaryRef, Infl.partOfSpeech, Infl.stem, Infl.suffix, Infl.segmentsInfo, Infl.gender, Infl.number, Infl.declension, Infl.gramCase, Infl.verbForm, Infl.tense, Infl.voice, Infl.person FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item',
+      };
+  @override
+  MorphologyAnalyses get asDslTable => this;
+  @override
+  i1.morphologyAnalysis map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.morphologyAnalysis(
+      form: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}form'])!,
+      item: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.int, data['${effectivePrefix}item'])!,
+      cnt: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.int, data['${effectivePrefix}cnt'])!,
+      dictionaryRef: attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string, data['${effectivePrefix}dictionaryRef'])!,
+      partOfSpeech: attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string, data['${effectivePrefix}partOfSpeech'])!,
+      stem: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}stem'])!,
+      suffix: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}suffix']),
+      segmentsInfo: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}segmentsInfo']),
+      gender: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}gender']),
+      number: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}number']),
+      declension: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}declension']),
+      gramCase: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}gramCase']),
+      verbForm: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}verbForm']),
+      tense: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}tense']),
+      voice: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}voice']),
+      person: attachedDatabase.typeMapping
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}person']),
+    );
+  }
+
+  late final i0.GeneratedColumn<String> form = i0.GeneratedColumn<String>(
+      'form', aliasedName, false,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<int> item = i0.GeneratedColumn<int>(
+      'item', aliasedName, false,
+      type: i0.DriftSqlType.int);
+  late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
+      'cnt', aliasedName, false,
+      type: i0.DriftSqlType.int);
+  late final i0.GeneratedColumn<String> dictionaryRef =
+      i0.GeneratedColumn<String>('dictionaryRef', aliasedName, false,
+          type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> partOfSpeech =
+      i0.GeneratedColumn<String>('partOfSpeech', aliasedName, false,
+          type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> stem = i0.GeneratedColumn<String>(
+      'stem', aliasedName, false,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> suffix = i0.GeneratedColumn<String>(
+      'suffix', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> segmentsInfo =
+      i0.GeneratedColumn<String>('segmentsInfo', aliasedName, true,
+          type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> gender = i0.GeneratedColumn<String>(
+      'gender', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> number = i0.GeneratedColumn<String>(
+      'number', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> declension = i0.GeneratedColumn<String>(
+      'declension', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> gramCase = i0.GeneratedColumn<String>(
+      'gramCase', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> verbForm = i0.GeneratedColumn<String>(
+      'verbForm', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> tense = i0.GeneratedColumn<String>(
+      'tense', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> voice = i0.GeneratedColumn<String>(
+      'voice', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  late final i0.GeneratedColumn<String> person = i0.GeneratedColumn<String>(
+      'person', aliasedName, true,
+      type: i0.DriftSqlType.string);
+  @override
+  MorphologyAnalyses createAlias(String alias) {
+    return MorphologyAnalyses(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables =>
+      const {'MorphologicalDetailInflections', 'MorphologicalDetails'};
+}
+
 class MorphAnalysisDrift extends i2.ModularAccessor {
   MorphAnalysisDrift(i0.GeneratedDatabase db) : super(db);
-  i0.Selectable<i3.Result> searchMorphologicalDataDefault(String var1) {
+  i0.Selectable<i3.Result> searchMorphologicalDataWithFts(String var1) {
     return customSelect(
         'SELECT Peek.* FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.form MATCH ?1 ORDER BY BM25(SearchableMorphDetInflections), Peek.form, Peek.item, Peek.cnt',
         variables: [
@@ -2132,7 +2448,7 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
         ));
   }
 
-  i0.Selectable<i3.Result> searchMorphologicalData(String var1) {
+  i0.Selectable<i3.Result> searchMorphologicalDataWithLike(String var1) {
     return customSelect(
         'SELECT Peek.* FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.form LIKE ?1 ORDER BY Peek.form, Peek.item, Peek.cnt',
         variables: [
@@ -2153,7 +2469,7 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
         ));
   }
 
-  i0.Selectable<i3.Result> searchMacronizedMorphologicalDataDefault(
+  i0.Selectable<i3.Result> searchMacronizedMorphologicalDataWithFts(
       String var1) {
     return customSelect(
         'SELECT Peek.* FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.macronizedForm MATCH ?1 ORDER BY BM25(SearchableMorphDetInflections), Peek.form, Peek.item, Peek.cnt',
@@ -2175,7 +2491,8 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
         ));
   }
 
-  i0.Selectable<i3.Result> searchMacronizedMorphologicalData(String var1) {
+  i0.Selectable<i3.Result> searchMacronizedMorphologicalDataWithLike(
+      String var1) {
     return customSelect(
         'SELECT Peek.* FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.macronizedForm LIKE ?1 ORDER BY Peek.form, Peek.item, Peek.cnt',
         variables: [
@@ -2196,6 +2513,65 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
         ));
   }
 
+  i0.Selectable<i4.Analysis> getMorphologicalDetailsOfForm(String var1) {
+    return customSelect(
+        'SELECT Analyses.* FROM SearchableMorphDetInflections AS Infl INNER JOIN "morphology.Analyses" AS Analyses ON Infl.form = Analyses.form WHERE Infl.form LIKE ?1 ORDER BY Analyses.form, Analyses.item, Analyses.cnt',
+        variables: [
+          i0.Variable<String>(var1)
+        ],
+        readsFrom: {
+          searchableMorphDetInflections,
+          morphologicalDetailInflections,
+          morphologicalDetails,
+        }).map((i0.QueryRow row) => i4.Analysis(
+          form: row.read<String>('form'),
+          item: row.read<int>('item'),
+          cnt: row.read<int>('cnt'),
+          dictionaryRef: row.read<String>('dictionaryRef'),
+          stem: row.read<String>('stem'),
+          suffix: row.readNullable<String>('suffix'),
+          segmentsInfo: row.readNullable<String>('segmentsInfo'),
+          gender: row.readNullable<String>('gender'),
+          number: row.readNullable<String>('number'),
+          declension: row.readNullable<String>('declension'),
+          gramCase: row.readNullable<String>('gramCase'),
+          verbForm: row.readNullable<String>('verbForm'),
+          tense: row.readNullable<String>('tense'),
+          voice: row.readNullable<String>('voice'),
+          person: row.readNullable<String>('person'),
+        ));
+  }
+
+  i0.Selectable<i4.Analysis> getMorphologicalDetailsOfMacronizedForm(
+      String var1) {
+    return customSelect(
+        'SELECT Analyses.* FROM SearchableMorphDetInflections AS Infl INNER JOIN "morphology.Analyses" AS Analyses ON Infl.form = Analyses.form WHERE Infl.macronizedForm LIKE ?1 ORDER BY Analyses.form, Analyses.item, Analyses.cnt',
+        variables: [
+          i0.Variable<String>(var1)
+        ],
+        readsFrom: {
+          searchableMorphDetInflections,
+          morphologicalDetailInflections,
+          morphologicalDetails,
+        }).map((i0.QueryRow row) => i4.Analysis(
+          form: row.read<String>('form'),
+          item: row.read<int>('item'),
+          cnt: row.read<int>('cnt'),
+          dictionaryRef: row.read<String>('dictionaryRef'),
+          stem: row.read<String>('stem'),
+          suffix: row.readNullable<String>('suffix'),
+          segmentsInfo: row.readNullable<String>('segmentsInfo'),
+          gender: row.readNullable<String>('gender'),
+          number: row.readNullable<String>('number'),
+          declension: row.readNullable<String>('declension'),
+          gramCase: row.readNullable<String>('gramCase'),
+          verbForm: row.readNullable<String>('verbForm'),
+          tense: row.readNullable<String>('tense'),
+          voice: row.readNullable<String>('voice'),
+          person: row.readNullable<String>('person'),
+        ));
+  }
+
   i1.SearchableMorphDetInflections get searchableMorphDetInflections =>
       i2.ReadDatabaseContainer(attachedDatabase)
           .resultSet<i1.SearchableMorphDetInflections>(
@@ -2210,4 +2586,7 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
   i1.MorphologicalDetails get morphologicalDetails =>
       i2.ReadDatabaseContainer(attachedDatabase)
           .resultSet<i1.MorphologicalDetails>('MorphologicalDetails');
+  i1.MorphologyAnalyses get morphologyAnalyses =>
+      i2.ReadDatabaseContainer(attachedDatabase)
+          .resultSet<i1.MorphologyAnalyses>('morphology.Analyses');
 }
