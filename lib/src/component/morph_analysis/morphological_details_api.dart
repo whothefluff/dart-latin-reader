@@ -32,9 +32,21 @@ Future<Analyses> morphologicalDetailsByForm(Ref ref, String form) async {
 }
 
 class MorphologicalDataRepository implements IMorphologicalDataRepository {
-  MorphologicalDataRepository(this._db);
+  MorphologicalDataRepository(
+    this._db,
+  ) {
+    _runnableQueries = {
+      (hasMacrons: true): (String form) =>
+          _db.morphAnalysisDrift.getMorphologicalDetailsOfMacronizedForm(form),
+      (hasMacrons: false): (String form) =>
+          _db.morphAnalysisDrift.getMorphologicalDetailsOfForm(form),
+    };
+  }
 
   final AppDb _db;
+  late final Map<({bool hasMacrons}), 
+             MultiSelectable<Analysis> Function(String form)> 
+      _runnableQueries;
 
   @override
   Future<Analyses> getMorphDetailsByKeys(AnalysisKeys keys) async {
@@ -51,11 +63,16 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
     return Analyses(dbData.map(_toDomain));
   }
 
+  /// If the input contains macrons, the query will look for them explicitely
+  /// and as they were specified
+  ///
+  /// If the input contains no macrons, the query will ignore them (which means
+  /// the result can contain macrons or not contain any)
   @override
   Future<Analyses> getMorphDetailsByForm(String form) async {
     log.info('MorphologicalDataRepository - retrieving $form analyses from db');
-    final dbData =
-        await _db.morphAnalysisDrift.getMorphologicalDetailsOfForm(form).get();
+    final formHasMacrons = form.contains(RegExp('[āēīōūĀĒĪŌŪ]'));
+    final dbData = await _runnableQueries[(hasMacrons: formHasMacrons)]!(form).get();
     return Analyses(dbData);
   }
 
