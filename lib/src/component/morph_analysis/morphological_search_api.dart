@@ -26,7 +26,7 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
     this._db,
   ) {
     _runnableQueries = {
-      (hasMacrons: true, useLike: true): (String form) =>
+      (hasMacrons: true, useLike: true): (String form) => 
           _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithLike(form),
       (hasMacrons: true, useLike: false): (String form) =>
           _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithFts(form),
@@ -39,8 +39,22 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
 
   final AppDb _db;
   late final Map<({bool hasMacrons, bool useLike}),
-      MultiSelectable<Result> Function(String form)> _runnableQueries;
+             MultiSelectable<Result> Function(String form)> 
+      _runnableQueries;
 
+  /// If the input contains macrons, the query will look for them explicitely
+  /// and as they were specified 
+  ///
+  /// If the input contains no macrons, the query will ignore them (which means
+  /// the result can contain macrons or not contain any)
+  ///
+  /// If the input contains wildcards (`*` or `%` for any number of
+  /// characters and `?` or `_` for a single character) or is made of less than
+  /// three characters, the query will use `LIKE` instead of doing an FTS5 
+  /// search
+  ///
+  /// If the input does not contain any wildcards and is made of three 
+  /// characters or more, the query looks for matches using full-text search 
   @override
   Future<Results> getSearchResults(String form) async {
     if (form.isNotEmpty) {
@@ -60,8 +74,7 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
 
   bool _hasMacrons(String form) => form.contains(RegExp('[āēīōūĀĒĪŌŪ]'));
 
-  bool _useLikeLogic(String form) =>
-      form.length < 3 || form.contains(RegExp('[%_]'));
+  bool _useLikeLogic(String form) => form.length < 3 || form.contains(RegExp('[%_]'));
 
 //
 }
