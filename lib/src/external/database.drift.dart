@@ -20,6 +20,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i1.SearchableMorphDetInflections searchableMorphDetInflections =
       i1.SearchableMorphDetInflections(this);
   late final i1.MorphologyPeek morphologyPeek = i1.MorphologyPeek(this);
+  late final i1.MorphologyAnalyses morphologyAnalyses =
+      i1.MorphologyAnalyses(this);
   late final i2.Dictionaries dictionaries = i2.Dictionaries(this);
   late final i2.DictionaryEntries dictionaryEntries =
       i2.DictionaryEntries(this);
@@ -79,6 +81,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
         morphologicalDetailInflections,
         searchableMorphDetInflections,
         morphologyPeek,
+        morphologyAnalyses,
         dictionaries,
         dictionaryEntries,
         dictionaryAlphabets,
