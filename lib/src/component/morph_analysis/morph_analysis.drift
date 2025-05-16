@@ -151,7 +151,7 @@ CREATE VIEW "morphology.Peek" AS
                                               cnt
                                            FROM InflectionData )
         SELECT form,
-               "REPLACE"( stem, '-', '' ) || suffix AS macronizedForm,
+               CONCAT( "REPLACE"( stem, '-', '' ), suffix ) AS macronizedForm,
                partOfSpeech,
                dictionaryRef,
                --this can't be done robustly because the dictionaryRef does not contain macrons (eg. rosā gets mixed with rosa)
@@ -198,9 +198,9 @@ searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*
                                                            WHERE Search.macronizedForm LIKE ?
                                                            ORDER BY Peek.form, Peek.item, Peek.cnt;
 
-getAnalysisKeysOf WITH AnalysisKey: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM "morphology.Peek" WHERE form LIKE ? ORDER BY form, item, cnt;
+getAnalysisKeysOf WITH AnalysisKey: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM SearchableMorphDetInflections WHERE form LIKE ? ORDER BY form, item, cnt;
 
-getAnalysisKeysOfMacronized WITH AnalysisKey: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM "morphology.Peek" WHERE macronizedForm LIKE ? ORDER BY form, item, cnt;
+getAnalysisKeysOfMacronized WITH AnalysisKey: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM SearchableMorphDetInflections WHERE macronizedForm LIKE ? ORDER BY form, item, cnt;
 
 CREATE VIEW "morphology.Analyses" AS MorphologyAnalysis AS 
     SELECT Infl.form,
