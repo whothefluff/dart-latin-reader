@@ -484,18 +484,18 @@ typedef $MorphologicalDetailInflectionsProcessedTableManager
         i0.PrefetchHooks Function()>;
 typedef $SearchableMorphDetInflectionsCreateCompanionBuilder
     = i1.SearchableMorphDetInflectionsCompanion Function({
-  required String form,
-  required String macronizedForm,
-  required String item,
-  required String cnt,
+  i0.Value<String?> form,
+  i0.Value<String?> macronizedForm,
+  i0.Value<String?> item,
+  i0.Value<String?> cnt,
   i0.Value<int> rowid,
 });
 typedef $SearchableMorphDetInflectionsUpdateCompanionBuilder
     = i1.SearchableMorphDetInflectionsCompanion Function({
-  i0.Value<String> form,
-  i0.Value<String> macronizedForm,
-  i0.Value<String> item,
-  i0.Value<String> cnt,
+  i0.Value<String?> form,
+  i0.Value<String?> macronizedForm,
+  i0.Value<String?> item,
+  i0.Value<String?> cnt,
   i0.Value<int> rowid,
 });
 
@@ -598,10 +598,10 @@ class $SearchableMorphDetInflectionsTableManager extends i0.RootTableManager<
               i1.$SearchableMorphDetInflectionsAnnotationComposer(
                   $db: db, $table: table),
           updateCompanionCallback: ({
-            i0.Value<String> form = const i0.Value.absent(),
-            i0.Value<String> macronizedForm = const i0.Value.absent(),
-            i0.Value<String> item = const i0.Value.absent(),
-            i0.Value<String> cnt = const i0.Value.absent(),
+            i0.Value<String?> form = const i0.Value.absent(),
+            i0.Value<String?> macronizedForm = const i0.Value.absent(),
+            i0.Value<String?> item = const i0.Value.absent(),
+            i0.Value<String?> cnt = const i0.Value.absent(),
             i0.Value<int> rowid = const i0.Value.absent(),
           }) =>
               i1.SearchableMorphDetInflectionsCompanion(
@@ -612,10 +612,10 @@ class $SearchableMorphDetInflectionsTableManager extends i0.RootTableManager<
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            required String form,
-            required String macronizedForm,
-            required String item,
-            required String cnt,
+            i0.Value<String?> form = const i0.Value.absent(),
+            i0.Value<String?> macronizedForm = const i0.Value.absent(),
+            i0.Value<String?> item = const i0.Value.absent(),
+            i0.Value<String?> cnt = const i0.Value.absent(),
             i0.Value<int> rowid = const i0.Value.absent(),
           }) =>
               i1.SearchableMorphDetInflectionsCompanion.insert(
@@ -1658,29 +1658,29 @@ class SearchableMorphDetInflections extends i0.Table
   static const i0.VerificationMeta _formMeta =
       const i0.VerificationMeta('form');
   late final i0.GeneratedColumn<String> form = i0.GeneratedColumn<String>(
-      'form', aliasedName, false,
+      'form', aliasedName, true,
       type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       $customConstraints: '');
   static const i0.VerificationMeta _macronizedFormMeta =
       const i0.VerificationMeta('macronizedForm');
   late final i0.GeneratedColumn<String> macronizedForm =
-      i0.GeneratedColumn<String>('macronizedForm', aliasedName, false,
+      i0.GeneratedColumn<String>('macronizedForm', aliasedName, true,
           type: i0.DriftSqlType.string,
-          requiredDuringInsert: true,
+          requiredDuringInsert: false,
           $customConstraints: '');
   static const i0.VerificationMeta _itemMeta =
       const i0.VerificationMeta('item');
   late final i0.GeneratedColumn<String> item = i0.GeneratedColumn<String>(
-      'item', aliasedName, false,
+      'item', aliasedName, true,
       type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       $customConstraints: '');
   static const i0.VerificationMeta _cntMeta = const i0.VerificationMeta('cnt');
   late final i0.GeneratedColumn<String> cnt = i0.GeneratedColumn<String>(
-      'cnt', aliasedName, false,
+      'cnt', aliasedName, true,
       type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       $customConstraints: '');
   @override
   List<i0.GeneratedColumn> get $columns => [form, macronizedForm, item, cnt];
@@ -1698,28 +1698,20 @@ class SearchableMorphDetInflections extends i0.Table
     if (data.containsKey('form')) {
       context.handle(
           _formMeta, form.isAcceptableOrUnknown(data['form']!, _formMeta));
-    } else if (isInserting) {
-      context.missing(_formMeta);
     }
     if (data.containsKey('macronizedForm')) {
       context.handle(
           _macronizedFormMeta,
           macronizedForm.isAcceptableOrUnknown(
               data['macronizedForm']!, _macronizedFormMeta));
-    } else if (isInserting) {
-      context.missing(_macronizedFormMeta);
     }
     if (data.containsKey('item')) {
       context.handle(
           _itemMeta, item.isAcceptableOrUnknown(data['item']!, _itemMeta));
-    } else if (isInserting) {
-      context.missing(_itemMeta);
     }
     if (data.containsKey('cnt')) {
       context.handle(
           _cntMeta, cnt.isAcceptableOrUnknown(data['cnt']!, _cntMeta));
-    } else if (isInserting) {
-      context.missing(_cntMeta);
     }
     return context;
   }
@@ -1732,13 +1724,13 @@ class SearchableMorphDetInflections extends i0.Table
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.SearchableMorphDetInflection(
       form: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}form'])!,
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}form']),
       macronizedForm: attachedDatabase.typeMapping.read(
-          i0.DriftSqlType.string, data['${effectivePrefix}macronizedForm'])!,
+          i0.DriftSqlType.string, data['${effectivePrefix}macronizedForm']),
       item: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}item'])!,
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}item']),
       cnt: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}cnt'])!,
+          .read(i0.DriftSqlType.string, data['${effectivePrefix}cnt']),
     );
   }
 
@@ -1756,31 +1748,43 @@ class SearchableMorphDetInflections extends i0.Table
 
 class SearchableMorphDetInflection extends i0.DataClass
     implements i0.Insertable<i1.SearchableMorphDetInflection> {
-  final String form;
-  final String macronizedForm;
-  final String item;
-  final String cnt;
+  final String? form;
+  final String? macronizedForm;
+  final String? item;
+  final String? cnt;
   const SearchableMorphDetInflection(
-      {required this.form,
-      required this.macronizedForm,
-      required this.item,
-      required this.cnt});
+      {this.form, this.macronizedForm, this.item, this.cnt});
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
-    map['form'] = i0.Variable<String>(form);
-    map['macronizedForm'] = i0.Variable<String>(macronizedForm);
-    map['item'] = i0.Variable<String>(item);
-    map['cnt'] = i0.Variable<String>(cnt);
+    if (!nullToAbsent || form != null) {
+      map['form'] = i0.Variable<String>(form);
+    }
+    if (!nullToAbsent || macronizedForm != null) {
+      map['macronizedForm'] = i0.Variable<String>(macronizedForm);
+    }
+    if (!nullToAbsent || item != null) {
+      map['item'] = i0.Variable<String>(item);
+    }
+    if (!nullToAbsent || cnt != null) {
+      map['cnt'] = i0.Variable<String>(cnt);
+    }
     return map;
   }
 
   i1.SearchableMorphDetInflectionsCompanion toCompanion(bool nullToAbsent) {
     return i1.SearchableMorphDetInflectionsCompanion(
-      form: i0.Value(form),
-      macronizedForm: i0.Value(macronizedForm),
-      item: i0.Value(item),
-      cnt: i0.Value(cnt),
+      form: form == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(form),
+      macronizedForm: macronizedForm == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(macronizedForm),
+      item: item == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(item),
+      cnt:
+          cnt == null && nullToAbsent ? const i0.Value.absent() : i0.Value(cnt),
     );
   }
 
@@ -1788,30 +1792,34 @@ class SearchableMorphDetInflection extends i0.DataClass
       {i0.ValueSerializer? serializer}) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return SearchableMorphDetInflection(
-      form: serializer.fromJson<String>(json['form']),
-      macronizedForm: serializer.fromJson<String>(json['macronizedForm']),
-      item: serializer.fromJson<String>(json['item']),
-      cnt: serializer.fromJson<String>(json['cnt']),
+      form: serializer.fromJson<String?>(json['form']),
+      macronizedForm: serializer.fromJson<String?>(json['macronizedForm']),
+      item: serializer.fromJson<String?>(json['item']),
+      cnt: serializer.fromJson<String?>(json['cnt']),
     );
   }
   @override
   Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'form': serializer.toJson<String>(form),
-      'macronizedForm': serializer.toJson<String>(macronizedForm),
-      'item': serializer.toJson<String>(item),
-      'cnt': serializer.toJson<String>(cnt),
+      'form': serializer.toJson<String?>(form),
+      'macronizedForm': serializer.toJson<String?>(macronizedForm),
+      'item': serializer.toJson<String?>(item),
+      'cnt': serializer.toJson<String?>(cnt),
     };
   }
 
   i1.SearchableMorphDetInflection copyWith(
-          {String? form, String? macronizedForm, String? item, String? cnt}) =>
+          {i0.Value<String?> form = const i0.Value.absent(),
+          i0.Value<String?> macronizedForm = const i0.Value.absent(),
+          i0.Value<String?> item = const i0.Value.absent(),
+          i0.Value<String?> cnt = const i0.Value.absent()}) =>
       i1.SearchableMorphDetInflection(
-        form: form ?? this.form,
-        macronizedForm: macronizedForm ?? this.macronizedForm,
-        item: item ?? this.item,
-        cnt: cnt ?? this.cnt,
+        form: form.present ? form.value : this.form,
+        macronizedForm:
+            macronizedForm.present ? macronizedForm.value : this.macronizedForm,
+        item: item.present ? item.value : this.item,
+        cnt: cnt.present ? cnt.value : this.cnt,
       );
   SearchableMorphDetInflection copyWithCompanion(
       i1.SearchableMorphDetInflectionsCompanion data) {
@@ -1850,10 +1858,10 @@ class SearchableMorphDetInflection extends i0.DataClass
 
 class SearchableMorphDetInflectionsCompanion
     extends i0.UpdateCompanion<i1.SearchableMorphDetInflection> {
-  final i0.Value<String> form;
-  final i0.Value<String> macronizedForm;
-  final i0.Value<String> item;
-  final i0.Value<String> cnt;
+  final i0.Value<String?> form;
+  final i0.Value<String?> macronizedForm;
+  final i0.Value<String?> item;
+  final i0.Value<String?> cnt;
   final i0.Value<int> rowid;
   const SearchableMorphDetInflectionsCompanion({
     this.form = const i0.Value.absent(),
@@ -1863,15 +1871,12 @@ class SearchableMorphDetInflectionsCompanion
     this.rowid = const i0.Value.absent(),
   });
   SearchableMorphDetInflectionsCompanion.insert({
-    required String form,
-    required String macronizedForm,
-    required String item,
-    required String cnt,
+    this.form = const i0.Value.absent(),
+    this.macronizedForm = const i0.Value.absent(),
+    this.item = const i0.Value.absent(),
+    this.cnt = const i0.Value.absent(),
     this.rowid = const i0.Value.absent(),
-  })  : form = i0.Value(form),
-        macronizedForm = i0.Value(macronizedForm),
-        item = i0.Value(item),
-        cnt = i0.Value(cnt);
+  });
   static i0.Insertable<i1.SearchableMorphDetInflection> custom({
     i0.Expression<String>? form,
     i0.Expression<String>? macronizedForm,
@@ -1889,10 +1894,10 @@ class SearchableMorphDetInflectionsCompanion
   }
 
   i1.SearchableMorphDetInflectionsCompanion copyWith(
-      {i0.Value<String>? form,
-      i0.Value<String>? macronizedForm,
-      i0.Value<String>? item,
-      i0.Value<String>? cnt,
+      {i0.Value<String?>? form,
+      i0.Value<String?>? macronizedForm,
+      i0.Value<String?>? item,
+      i0.Value<String?>? cnt,
       i0.Value<int>? rowid}) {
     return i1.SearchableMorphDetInflectionsCompanion(
       form: form ?? this.form,
@@ -1939,7 +1944,7 @@ class SearchableMorphDetInflectionsCompanion
 
 class MorphologyPeekData extends i0.DataClass {
   final String form;
-  final String? macronizedForm;
+  final String macronizedForm;
   final String? partOfSpeech;
   final String dictionaryRef;
   final String? additional;
@@ -1947,7 +1952,7 @@ class MorphologyPeekData extends i0.DataClass {
   final int cnt;
   const MorphologyPeekData(
       {required this.form,
-      this.macronizedForm,
+      required this.macronizedForm,
       this.partOfSpeech,
       required this.dictionaryRef,
       this.additional,
@@ -1958,7 +1963,7 @@ class MorphologyPeekData extends i0.DataClass {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return MorphologyPeekData(
       form: serializer.fromJson<String>(json['form']),
-      macronizedForm: serializer.fromJson<String?>(json['macronizedForm']),
+      macronizedForm: serializer.fromJson<String>(json['macronizedForm']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
       additional: serializer.fromJson<String?>(json['additional']),
@@ -1971,7 +1976,7 @@ class MorphologyPeekData extends i0.DataClass {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'form': serializer.toJson<String>(form),
-      'macronizedForm': serializer.toJson<String?>(macronizedForm),
+      'macronizedForm': serializer.toJson<String>(macronizedForm),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
       'additional': serializer.toJson<String?>(additional),
@@ -1982,7 +1987,7 @@ class MorphologyPeekData extends i0.DataClass {
 
   i1.MorphologyPeekData copyWith(
           {String? form,
-          i0.Value<String?> macronizedForm = const i0.Value.absent(),
+          String? macronizedForm,
           i0.Value<String?> partOfSpeech = const i0.Value.absent(),
           String? dictionaryRef,
           i0.Value<String?> additional = const i0.Value.absent(),
@@ -1990,8 +1995,7 @@ class MorphologyPeekData extends i0.DataClass {
           int? cnt}) =>
       i1.MorphologyPeekData(
         form: form ?? this.form,
-        macronizedForm:
-            macronizedForm.present ? macronizedForm.value : this.macronizedForm,
+        macronizedForm: macronizedForm ?? this.macronizedForm,
         partOfSpeech:
             partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
         dictionaryRef: dictionaryRef ?? this.dictionaryRef,
@@ -2053,7 +2057,7 @@ class MorphologyPeek
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
         i0.SqlDialect.sqlite:
-            'CREATE VIEW "morphology.Peek" AS WITH InflectionData AS (SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(IIF(Infl.verbForm IS NULL AND Infl.segmentsInfo IN (\'irregular\', \'indeclinable\'), Infl.segmentsInfo, NULL), Infl.verbForm) AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adjective\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, IIF(Infl.suffix IS NOT NULL, \'-\' || Infl.suffix || \' suffix\', NULL) AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adverb\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'conjunction\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'interjection\' UNION ALL SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(Infl.verbForm, Infl.declension || \' declension\') AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'noun\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'preposition\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, Infl.segmentsInfo AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'verb\'), InflDataWithCleanDictRef AS (SELECT form, stem, partOfSpeech, suffix, "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(dictionaryRef, \'1\', \'\'), \'2\', \'\'), \'3\', \'\'), \'4\', \'\'), \'5\', \'\'), \'6\', \'\'), \'7\', \'\'), \'8\', \'\'), \'9\', \'\') AS dictionaryRef, additional, item, cnt FROM InflectionData) SELECT form, "REPLACE"(stem, \'-\', \'\') || suffix AS macronizedForm, partOfSpeech, dictionaryRef, additional, item, cnt FROM InflDataWithCleanDictRef ORDER BY form, item, cnt',
+            'CREATE VIEW "morphology.Peek" AS WITH InflectionData AS (SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(IIF(Infl.verbForm IS NULL AND Infl.segmentsInfo IN (\'irregular\', \'indeclinable\'), Infl.segmentsInfo, NULL), Infl.verbForm) AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adjective\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, IIF(Infl.suffix IS NOT NULL, \'-\' || Infl.suffix || \' suffix\', NULL) AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adverb\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'conjunction\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'interjection\' UNION ALL SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(Infl.verbForm, Infl.declension || \' declension\') AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'noun\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'preposition\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, Infl.segmentsInfo AS additional, Infl.item, Infl.cnt, Infl.stem, Infl.suffix FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'verb\'), InflDataWithCleanDictRef AS (SELECT form, stem, partOfSpeech, suffix, "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(dictionaryRef, \'1\', \'\'), \'2\', \'\'), \'3\', \'\'), \'4\', \'\'), \'5\', \'\'), \'6\', \'\'), \'7\', \'\'), \'8\', \'\'), \'9\', \'\') AS dictionaryRef, additional, item, cnt FROM InflectionData) SELECT form, CONCAT("REPLACE"(stem, \'-\', \'\'), suffix) AS macronizedForm, partOfSpeech, dictionaryRef, additional, item, cnt FROM InflDataWithCleanDictRef ORDER BY form, item, cnt',
       };
   @override
   MorphologyPeek get asDslTable => this;
@@ -2064,7 +2068,7 @@ class MorphologyPeek
       form: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.string, data['${effectivePrefix}form'])!,
       macronizedForm: attachedDatabase.typeMapping.read(
-          i0.DriftSqlType.string, data['${effectivePrefix}macronizedForm']),
+          i0.DriftSqlType.string, data['${effectivePrefix}macronizedForm'])!,
       partOfSpeech: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.string, data['${effectivePrefix}partOfSpeech']),
       dictionaryRef: attachedDatabase.typeMapping.read(
@@ -2082,7 +2086,7 @@ class MorphologyPeek
       'form', aliasedName, false,
       type: i0.DriftSqlType.string);
   late final i0.GeneratedColumn<String> macronizedForm =
-      i0.GeneratedColumn<String>('macronizedForm', aliasedName, true,
+      i0.GeneratedColumn<String>('macronizedForm', aliasedName, false,
           type: i0.DriftSqlType.string);
   late final i0.GeneratedColumn<String> partOfSpeech =
       i0.GeneratedColumn<String>('partOfSpeech', aliasedName, true,
@@ -2439,7 +2443,7 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
           morphologicalDetails,
         }).map((i0.QueryRow row) => i3.Result(
           form: row.read<String>('form'),
-          macronizedForm: row.readNullable<String>('macronizedForm'),
+          macronizedForm: row.read<String>('macronizedForm'),
           partOfSpeech: row.readNullable<String>('partOfSpeech'),
           dictionaryRef: row.read<String>('dictionaryRef'),
           additional: row.readNullable<String>('additional'),
@@ -2460,7 +2464,7 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
           morphologicalDetails,
         }).map((i0.QueryRow row) => i3.Result(
           form: row.read<String>('form'),
-          macronizedForm: row.readNullable<String>('macronizedForm'),
+          macronizedForm: row.read<String>('macronizedForm'),
           partOfSpeech: row.readNullable<String>('partOfSpeech'),
           dictionaryRef: row.read<String>('dictionaryRef'),
           additional: row.readNullable<String>('additional'),
@@ -2482,7 +2486,7 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
           morphologicalDetails,
         }).map((i0.QueryRow row) => i3.Result(
           form: row.read<String>('form'),
-          macronizedForm: row.readNullable<String>('macronizedForm'),
+          macronizedForm: row.read<String>('macronizedForm'),
           partOfSpeech: row.readNullable<String>('partOfSpeech'),
           dictionaryRef: row.read<String>('dictionaryRef'),
           additional: row.readNullable<String>('additional'),
@@ -2504,7 +2508,7 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
           morphologicalDetails,
         }).map((i0.QueryRow row) => i3.Result(
           form: row.read<String>('form'),
-          macronizedForm: row.readNullable<String>('macronizedForm'),
+          macronizedForm: row.read<String>('macronizedForm'),
           partOfSpeech: row.readNullable<String>('partOfSpeech'),
           dictionaryRef: row.read<String>('dictionaryRef'),
           additional: row.readNullable<String>('additional'),
@@ -2515,33 +2519,31 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
 
   i0.Selectable<i4.AnalysisKey> getAnalysisKeysOf(String var1) {
     return customSelect(
-        'SELECT form, CAST(item AS INT) AS item, CAST(cnt AS INT) AS cnt FROM "morphology.Peek" WHERE form LIKE ?1 ORDER BY form, item, cnt',
+        'SELECT form, CAST(item AS INT) AS item, CAST(cnt AS INT) AS cnt FROM SearchableMorphDetInflections WHERE form LIKE ?1 ORDER BY form, item, cnt',
         variables: [
           i0.Variable<String>(var1)
         ],
         readsFrom: {
-          morphologicalDetailInflections,
-          morphologicalDetails,
+          searchableMorphDetInflections,
         }).map((i0.QueryRow row) => i4.AnalysisKey(
-          form: row.read<String>('form'),
-          item: row.read<int>('item'),
-          cnt: row.read<int>('cnt'),
+          form: row.readNullable<String>('form'),
+          item: row.readNullable<int>('item'),
+          cnt: row.readNullable<int>('cnt'),
         ));
   }
 
   i0.Selectable<i4.AnalysisKey> getAnalysisKeysOfMacronized(String var1) {
     return customSelect(
-        'SELECT form, CAST(item AS INT) AS item, CAST(cnt AS INT) AS cnt FROM "morphology.Peek" WHERE macronizedForm LIKE ?1 ORDER BY form, item, cnt',
+        'SELECT form, CAST(item AS INT) AS item, CAST(cnt AS INT) AS cnt FROM SearchableMorphDetInflections WHERE macronizedForm LIKE ?1 ORDER BY form, item, cnt',
         variables: [
           i0.Variable<String>(var1)
         ],
         readsFrom: {
-          morphologicalDetailInflections,
-          morphologicalDetails,
+          searchableMorphDetInflections,
         }).map((i0.QueryRow row) => i4.AnalysisKey(
-          form: row.read<String>('form'),
-          item: row.read<int>('item'),
-          cnt: row.read<int>('cnt'),
+          form: row.readNullable<String>('form'),
+          item: row.readNullable<int>('item'),
+          cnt: row.readNullable<int>('cnt'),
         ));
   }
 

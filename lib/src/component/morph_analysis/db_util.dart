@@ -84,7 +84,7 @@ final operations = [
           inflTab.form,
           inflTab.item,
           inflTab.cnt,
-          inflTab.stem + inflTab.suffix,
+          concat([_removeAllHyphens(inflTab.stem), inflTab.suffix]),
         ]);
       final searchTab = db.searchableMorphDetInflections;
       await db.into(searchTab).insertFromSelect(allInflections,
@@ -92,7 +92,7 @@ final operations = [
             searchTab.form: inflTab.form,
             searchTab.item: inflTab.item,
             searchTab.cnt: inflTab.cnt,
-            searchTab.macronizedForm: inflTab.stem + inflTab.suffix,
+            searchTab.macronizedForm:concat([_removeAllHyphens(inflTab.stem), inflTab.suffix]) 
           },
           mode: InsertMode.insertOrRollback);
       await db.customInsert(
@@ -104,3 +104,18 @@ final operations = [
     }
   )
 ];
+
+Expression<String> _removeAllHyphens(
+  Expression<String> columnExpression,
+) =>
+    replace<String>(columnExpression, const Constant('-'), const Constant(''));
+
+Expression<T> replace<T extends Object>(
+  Expression<T> val,
+  Expression<T> sub,
+  Expression<T> wit,
+) =>
+    FunctionCallExpression<T>('REPLACE', [val, sub, wit]);
+
+Expression<T> concat<T extends Object>(List<Expression<Object>> args) =>
+    FunctionCallExpression<T>('CONCAT', args);
