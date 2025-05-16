@@ -14,52 +14,45 @@ part 'morphological_details_api.g.dart';
 //infrastructure
 
 @riverpod
-Future<Analyses> morphologicalDetailsByKeys(Ref ref, AnalysisKeys keys) async {
-  log.info(() => '@riverpod - morphologicalDetailsByKeys');
+Future<Analyses> morphologicalAnalyses(Ref ref, AnalysisKeys keys) async {
+  log.info(() => '@riverpod - morphologicalAnalyses');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = MorphologicalDataRepository(db);
-  return GetMorphologicalDetailsByKeysUseCase(repo, keys).invoke();
+  return GetMorphologicalAnalysesUseCase(repo, keys).invoke();
 }
 
 @riverpod
-Future<Analyses> morphologicalDetailsByForm(Ref ref, String form) async {
-  log.info(() => '@riverpod - morphologicalDetailsByForm');
+Future<AnalysisKeys> morphologicalAnalysisKeys(Ref ref, String form) async {
+  log.info(() => '@riverpod - morphologicalAnalysisKeys');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = MorphologicalDataRepository(db);
-  return GetMorphologicalDetailsByFormUseCase(repo, form).invoke();
+  return GetMorphologicalAnalysisKeysUseCase(repo, form).invoke();
 }
 
 class MorphologicalDataRepository implements IMorphologicalDataRepository {
   MorphologicalDataRepository(
     this._db,
   ) {
-    _runnableQueries = {
+    _analysisKeysQueries = {
       (hasMacrons: true): (String form) =>
-          _db.morphAnalysisDrift.getMorphologicalDetailsOfMacronizedForm(form),
+          _db.morphAnalysisDrift.getAnalysisKeysOfMacronized(form),
       (hasMacrons: false): (String form) =>
-          _db.morphAnalysisDrift.getMorphologicalDetailsOfForm(form),
+          _db.morphAnalysisDrift.getAnalysisKeysOf(form),
     };
   }
 
   final AppDb _db;
-  late final Map<({bool hasMacrons}), 
-             MultiSelectable<Analysis> Function(String form)> 
-      _runnableQueries;
+  late final Map<({bool hasMacrons}),
+             MultiSelectable<AnalysisKey> Function(String form)> 
+      _analysisKeysQueries;
 
   @override
-  Future<Analyses> getMorphDetailsByKeys(AnalysisKeys keys) async {
+  Future<Analyses> getMorphAnalyses(AnalysisKeys keys) async {
     log.info('MorphologicalDataRepository - retrieving analyses from db');
-    final dbData = await (_db.select(_db.morphAnalysisDrift.morphologyAnalyses)
-          ..where((t) => Expression.or(
-                keys.map((k) => Expression.and([
-                      t.form.equals(k.form),
-                      t.item.equals(k.item),
-                      t.cnt.equals(k.cnt)
-                    ])),
-              )))
-        .get();
+    final dbData = 
+          await (_db.select(_db.morphAnalysisDrift.morphologyAnalyses)..where(_keysMatch(keys))).get();
     return Analyses(dbData.map(_toDomain));
   }
 
@@ -69,14 +62,26 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   /// If the input contains no macrons, the query will ignore them (which means
   /// the result can contain macrons or not contain any)
   @override
-  Future<Analyses> getMorphDetailsByForm(String form) async {
+  Future<AnalysisKeys> getMorphAnalysisKeys(String form) async {
     log.info('MorphologicalDataRepository - retrieving $form analyses from db');
     final formHasMacrons = form.contains(RegExp('[āēīōūĀĒĪŌŪ]'));
-    final dbData = await _runnableQueries[(hasMacrons: formHasMacrons)]!(form).get();
-    return Analyses(dbData);
+    final dbData =
+        await _analysisKeysQueries[(hasMacrons: formHasMacrons)]!(form).get();
+    return AnalysisKeys(dbData);
   }
 
-  Analysis _toDomain(morphologyAnalysis e) => Analysis(
+  Expression<bool> Function(MorphologyAnalyses a) _keysMatch(
+    AnalysisKeys keys,
+  ) =>
+      (a) => Expression.or(
+            keys.map((k) => Expression.and([
+                  a.form.equals(k.form),
+                  a.item.equals(k.item),
+                  a.cnt.equals(k.cnt)
+                ])),
+          );
+
+  Analysis _toDomain(MorphologyAnalysis e) => Analysis(
         form: e.form,
         item: e.item,
         cnt: e.cnt,
@@ -100,15 +105,15 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
 
 abstract interface class IMorphologicalDataRepository {
 //
-  Future<Analyses> getMorphDetailsByKeys(AnalysisKeys keys);
+  Future<Analyses> getMorphAnalyses(AnalysisKeys keys);
 
-  Future<Analyses> getMorphDetailsByForm(String form);
+  Future<AnalysisKeys> getMorphAnalysisKeys(String form);
 //
 }
 
-class GetMorphologicalDetailsByKeysUseCase
-    implements IGetMorphologicalDetailsUseCase {
-  GetMorphologicalDetailsByKeysUseCase(
+class GetMorphologicalAnalysesUseCase
+    implements IGetMorphologicalAnalysesUseCase {
+  GetMorphologicalAnalysesUseCase(
     this._repository,
     this._keys,
   );
@@ -117,13 +122,13 @@ class GetMorphologicalDetailsByKeysUseCase
   final AnalysisKeys _keys;
 
   @override
-  Future<Analyses> invoke() async => _repository.getMorphDetailsByKeys(_keys);
+  Future<Analyses> invoke() async => _repository.getMorphAnalyses(_keys);
 //
 }
 
-class GetMorphologicalDetailsByFormUseCase
-    implements IGetMorphologicalDetailsUseCase {
-  GetMorphologicalDetailsByFormUseCase(
+class GetMorphologicalAnalysisKeysUseCase
+    implements IGetMorphologicalAnalysisKeysUseCase {
+  GetMorphologicalAnalysisKeysUseCase(
     this._repository,
     this._form,
   );
@@ -132,34 +137,21 @@ class GetMorphologicalDetailsByFormUseCase
   final String _form;
 
   @override
-  Future<Analyses> invoke() async => _repository.getMorphDetailsByForm(_form);
+  Future<AnalysisKeys> invoke() async => _repository.getMorphAnalysisKeys(_form);
 //
-}
-
-@immutable
-extension type const AnalysisKeys._(UnmodifiableListView<AnalysisKey> unm)
-    implements UnmodifiableListView<AnalysisKey> {
-  AnalysisKeys(Iterable<AnalysisKey> iter) : this._(UnmodifiableListView(iter));
-}
-
-extension type const AnalysisKey._(({String form, int item, int cnt}) _record) {
-  AnalysisKey({
-    required String form,
-    required int item,
-    required int cnt,
-  }) : this._((form: form, item: item, cnt: cnt));
-
-  String get form => _record.form;
-  int get item => _record.item;
-  int get cnt => _record.cnt;
-  //
 }
 
 //domain
 
-abstract interface class IGetMorphologicalDetailsUseCase {
+abstract interface class IGetMorphologicalAnalysesUseCase {
 //
   Future<Analyses> invoke();
+//
+}
+
+abstract interface class IGetMorphologicalAnalysisKeysUseCase {
+//
+  Future<AnalysisKeys> invoke();
 //
 }
 
@@ -220,4 +212,23 @@ class Analysis {
   @override
   int get hashCode => Object.hash(form, item, cnt);
 //
+}
+
+@immutable
+extension type const AnalysisKeys._(UnmodifiableListView<AnalysisKey> unm)
+    implements UnmodifiableListView<AnalysisKey> {
+  AnalysisKeys(Iterable<AnalysisKey> iter) : this._(UnmodifiableListView(iter));
+}
+
+extension type const AnalysisKey._(({String form, int item, int cnt}) _record) {
+  AnalysisKey({
+    required String form,
+    required int item,
+    required int cnt,
+  }) : this._((form: form, item: item, cnt: cnt));
+
+  String get form => _record.form;
+  int get item => _record.item;
+  int get cnt => _record.cnt;
+  //
 }

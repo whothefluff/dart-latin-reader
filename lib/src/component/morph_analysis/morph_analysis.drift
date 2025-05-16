@@ -198,7 +198,11 @@ searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*
                                                            WHERE Search.macronizedForm LIKE ?
                                                            ORDER BY Peek.form, Peek.item, Peek.cnt;
 
-CREATE VIEW "morphology.Analyses" AS morphologyAnalysis AS
+getAnalysisKeysOf WITH AnalysisKey: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM "morphology.Peek" WHERE form LIKE ? ORDER BY form, item, cnt;
+
+getAnalysisKeysOfMacronized WITH AnalysisKey: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM "morphology.Peek" WHERE macronizedForm LIKE ? ORDER BY form, item, cnt;
+
+CREATE VIEW "morphology.Analyses" AS MorphologyAnalysis AS 
     SELECT Infl.form,
            Infl.item,
            Infl.cnt,
@@ -220,14 +224,4 @@ CREATE VIEW "morphology.Analyses" AS morphologyAnalysis AS
             ON Infl.form = MorphologicalDetails.form
                AND Infl.item = MorphologicalDetails.item;
 
-getMorphologicalDetailsOfForm WITH Analysis: SELECT Analyses.* 
-                                                 FROM SearchableMorphDetInflections AS Infl
-                                                 INNER JOIN "morphology.Analyses" AS Analyses
-                                                     ON Infl.form = Analyses.form
-                                                 WHERE Infl.form LIKE ? ORDER BY Analyses.form, Analyses.item, Analyses.cnt;
-
-getMorphologicalDetailsOfMacronizedForm WITH Analysis: SELECT Analyses.* 
-                                                           FROM SearchableMorphDetInflections AS Infl
-                                                           INNER JOIN "morphology.Analyses" AS Analyses
-                                                               ON Infl.form = Analyses.form
-                                                           WHERE Infl.macronizedForm LIKE ? ORDER BY Analyses.form, Analyses.item, Analyses.cnt;
+dummy: SELECT * FROM "morphology.Analyses"; --for some reason, this is necessary to force Drift to generate a getter

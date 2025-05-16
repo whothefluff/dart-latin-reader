@@ -6,8 +6,8 @@ part of 'morphological_details_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$morphologicalDetailsByKeysHash() =>
-    r'0ee61c616ed5251ea4e538082d7b50abe7e3cb47';
+String _$morphologicalAnalysesHash() =>
+    r'906b4c68651a1d63b3380bbd0b70a68c4ff759c4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,27 +30,27 @@ class _SystemHash {
   }
 }
 
-/// See also [morphologicalDetailsByKeys].
-@ProviderFor(morphologicalDetailsByKeys)
-const morphologicalDetailsByKeysProvider = MorphologicalDetailsByKeysFamily();
+/// See also [morphologicalAnalyses].
+@ProviderFor(morphologicalAnalyses)
+const morphologicalAnalysesProvider = MorphologicalAnalysesFamily();
 
-/// See also [morphologicalDetailsByKeys].
-class MorphologicalDetailsByKeysFamily extends Family<AsyncValue<Analyses>> {
-  /// See also [morphologicalDetailsByKeys].
-  const MorphologicalDetailsByKeysFamily();
+/// See also [morphologicalAnalyses].
+class MorphologicalAnalysesFamily extends Family<AsyncValue<Analyses>> {
+  /// See also [morphologicalAnalyses].
+  const MorphologicalAnalysesFamily();
 
-  /// See also [morphologicalDetailsByKeys].
-  MorphologicalDetailsByKeysProvider call(
+  /// See also [morphologicalAnalyses].
+  MorphologicalAnalysesProvider call(
     AnalysisKeys keys,
   ) {
-    return MorphologicalDetailsByKeysProvider(
+    return MorphologicalAnalysesProvider(
       keys,
     );
   }
 
   @override
-  MorphologicalDetailsByKeysProvider getProviderOverride(
-    covariant MorphologicalDetailsByKeysProvider provider,
+  MorphologicalAnalysesProvider getProviderOverride(
+    covariant MorphologicalAnalysesProvider provider,
   ) {
     return call(
       provider.keys,
@@ -69,33 +69,33 @@ class MorphologicalDetailsByKeysFamily extends Family<AsyncValue<Analyses>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'morphologicalDetailsByKeysProvider';
+  String? get name => r'morphologicalAnalysesProvider';
 }
 
-/// See also [morphologicalDetailsByKeys].
-class MorphologicalDetailsByKeysProvider
+/// See also [morphologicalAnalyses].
+class MorphologicalAnalysesProvider
     extends AutoDisposeFutureProvider<Analyses> {
-  /// See also [morphologicalDetailsByKeys].
-  MorphologicalDetailsByKeysProvider(
+  /// See also [morphologicalAnalyses].
+  MorphologicalAnalysesProvider(
     AnalysisKeys keys,
   ) : this._internal(
-          (ref) => morphologicalDetailsByKeys(
-            ref as MorphologicalDetailsByKeysRef,
+          (ref) => morphologicalAnalyses(
+            ref as MorphologicalAnalysesRef,
             keys,
           ),
-          from: morphologicalDetailsByKeysProvider,
-          name: r'morphologicalDetailsByKeysProvider',
+          from: morphologicalAnalysesProvider,
+          name: r'morphologicalAnalysesProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$morphologicalDetailsByKeysHash,
-          dependencies: MorphologicalDetailsByKeysFamily._dependencies,
+                  : _$morphologicalAnalysesHash,
+          dependencies: MorphologicalAnalysesFamily._dependencies,
           allTransitiveDependencies:
-              MorphologicalDetailsByKeysFamily._allTransitiveDependencies,
+              MorphologicalAnalysesFamily._allTransitiveDependencies,
           keys: keys,
         );
 
-  MorphologicalDetailsByKeysProvider._internal(
+  MorphologicalAnalysesProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -109,12 +109,12 @@ class MorphologicalDetailsByKeysProvider
 
   @override
   Override overrideWith(
-    FutureOr<Analyses> Function(MorphologicalDetailsByKeysRef provider) create,
+    FutureOr<Analyses> Function(MorphologicalAnalysesRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: MorphologicalDetailsByKeysProvider._internal(
-        (ref) => create(ref as MorphologicalDetailsByKeysRef),
+      override: MorphologicalAnalysesProvider._internal(
+        (ref) => create(ref as MorphologicalAnalysesRef),
         from: from,
         name: null,
         dependencies: null,
@@ -127,12 +127,12 @@ class MorphologicalDetailsByKeysProvider
 
   @override
   AutoDisposeFutureProviderElement<Analyses> createElement() {
-    return _MorphologicalDetailsByKeysProviderElement(this);
+    return _MorphologicalAnalysesProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is MorphologicalDetailsByKeysProvider && other.keys == keys;
+    return other is MorphologicalAnalysesProvider && other.keys == keys;
   }
 
   @override
@@ -146,44 +146,44 @@ class MorphologicalDetailsByKeysProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin MorphologicalDetailsByKeysRef on AutoDisposeFutureProviderRef<Analyses> {
+mixin MorphologicalAnalysesRef on AutoDisposeFutureProviderRef<Analyses> {
   /// The parameter `keys` of this provider.
   AnalysisKeys get keys;
 }
 
-class _MorphologicalDetailsByKeysProviderElement
+class _MorphologicalAnalysesProviderElement
     extends AutoDisposeFutureProviderElement<Analyses>
-    with MorphologicalDetailsByKeysRef {
-  _MorphologicalDetailsByKeysProviderElement(super.provider);
+    with MorphologicalAnalysesRef {
+  _MorphologicalAnalysesProviderElement(super.provider);
 
   @override
-  AnalysisKeys get keys => (origin as MorphologicalDetailsByKeysProvider).keys;
+  AnalysisKeys get keys => (origin as MorphologicalAnalysesProvider).keys;
 }
 
-String _$morphologicalDetailsByFormHash() =>
-    r'2b0e96d88dbf2bb6bacbfe9655fdeb98a3e9b01a';
+String _$morphologicalAnalysisKeysHash() =>
+    r'e14be07d935b87007c90edf0f8ccdf7f8b8d3a59';
 
-/// See also [morphologicalDetailsByForm].
-@ProviderFor(morphologicalDetailsByForm)
-const morphologicalDetailsByFormProvider = MorphologicalDetailsByFormFamily();
+/// See also [morphologicalAnalysisKeys].
+@ProviderFor(morphologicalAnalysisKeys)
+const morphologicalAnalysisKeysProvider = MorphologicalAnalysisKeysFamily();
 
-/// See also [morphologicalDetailsByForm].
-class MorphologicalDetailsByFormFamily extends Family<AsyncValue<Analyses>> {
-  /// See also [morphologicalDetailsByForm].
-  const MorphologicalDetailsByFormFamily();
+/// See also [morphologicalAnalysisKeys].
+class MorphologicalAnalysisKeysFamily extends Family<AsyncValue<AnalysisKeys>> {
+  /// See also [morphologicalAnalysisKeys].
+  const MorphologicalAnalysisKeysFamily();
 
-  /// See also [morphologicalDetailsByForm].
-  MorphologicalDetailsByFormProvider call(
+  /// See also [morphologicalAnalysisKeys].
+  MorphologicalAnalysisKeysProvider call(
     String form,
   ) {
-    return MorphologicalDetailsByFormProvider(
+    return MorphologicalAnalysisKeysProvider(
       form,
     );
   }
 
   @override
-  MorphologicalDetailsByFormProvider getProviderOverride(
-    covariant MorphologicalDetailsByFormProvider provider,
+  MorphologicalAnalysisKeysProvider getProviderOverride(
+    covariant MorphologicalAnalysisKeysProvider provider,
   ) {
     return call(
       provider.form,
@@ -202,33 +202,33 @@ class MorphologicalDetailsByFormFamily extends Family<AsyncValue<Analyses>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'morphologicalDetailsByFormProvider';
+  String? get name => r'morphologicalAnalysisKeysProvider';
 }
 
-/// See also [morphologicalDetailsByForm].
-class MorphologicalDetailsByFormProvider
-    extends AutoDisposeFutureProvider<Analyses> {
-  /// See also [morphologicalDetailsByForm].
-  MorphologicalDetailsByFormProvider(
+/// See also [morphologicalAnalysisKeys].
+class MorphologicalAnalysisKeysProvider
+    extends AutoDisposeFutureProvider<AnalysisKeys> {
+  /// See also [morphologicalAnalysisKeys].
+  MorphologicalAnalysisKeysProvider(
     String form,
   ) : this._internal(
-          (ref) => morphologicalDetailsByForm(
-            ref as MorphologicalDetailsByFormRef,
+          (ref) => morphologicalAnalysisKeys(
+            ref as MorphologicalAnalysisKeysRef,
             form,
           ),
-          from: morphologicalDetailsByFormProvider,
-          name: r'morphologicalDetailsByFormProvider',
+          from: morphologicalAnalysisKeysProvider,
+          name: r'morphologicalAnalysisKeysProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$morphologicalDetailsByFormHash,
-          dependencies: MorphologicalDetailsByFormFamily._dependencies,
+                  : _$morphologicalAnalysisKeysHash,
+          dependencies: MorphologicalAnalysisKeysFamily._dependencies,
           allTransitiveDependencies:
-              MorphologicalDetailsByFormFamily._allTransitiveDependencies,
+              MorphologicalAnalysisKeysFamily._allTransitiveDependencies,
           form: form,
         );
 
-  MorphologicalDetailsByFormProvider._internal(
+  MorphologicalAnalysisKeysProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -242,12 +242,13 @@ class MorphologicalDetailsByFormProvider
 
   @override
   Override overrideWith(
-    FutureOr<Analyses> Function(MorphologicalDetailsByFormRef provider) create,
+    FutureOr<AnalysisKeys> Function(MorphologicalAnalysisKeysRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: MorphologicalDetailsByFormProvider._internal(
-        (ref) => create(ref as MorphologicalDetailsByFormRef),
+      override: MorphologicalAnalysisKeysProvider._internal(
+        (ref) => create(ref as MorphologicalAnalysisKeysRef),
         from: from,
         name: null,
         dependencies: null,
@@ -259,13 +260,13 @@ class MorphologicalDetailsByFormProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<Analyses> createElement() {
-    return _MorphologicalDetailsByFormProviderElement(this);
+  AutoDisposeFutureProviderElement<AnalysisKeys> createElement() {
+    return _MorphologicalAnalysisKeysProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is MorphologicalDetailsByFormProvider && other.form == form;
+    return other is MorphologicalAnalysisKeysProvider && other.form == form;
   }
 
   @override
@@ -279,18 +280,19 @@ class MorphologicalDetailsByFormProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin MorphologicalDetailsByFormRef on AutoDisposeFutureProviderRef<Analyses> {
+mixin MorphologicalAnalysisKeysRef
+    on AutoDisposeFutureProviderRef<AnalysisKeys> {
   /// The parameter `form` of this provider.
   String get form;
 }
 
-class _MorphologicalDetailsByFormProviderElement
-    extends AutoDisposeFutureProviderElement<Analyses>
-    with MorphologicalDetailsByFormRef {
-  _MorphologicalDetailsByFormProviderElement(super.provider);
+class _MorphologicalAnalysisKeysProviderElement
+    extends AutoDisposeFutureProviderElement<AnalysisKeys>
+    with MorphologicalAnalysisKeysRef {
+  _MorphologicalAnalysisKeysProviderElement(super.provider);
 
   @override
-  String get form => (origin as MorphologicalDetailsByFormProvider).form;
+  String get form => (origin as MorphologicalAnalysisKeysProvider).form;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
