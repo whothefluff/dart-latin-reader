@@ -2111,7 +2111,7 @@ class MorphologyPeek
       const {'MorphologicalDetailInflections', 'MorphologicalDetails'};
 }
 
-class morphologyAnalysis extends i0.DataClass {
+class MorphologyAnalysis extends i0.DataClass {
   final String form;
   final int item;
   final int cnt;
@@ -2128,7 +2128,7 @@ class morphologyAnalysis extends i0.DataClass {
   final String? tense;
   final String? voice;
   final String? person;
-  const morphologyAnalysis(
+  const MorphologyAnalysis(
       {required this.form,
       required this.item,
       required this.cnt,
@@ -2145,10 +2145,10 @@ class morphologyAnalysis extends i0.DataClass {
       this.tense,
       this.voice,
       this.person});
-  factory morphologyAnalysis.fromJson(Map<String, dynamic> json,
+  factory MorphologyAnalysis.fromJson(Map<String, dynamic> json,
       {i0.ValueSerializer? serializer}) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return morphologyAnalysis(
+    return MorphologyAnalysis(
       form: serializer.fromJson<String>(json['form']),
       item: serializer.fromJson<int>(json['item']),
       cnt: serializer.fromJson<int>(json['cnt']),
@@ -2190,7 +2190,7 @@ class morphologyAnalysis extends i0.DataClass {
     };
   }
 
-  i1.morphologyAnalysis copyWith(
+  i1.MorphologyAnalysis copyWith(
           {String? form,
           int? item,
           int? cnt,
@@ -2207,7 +2207,7 @@ class morphologyAnalysis extends i0.DataClass {
           i0.Value<String?> tense = const i0.Value.absent(),
           i0.Value<String?> voice = const i0.Value.absent(),
           i0.Value<String?> person = const i0.Value.absent()}) =>
-      i1.morphologyAnalysis(
+      i1.MorphologyAnalysis(
         form: form ?? this.form,
         item: item ?? this.item,
         cnt: cnt ?? this.cnt,
@@ -2228,7 +2228,7 @@ class morphologyAnalysis extends i0.DataClass {
       );
   @override
   String toString() {
-    return (StringBuffer('morphologyAnalysis(')
+    return (StringBuffer('MorphologyAnalysis(')
           ..write('form: $form, ')
           ..write('item: $item, ')
           ..write('cnt: $cnt, ')
@@ -2270,7 +2270,7 @@ class morphologyAnalysis extends i0.DataClass {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is i1.morphologyAnalysis &&
+      (other is i1.MorphologyAnalysis &&
           other.form == this.form &&
           other.item == this.item &&
           other.cnt == this.cnt &&
@@ -2290,7 +2290,7 @@ class morphologyAnalysis extends i0.DataClass {
 }
 
 class MorphologyAnalyses
-    extends i0.ViewInfo<i1.MorphologyAnalyses, i1.morphologyAnalysis>
+    extends i0.ViewInfo<i1.MorphologyAnalyses, i1.MorphologyAnalysis>
     implements i0.HasResultSet {
   final String? _alias;
   @override
@@ -2327,9 +2327,9 @@ class MorphologyAnalyses
   @override
   MorphologyAnalyses get asDslTable => this;
   @override
-  i1.morphologyAnalysis map(Map<String, dynamic> data, {String? tablePrefix}) {
+  i1.MorphologyAnalysis map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return i1.morphologyAnalysis(
+    return i1.MorphologyAnalysis(
       form: attachedDatabase.typeMapping
           .read(i0.DriftSqlType.string, data['${effectivePrefix}form'])!,
       item: attachedDatabase.typeMapping
@@ -2513,63 +2513,45 @@ class MorphAnalysisDrift extends i2.ModularAccessor {
         ));
   }
 
-  i0.Selectable<i4.Analysis> getMorphologicalDetailsOfForm(String var1) {
+  i0.Selectable<i4.AnalysisKey> getAnalysisKeysOf(String var1) {
     return customSelect(
-        'SELECT Analyses.* FROM SearchableMorphDetInflections AS Infl INNER JOIN "morphology.Analyses" AS Analyses ON Infl.form = Analyses.form WHERE Infl.form LIKE ?1 ORDER BY Analyses.form, Analyses.item, Analyses.cnt',
+        'SELECT form, CAST(item AS INT) AS item, CAST(cnt AS INT) AS cnt FROM "morphology.Peek" WHERE form LIKE ?1 ORDER BY form, item, cnt',
         variables: [
           i0.Variable<String>(var1)
         ],
         readsFrom: {
-          searchableMorphDetInflections,
           morphologicalDetailInflections,
           morphologicalDetails,
-        }).map((i0.QueryRow row) => i4.Analysis(
+        }).map((i0.QueryRow row) => i4.AnalysisKey(
           form: row.read<String>('form'),
           item: row.read<int>('item'),
           cnt: row.read<int>('cnt'),
-          dictionaryRef: row.read<String>('dictionaryRef'),
-          stem: row.read<String>('stem'),
-          suffix: row.readNullable<String>('suffix'),
-          segmentsInfo: row.readNullable<String>('segmentsInfo'),
-          gender: row.readNullable<String>('gender'),
-          number: row.readNullable<String>('number'),
-          declension: row.readNullable<String>('declension'),
-          gramCase: row.readNullable<String>('gramCase'),
-          verbForm: row.readNullable<String>('verbForm'),
-          tense: row.readNullable<String>('tense'),
-          voice: row.readNullable<String>('voice'),
-          person: row.readNullable<String>('person'),
         ));
   }
 
-  i0.Selectable<i4.Analysis> getMorphologicalDetailsOfMacronizedForm(
-      String var1) {
+  i0.Selectable<i4.AnalysisKey> getAnalysisKeysOfMacronized(String var1) {
     return customSelect(
-        'SELECT Analyses.* FROM SearchableMorphDetInflections AS Infl INNER JOIN "morphology.Analyses" AS Analyses ON Infl.form = Analyses.form WHERE Infl.macronizedForm LIKE ?1 ORDER BY Analyses.form, Analyses.item, Analyses.cnt',
+        'SELECT form, CAST(item AS INT) AS item, CAST(cnt AS INT) AS cnt FROM "morphology.Peek" WHERE macronizedForm LIKE ?1 ORDER BY form, item, cnt',
         variables: [
           i0.Variable<String>(var1)
         ],
         readsFrom: {
-          searchableMorphDetInflections,
           morphologicalDetailInflections,
           morphologicalDetails,
-        }).map((i0.QueryRow row) => i4.Analysis(
+        }).map((i0.QueryRow row) => i4.AnalysisKey(
           form: row.read<String>('form'),
           item: row.read<int>('item'),
           cnt: row.read<int>('cnt'),
-          dictionaryRef: row.read<String>('dictionaryRef'),
-          stem: row.read<String>('stem'),
-          suffix: row.readNullable<String>('suffix'),
-          segmentsInfo: row.readNullable<String>('segmentsInfo'),
-          gender: row.readNullable<String>('gender'),
-          number: row.readNullable<String>('number'),
-          declension: row.readNullable<String>('declension'),
-          gramCase: row.readNullable<String>('gramCase'),
-          verbForm: row.readNullable<String>('verbForm'),
-          tense: row.readNullable<String>('tense'),
-          voice: row.readNullable<String>('voice'),
-          person: row.readNullable<String>('person'),
         ));
+  }
+
+  i0.Selectable<i1.MorphologyAnalysis> dummy() {
+    return customSelect('SELECT * FROM "morphology.Analyses"',
+        variables: [],
+        readsFrom: {
+          morphologicalDetailInflections,
+          morphologicalDetails,
+        }).asyncMap(morphologyAnalyses.mapFromRow);
   }
 
   i1.SearchableMorphDetInflections get searchableMorphDetInflections =>
