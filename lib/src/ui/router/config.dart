@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
 import 'package:latin_reader/src/ui/page/dictionary/dictionaries_page.dart';
 import 'package:latin_reader/src/ui/page/dictionary/dictionary_entries_page.dart';
 import 'package:latin_reader/src/ui/page/dictionary/dictionary_entry_page.dart';
@@ -8,6 +9,7 @@ import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/authors_page.dart';
 import 'package:latin_reader/src/ui/page/library/text_page.dart';
 import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
+import 'package:latin_reader/src/ui/page/morphology/morphological_data_page.dart';
 import 'package:latin_reader/src/ui/page/morphology/morphological_search_page.dart';
 import 'package:latin_reader/src/ui/page/word_frequency_page.dart';
 import 'package:latin_reader/src/ui/page/word_lookup_page.dart';
@@ -115,8 +117,9 @@ class SettingsRoute extends GoRouteData {
       ],
     ),
     TypedStatefulShellBranch<MorphologyBranch>(
-      routes: <TypedRoute<RouteData>>[
-        TypedGoRoute<MorphologyRoute>(path: '/morph-analysis'),
+      routes: [
+        TypedGoRoute<MorphologicalSearchRoute>(path: '/morph-search'),
+        TypedGoRoute<MorphologicalDataRoute>(path: '/morph-detail/:keys'),
       ],
     ),
     TypedStatefulShellBranch<WordLookupBranch>(
@@ -271,11 +274,23 @@ class WordFrequencyRoute extends GoRouteData {
 //
 }
 
-class MorphologyRoute extends GoRouteData {
-  const MorphologyRoute();
+class MorphologicalSearchRoute extends GoRouteData {
+  const MorphologicalSearchRoute();
 
   @override
   Widget build(context, state) => const MorphologicalSearchPage();
+//
+}
+
+class MorphologicalDataRoute extends GoRouteData {
+  const MorphologicalDataRoute(
+    this.keys,
+  );
+
+  final String keys;
+
+  @override
+  Widget build(context, state) => MorphologicalDataPage(AnalysisKeys.fromJson(keys));
 //
 }
 

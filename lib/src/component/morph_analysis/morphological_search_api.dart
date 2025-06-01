@@ -135,7 +135,7 @@ class Result {
 
   @override
   String toString() =>
-      'Result{form: $form, pos: $partOfSpeech, dict: $dictionaryRef}';
+      'Result{form: $form, item: $item, cnt: $cnt}';
 
   @override
   bool operator ==(Object other) {

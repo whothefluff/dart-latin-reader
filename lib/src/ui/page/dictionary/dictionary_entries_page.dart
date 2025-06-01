@@ -103,7 +103,6 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
   Widget Function(BuildContext, int) tile() => (context, index) {
         final subtitleStyleBecauseFuckFlutter = subtitleTextStyle(context);
         final entry = widget.data[index];
-        final inflection = removeQuotes(entry.inflection);
         return ListTile(
           title: Text.rich(
             TextSpan(
@@ -114,7 +113,7 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
                 ),
                 const TextSpan(text: ' '),
                 TextSpan(
-                  text: inflection,
+                  text: entry.inflection,
                   style: subtitleStyleBecauseFuckFlutter,
                 ),
               ],
@@ -129,9 +128,6 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
 
   String removeDigits(String original) =>
       original.replaceAll(RegExp(r'\d'), '');
-
-  String? removeQuotes(String? original) =>
-      original?.replaceAll(RegExp('"'), '');
 //
 }
 

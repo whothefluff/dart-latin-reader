@@ -1,7 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/logger.dart';
+import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
 import 'package:latin_reader/src/component/morph_analysis/morphological_search_api.dart';
+import 'package:latin_reader/src/ui/page/morphology/common.dart';
 import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
@@ -20,7 +23,7 @@ class MorphologicalSearchPage extends ConsumerStatefulWidget {
 class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
 //
   final SearchController _searchController = SearchController();
-  Result? _selectedResult;
+  Results? _selectedResults;
   bool _isSearching = false;
 
   @override
@@ -30,16 +33,22 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
   }
 
   /// Called when a search result is selected
-  void _handleResultSelected(Result result) {
+  Future<void> _handleResultSelected(Results results) async {
     setState(() {
-      _selectedResult = result;
+      _selectedResults = results;
       _searchController.closeView(_searchController.text);
     });
-    log.info(() => 'MorphologyPage - selecting $result');
+    log.info(() => 'MorphologyPage - selecting $_selectedResults');
+    final k = AnalysisKeys(results.map((r) => AnalysisKey(
+          form: r.form,
+          item: r.item,
+          cnt: r.cnt,
+        )));
+    await MorphologicalDataRoute(k.toJson()).push<void>(context);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     final size = MediaQuery.sizeOf(context);
     final theme = Theme.of(context);
     final dictRefStyle =
@@ -89,29 +98,33 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                         ),
                       ];
                     }
+                    // Appealing sort not easy since the results are primarily ordered by match and key
+                    final groupedRes = results.groupListsBy(consolidatedForm());
                     return [
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const ClampingScrollPhysics(),
-                        itemCount: results.length,
+                        itemCount: groupedRes.length,
                         itemBuilder: (context, index) {
-                          final result = results[index];
-                          final title = result.macronizedForm ?? result.form;
+                          final result = groupedRes.keys.toList()[index];
                           final details = [
-                            result.partOfSpeech,
-                            result.additional,
+                            result.pos,
+                            result.add,
                           ].where((e) => e != null).join(' • ');
                           return ListTile(
                             title: Text.rich(TextSpan(
-                              text: '$title ',
+                              text: '${result.title} ',
                               children: [
                                 TextSpan(
-                                    text: result.dictionaryRef,
-                                    style: dictRefStyle)
+                                  text: result.dictRef,
+                                  style: dictRefStyle,
+                                )
                               ],
                             )),
                             subtitle: Text(details),
-                            onTap: () => _handleResultSelected(result),
+                            onTap: () => _handleResultSelected(
+                              Results(groupedRes[result]!),
+                            ),
                           );
                         },
                       ),
@@ -132,75 +145,27 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
         actions: [
           const VerticalDivider(),
           IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () async {
-              await const SettingsRoute().push<void>(context);
-            },
-          ),
+              icon: const Icon(Icons.settings),
+              onPressed: () async => const SettingsRoute().push<void>(context)),
         ],
       ),
       body: Column(
         children: [
           if (_isSearching) showLoading(),
           // Content area (shows selected result or placeholder)
-          Expanded(
-            child: _selectedResult == null
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        'Search for a Latin form and select a result',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  )
-                : _buildResultContent(_selectedResult!),
+          const Expanded(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Search for a Latin form and select a result',
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildResultContent(Result result) => Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              result.macronizedForm ?? result.form,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Part of Speech: ${result.partOfSpeech}',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            ...[
-              const SizedBox(height: 4),
-              Text(
-                'Dictionary Reference: ${result.dictionaryRef}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-            if (result.additional != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                'Additional: ${result.additional}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-            const SizedBox(height: 16),
-            const Center(
-              child: Text(
-                '(Content would be refreshed here)',
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
 //
 }

@@ -49,7 +49,8 @@ final operations = [
                   dictionary: Value(row[0].toString()),
                   lemma: Value(row[1].toString()),
                   partOfSpeech: stringValue(row[2].toString()),
-                  inflection: stringValue(row[3].toString()),
+                  //at least for L&S, this field contains "," which is not good for .csv files 
+                  inflection: stringValue(row[3].toString().replaceAll(RegExp('"'), '')),
                   idx: Value(row[4] as int),
                 )),
             mode: InsertMode.insertOrRollback),
