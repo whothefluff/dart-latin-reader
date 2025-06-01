@@ -10,6 +10,29 @@ CREATE TABLE "MorphologicalDetails"(
 STRICT, 
 WITHOUT ROWID;
 
+/* 
+for the coexistance of several sources of analyses, something like this would be necessary
+but (for the time being) forcing all navigations from an analysis to a L&S entry will suffice
+
+CREATE TABLE "MorphologicalDetails"(
+    "form" TEXT NOT NULL,
+    "item" INTEGER NOT NULL CHECK( item >= 0 ),
+    PRIMARY KEY( form, item )
+) STRICT, WITHOUT ROWID;
+
+CREATE TABLE "MorphologicalDetailDicts"(
+    "form" TEXT NOT NULL,
+    "item" INTEGER NOT NULL,
+    "dictionary" TEXT NOT NULL,
+    "dictionaryRef" TEXT NOT NULL,
+    PRIMARY KEY( form, item, dictionary ),
+    FOREIGN KEY( form, item ) REFERENCES MorphologicalDetails( form, item ),
+    --FOREIGN KEY( dictionary, dictionaryRef ) REFERENCES DictionaryEntries( dictionary, lemma )
+) STRICT, WITHOUT ROWID;
+
+ */
+
+--TODO(whothefluff): consider adding nullable field "macronizedForm" to avoid calculation duplication for search tab and views
 CREATE TABLE "MorphologicalDetailInflections"(
     "form" TEXT NOT NULL,
     "item" INTEGER NOT NULL,
@@ -49,9 +72,7 @@ CREATE VIEW "morphology.Peek" AS
                                                    NULL ),
                                               Infl.verbForm ) AS additional,
                                     Infl.item,
-                                    Infl.cnt,
-                                    Infl.stem,
-                                    Infl.suffix
+                                    Infl.cnt
                                  FROM MorphologicalDetailInflections AS Infl
                                  INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
@@ -63,9 +84,7 @@ CREATE VIEW "morphology.Peek" AS
                                     MorphologicalDetails.dictionaryRef,
                                     IIF( Infl.suffix IS NOT NULL, '-' || Infl.suffix || ' suffix', NULL ) AS additional,
                                     Infl.item,
-                                    Infl.cnt,
-                                    Infl.stem,
-                                    Infl.suffix
+                                    Infl.cnt
                                  FROM MorphologicalDetailInflections AS Infl
                                  INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
@@ -77,9 +96,7 @@ CREATE VIEW "morphology.Peek" AS
                                     MorphologicalDetails.dictionaryRef,
                                     NULL AS additional,
                                     Infl.item,
-                                    Infl.cnt,
-                                    Infl.stem,
-                                    Infl.suffix
+                                    Infl.cnt
                                  FROM MorphologicalDetailInflections as Infl
                                  INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
@@ -91,9 +108,7 @@ CREATE VIEW "morphology.Peek" AS
                                     MorphologicalDetails.dictionaryRef,
                                     NULL AS additional,
                                     Infl.item,
-                                    Infl.cnt,
-                                    Infl.stem,
-                                    Infl.suffix
+                                    Infl.cnt
                                  FROM MorphologicalDetailInflections AS Infl
                                  INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
@@ -105,9 +120,7 @@ CREATE VIEW "morphology.Peek" AS
                                     MorphologicalDetails.dictionaryRef,
                                     COALESCE( Infl.verbForm, Infl.declension || ' declension' ) AS additional,
                                     Infl.item,
-                                    Infl.cnt,
-                                    Infl.stem,
-                                    Infl.suffix
+                                    Infl.cnt
                                  FROM MorphologicalDetailInflections as Infl
                                  INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
@@ -119,9 +132,7 @@ CREATE VIEW "morphology.Peek" AS
                                     MorphologicalDetails.dictionaryRef,
                                     NULL AS additional,
                                     Infl.item,
-                                    Infl.cnt,
-                                    Infl.stem,
-                                    Infl.suffix
+                                    Infl.cnt
                                  FROM MorphologicalDetailInflections AS Infl
                                  INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
@@ -133,25 +144,13 @@ CREATE VIEW "morphology.Peek" AS
                                     MorphologicalDetails.dictionaryRef,
                                     Infl.segmentsInfo AS additional,
                                     Infl.item,
-                                    Infl.cnt,
-                                    Infl.stem,
-                                    Infl.suffix
+                                    Infl.cnt
                                  FROM MorphologicalDetailInflections AS Infl
                                  INNER JOIN MorphologicalDetails
                                      ON Infl.form = MorphologicalDetails.form
                                         AND Infl.item = MorphologicalDetails.item
-                                 WHERE Infl.partOfSpeech = 'verb' ),
-         InflDataWithCleanDictRef AS ( SELECT form,
-                                              stem,
-                                              partOfSpeech,
-                                              suffix,
-                                              "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(dictionaryRef, '1', ''), '2', ''), '3', ''), '4', ''), '5', ''), '6', ''), '7', ''), '8', ''), '9', '') AS dictionaryRef,
-                                              additional,
-                                              item,
-                                              cnt
-                                           FROM InflectionData )
+                                 WHERE Infl.partOfSpeech = 'verb' )
         SELECT form,
-               CONCAT( "REPLACE"( stem, '-', '' ), suffix ) AS macronizedForm,
                partOfSpeech,
                dictionaryRef,
                --this can't be done robustly because the dictionaryRef does not contain macrons (eg. rosā gets mixed with rosa)
@@ -159,10 +158,10 @@ CREATE VIEW "morphology.Peek" AS
                additional,
                item,
                cnt
-            FROM InflDataWithCleanDictRef
+            FROM InflectionData
             ORDER BY form, item, cnt;
 
-searchMorphologicalDataWithFts WITH Result: SELECT Peek.* 
+searchMorphologicalDataWithFts WITH Result: SELECT Peek.*, Search.macronizedForm
                                                 FROM SearchableMorphDetInflections AS Search
                                                 INNER JOIN "morphology.Peek" AS Peek
                                                     ON Search.form = Peek.form 
@@ -171,7 +170,7 @@ searchMorphologicalDataWithFts WITH Result: SELECT Peek.*
                                                 WHERE Search.form MATCH ?
                                                 ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
 
-searchMorphologicalDataWithLike WITH Result: SELECT Peek.* 
+searchMorphologicalDataWithLike WITH Result: SELECT Peek.*, Search.macronizedForm
                                                  FROM SearchableMorphDetInflections AS Search
                                                  INNER JOIN "morphology.Peek" AS Peek
                                                       ON Search.form = Peek.form 
@@ -180,7 +179,7 @@ searchMorphologicalDataWithLike WITH Result: SELECT Peek.*
                                                  WHERE Search.form LIKE ?
                                                  ORDER BY Peek.form, Peek.item, Peek.cnt;
 
-searchMacronizedMorphologicalDataWithFts WITH Result: SELECT Peek.* 
+searchMacronizedMorphologicalDataWithFts WITH Result: SELECT Peek.*, Search.macronizedForm
                                                               FROM SearchableMorphDetInflections AS Search
                                                               INNER JOIN "morphology.Peek" AS Peek
                                                                   ON Search.form = Peek.form
@@ -189,7 +188,7 @@ searchMacronizedMorphologicalDataWithFts WITH Result: SELECT Peek.*
                                                               WHERE Search.macronizedForm MATCH ?
                                                               ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
 
-searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*
+searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*, Search.macronizedForm
                                                            FROM SearchableMorphDetInflections AS Search
                                                            INNER JOIN "morphology.Peek" AS Peek
                                                                ON Search.form = Peek.form
@@ -206,6 +205,7 @@ CREATE VIEW "morphology.Analyses" AS MorphologyAnalysis AS
     SELECT Infl.form,
            Infl.item,
            Infl.cnt,
+           CONCAT( "REPLACE"( Infl.stem, '-', '' ), Infl.suffix ) AS macronizedForm,
            MorphologicalDetails.dictionaryRef,
            Infl.partOfSpeech,
            Infl.stem,
@@ -218,10 +218,15 @@ CREATE VIEW "morphology.Analyses" AS MorphologyAnalysis AS
            Infl.verbForm,
            Infl.tense,
            Infl.voice,
-           Infl.person
+           Infl.person,
+           Peek.additional
         FROM MorphologicalDetailInflections AS Infl
         INNER JOIN MorphologicalDetails
             ON Infl.form = MorphologicalDetails.form
-               AND Infl.item = MorphologicalDetails.item;
+               AND Infl.item = MorphologicalDetails.item
+        INNER JOIN "morphology.Peek" AS Peek
+            ON Infl.form = Peek.form
+               AND Infl.item = Peek.item
+               AND Infl.cnt = Peek.cnt;
 
 dummy: SELECT * FROM "morphology.Analyses"; --for some reason, this is necessary to force Drift to generate a getter

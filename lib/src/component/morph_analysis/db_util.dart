@@ -92,7 +92,8 @@ final operations = [
             searchTab.form: inflTab.form,
             searchTab.item: inflTab.item,
             searchTab.cnt: inflTab.cnt,
-            searchTab.macronizedForm:concat([_removeAllHyphens(inflTab.stem), inflTab.suffix]) 
+            // TODO(whothefluff): consider adding nullable field "macronizedForm" to source tab to avoid calculation duplication for search tab and views
+            searchTab.macronizedForm: concat([_removeAllHyphens(inflTab.stem), inflTab.suffix])
           },
           mode: InsertMode.insertOrRollback);
       await db.customInsert(

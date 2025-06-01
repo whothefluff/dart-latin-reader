@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
@@ -45,14 +46,14 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
 
   final AppDb _db;
   late final Map<({bool hasMacrons}),
-             MultiSelectable<AnalysisKey> Function(String form)> 
+                 MultiSelectable<AnalysisKey> Function(String form)> 
       _analysisKeysQueries;
 
   @override
   Future<Analyses> getMorphAnalyses(AnalysisKeys keys) async {
     log.info('MorphologicalDataRepository - retrieving analyses from db');
     final dbData = 
-          await (_db.select(_db.morphAnalysisDrift.morphologyAnalyses)..where(_keysMatch(keys))).get();
+         await (_db.select(_db.morphAnalysisDrift.morphologyAnalyses)..where(_keysMatch(keys))).get();
     return Analyses(dbData.map(_toDomain));
   }
 
@@ -85,7 +86,9 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
         form: e.form,
         item: e.item,
         cnt: e.cnt,
+        macronizedForm: e.macronizedForm,
         dictionaryRef: e.dictionaryRef,
+        partOfSpeech: e.partOfSpeech,
         stem: e.stem,
         suffix: e.suffix,
         segmentsInfo: e.segmentsInfo,
@@ -97,6 +100,7 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
         tense: e.tense,
         voice: e.voice,
         person: e.person,
+        additional: e.additional,
       );
 //
 }
@@ -167,7 +171,9 @@ class Analysis {
     required this.form,
     required this.item,
     required this.cnt,
+    required this.macronizedForm,
     required this.dictionaryRef,
+    required this.partOfSpeech,
     required this.stem,
     this.suffix,
     this.segmentsInfo,
@@ -179,12 +185,15 @@ class Analysis {
     this.tense,
     this.voice,
     this.person,
+    this.additional,
   });
 
   final String form;
   final int item;
   final int cnt;
+  final String macronizedForm;
   final String dictionaryRef;
+  final String partOfSpeech;
   final String stem;
   final String? suffix;
   final String? segmentsInfo;
@@ -196,6 +205,7 @@ class Analysis {
   final String? tense;
   final String? voice;
   final String? person;
+  final String? additional;
 
   @override
   String toString() => 'Analysis{form: $form, item: $item, cnt: $cnt}';
@@ -218,6 +228,37 @@ class Analysis {
 extension type const AnalysisKeys._(UnmodifiableListView<AnalysisKey> unm)
     implements UnmodifiableListView<AnalysisKey> {
   AnalysisKeys(Iterable<AnalysisKey> iter) : this._(UnmodifiableListView(iter));
+
+  AnalysisKeys.fromJson(String source)
+      : this((jsonDecode(source) as List).expand((formEntry) {
+          final formData = formEntry as List;
+          final items = formData[1] as List;
+          return items.expand((itemEntry) {
+            final itemData = itemEntry as List;
+            final counts = itemData[1] as List;
+            return counts.map((cnt) => AnalysisKey(
+                  form: formData[0] as String,
+                  item: itemData[0] as int,
+                  cnt: cnt as int,
+                ));
+          });
+        }));
+
+  String toJson() {
+    final forms = <String, Map<int, List<int>>>{};
+    forEach((k) {
+      final l = (forms[k.form] ??= {})[k.item] ??= [];
+      return l.add(k.cnt);
+    });
+    final compact = forms.entries
+        .map((form) => [
+              form.key,
+              form.value.entries.map((i) => [i.key, i.value]).toList()
+            ])
+        .toList();
+    return jsonEncode(compact);
+  }
+//
 }
 
 extension type const AnalysisKey._(({String form, int item, int cnt}) _record) {

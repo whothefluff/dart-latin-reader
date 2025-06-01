@@ -101,8 +101,12 @@ RouteBase get $mainRoute => StatefulShellRouteData.$route(
         StatefulShellBranchData.$branch(
           routes: [
             GoRouteData.$route(
-              path: '/morph-analysis',
-              factory: $MorphologyRouteExtension._fromState,
+              path: '/morph-search',
+              factory: $MorphologicalSearchRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/morph-detail/:keys',
+              factory: $MorphologicalDataRouteExtension._fromState,
             ),
           ],
         ),
@@ -307,12 +311,32 @@ extension $WordFrequencyRouteExtension on WordFrequencyRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $MorphologyRouteExtension on MorphologyRoute {
-  static MorphologyRoute _fromState(GoRouterState state) =>
-      const MorphologyRoute();
+extension $MorphologicalSearchRouteExtension on MorphologicalSearchRoute {
+  static MorphologicalSearchRoute _fromState(GoRouterState state) =>
+      const MorphologicalSearchRoute();
 
   String get location => GoRouteData.$location(
-        '/morph-analysis',
+        '/morph-search',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $MorphologicalDataRouteExtension on MorphologicalDataRoute {
+  static MorphologicalDataRoute _fromState(GoRouterState state) =>
+      MorphologicalDataRoute(
+        state.pathParameters['keys']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/morph-detail/${Uri.encodeComponent(keys)}',
       );
 
   void go(BuildContext context) => context.go(location);
