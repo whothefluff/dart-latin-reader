@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/logger.dart';
+import 'package:latin_reader/src/component/morph_analysis/enriched_morph_search_api.dart';
 import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
-import 'package:latin_reader/src/component/morph_analysis/morphological_search_api.dart';
 import 'package:latin_reader/src/ui/page/morphology/common.dart';
 import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
@@ -23,7 +23,7 @@ class MorphologicalSearchPage extends ConsumerStatefulWidget {
 class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
 //
   final SearchController _searchController = SearchController();
-  Results? _selectedResults;
+  EnrichedResults? _selectedResults;
   bool _isSearching = false;
 
   @override
@@ -33,7 +33,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
   }
 
   /// Called when a search result is selected
-  Future<void> _handleResultSelected(Results results) async {
+  Future<void> _handleResultSelected(EnrichedResults results) async {
     setState(() {
       _selectedResults = results;
       _searchController.closeView(_searchController.text);
@@ -83,7 +83,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                   log.info(() => 'MorphologyPage - searching for: $searchTerm');
                   try {
                     final results = await ref
-                        .watch(morphologicalSearchProvider(searchTerm).future);
+                        .watch(enrichedMorphologicalSearchProvider(searchTerm).future);
                     // Reset searching state
                     if (_isSearching) {
                       setState(() => _isSearching = false);
@@ -123,7 +123,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                             )),
                             subtitle: Text(details),
                             onTap: () => _handleResultSelected(
-                              Results(groupedRes[result]!),
+                              EnrichedResults(groupedRes[result]!),
                             ),
                           );
                         },
@@ -131,7 +131,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                     ];
                   } on Exception catch (e, stack) {
                     return [
-                      showError(ref, morphologicalSearchProvider(searchTerm))(
+                      showError(ref, enrichedMorphologicalSearchProvider(searchTerm))(
                         e,
                         stack,
                       ),
