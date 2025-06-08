@@ -4,9 +4,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart';
 import 'package:latin_reader/src/component/morph_analysis/enriched_morph_details_api.dart';
 import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
 import 'package:latin_reader/src/ui/page/morphology/common.dart';
+import 'package:latin_reader/src/ui/router/config.dart';
 import 'package:latin_reader/src/ui/widget/show_error.dart';
 import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
@@ -175,7 +177,7 @@ bool _isOnDesktopOrWeb() {
 }
 
 /// One will be used inside each PageView element
-class MorphEntryCard extends StatelessWidget {
+class MorphEntryCard extends ConsumerWidget {
   const MorphEntryCard({
     super.key,
     required this.analyses,
@@ -186,7 +188,7 @@ class MorphEntryCard extends StatelessWidget {
   final CrossAxisAlignment cardContentAlignment;
 
   @override
-  Widget build(context) {
+  Widget build(context, ref) {
     final theme = Theme.of(context);
     final groupedData = _GroupedAnalysisData(analyses);
     return Card(
@@ -196,7 +198,7 @@ class MorphEntryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: cardContentAlignment,
           children: [
-            _header(theme),
+            _header(context, theme, ref),
             const SizedBox(height: 10),
             const Divider(thickness: 3),
             _commonSection(theme, groupedData.commonProperties),
@@ -207,24 +209,57 @@ class MorphEntryCard extends StatelessWidget {
     );
   }
 
-  Widget _header(ThemeData theme) {
+  Widget _header(BuildContext context, ThemeData theme, WidgetRef ref) {
     final themeTextStyle = theme.textTheme.titleMedium!;
     final themeColor = theme.colorScheme;
     final textStyle = themeTextStyle.copyWith(color: themeColor.tertiary);
     final firstAnalysis = analyses.first;
     return Column(
       crossAxisAlignment: cardContentAlignment,
-      children: _styledGroup(
-        textStyle,
-        [
+      children: [
+        ..._styledGroup(textStyle, [
           Text(_lexicalForm(firstAnalysis)),
           Text(firstAnalysis.partOfSpeech),
           // TODO(whothefluff): change for null-aware element when possible (next dart v)
           if (firstAnalysis.additional != null) Text(firstAnalysis.additional!),
-        ],
-      ),
+        ]),
+        ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: dictButton(themeColor, firstAnalysis, context, ref),
+          )
+        ]
+      ],
     );
   }
+
+  ActionChip dictButton(
+    ColorScheme themeColor,
+    EnrichedAnalysis firstAnalysis,
+    BuildContext context,
+    WidgetRef ref,
+  ) =>
+      ActionChip(
+        avatar: Icon(
+          Icons.translate,
+          color: themeColor.secondary,
+        ),
+        label: const Text('View in Dictionary'),
+        onPressed: () async {
+          // We could create a provider specifically for this but this call
+          // should remain extremely fast forever
+          final dictionaries = await ref.read(dictionariesProvider.future);
+          final lns = dictionaries.singleWhere(
+            (d) => d.name == 'Lewis & Short',
+          );
+          if (context.mounted) {
+            await DictionaryEntryRoute(
+              lns.id,
+              firstAnalysis.lnsLemma,
+            ).push<void>(context);
+          }
+        },
+      );
 
   String _lexicalForm(EnrichedAnalysis analysis) =>
       '${analysis.dictionaryRef.replaceAll(RegExp(r'\d'), '')}${analysis.lnsInflection != null ? ', ${analysis.lnsInflection}' : ''}';
