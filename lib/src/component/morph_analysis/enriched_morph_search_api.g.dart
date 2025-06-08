@@ -7,7 +7,7 @@ part of 'enriched_morph_search_api.dart';
 // **************************************************************************
 
 String _$enrichedMorphologicalSearchHash() =>
-    r'248c68ac62d72ce2cfb356e6ed617feb0ba2af74';
+    r'bad5b03baf8f1aae2a42688f90f637d5c12d2312';
 
 /// Copied from Dart SDK
 class _SystemHash {
