@@ -1,7 +1,26 @@
 // Create a new file: dictionary_ref_resolver.dart
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart';
 
+//infrastructure
+
+class RiverpodDictionaryRepository implements IDictionaryRepository {
+  RiverpodDictionaryRepository(
+    this._ref,
+  );
+
+  final Ref _ref;
+
+  @override
+  Future<LnsBasicInfo> getLnsInfoFor(Iterable<String> lemmas) =>
+      _ref.read(lnsBasicInfoProvider(lemmas).future);
+}
+
+//domain
+
+/// A domain service that encapsulates the business logic for resolving and enriching
+/// morphological data by finding corresponding entries in a dictionary
 class DictionaryRefResolver {
   DictionaryRefResolver(
     this.repo,
@@ -10,9 +29,9 @@ class DictionaryRefResolver {
   final IDictionaryRepository repo;
 
   /// Resolves morphological dictionary references to actual dictionary entries
-  /// 
+  ///
   /// Many forms are correct but use a different way of writing the word
-  /// ('adtingere' has lexical 'ad-tingo', but the L&S only contemplates 
+  /// ('adtingere' has lexical 'ad-tingo', but the L&S only contemplates
   /// 'attingo')
   ///
   /// A few dozen entries will not be found as is, but only adding '1'
@@ -25,15 +44,17 @@ class DictionaryRefResolver {
   ///
   /// Some forms are unfixable ('adulteram' has lexical 'adultera', when it should
   /// be 'adulter')
-  /// 
+  ///
   /// Some forms like 'moris' contain suspicious duplicates(?)
-  /// 
-  /// In general, it is likely a good idea to ignore morphological analyses 
-  /// without matches in this method
-  Future<Map<String, LnsBasicInfoEntry>> resolveDictionaryRefs(
-    Iterable<String> morphDictRefs,
-  ) async {
-    final pureLemmas = morphDictRefs.toSet();
+  ///
+  /// It will return a subset of [items] with matches in the dictionary
+  Future<Iterable<U>> resolveAndEnrich<T, U>({
+    required Iterable<T> items,
+    required String Function(T item) getDictRef,
+    required U Function(T item, LnsBasicInfoEntry lnsInfo) createEnriched,
+  }) async {
+    // Get all unique dictionary references from the source items.
+    final pureLemmas = items.map(getDictRef).toSet();
     // First, look for exact lemmas but with '-' replacements (d-p = pp, etc.) TODO
     // First try to find exact matches
     final pureMatches = Map.fromEntries(
@@ -78,7 +99,16 @@ class DictionaryRefResolver {
       ),
     );
     // Put all found results together
-    return {...pureMatches, ...suffixedMatches, ...normalizedMatches};
+    final lnsInfoByMorphDictRef = {
+      ...pureMatches,
+      ...suffixedMatches,
+      ...normalizedMatches
+    };
+    return items
+        // Filter out entries without matches
+        .where((i) => lnsInfoByMorphDictRef.containsKey(getDictRef(i)))
+        // Create entries with additional dict data
+        .map((e) => createEnriched(e, lnsInfoByMorphDictRef[getDictRef(e)]!));
   }
 //
 }

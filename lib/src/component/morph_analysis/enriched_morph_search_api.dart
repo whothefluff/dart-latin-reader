@@ -24,21 +24,8 @@ Future<EnrichedResults> enrichedMorphologicalSearch(
   final results = await ref.watch(morphologicalSearchProvider(form).future);
   return SearchEnrichedMorphologicalDataUseCase(
     results: results,
-    repo: DictionaryDataService(ref),
+    repo: RiverpodDictionaryRepository(ref),
   ).invoke();
-}
-
-class DictionaryDataService implements IDictionaryRepository {
-  DictionaryDataService(
-    this._ref,
-  );
-
-  final Ref _ref;
-
-  @override
-  Future<LnsBasicInfo> getLnsInfoFor(lemmas) async =>
-      _ref.watch(lnsBasicInfoProvider(lemmas).future);
-//
 }
 
 // interactors
@@ -56,17 +43,15 @@ class SearchEnrichedMorphologicalDataUseCase
   @override
   Future<EnrichedResults> invoke() async {
     final resolver = DictionaryRefResolver(repo);
-    final lnsInfoByMorphDictRef = await resolver.resolveDictionaryRefs(
-      results.map((r) => r.dictionaryRef).toSet(),
+    final enrichedItems = await resolver.resolveAndEnrich(
+      items: results,
+      getDictRef: (result) => result.dictionaryRef,
+      createEnriched: (result, lnsInfo) => EnrichedResult(
+        base: result,
+        lns: lnsInfo,
+      ),
     );
-    // Only return results for which dictionary entries are found, since
-    // the Results contains data of low quality otherwise
-    return EnrichedResults(results
-        .where((r) => lnsInfoByMorphDictRef.containsKey(r.dictionaryRef))
-        .map((r) => EnrichedResult(
-              base: r,
-              lns: lnsInfoByMorphDictRef[r.dictionaryRef]!,
-            )));
+    return EnrichedResults(enrichedItems);
   }
 //
 }

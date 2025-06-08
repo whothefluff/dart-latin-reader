@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/logger.dart';
 import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart'
     hide IDictionaryRepository;
-import 'package:latin_reader/src/component/morph_analysis/enriched_morph_search_api.dart';
 import 'package:latin_reader/src/component/morph_analysis/enriched_resolver.dart';
 import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
 import 'package:latin_reader/src/external/provider_ext.dart';
@@ -25,7 +24,7 @@ Future<EnrichedAnalyses> enrichedMorphologicalAnalyses(
   final analyses = await ref.watch(morphologicalAnalysesProvider(keys).future);
   return GetEnrichedMorphologicalAnalysesUseCase(
     analyses: analyses,
-    repo: DictionaryDataService(ref),
+    repo: RiverpodDictionaryRepository(ref),
   ).invoke();
 }
 
@@ -44,17 +43,15 @@ class GetEnrichedMorphologicalAnalysesUseCase
   @override
   Future<EnrichedAnalyses> invoke() async {
     final resolver = DictionaryRefResolver(repo);
-    final lnsInfoByMorphDictRef = await resolver.resolveDictionaryRefs(
-      analyses.map((a) => a.dictionaryRef).toSet(),
+    final enrichedItems = await resolver.resolveAndEnrich(
+      items: analyses,
+      getDictRef: (analysis) => analysis.dictionaryRef,
+      createEnriched: (analysis, lnsInfo) => EnrichedAnalysis(
+        base: analysis,
+        lns: lnsInfo,
+      ),
     );
-    // Only return results for which dictionary entries are found, since
-    // the Results contains data of low quality otherwise
-    return EnrichedAnalyses(analyses
-        .where((r) => lnsInfoByMorphDictRef.containsKey(r.dictionaryRef))
-        .map((a) => EnrichedAnalysis(
-              base: a,
-              lns: lnsInfoByMorphDictRef[a.dictionaryRef]!,
-            )));
+    return EnrichedAnalyses(enrichedItems);
   }
 //
 }
