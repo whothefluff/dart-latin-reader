@@ -3,7 +3,10 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart';
+import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart'
+    hide IDictionaryRepository;
+import 'package:latin_reader/src/component/morph_analysis/enriched_morph_search_api.dart';
+import 'package:latin_reader/src/component/morph_analysis/enriched_resolver.dart';
 import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
 import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -20,11 +23,9 @@ Future<EnrichedAnalyses> enrichedMorphologicalAnalyses(
   log.info(() => '@riverpod - enrichedMorphologicalAnalyses');
   ref.cacheFor(const Duration(minutes: 5));
   final analyses = await ref.watch(morphologicalAnalysesProvider(keys).future);
-  final lemmas = analyses.map((a) => a.dictionaryRef).toSet();
-  final lnsInfo = await ref.watch(lnsBasicInfoProvider(lemmas).future);
   return GetEnrichedMorphologicalAnalysesUseCase(
     analyses: analyses,
-    lnsInfo: lnsInfo,
+    repo: DictionaryDataService(ref),
   ).invoke();
 }
 
@@ -34,24 +35,28 @@ class GetEnrichedMorphologicalAnalysesUseCase
     implements IGetEnrichedMorphologicalAnalysesUseCase {
   GetEnrichedMorphologicalAnalysesUseCase({
     required this.analyses,
-    required this.lnsInfo,
+    required this.repo,
   });
 
   final Analyses analyses;
-  final LnsBasicInfo lnsInfo;
+  final IDictionaryRepository repo;
 
   @override
   Future<EnrichedAnalyses> invoke() async {
-    final lnsInfoByLemma = <String, LnsBasicInfoEntry>{}
-      ..addEntries(lnsInfo.map((entry) => MapEntry(entry.lemma, entry)));
-    return EnrichedAnalyses(
-      analyses.map((a) => EnrichedAnalysis(
-            base: a,
-            lns: lnsInfoByLemma[a.dictionaryRef] ??
-                LnsBasicInfoEntry(lemma: a.dictionaryRef),
-          )),
+    final resolver = DictionaryRefResolver(repo);
+    final lnsInfoByMorphDictRef = await resolver.resolveDictionaryRefs(
+      analyses.map((a) => a.dictionaryRef).toSet(),
     );
+    // Only return results for which dictionary entries are found, since
+    // the Results contains data of low quality otherwise
+    return EnrichedAnalyses(analyses
+        .where((r) => lnsInfoByMorphDictRef.containsKey(r.dictionaryRef))
+        .map((a) => EnrichedAnalysis(
+              base: a,
+              lns: lnsInfoByMorphDictRef[a.dictionaryRef]!,
+            )));
   }
+//
 }
 
 //domain
@@ -97,6 +102,7 @@ class EnrichedAnalysis {
   String? get voice => base.voice;
   String? get person => base.person;
   String? get additional => base.additional;
+  String get lnsLemma => lns.lemma;
   String? get lnsInflection => lns.inflection;
   String? get lnsPartOfSpeech => lns.partOfSpeech;
 
