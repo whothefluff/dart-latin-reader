@@ -39,32 +39,37 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
 
   final AppDb _db;
   late final Map<({bool hasMacrons, bool useLike}),
-             MultiSelectable<Result> Function(String form)> 
+                 MultiSelectable<Result> Function(String form)> 
       _runnableQueries;
 
   /// If the input contains macrons, the query will look for them explicitely
-  /// and as they were specified 
+  /// and as they were specified
   ///
   /// If the input contains no macrons, the query will ignore them (which means
   /// the result can contain macrons or not contain any)
   ///
-  /// If the input contains wildcards (`*` or `%` for any number of
-  /// characters and `?` or `_` for a single character) or is made of less than
-  /// three characters, the query will use `LIKE` instead of doing an FTS5 
-  /// search
+  /// If the input contains non-word characters (i.e. anything that is not a
+  /// Latin letter or an arabic numeral) or is made of less than three
+  /// characters three characters, the query will use `LIKE` instead of doing
+  /// an FTS5 search:
+  /// - If the input contains wildcards (`*` or `%` for any number of
+  /// characters and `?` or `_` for a single character), these will be used by
+  /// the SQL engine
+  /// - If the input begins and ends with single `'` or double `"` quotes, the
+  /// query runs without them so that they are found as exact strings
   ///
-  /// If the input does not contain any wildcards and is made of three 
-  /// characters or more, the query looks for matches using full-text search 
+  /// If the input does not contain any strange characters and is made of three
+  /// characters or more, the query looks for matches using full-text search
   @override
   Future<Results> getSearchResults(String form) async {
     if (form.isNotEmpty) {
-      final parsedInput = form.replaceAll('*', '%').replaceAll('?', '_');
-      log.info('MorphologicalDataRepository - searching $parsedInput in db');
       final key = (
-        hasMacrons: _hasMacrons(parsedInput),
-        useLike: _useLikeLogic(parsedInput)
+        hasMacrons: _hasMacrons(form),
+        useLike: _useLikeLogic(form),
       );
       final runQuery = _runnableQueries[key]!;
+      final parsedInput = _sanitizeQuotes(_sanitizeWildcards(form));
+      log.info('MorphologicalDataRepository - searching $parsedInput in db');
       final dbData = await runQuery(parsedInput).get();
       return Results(dbData);
     } else {
@@ -72,9 +77,25 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
     }
   }
 
+  String _sanitizeWildcards(String form) => form.replaceAll('*', '%').replaceAll('?', '_');
+
   bool _hasMacrons(String form) => form.contains(RegExp('[āēīōūĀĒĪŌŪ]'));
 
-  bool _useLikeLogic(String form) => form.length < 3 || form.contains(RegExp('[%_]'));
+  /// Any weird characters default to LIKE, since MATCH can return errors and
+  /// we can't use advanced FTS5 syntax for a table column that exclusively 
+  /// stores single words
+  bool _useLikeLogic(String form) => form.length < 3 || form.contains(RegExp(r'[^\wāēīōūĀĒĪŌŪ]'));
+
+  /// If a user types leading *and* trailing quotes, either single or double,
+  /// we strip them off so that the LIKE logic will look for a match without
+  /// query characters
+  ///
+  /// In any other case return the original string
+  String _sanitizeQuotes(String form) =>
+      ((form.startsWith('"') && form.endsWith('"')) ||
+              (form.startsWith("'") && form.endsWith("'")))
+          ? form.substring(1, form.length - 1)
+          : form;
 
 //
 }
@@ -134,8 +155,7 @@ class Result {
   final int cnt;
 
   @override
-  String toString() =>
-      'Result{form: $form, item: $item, cnt: $cnt}';
+  String toString() => 'Result{form: $form, item: $item, cnt: $cnt}';
 
   @override
   bool operator ==(Object other) {
