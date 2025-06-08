@@ -3,7 +3,9 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart';
+import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart'
+    hide IDictionaryRepository;
+import 'package:latin_reader/src/component/morph_analysis/enriched_resolver.dart';
 import 'package:latin_reader/src/component/morph_analysis/morphological_search_api.dart';
 import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -41,21 +43,6 @@ class DictionaryDataService implements IDictionaryRepository {
 
 // interactors
 
-abstract interface class IDictionaryRepository {
-//
-  Future<LnsBasicInfo> getLnsInfoFor(Iterable<String> lemmas);
-//
-}
-
-/// First, look for exact lemmas but with '-' replacements (d-p = pp, etc.) TODO
-///
-/// Then, for the lemmas with no matches, look for lemma AND '1'
-///
-/// Then, for the lemmas still with no matches, look for lema
-/// WITHOUT trailing '1'
-///
-/// Return forms with at least one match (assumption: no match in dict = wrong
-/// analysis)
 class SearchEnrichedMorphologicalDataUseCase
     implements ISearchEnrichedMorphologicalDataUseCase {
   SearchEnrichedMorphologicalDataUseCase({
@@ -68,59 +55,9 @@ class SearchEnrichedMorphologicalDataUseCase
 
   @override
   Future<EnrichedResults> invoke() async {
-    final pureLemmas = results.map((r) => r.dictionaryRef).toSet();
-    // First try to find exact matches
-    final pureMatches = (await repo.getLnsInfoFor(pureLemmas)).map(
-      (e) => (
-        morphDictRef: e.lemma,
-        lnsLemma: e.lemma,
-        lnsPos: e.partOfSpeech,
-        lnsInflection: e.inflection,
-      ),
-    );
-    // A few dozen entries will not be found as is, but only adding '1'
-    // E.g. 'principum' has dictionaryRef 'princeps',
-    // but the dictionary has lemma 'princeps1'
-    final matchedPLemmas = pureMatches.map((e) => e.morphDictRef).toSet();
-    final unmatchedPLemmas = pureLemmas.difference(matchedPLemmas);
-    final suffixedLemmas = unmatchedPLemmas
-        .where((e) => !e.endsWith('1'))
-        .map((e) => '${e}1')
-        .toSet();
-    final suffixedMatches =
-        (await repo.getLnsInfoFor(suffixedLemmas)).map((e) => (
-              morphDictRef: e.lemma.replaceFirst(r'1$', ''),
-              lnsLemma: e.lemma,
-              lnsPos: e.partOfSpeech,
-              lnsInflection: e.inflection,
-            ));
-    // A small handful of entries entries still not be found, so we delete '1'
-    // E.g. 'equus' has has dictionaryRef 'equus1',
-    // but the dictionary only has lemma 'equus'
-    final matchedSLemmas = suffixedMatches.map((e) => e.morphDictRef).toSet();
-    final unmatchedSLemmas = unmatchedPLemmas.difference(matchedSLemmas);
-    final normalizedLemmas = unmatchedSLemmas
-        .where((e) => e.endsWith('1'))
-        .map((e) => e.replaceFirst(RegExp(r'1$'), ''))
-        .toSet();
-    final normalizedMatches =
-        (await repo.getLnsInfoFor(normalizedLemmas)).map((e) => (
-              morphDictRef: '${e.lemma}1',
-              lnsLemma: e.lemma,
-              lnsPos: e.partOfSpeech,
-              lnsInflection: e.inflection,
-            ));
-    // Put all found results together
-    final comb = [...pureMatches, ...suffixedMatches, ...normalizedMatches];
-    final lnsInfoByMorphDictRef = Map.fromEntries(
-      comb.map((e) => MapEntry(
-            e.morphDictRef,
-            LnsBasicInfoEntry(
-              lemma: e.lnsLemma,
-              inflection: e.lnsInflection,
-              partOfSpeech: e.lnsPos,
-            ),
-          )),
+    final resolver = DictionaryRefResolver(repo);
+    final lnsInfoByMorphDictRef = await resolver.resolveDictionaryRefs(
+      results.map((r) => r.dictionaryRef).toSet(),
     );
     // Only return results for which dictionary entries are found, since
     // the Results contains data of low quality otherwise
