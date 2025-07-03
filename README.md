@@ -2,6 +2,9 @@
 
 A new Flutter project.
 
+To be formatted later:
+- After adding a new work, the query in morph_analysis folder should be run again to see if new assimilations appear
+
 ## Getting Started
 
 This project is a starting point for a Flutter application that follows the

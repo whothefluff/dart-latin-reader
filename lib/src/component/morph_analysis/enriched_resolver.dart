@@ -27,6 +27,16 @@ class DictionaryRefResolver {
   );
 
   final IDictionaryRepository repo;
+  static const Map<String, String> _assimilations = {
+    'd-p': 'pp',
+    'd-t': 'tt',
+    'd-s': 'ss',
+    'n-c': 'nc',
+    'n-r': 'rr',
+    'x-f': 'ff',
+    'x-s': 's',
+    'x-l': 'l',
+  };
 
   /// Resolves morphological dictionary references to actual dictionary entries
   ///
@@ -47,6 +57,9 @@ class DictionaryRefResolver {
   ///
   /// Some forms like 'moris' contain suspicious duplicates(?)
   ///
+  /// Since this doesn't happen reliably, we have to perform corrections
+  /// and call sequentially as fallbacks instead of one big call
+  ///
   /// It will return a subset of [items] with matches in the dictionary
   Future<Iterable<U>> resolveAndEnrich<T, U>({
     required Iterable<T> items,
@@ -55,10 +68,10 @@ class DictionaryRefResolver {
   }) async {
     // Get all unique dictionary references from the source items.
     final pureLemmas = items.map(getDictRef).toSet();
-    // First, look for exact lemmas but with '-' replacements (d-p = pp, etc.) TODO
-    // First try to find exact matches
-    final pureMatches = Map.fromEntries(
-      (await repo.getLnsInfoFor(pureLemmas)).map(
+    // First, look for exact lemmas but with '-' replacements
+    final assimilated = _assimilated(pureLemmas);
+    final assimilatedMatches = Map.fromEntries(
+      (await repo.getLnsInfoFor(assimilated.lemmas)).map(
         (e) => MapEntry(
           // dictionaryRef of morph data and lemma of dict data match here
           e.lemma,
@@ -67,8 +80,8 @@ class DictionaryRefResolver {
       ),
     );
     // For the lemmas with no matches, look for lemma AND '1'
-    final matchedPLemmas = pureMatches.keys.toSet();
-    final unmatchedPLemmas = pureLemmas.difference(matchedPLemmas);
+    final matchedPLemmas = assimilatedMatches.keys.toSet();
+    final unmatchedPLemmas = assimilated.lemmas.difference(matchedPLemmas);
     final suffixedLemmas = unmatchedPLemmas
         .where((e) => !e.endsWith('1'))
         .map((e) => '${e}1')
@@ -99,17 +112,46 @@ class DictionaryRefResolver {
       ),
     );
     // Put all found results together
-    final lnsInfoByMorphDictRef = {
-      ...pureMatches,
+    final allMatches = {
+      ...assimilatedMatches,
       ...suffixedMatches,
-      ...normalizedMatches
+      ...normalizedMatches,
     };
+    // Substitute any potentially assimilated forms back to their original form
+    final lnsInfoByMorphDictRef = allMatches.map(
+      (key, value) => MapEntry(assimilated.toOriginal[key] ?? key, value),
+    );
     return items
         // Filter out entries without matches
         .where((i) => lnsInfoByMorphDictRef.containsKey(getDictRef(i)))
         // Create entries with additional dict data
         .map((e) => createEnriched(e, lnsInfoByMorphDictRef[getDictRef(e)]!));
   }
+
+  ({Set<String> lemmas, Map<String, String> toOriginal}) _assimilated(
+    Set<String> originalLemmas,
+  ) =>
+      originalLemmas.fold(
+        (lemmas: <String>{}, toOriginal: <String, String>{}),
+        (acc, original) {
+          final assimilated = _assimilate(original);
+          // Only some forms will actually be assimilated
+          acc.lemmas.add(assimilated);
+          if (assimilated != original) {
+            // Offer a way back to the original lemma
+            acc.toOriginal[assimilated] = original;
+          }
+          return acc;
+        },
+      );
+
+  String _assimilate(String lemma) => _assimilations.entries
+      .fold(
+        lemma,
+        (current, a) => current.replaceAll(a.key, a.value),
+      )
+      .replaceAll('-', '')
+      .replaceAll('_', '');
 //
 }
 
