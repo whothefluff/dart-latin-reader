@@ -80,9 +80,9 @@ class DictionaryRefResolver {
       ),
     );
     // For the lemmas with no matches, look for lemma AND '1'
-    final matchedPLemmas = assimilatedMatches.keys.toSet();
-    final unmatchedPLemmas = assimilated.lemmas.difference(matchedPLemmas);
-    final suffixedLemmas = unmatchedPLemmas
+    final matchedALemmas = assimilatedMatches.keys.toSet();
+    final unmatchedALemmas = assimilated.lemmas.difference(matchedALemmas);
+    final suffixedLemmas = unmatchedALemmas
         .where((e) => !e.endsWith('1'))
         .map((e) => '${e}1')
         .toSet();
@@ -97,7 +97,7 @@ class DictionaryRefResolver {
     );
     // For lemmas still with no matches, look for lema WITHOUT trailing '1'
     final matchedSLemmas = suffixedMatches.keys.toSet();
-    final unmatchedSLemmas = unmatchedPLemmas.difference(matchedSLemmas);
+    final unmatchedSLemmas = unmatchedALemmas.difference(matchedSLemmas);
     final normalizedLemmas = unmatchedSLemmas
         .where((e) => e.endsWith('1'))
         .map((e) => e.replaceFirst(RegExp(r'1$'), ''))
