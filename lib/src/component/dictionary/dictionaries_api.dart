@@ -1,11 +1,15 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
 
 part 'dictionaries_api.g.dart';
 
@@ -33,15 +37,16 @@ class DictionaryRepository implements IDictionaryRepository {
     final dbData = await _db.dictionaryDrift.getDictionaries().get();
     return Dictionaries(dbData);
   }
-//
+
+  //
 }
 
 //interactors
 
 abstract interface class IDictionaryRepository {
-//
+  //
   Future<Dictionaries> getDictionaries();
-//
+  //
 }
 
 class GetDictionariesUseCase implements IGetDictionariesUseCase {
@@ -53,15 +58,15 @@ class GetDictionariesUseCase implements IGetDictionariesUseCase {
 
   @override
   Future<Dictionaries> invoke() async => _repository.getDictionaries();
-//
+  //
 }
 
 //domain
 
 abstract interface class IGetDictionariesUseCase {
-//
+  //
   Future<Dictionaries> invoke();
-//
+  //
 }
 
 @immutable
@@ -92,12 +97,10 @@ class Dictionary {
   String toString() => 'Dictionary{name: $name}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Dictionary && other.id == id;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is Dictionary && other.id == id);
 
   @override
   int get hashCode => id.hashCode;
-//
+  //
 }

@@ -9,18 +9,20 @@ import 'package:latin_reader/src/component/library/work_details_api.dart' as i5;
 import 'package:latin_reader/src/component/library/work_contents_api.dart'
     as i6;
 
-typedef $AuthorsCreateCompanionBuilder = i1.AuthorsCompanion Function({
-  required String id,
-  required String name,
-  required String about,
-  required i2.Uint8List image,
-});
-typedef $AuthorsUpdateCompanionBuilder = i1.AuthorsCompanion Function({
-  i0.Value<String> id,
-  i0.Value<String> name,
-  i0.Value<String> about,
-  i0.Value<i2.Uint8List> image,
-});
+typedef $AuthorsCreateCompanionBuilder =
+    i1.AuthorsCompanion Function({
+      required String id,
+      required String name,
+      required String about,
+      required i2.Uint8List image,
+    });
+typedef $AuthorsUpdateCompanionBuilder =
+    i1.AuthorsCompanion Function({
+      i0.Value<String> id,
+      i0.Value<String> name,
+      i0.Value<String> about,
+      i0.Value<i2.Uint8List> image,
+    });
 
 class $AuthorsFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.Authors> {
@@ -32,16 +34,24 @@ class $AuthorsFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => i0.ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => i0.ColumnFilters(column));
+    column: $table.name,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get about => $composableBuilder(
-      column: $table.about, builder: (column) => i0.ColumnFilters(column));
+    column: $table.about,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<i2.Uint8List> get image => $composableBuilder(
-      column: $table.image, builder: (column) => i0.ColumnFilters(column));
+    column: $table.image,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $AuthorsOrderingComposer
@@ -54,16 +64,24 @@ class $AuthorsOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.name,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get about => $composableBuilder(
-      column: $table.about, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.about,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<i2.Uint8List> get image => $composableBuilder(
-      column: $table.image, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.image,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $AuthorsAnnotationComposer
@@ -88,20 +106,27 @@ class $AuthorsAnnotationComposer
       $composableBuilder(column: $table.image, builder: (column) => column);
 }
 
-class $AuthorsTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.Authors,
-    i1.Author,
-    i1.$AuthorsFilterComposer,
-    i1.$AuthorsOrderingComposer,
-    i1.$AuthorsAnnotationComposer,
-    $AuthorsCreateCompanionBuilder,
-    $AuthorsUpdateCompanionBuilder,
-    (i1.Author, i0.BaseReferences<i0.GeneratedDatabase, i1.Authors, i1.Author>),
-    i1.Author,
-    i0.PrefetchHooks Function()> {
+class $AuthorsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.Authors,
+          i1.Author,
+          i1.$AuthorsFilterComposer,
+          i1.$AuthorsOrderingComposer,
+          i1.$AuthorsAnnotationComposer,
+          $AuthorsCreateCompanionBuilder,
+          $AuthorsUpdateCompanionBuilder,
+          (
+            i1.Author,
+            i0.BaseReferences<i0.GeneratedDatabase, i1.Authors, i1.Author>,
+          ),
+          i1.Author,
+          i0.PrefetchHooks Function()
+        > {
   $AuthorsTableManager(i0.GeneratedDatabase db, i1.Authors table)
-      : super(i0.TableManagerState(
+    : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -110,61 +135,67 @@ class $AuthorsTableManager extends i0.RootTableManager<
               i1.$AuthorsOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$AuthorsAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> id = const i0.Value.absent(),
-            i0.Value<String> name = const i0.Value.absent(),
-            i0.Value<String> about = const i0.Value.absent(),
-            i0.Value<i2.Uint8List> image = const i0.Value.absent(),
-          }) =>
-              i1.AuthorsCompanion(
-            id: id,
-            name: name,
-            about: about,
-            image: image,
-          ),
-          createCompanionCallback: ({
-            required String id,
-            required String name,
-            required String about,
-            required i2.Uint8List image,
-          }) =>
-              i1.AuthorsCompanion.insert(
-            id: id,
-            name: name,
-            about: about,
-            image: image,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> id = const i0.Value.absent(),
+                i0.Value<String> name = const i0.Value.absent(),
+                i0.Value<String> about = const i0.Value.absent(),
+                i0.Value<i2.Uint8List> image = const i0.Value.absent(),
+              }) => i1.AuthorsCompanion(
+                id: id,
+                name: name,
+                about: about,
+                image: image,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String about,
+                required i2.Uint8List image,
+              }) => i1.AuthorsCompanion.insert(
+                id: id,
+                name: name,
+                about: about,
+                image: image,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $AuthorsProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.Authors,
-    i1.Author,
-    i1.$AuthorsFilterComposer,
-    i1.$AuthorsOrderingComposer,
-    i1.$AuthorsAnnotationComposer,
-    $AuthorsCreateCompanionBuilder,
-    $AuthorsUpdateCompanionBuilder,
-    (i1.Author, i0.BaseReferences<i0.GeneratedDatabase, i1.Authors, i1.Author>),
-    i1.Author,
-    i0.PrefetchHooks Function()>;
-typedef $AuthorAbbreviationsCreateCompanionBuilder
-    = i1.AuthorAbbreviationsCompanion Function({
-  required String authorId,
-  required int id,
-  required String val,
-});
-typedef $AuthorAbbreviationsUpdateCompanionBuilder
-    = i1.AuthorAbbreviationsCompanion Function({
-  i0.Value<String> authorId,
-  i0.Value<int> id,
-  i0.Value<String> val,
-});
+typedef $AuthorsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.Authors,
+      i1.Author,
+      i1.$AuthorsFilterComposer,
+      i1.$AuthorsOrderingComposer,
+      i1.$AuthorsAnnotationComposer,
+      $AuthorsCreateCompanionBuilder,
+      $AuthorsUpdateCompanionBuilder,
+      (
+        i1.Author,
+        i0.BaseReferences<i0.GeneratedDatabase, i1.Authors, i1.Author>,
+      ),
+      i1.Author,
+      i0.PrefetchHooks Function()
+    >;
+typedef $AuthorAbbreviationsCreateCompanionBuilder =
+    i1.AuthorAbbreviationsCompanion Function({
+      required String authorId,
+      required int id,
+      required String val,
+    });
+typedef $AuthorAbbreviationsUpdateCompanionBuilder =
+    i1.AuthorAbbreviationsCompanion Function({
+      i0.Value<String> authorId,
+      i0.Value<int> id,
+      i0.Value<String> val,
+    });
 
 class $AuthorAbbreviationsFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.AuthorAbbreviations> {
@@ -176,13 +207,19 @@ class $AuthorAbbreviationsFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get authorId => $composableBuilder(
-      column: $table.authorId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.authorId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => i0.ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get val => $composableBuilder(
-      column: $table.val, builder: (column) => i0.ColumnFilters(column));
+    column: $table.val,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $AuthorAbbreviationsOrderingComposer
@@ -195,13 +232,19 @@ class $AuthorAbbreviationsOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get authorId => $composableBuilder(
-      column: $table.authorId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.authorId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get val => $composableBuilder(
-      column: $table.val, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.val,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $AuthorAbbreviationsAnnotationComposer
@@ -223,25 +266,33 @@ class $AuthorAbbreviationsAnnotationComposer
       $composableBuilder(column: $table.val, builder: (column) => column);
 }
 
-class $AuthorAbbreviationsTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.AuthorAbbreviations,
-    i1.AuthorAbbreviation,
-    i1.$AuthorAbbreviationsFilterComposer,
-    i1.$AuthorAbbreviationsOrderingComposer,
-    i1.$AuthorAbbreviationsAnnotationComposer,
-    $AuthorAbbreviationsCreateCompanionBuilder,
-    $AuthorAbbreviationsUpdateCompanionBuilder,
-    (
-      i1.AuthorAbbreviation,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.AuthorAbbreviations,
-          i1.AuthorAbbreviation>
-    ),
-    i1.AuthorAbbreviation,
-    i0.PrefetchHooks Function()> {
+class $AuthorAbbreviationsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.AuthorAbbreviations,
+          i1.AuthorAbbreviation,
+          i1.$AuthorAbbreviationsFilterComposer,
+          i1.$AuthorAbbreviationsOrderingComposer,
+          i1.$AuthorAbbreviationsAnnotationComposer,
+          $AuthorAbbreviationsCreateCompanionBuilder,
+          $AuthorAbbreviationsUpdateCompanionBuilder,
+          (
+            i1.AuthorAbbreviation,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.AuthorAbbreviations,
+              i1.AuthorAbbreviation
+            >,
+          ),
+          i1.AuthorAbbreviation,
+          i0.PrefetchHooks Function()
+        > {
   $AuthorAbbreviationsTableManager(
-      i0.GeneratedDatabase db, i1.AuthorAbbreviations table)
-      : super(i0.TableManagerState(
+    i0.GeneratedDatabase db,
+    i1.AuthorAbbreviations table,
+  ) : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -250,59 +301,67 @@ class $AuthorAbbreviationsTableManager extends i0.RootTableManager<
               i1.$AuthorAbbreviationsOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$AuthorAbbreviationsAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> authorId = const i0.Value.absent(),
-            i0.Value<int> id = const i0.Value.absent(),
-            i0.Value<String> val = const i0.Value.absent(),
-          }) =>
-              i1.AuthorAbbreviationsCompanion(
-            authorId: authorId,
-            id: id,
-            val: val,
-          ),
-          createCompanionCallback: ({
-            required String authorId,
-            required int id,
-            required String val,
-          }) =>
-              i1.AuthorAbbreviationsCompanion.insert(
-            authorId: authorId,
-            id: id,
-            val: val,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> authorId = const i0.Value.absent(),
+                i0.Value<int> id = const i0.Value.absent(),
+                i0.Value<String> val = const i0.Value.absent(),
+              }) => i1.AuthorAbbreviationsCompanion(
+                authorId: authorId,
+                id: id,
+                val: val,
+              ),
+          createCompanionCallback:
+              ({
+                required String authorId,
+                required int id,
+                required String val,
+              }) => i1.AuthorAbbreviationsCompanion.insert(
+                authorId: authorId,
+                id: id,
+                val: val,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $AuthorAbbreviationsProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.AuthorAbbreviations,
-    i1.AuthorAbbreviation,
-    i1.$AuthorAbbreviationsFilterComposer,
-    i1.$AuthorAbbreviationsOrderingComposer,
-    i1.$AuthorAbbreviationsAnnotationComposer,
-    $AuthorAbbreviationsCreateCompanionBuilder,
-    $AuthorAbbreviationsUpdateCompanionBuilder,
-    (
+typedef $AuthorAbbreviationsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.AuthorAbbreviations,
       i1.AuthorAbbreviation,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.AuthorAbbreviations,
-          i1.AuthorAbbreviation>
-    ),
-    i1.AuthorAbbreviation,
-    i0.PrefetchHooks Function()>;
-typedef $WorksCreateCompanionBuilder = i1.WorksCompanion Function({
-  required String id,
-  required String name,
-  required String about,
-});
-typedef $WorksUpdateCompanionBuilder = i1.WorksCompanion Function({
-  i0.Value<String> id,
-  i0.Value<String> name,
-  i0.Value<String> about,
-});
+      i1.$AuthorAbbreviationsFilterComposer,
+      i1.$AuthorAbbreviationsOrderingComposer,
+      i1.$AuthorAbbreviationsAnnotationComposer,
+      $AuthorAbbreviationsCreateCompanionBuilder,
+      $AuthorAbbreviationsUpdateCompanionBuilder,
+      (
+        i1.AuthorAbbreviation,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.AuthorAbbreviations,
+          i1.AuthorAbbreviation
+        >,
+      ),
+      i1.AuthorAbbreviation,
+      i0.PrefetchHooks Function()
+    >;
+typedef $WorksCreateCompanionBuilder =
+    i1.WorksCompanion Function({
+      required String id,
+      required String name,
+      required String about,
+    });
+typedef $WorksUpdateCompanionBuilder =
+    i1.WorksCompanion Function({
+      i0.Value<String> id,
+      i0.Value<String> name,
+      i0.Value<String> about,
+    });
 
 class $WorksFilterComposer extends i0.Composer<i0.GeneratedDatabase, i1.Works> {
   $WorksFilterComposer({
@@ -313,13 +372,19 @@ class $WorksFilterComposer extends i0.Composer<i0.GeneratedDatabase, i1.Works> {
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => i0.ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => i0.ColumnFilters(column));
+    column: $table.name,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get about => $composableBuilder(
-      column: $table.about, builder: (column) => i0.ColumnFilters(column));
+    column: $table.about,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $WorksOrderingComposer
@@ -332,13 +397,19 @@ class $WorksOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.name,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get about => $composableBuilder(
-      column: $table.about, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.about,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorksAnnotationComposer
@@ -360,20 +431,24 @@ class $WorksAnnotationComposer
       $composableBuilder(column: $table.about, builder: (column) => column);
 }
 
-class $WorksTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.Works,
-    i1.Work,
-    i1.$WorksFilterComposer,
-    i1.$WorksOrderingComposer,
-    i1.$WorksAnnotationComposer,
-    $WorksCreateCompanionBuilder,
-    $WorksUpdateCompanionBuilder,
-    (i1.Work, i0.BaseReferences<i0.GeneratedDatabase, i1.Works, i1.Work>),
-    i1.Work,
-    i0.PrefetchHooks Function()> {
+class $WorksTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.Works,
+          i1.Work,
+          i1.$WorksFilterComposer,
+          i1.$WorksOrderingComposer,
+          i1.$WorksAnnotationComposer,
+          $WorksCreateCompanionBuilder,
+          $WorksUpdateCompanionBuilder,
+          (i1.Work, i0.BaseReferences<i0.GeneratedDatabase, i1.Works, i1.Work>),
+          i1.Work,
+          i0.PrefetchHooks Function()
+        > {
   $WorksTableManager(i0.GeneratedDatabase db, i1.Works table)
-      : super(i0.TableManagerState(
+    : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -382,57 +457,52 @@ class $WorksTableManager extends i0.RootTableManager<
               i1.$WorksOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$WorksAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> id = const i0.Value.absent(),
-            i0.Value<String> name = const i0.Value.absent(),
-            i0.Value<String> about = const i0.Value.absent(),
-          }) =>
-              i1.WorksCompanion(
-            id: id,
-            name: name,
-            about: about,
-          ),
-          createCompanionCallback: ({
-            required String id,
-            required String name,
-            required String about,
-          }) =>
-              i1.WorksCompanion.insert(
-            id: id,
-            name: name,
-            about: about,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> id = const i0.Value.absent(),
+                i0.Value<String> name = const i0.Value.absent(),
+                i0.Value<String> about = const i0.Value.absent(),
+              }) => i1.WorksCompanion(id: id, name: name, about: about),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String about,
+              }) => i1.WorksCompanion.insert(id: id, name: name, about: about),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $WorksProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.Works,
-    i1.Work,
-    i1.$WorksFilterComposer,
-    i1.$WorksOrderingComposer,
-    i1.$WorksAnnotationComposer,
-    $WorksCreateCompanionBuilder,
-    $WorksUpdateCompanionBuilder,
-    (i1.Work, i0.BaseReferences<i0.GeneratedDatabase, i1.Works, i1.Work>),
-    i1.Work,
-    i0.PrefetchHooks Function()>;
-typedef $WorkAbbreviationsCreateCompanionBuilder = i1.WorkAbbreviationsCompanion
-    Function({
-  required String workId,
-  required int id,
-  required String val,
-});
-typedef $WorkAbbreviationsUpdateCompanionBuilder = i1.WorkAbbreviationsCompanion
-    Function({
-  i0.Value<String> workId,
-  i0.Value<int> id,
-  i0.Value<String> val,
-});
+typedef $WorksProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.Works,
+      i1.Work,
+      i1.$WorksFilterComposer,
+      i1.$WorksOrderingComposer,
+      i1.$WorksAnnotationComposer,
+      $WorksCreateCompanionBuilder,
+      $WorksUpdateCompanionBuilder,
+      (i1.Work, i0.BaseReferences<i0.GeneratedDatabase, i1.Works, i1.Work>),
+      i1.Work,
+      i0.PrefetchHooks Function()
+    >;
+typedef $WorkAbbreviationsCreateCompanionBuilder =
+    i1.WorkAbbreviationsCompanion Function({
+      required String workId,
+      required int id,
+      required String val,
+    });
+typedef $WorkAbbreviationsUpdateCompanionBuilder =
+    i1.WorkAbbreviationsCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<int> id,
+      i0.Value<String> val,
+    });
 
 class $WorkAbbreviationsFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.WorkAbbreviations> {
@@ -444,13 +514,19 @@ class $WorkAbbreviationsFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => i0.ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get val => $composableBuilder(
-      column: $table.val, builder: (column) => i0.ColumnFilters(column));
+    column: $table.val,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $WorkAbbreviationsOrderingComposer
@@ -463,13 +539,19 @@ class $WorkAbbreviationsOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get val => $composableBuilder(
-      column: $table.val, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.val,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorkAbbreviationsAnnotationComposer
@@ -491,25 +573,33 @@ class $WorkAbbreviationsAnnotationComposer
       $composableBuilder(column: $table.val, builder: (column) => column);
 }
 
-class $WorkAbbreviationsTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.WorkAbbreviations,
-    i1.WorkAbbreviation,
-    i1.$WorkAbbreviationsFilterComposer,
-    i1.$WorkAbbreviationsOrderingComposer,
-    i1.$WorkAbbreviationsAnnotationComposer,
-    $WorkAbbreviationsCreateCompanionBuilder,
-    $WorkAbbreviationsUpdateCompanionBuilder,
-    (
-      i1.WorkAbbreviation,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.WorkAbbreviations,
-          i1.WorkAbbreviation>
-    ),
-    i1.WorkAbbreviation,
-    i0.PrefetchHooks Function()> {
+class $WorkAbbreviationsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.WorkAbbreviations,
+          i1.WorkAbbreviation,
+          i1.$WorkAbbreviationsFilterComposer,
+          i1.$WorkAbbreviationsOrderingComposer,
+          i1.$WorkAbbreviationsAnnotationComposer,
+          $WorkAbbreviationsCreateCompanionBuilder,
+          $WorkAbbreviationsUpdateCompanionBuilder,
+          (
+            i1.WorkAbbreviation,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.WorkAbbreviations,
+              i1.WorkAbbreviation
+            >,
+          ),
+          i1.WorkAbbreviation,
+          i0.PrefetchHooks Function()
+        > {
   $WorkAbbreviationsTableManager(
-      i0.GeneratedDatabase db, i1.WorkAbbreviations table)
-      : super(i0.TableManagerState(
+    i0.GeneratedDatabase db,
+    i1.WorkAbbreviations table,
+  ) : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -518,63 +608,69 @@ class $WorkAbbreviationsTableManager extends i0.RootTableManager<
               i1.$WorkAbbreviationsOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$WorkAbbreviationsAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> workId = const i0.Value.absent(),
-            i0.Value<int> id = const i0.Value.absent(),
-            i0.Value<String> val = const i0.Value.absent(),
-          }) =>
-              i1.WorkAbbreviationsCompanion(
-            workId: workId,
-            id: id,
-            val: val,
-          ),
-          createCompanionCallback: ({
-            required String workId,
-            required int id,
-            required String val,
-          }) =>
-              i1.WorkAbbreviationsCompanion.insert(
-            workId: workId,
-            id: id,
-            val: val,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<int> id = const i0.Value.absent(),
+                i0.Value<String> val = const i0.Value.absent(),
+              }) => i1.WorkAbbreviationsCompanion(
+                workId: workId,
+                id: id,
+                val: val,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required int id,
+                required String val,
+              }) => i1.WorkAbbreviationsCompanion.insert(
+                workId: workId,
+                id: id,
+                val: val,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $WorkAbbreviationsProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.WorkAbbreviations,
-    i1.WorkAbbreviation,
-    i1.$WorkAbbreviationsFilterComposer,
-    i1.$WorkAbbreviationsOrderingComposer,
-    i1.$WorkAbbreviationsAnnotationComposer,
-    $WorkAbbreviationsCreateCompanionBuilder,
-    $WorkAbbreviationsUpdateCompanionBuilder,
-    (
+typedef $WorkAbbreviationsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.WorkAbbreviations,
       i1.WorkAbbreviation,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.WorkAbbreviations,
-          i1.WorkAbbreviation>
-    ),
-    i1.WorkAbbreviation,
-    i0.PrefetchHooks Function()>;
-typedef $WorkContentsCreateCompanionBuilder = i1.WorkContentsCompanion
-    Function({
-  required String workId,
-  required int idx,
-  required String word,
-  required String sourceReference,
-});
-typedef $WorkContentsUpdateCompanionBuilder = i1.WorkContentsCompanion
-    Function({
-  i0.Value<String> workId,
-  i0.Value<int> idx,
-  i0.Value<String> word,
-  i0.Value<String> sourceReference,
-});
+      i1.$WorkAbbreviationsFilterComposer,
+      i1.$WorkAbbreviationsOrderingComposer,
+      i1.$WorkAbbreviationsAnnotationComposer,
+      $WorkAbbreviationsCreateCompanionBuilder,
+      $WorkAbbreviationsUpdateCompanionBuilder,
+      (
+        i1.WorkAbbreviation,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.WorkAbbreviations,
+          i1.WorkAbbreviation
+        >,
+      ),
+      i1.WorkAbbreviation,
+      i0.PrefetchHooks Function()
+    >;
+typedef $WorkContentsCreateCompanionBuilder =
+    i1.WorkContentsCompanion Function({
+      required String workId,
+      required int idx,
+      required String word,
+      required String sourceReference,
+    });
+typedef $WorkContentsUpdateCompanionBuilder =
+    i1.WorkContentsCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<int> idx,
+      i0.Value<String> word,
+      i0.Value<String> sourceReference,
+    });
 
 class $WorkContentsFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.WorkContents> {
@@ -586,17 +682,24 @@ class $WorkContentsFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get idx => $composableBuilder(
-      column: $table.idx, builder: (column) => i0.ColumnFilters(column));
+    column: $table.idx,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get word => $composableBuilder(
-      column: $table.word, builder: (column) => i0.ColumnFilters(column));
+    column: $table.word,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get sourceReference => $composableBuilder(
-      column: $table.sourceReference,
-      builder: (column) => i0.ColumnFilters(column));
+    column: $table.sourceReference,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $WorkContentsOrderingComposer
@@ -609,17 +712,24 @@ class $WorkContentsOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get idx => $composableBuilder(
-      column: $table.idx, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.idx,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get word => $composableBuilder(
-      column: $table.word, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.word,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get sourceReference => $composableBuilder(
-      column: $table.sourceReference,
-      builder: (column) => i0.ColumnOrderings(column));
+    column: $table.sourceReference,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorkContentsAnnotationComposer
@@ -641,26 +751,36 @@ class $WorkContentsAnnotationComposer
       $composableBuilder(column: $table.word, builder: (column) => column);
 
   i0.GeneratedColumn<String> get sourceReference => $composableBuilder(
-      column: $table.sourceReference, builder: (column) => column);
+    column: $table.sourceReference,
+    builder: (column) => column,
+  );
 }
 
-class $WorkContentsTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.WorkContents,
-    i1.WorkContent,
-    i1.$WorkContentsFilterComposer,
-    i1.$WorkContentsOrderingComposer,
-    i1.$WorkContentsAnnotationComposer,
-    $WorkContentsCreateCompanionBuilder,
-    $WorkContentsUpdateCompanionBuilder,
-    (
-      i1.WorkContent,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.WorkContents, i1.WorkContent>
-    ),
-    i1.WorkContent,
-    i0.PrefetchHooks Function()> {
+class $WorkContentsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.WorkContents,
+          i1.WorkContent,
+          i1.$WorkContentsFilterComposer,
+          i1.$WorkContentsOrderingComposer,
+          i1.$WorkContentsAnnotationComposer,
+          $WorkContentsCreateCompanionBuilder,
+          $WorkContentsUpdateCompanionBuilder,
+          (
+            i1.WorkContent,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.WorkContents,
+              i1.WorkContent
+            >,
+          ),
+          i1.WorkContent,
+          i0.PrefetchHooks Function()
+        > {
   $WorkContentsTableManager(i0.GeneratedDatabase db, i1.WorkContents table)
-      : super(i0.TableManagerState(
+    : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -669,74 +789,81 @@ class $WorkContentsTableManager extends i0.RootTableManager<
               i1.$WorkContentsOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$WorkContentsAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> workId = const i0.Value.absent(),
-            i0.Value<int> idx = const i0.Value.absent(),
-            i0.Value<String> word = const i0.Value.absent(),
-            i0.Value<String> sourceReference = const i0.Value.absent(),
-          }) =>
-              i1.WorkContentsCompanion(
-            workId: workId,
-            idx: idx,
-            word: word,
-            sourceReference: sourceReference,
-          ),
-          createCompanionCallback: ({
-            required String workId,
-            required int idx,
-            required String word,
-            required String sourceReference,
-          }) =>
-              i1.WorkContentsCompanion.insert(
-            workId: workId,
-            idx: idx,
-            word: word,
-            sourceReference: sourceReference,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<int> idx = const i0.Value.absent(),
+                i0.Value<String> word = const i0.Value.absent(),
+                i0.Value<String> sourceReference = const i0.Value.absent(),
+              }) => i1.WorkContentsCompanion(
+                workId: workId,
+                idx: idx,
+                word: word,
+                sourceReference: sourceReference,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required int idx,
+                required String word,
+                required String sourceReference,
+              }) => i1.WorkContentsCompanion.insert(
+                workId: workId,
+                idx: idx,
+                word: word,
+                sourceReference: sourceReference,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $WorkContentsProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.WorkContents,
-    i1.WorkContent,
-    i1.$WorkContentsFilterComposer,
-    i1.$WorkContentsOrderingComposer,
-    i1.$WorkContentsAnnotationComposer,
-    $WorkContentsCreateCompanionBuilder,
-    $WorkContentsUpdateCompanionBuilder,
-    (
+typedef $WorkContentsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.WorkContents,
       i1.WorkContent,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.WorkContents, i1.WorkContent>
-    ),
-    i1.WorkContent,
-    i0.PrefetchHooks Function()>;
-typedef $WorkContentSubdivisionsCreateCompanionBuilder
-    = i1.WorkContentSubdivisionsCompanion Function({
-  required String workId,
-  required String node,
-  required String typ,
-  required int cnt,
-  required String name,
-  i0.Value<String?> parent,
-  required int fromIndex,
-  required int toIndex,
-});
-typedef $WorkContentSubdivisionsUpdateCompanionBuilder
-    = i1.WorkContentSubdivisionsCompanion Function({
-  i0.Value<String> workId,
-  i0.Value<String> node,
-  i0.Value<String> typ,
-  i0.Value<int> cnt,
-  i0.Value<String> name,
-  i0.Value<String?> parent,
-  i0.Value<int> fromIndex,
-  i0.Value<int> toIndex,
-});
+      i1.$WorkContentsFilterComposer,
+      i1.$WorkContentsOrderingComposer,
+      i1.$WorkContentsAnnotationComposer,
+      $WorkContentsCreateCompanionBuilder,
+      $WorkContentsUpdateCompanionBuilder,
+      (
+        i1.WorkContent,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.WorkContents,
+          i1.WorkContent
+        >,
+      ),
+      i1.WorkContent,
+      i0.PrefetchHooks Function()
+    >;
+typedef $WorkContentSubdivisionsCreateCompanionBuilder =
+    i1.WorkContentSubdivisionsCompanion Function({
+      required String workId,
+      required String node,
+      required String typ,
+      required int cnt,
+      required String name,
+      i0.Value<String?> parent,
+      required int fromIndex,
+      required int toIndex,
+    });
+typedef $WorkContentSubdivisionsUpdateCompanionBuilder =
+    i1.WorkContentSubdivisionsCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<String> node,
+      i0.Value<String> typ,
+      i0.Value<int> cnt,
+      i0.Value<String> name,
+      i0.Value<String?> parent,
+      i0.Value<int> fromIndex,
+      i0.Value<int> toIndex,
+    });
 
 class $WorkContentSubdivisionsFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.WorkContentSubdivisions> {
@@ -748,28 +875,44 @@ class $WorkContentSubdivisionsFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get node => $composableBuilder(
-      column: $table.node, builder: (column) => i0.ColumnFilters(column));
+    column: $table.node,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get typ => $composableBuilder(
-      column: $table.typ, builder: (column) => i0.ColumnFilters(column));
+    column: $table.typ,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get cnt => $composableBuilder(
-      column: $table.cnt, builder: (column) => i0.ColumnFilters(column));
+    column: $table.cnt,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => i0.ColumnFilters(column));
+    column: $table.name,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get parent => $composableBuilder(
-      column: $table.parent, builder: (column) => i0.ColumnFilters(column));
+    column: $table.parent,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get fromIndex => $composableBuilder(
-      column: $table.fromIndex, builder: (column) => i0.ColumnFilters(column));
+    column: $table.fromIndex,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get toIndex => $composableBuilder(
-      column: $table.toIndex, builder: (column) => i0.ColumnFilters(column));
+    column: $table.toIndex,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $WorkContentSubdivisionsOrderingComposer
@@ -782,29 +925,44 @@ class $WorkContentSubdivisionsOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get node => $composableBuilder(
-      column: $table.node, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.node,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get typ => $composableBuilder(
-      column: $table.typ, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.typ,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get cnt => $composableBuilder(
-      column: $table.cnt, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.cnt,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.name,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get parent => $composableBuilder(
-      column: $table.parent, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.parent,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get fromIndex => $composableBuilder(
-      column: $table.fromIndex,
-      builder: (column) => i0.ColumnOrderings(column));
+    column: $table.fromIndex,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get toIndex => $composableBuilder(
-      column: $table.toIndex, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.toIndex,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorkContentSubdivisionsAnnotationComposer
@@ -841,25 +999,33 @@ class $WorkContentSubdivisionsAnnotationComposer
       $composableBuilder(column: $table.toIndex, builder: (column) => column);
 }
 
-class $WorkContentSubdivisionsTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.WorkContentSubdivisions,
-    i1.WorkContentSubdivision,
-    i1.$WorkContentSubdivisionsFilterComposer,
-    i1.$WorkContentSubdivisionsOrderingComposer,
-    i1.$WorkContentSubdivisionsAnnotationComposer,
-    $WorkContentSubdivisionsCreateCompanionBuilder,
-    $WorkContentSubdivisionsUpdateCompanionBuilder,
-    (
-      i1.WorkContentSubdivision,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.WorkContentSubdivisions,
-          i1.WorkContentSubdivision>
-    ),
-    i1.WorkContentSubdivision,
-    i0.PrefetchHooks Function()> {
+class $WorkContentSubdivisionsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.WorkContentSubdivisions,
+          i1.WorkContentSubdivision,
+          i1.$WorkContentSubdivisionsFilterComposer,
+          i1.$WorkContentSubdivisionsOrderingComposer,
+          i1.$WorkContentSubdivisionsAnnotationComposer,
+          $WorkContentSubdivisionsCreateCompanionBuilder,
+          $WorkContentSubdivisionsUpdateCompanionBuilder,
+          (
+            i1.WorkContentSubdivision,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.WorkContentSubdivisions,
+              i1.WorkContentSubdivision
+            >,
+          ),
+          i1.WorkContentSubdivision,
+          i0.PrefetchHooks Function()
+        > {
   $WorkContentSubdivisionsTableManager(
-      i0.GeneratedDatabase db, i1.WorkContentSubdivisions table)
-      : super(i0.TableManagerState(
+    i0.GeneratedDatabase db,
+    i1.WorkContentSubdivisions table,
+  ) : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -868,89 +1034,96 @@ class $WorkContentSubdivisionsTableManager extends i0.RootTableManager<
               .$WorkContentSubdivisionsOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$WorkContentSubdivisionsAnnotationComposer(
-                  $db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> workId = const i0.Value.absent(),
-            i0.Value<String> node = const i0.Value.absent(),
-            i0.Value<String> typ = const i0.Value.absent(),
-            i0.Value<int> cnt = const i0.Value.absent(),
-            i0.Value<String> name = const i0.Value.absent(),
-            i0.Value<String?> parent = const i0.Value.absent(),
-            i0.Value<int> fromIndex = const i0.Value.absent(),
-            i0.Value<int> toIndex = const i0.Value.absent(),
-          }) =>
-              i1.WorkContentSubdivisionsCompanion(
-            workId: workId,
-            node: node,
-            typ: typ,
-            cnt: cnt,
-            name: name,
-            parent: parent,
-            fromIndex: fromIndex,
-            toIndex: toIndex,
-          ),
-          createCompanionCallback: ({
-            required String workId,
-            required String node,
-            required String typ,
-            required int cnt,
-            required String name,
-            i0.Value<String?> parent = const i0.Value.absent(),
-            required int fromIndex,
-            required int toIndex,
-          }) =>
-              i1.WorkContentSubdivisionsCompanion.insert(
-            workId: workId,
-            node: node,
-            typ: typ,
-            cnt: cnt,
-            name: name,
-            parent: parent,
-            fromIndex: fromIndex,
-            toIndex: toIndex,
-          ),
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<String> node = const i0.Value.absent(),
+                i0.Value<String> typ = const i0.Value.absent(),
+                i0.Value<int> cnt = const i0.Value.absent(),
+                i0.Value<String> name = const i0.Value.absent(),
+                i0.Value<String?> parent = const i0.Value.absent(),
+                i0.Value<int> fromIndex = const i0.Value.absent(),
+                i0.Value<int> toIndex = const i0.Value.absent(),
+              }) => i1.WorkContentSubdivisionsCompanion(
+                workId: workId,
+                node: node,
+                typ: typ,
+                cnt: cnt,
+                name: name,
+                parent: parent,
+                fromIndex: fromIndex,
+                toIndex: toIndex,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required String node,
+                required String typ,
+                required int cnt,
+                required String name,
+                i0.Value<String?> parent = const i0.Value.absent(),
+                required int fromIndex,
+                required int toIndex,
+              }) => i1.WorkContentSubdivisionsCompanion.insert(
+                workId: workId,
+                node: node,
+                typ: typ,
+                cnt: cnt,
+                name: name,
+                parent: parent,
+                fromIndex: fromIndex,
+                toIndex: toIndex,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $WorkContentSubdivisionsProcessedTableManager
-    = i0.ProcessedTableManager<
-        i0.GeneratedDatabase,
-        i1.WorkContentSubdivisions,
+typedef $WorkContentSubdivisionsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.WorkContentSubdivisions,
+      i1.WorkContentSubdivision,
+      i1.$WorkContentSubdivisionsFilterComposer,
+      i1.$WorkContentSubdivisionsOrderingComposer,
+      i1.$WorkContentSubdivisionsAnnotationComposer,
+      $WorkContentSubdivisionsCreateCompanionBuilder,
+      $WorkContentSubdivisionsUpdateCompanionBuilder,
+      (
         i1.WorkContentSubdivision,
-        i1.$WorkContentSubdivisionsFilterComposer,
-        i1.$WorkContentSubdivisionsOrderingComposer,
-        i1.$WorkContentSubdivisionsAnnotationComposer,
-        $WorkContentSubdivisionsCreateCompanionBuilder,
-        $WorkContentSubdivisionsUpdateCompanionBuilder,
-        (
-          i1.WorkContentSubdivision,
-          i0.BaseReferences<i0.GeneratedDatabase, i1.WorkContentSubdivisions,
-              i1.WorkContentSubdivision>
-        ),
-        i1.WorkContentSubdivision,
-        i0.PrefetchHooks Function()>;
-typedef $WorkContentSupplementaryCreateCompanionBuilder
-    = i1.WorkContentSupplementaryCompanion Function({
-  required String workId,
-  required String typ,
-  required int cnt,
-  required int fromIndex,
-  required int toIndex,
-  required String val,
-});
-typedef $WorkContentSupplementaryUpdateCompanionBuilder
-    = i1.WorkContentSupplementaryCompanion Function({
-  i0.Value<String> workId,
-  i0.Value<String> typ,
-  i0.Value<int> cnt,
-  i0.Value<int> fromIndex,
-  i0.Value<int> toIndex,
-  i0.Value<String> val,
-});
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.WorkContentSubdivisions,
+          i1.WorkContentSubdivision
+        >,
+      ),
+      i1.WorkContentSubdivision,
+      i0.PrefetchHooks Function()
+    >;
+typedef $WorkContentSupplementaryCreateCompanionBuilder =
+    i1.WorkContentSupplementaryCompanion Function({
+      required String workId,
+      required String typ,
+      required int cnt,
+      required int fromIndex,
+      required int toIndex,
+      required String val,
+    });
+typedef $WorkContentSupplementaryUpdateCompanionBuilder =
+    i1.WorkContentSupplementaryCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<String> typ,
+      i0.Value<int> cnt,
+      i0.Value<int> fromIndex,
+      i0.Value<int> toIndex,
+      i0.Value<String> val,
+    });
 
 class $WorkContentSupplementaryFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.WorkContentSupplementary> {
@@ -962,22 +1135,34 @@ class $WorkContentSupplementaryFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get typ => $composableBuilder(
-      column: $table.typ, builder: (column) => i0.ColumnFilters(column));
+    column: $table.typ,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get cnt => $composableBuilder(
-      column: $table.cnt, builder: (column) => i0.ColumnFilters(column));
+    column: $table.cnt,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get fromIndex => $composableBuilder(
-      column: $table.fromIndex, builder: (column) => i0.ColumnFilters(column));
+    column: $table.fromIndex,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get toIndex => $composableBuilder(
-      column: $table.toIndex, builder: (column) => i0.ColumnFilters(column));
+    column: $table.toIndex,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get val => $composableBuilder(
-      column: $table.val, builder: (column) => i0.ColumnFilters(column));
+    column: $table.val,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $WorkContentSupplementaryOrderingComposer
@@ -990,23 +1175,34 @@ class $WorkContentSupplementaryOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get typ => $composableBuilder(
-      column: $table.typ, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.typ,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get cnt => $composableBuilder(
-      column: $table.cnt, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.cnt,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get fromIndex => $composableBuilder(
-      column: $table.fromIndex,
-      builder: (column) => i0.ColumnOrderings(column));
+    column: $table.fromIndex,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get toIndex => $composableBuilder(
-      column: $table.toIndex, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.toIndex,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get val => $composableBuilder(
-      column: $table.val, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.val,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorkContentSupplementaryAnnotationComposer
@@ -1037,103 +1233,120 @@ class $WorkContentSupplementaryAnnotationComposer
       $composableBuilder(column: $table.val, builder: (column) => column);
 }
 
-class $WorkContentSupplementaryTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.WorkContentSupplementary,
-    i1.WorkContentSupplementaryData,
-    i1.$WorkContentSupplementaryFilterComposer,
-    i1.$WorkContentSupplementaryOrderingComposer,
-    i1.$WorkContentSupplementaryAnnotationComposer,
-    $WorkContentSupplementaryCreateCompanionBuilder,
-    $WorkContentSupplementaryUpdateCompanionBuilder,
-    (
-      i1.WorkContentSupplementaryData,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.WorkContentSupplementary,
-          i1.WorkContentSupplementaryData>
-    ),
-    i1.WorkContentSupplementaryData,
-    i0.PrefetchHooks Function()> {
+class $WorkContentSupplementaryTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.WorkContentSupplementary,
+          i1.WorkContentSupplementaryData,
+          i1.$WorkContentSupplementaryFilterComposer,
+          i1.$WorkContentSupplementaryOrderingComposer,
+          i1.$WorkContentSupplementaryAnnotationComposer,
+          $WorkContentSupplementaryCreateCompanionBuilder,
+          $WorkContentSupplementaryUpdateCompanionBuilder,
+          (
+            i1.WorkContentSupplementaryData,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.WorkContentSupplementary,
+              i1.WorkContentSupplementaryData
+            >,
+          ),
+          i1.WorkContentSupplementaryData,
+          i0.PrefetchHooks Function()
+        > {
   $WorkContentSupplementaryTableManager(
-      i0.GeneratedDatabase db, i1.WorkContentSupplementary table)
-      : super(i0.TableManagerState(
+    i0.GeneratedDatabase db,
+    i1.WorkContentSupplementary table,
+  ) : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () => i1
               .$WorkContentSupplementaryFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
               i1.$WorkContentSupplementaryOrderingComposer(
-                  $db: db, $table: table),
+                $db: db,
+                $table: table,
+              ),
           createComputedFieldComposer: () =>
               i1.$WorkContentSupplementaryAnnotationComposer(
-                  $db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> workId = const i0.Value.absent(),
-            i0.Value<String> typ = const i0.Value.absent(),
-            i0.Value<int> cnt = const i0.Value.absent(),
-            i0.Value<int> fromIndex = const i0.Value.absent(),
-            i0.Value<int> toIndex = const i0.Value.absent(),
-            i0.Value<String> val = const i0.Value.absent(),
-          }) =>
-              i1.WorkContentSupplementaryCompanion(
-            workId: workId,
-            typ: typ,
-            cnt: cnt,
-            fromIndex: fromIndex,
-            toIndex: toIndex,
-            val: val,
-          ),
-          createCompanionCallback: ({
-            required String workId,
-            required String typ,
-            required int cnt,
-            required int fromIndex,
-            required int toIndex,
-            required String val,
-          }) =>
-              i1.WorkContentSupplementaryCompanion.insert(
-            workId: workId,
-            typ: typ,
-            cnt: cnt,
-            fromIndex: fromIndex,
-            toIndex: toIndex,
-            val: val,
-          ),
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<String> typ = const i0.Value.absent(),
+                i0.Value<int> cnt = const i0.Value.absent(),
+                i0.Value<int> fromIndex = const i0.Value.absent(),
+                i0.Value<int> toIndex = const i0.Value.absent(),
+                i0.Value<String> val = const i0.Value.absent(),
+              }) => i1.WorkContentSupplementaryCompanion(
+                workId: workId,
+                typ: typ,
+                cnt: cnt,
+                fromIndex: fromIndex,
+                toIndex: toIndex,
+                val: val,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required String typ,
+                required int cnt,
+                required int fromIndex,
+                required int toIndex,
+                required String val,
+              }) => i1.WorkContentSupplementaryCompanion.insert(
+                workId: workId,
+                typ: typ,
+                cnt: cnt,
+                fromIndex: fromIndex,
+                toIndex: toIndex,
+                val: val,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $WorkContentSupplementaryProcessedTableManager
-    = i0.ProcessedTableManager<
-        i0.GeneratedDatabase,
-        i1.WorkContentSupplementary,
+typedef $WorkContentSupplementaryProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.WorkContentSupplementary,
+      i1.WorkContentSupplementaryData,
+      i1.$WorkContentSupplementaryFilterComposer,
+      i1.$WorkContentSupplementaryOrderingComposer,
+      i1.$WorkContentSupplementaryAnnotationComposer,
+      $WorkContentSupplementaryCreateCompanionBuilder,
+      $WorkContentSupplementaryUpdateCompanionBuilder,
+      (
         i1.WorkContentSupplementaryData,
-        i1.$WorkContentSupplementaryFilterComposer,
-        i1.$WorkContentSupplementaryOrderingComposer,
-        i1.$WorkContentSupplementaryAnnotationComposer,
-        $WorkContentSupplementaryCreateCompanionBuilder,
-        $WorkContentSupplementaryUpdateCompanionBuilder,
-        (
-          i1.WorkContentSupplementaryData,
-          i0.BaseReferences<i0.GeneratedDatabase, i1.WorkContentSupplementary,
-              i1.WorkContentSupplementaryData>
-        ),
-        i1.WorkContentSupplementaryData,
-        i0.PrefetchHooks Function()>;
-typedef $MacronizationsCreateCompanionBuilder = i1.MacronizationsCompanion
-    Function({
-  required String word,
-  required String macronizedWord,
-  required int isUncertain,
-});
-typedef $MacronizationsUpdateCompanionBuilder = i1.MacronizationsCompanion
-    Function({
-  i0.Value<String> word,
-  i0.Value<String> macronizedWord,
-  i0.Value<int> isUncertain,
-});
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.WorkContentSupplementary,
+          i1.WorkContentSupplementaryData
+        >,
+      ),
+      i1.WorkContentSupplementaryData,
+      i0.PrefetchHooks Function()
+    >;
+typedef $MacronizationsCreateCompanionBuilder =
+    i1.MacronizationsCompanion Function({
+      required String word,
+      required String macronizedWord,
+      required int isUncertain,
+    });
+typedef $MacronizationsUpdateCompanionBuilder =
+    i1.MacronizationsCompanion Function({
+      i0.Value<String> word,
+      i0.Value<String> macronizedWord,
+      i0.Value<int> isUncertain,
+    });
 
 class $MacronizationsFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.Macronizations> {
@@ -1145,15 +1358,19 @@ class $MacronizationsFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get word => $composableBuilder(
-      column: $table.word, builder: (column) => i0.ColumnFilters(column));
+    column: $table.word,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord,
-      builder: (column) => i0.ColumnFilters(column));
+    column: $table.macronizedWord,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<int> get isUncertain => $composableBuilder(
-      column: $table.isUncertain,
-      builder: (column) => i0.ColumnFilters(column));
+    column: $table.isUncertain,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $MacronizationsOrderingComposer
@@ -1166,15 +1383,19 @@ class $MacronizationsOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get word => $composableBuilder(
-      column: $table.word, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.word,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord,
-      builder: (column) => i0.ColumnOrderings(column));
+    column: $table.macronizedWord,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<int> get isUncertain => $composableBuilder(
-      column: $table.isUncertain,
-      builder: (column) => i0.ColumnOrderings(column));
+    column: $table.isUncertain,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $MacronizationsAnnotationComposer
@@ -1190,30 +1411,41 @@ class $MacronizationsAnnotationComposer
       $composableBuilder(column: $table.word, builder: (column) => column);
 
   i0.GeneratedColumn<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord, builder: (column) => column);
+    column: $table.macronizedWord,
+    builder: (column) => column,
+  );
 
   i0.GeneratedColumn<int> get isUncertain => $composableBuilder(
-      column: $table.isUncertain, builder: (column) => column);
+    column: $table.isUncertain,
+    builder: (column) => column,
+  );
 }
 
-class $MacronizationsTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.Macronizations,
-    i1.Macronization,
-    i1.$MacronizationsFilterComposer,
-    i1.$MacronizationsOrderingComposer,
-    i1.$MacronizationsAnnotationComposer,
-    $MacronizationsCreateCompanionBuilder,
-    $MacronizationsUpdateCompanionBuilder,
-    (
-      i1.Macronization,
-      i0
-      .BaseReferences<i0.GeneratedDatabase, i1.Macronizations, i1.Macronization>
-    ),
-    i1.Macronization,
-    i0.PrefetchHooks Function()> {
+class $MacronizationsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.Macronizations,
+          i1.Macronization,
+          i1.$MacronizationsFilterComposer,
+          i1.$MacronizationsOrderingComposer,
+          i1.$MacronizationsAnnotationComposer,
+          $MacronizationsCreateCompanionBuilder,
+          $MacronizationsUpdateCompanionBuilder,
+          (
+            i1.Macronization,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.Macronizations,
+              i1.Macronization
+            >,
+          ),
+          i1.Macronization,
+          i0.PrefetchHooks Function()
+        > {
   $MacronizationsTableManager(i0.GeneratedDatabase db, i1.Macronizations table)
-      : super(i0.TableManagerState(
+    : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -1222,61 +1454,67 @@ class $MacronizationsTableManager extends i0.RootTableManager<
               i1.$MacronizationsOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$MacronizationsAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> word = const i0.Value.absent(),
-            i0.Value<String> macronizedWord = const i0.Value.absent(),
-            i0.Value<int> isUncertain = const i0.Value.absent(),
-          }) =>
-              i1.MacronizationsCompanion(
-            word: word,
-            macronizedWord: macronizedWord,
-            isUncertain: isUncertain,
-          ),
-          createCompanionCallback: ({
-            required String word,
-            required String macronizedWord,
-            required int isUncertain,
-          }) =>
-              i1.MacronizationsCompanion.insert(
-            word: word,
-            macronizedWord: macronizedWord,
-            isUncertain: isUncertain,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> word = const i0.Value.absent(),
+                i0.Value<String> macronizedWord = const i0.Value.absent(),
+                i0.Value<int> isUncertain = const i0.Value.absent(),
+              }) => i1.MacronizationsCompanion(
+                word: word,
+                macronizedWord: macronizedWord,
+                isUncertain: isUncertain,
+              ),
+          createCompanionCallback:
+              ({
+                required String word,
+                required String macronizedWord,
+                required int isUncertain,
+              }) => i1.MacronizationsCompanion.insert(
+                word: word,
+                macronizedWord: macronizedWord,
+                isUncertain: isUncertain,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $MacronizationsProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.Macronizations,
-    i1.Macronization,
-    i1.$MacronizationsFilterComposer,
-    i1.$MacronizationsOrderingComposer,
-    i1.$MacronizationsAnnotationComposer,
-    $MacronizationsCreateCompanionBuilder,
-    $MacronizationsUpdateCompanionBuilder,
-    (
+typedef $MacronizationsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.Macronizations,
       i1.Macronization,
-      i0
-      .BaseReferences<i0.GeneratedDatabase, i1.Macronizations, i1.Macronization>
-    ),
-    i1.Macronization,
-    i0.PrefetchHooks Function()>;
-typedef $WorkMacronizationsCreateCompanionBuilder
-    = i1.WorkMacronizationsCompanion Function({
-  required String workId,
-  required String idx,
-  required String macronizedWord,
-});
-typedef $WorkMacronizationsUpdateCompanionBuilder
-    = i1.WorkMacronizationsCompanion Function({
-  i0.Value<String> workId,
-  i0.Value<String> idx,
-  i0.Value<String> macronizedWord,
-});
+      i1.$MacronizationsFilterComposer,
+      i1.$MacronizationsOrderingComposer,
+      i1.$MacronizationsAnnotationComposer,
+      $MacronizationsCreateCompanionBuilder,
+      $MacronizationsUpdateCompanionBuilder,
+      (
+        i1.Macronization,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.Macronizations,
+          i1.Macronization
+        >,
+      ),
+      i1.Macronization,
+      i0.PrefetchHooks Function()
+    >;
+typedef $WorkMacronizationsCreateCompanionBuilder =
+    i1.WorkMacronizationsCompanion Function({
+      required String workId,
+      required String idx,
+      required String macronizedWord,
+    });
+typedef $WorkMacronizationsUpdateCompanionBuilder =
+    i1.WorkMacronizationsCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<String> idx,
+      i0.Value<String> macronizedWord,
+    });
 
 class $WorkMacronizationsFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.WorkMacronizations> {
@@ -1288,14 +1526,19 @@ class $WorkMacronizationsFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get idx => $composableBuilder(
-      column: $table.idx, builder: (column) => i0.ColumnFilters(column));
+    column: $table.idx,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord,
-      builder: (column) => i0.ColumnFilters(column));
+    column: $table.macronizedWord,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $WorkMacronizationsOrderingComposer
@@ -1308,14 +1551,19 @@ class $WorkMacronizationsOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get idx => $composableBuilder(
-      column: $table.idx, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.idx,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord,
-      builder: (column) => i0.ColumnOrderings(column));
+    column: $table.macronizedWord,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorkMacronizationsAnnotationComposer
@@ -1334,28 +1582,38 @@ class $WorkMacronizationsAnnotationComposer
       $composableBuilder(column: $table.idx, builder: (column) => column);
 
   i0.GeneratedColumn<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord, builder: (column) => column);
+    column: $table.macronizedWord,
+    builder: (column) => column,
+  );
 }
 
-class $WorkMacronizationsTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.WorkMacronizations,
-    i1.WorkMacronization,
-    i1.$WorkMacronizationsFilterComposer,
-    i1.$WorkMacronizationsOrderingComposer,
-    i1.$WorkMacronizationsAnnotationComposer,
-    $WorkMacronizationsCreateCompanionBuilder,
-    $WorkMacronizationsUpdateCompanionBuilder,
-    (
-      i1.WorkMacronization,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.WorkMacronizations,
-          i1.WorkMacronization>
-    ),
-    i1.WorkMacronization,
-    i0.PrefetchHooks Function()> {
+class $WorkMacronizationsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.WorkMacronizations,
+          i1.WorkMacronization,
+          i1.$WorkMacronizationsFilterComposer,
+          i1.$WorkMacronizationsOrderingComposer,
+          i1.$WorkMacronizationsAnnotationComposer,
+          $WorkMacronizationsCreateCompanionBuilder,
+          $WorkMacronizationsUpdateCompanionBuilder,
+          (
+            i1.WorkMacronization,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.WorkMacronizations,
+              i1.WorkMacronization
+            >,
+          ),
+          i1.WorkMacronization,
+          i0.PrefetchHooks Function()
+        > {
   $WorkMacronizationsTableManager(
-      i0.GeneratedDatabase db, i1.WorkMacronizations table)
-      : super(i0.TableManagerState(
+    i0.GeneratedDatabase db,
+    i1.WorkMacronizations table,
+  ) : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -1364,61 +1622,67 @@ class $WorkMacronizationsTableManager extends i0.RootTableManager<
               i1.$WorkMacronizationsOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$WorkMacronizationsAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> workId = const i0.Value.absent(),
-            i0.Value<String> idx = const i0.Value.absent(),
-            i0.Value<String> macronizedWord = const i0.Value.absent(),
-          }) =>
-              i1.WorkMacronizationsCompanion(
-            workId: workId,
-            idx: idx,
-            macronizedWord: macronizedWord,
-          ),
-          createCompanionCallback: ({
-            required String workId,
-            required String idx,
-            required String macronizedWord,
-          }) =>
-              i1.WorkMacronizationsCompanion.insert(
-            workId: workId,
-            idx: idx,
-            macronizedWord: macronizedWord,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<String> idx = const i0.Value.absent(),
+                i0.Value<String> macronizedWord = const i0.Value.absent(),
+              }) => i1.WorkMacronizationsCompanion(
+                workId: workId,
+                idx: idx,
+                macronizedWord: macronizedWord,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required String idx,
+                required String macronizedWord,
+              }) => i1.WorkMacronizationsCompanion.insert(
+                workId: workId,
+                idx: idx,
+                macronizedWord: macronizedWord,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $WorkMacronizationsProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.WorkMacronizations,
-    i1.WorkMacronization,
-    i1.$WorkMacronizationsFilterComposer,
-    i1.$WorkMacronizationsOrderingComposer,
-    i1.$WorkMacronizationsAnnotationComposer,
-    $WorkMacronizationsCreateCompanionBuilder,
-    $WorkMacronizationsUpdateCompanionBuilder,
-    (
+typedef $WorkMacronizationsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.WorkMacronizations,
       i1.WorkMacronization,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.WorkMacronizations,
-          i1.WorkMacronization>
-    ),
-    i1.WorkMacronization,
-    i0.PrefetchHooks Function()>;
-typedef $UserProvidedMacronizationsCreateCompanionBuilder
-    = i1.UserProvidedMacronizationsCompanion Function({
-  required String workId,
-  required String idx,
-  required String macronizedWord,
-});
-typedef $UserProvidedMacronizationsUpdateCompanionBuilder
-    = i1.UserProvidedMacronizationsCompanion Function({
-  i0.Value<String> workId,
-  i0.Value<String> idx,
-  i0.Value<String> macronizedWord,
-});
+      i1.$WorkMacronizationsFilterComposer,
+      i1.$WorkMacronizationsOrderingComposer,
+      i1.$WorkMacronizationsAnnotationComposer,
+      $WorkMacronizationsCreateCompanionBuilder,
+      $WorkMacronizationsUpdateCompanionBuilder,
+      (
+        i1.WorkMacronization,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.WorkMacronizations,
+          i1.WorkMacronization
+        >,
+      ),
+      i1.WorkMacronization,
+      i0.PrefetchHooks Function()
+    >;
+typedef $UserProvidedMacronizationsCreateCompanionBuilder =
+    i1.UserProvidedMacronizationsCompanion Function({
+      required String workId,
+      required String idx,
+      required String macronizedWord,
+    });
+typedef $UserProvidedMacronizationsUpdateCompanionBuilder =
+    i1.UserProvidedMacronizationsCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<String> idx,
+      i0.Value<String> macronizedWord,
+    });
 
 class $UserProvidedMacronizationsFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.UserProvidedMacronizations> {
@@ -1430,14 +1694,19 @@ class $UserProvidedMacronizationsFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get idx => $composableBuilder(
-      column: $table.idx, builder: (column) => i0.ColumnFilters(column));
+    column: $table.idx,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord,
-      builder: (column) => i0.ColumnFilters(column));
+    column: $table.macronizedWord,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $UserProvidedMacronizationsOrderingComposer
@@ -1450,14 +1719,19 @@ class $UserProvidedMacronizationsOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get idx => $composableBuilder(
-      column: $table.idx, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.idx,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord,
-      builder: (column) => i0.ColumnOrderings(column));
+    column: $table.macronizedWord,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $UserProvidedMacronizationsAnnotationComposer
@@ -1476,93 +1750,114 @@ class $UserProvidedMacronizationsAnnotationComposer
       $composableBuilder(column: $table.idx, builder: (column) => column);
 
   i0.GeneratedColumn<String> get macronizedWord => $composableBuilder(
-      column: $table.macronizedWord, builder: (column) => column);
+    column: $table.macronizedWord,
+    builder: (column) => column,
+  );
 }
 
-class $UserProvidedMacronizationsTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.UserProvidedMacronizations,
-    i1.UserProvidedMacronization,
-    i1.$UserProvidedMacronizationsFilterComposer,
-    i1.$UserProvidedMacronizationsOrderingComposer,
-    i1.$UserProvidedMacronizationsAnnotationComposer,
-    $UserProvidedMacronizationsCreateCompanionBuilder,
-    $UserProvidedMacronizationsUpdateCompanionBuilder,
-    (
-      i1.UserProvidedMacronization,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.UserProvidedMacronizations,
-          i1.UserProvidedMacronization>
-    ),
-    i1.UserProvidedMacronization,
-    i0.PrefetchHooks Function()> {
+class $UserProvidedMacronizationsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.UserProvidedMacronizations,
+          i1.UserProvidedMacronization,
+          i1.$UserProvidedMacronizationsFilterComposer,
+          i1.$UserProvidedMacronizationsOrderingComposer,
+          i1.$UserProvidedMacronizationsAnnotationComposer,
+          $UserProvidedMacronizationsCreateCompanionBuilder,
+          $UserProvidedMacronizationsUpdateCompanionBuilder,
+          (
+            i1.UserProvidedMacronization,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.UserProvidedMacronizations,
+              i1.UserProvidedMacronization
+            >,
+          ),
+          i1.UserProvidedMacronization,
+          i0.PrefetchHooks Function()
+        > {
   $UserProvidedMacronizationsTableManager(
-      i0.GeneratedDatabase db, i1.UserProvidedMacronizations table)
-      : super(i0.TableManagerState(
+    i0.GeneratedDatabase db,
+    i1.UserProvidedMacronizations table,
+  ) : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
               i1.$UserProvidedMacronizationsFilterComposer(
-                  $db: db, $table: table),
+                $db: db,
+                $table: table,
+              ),
           createOrderingComposer: () =>
               i1.$UserProvidedMacronizationsOrderingComposer(
-                  $db: db, $table: table),
+                $db: db,
+                $table: table,
+              ),
           createComputedFieldComposer: () =>
               i1.$UserProvidedMacronizationsAnnotationComposer(
-                  $db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> workId = const i0.Value.absent(),
-            i0.Value<String> idx = const i0.Value.absent(),
-            i0.Value<String> macronizedWord = const i0.Value.absent(),
-          }) =>
-              i1.UserProvidedMacronizationsCompanion(
-            workId: workId,
-            idx: idx,
-            macronizedWord: macronizedWord,
-          ),
-          createCompanionCallback: ({
-            required String workId,
-            required String idx,
-            required String macronizedWord,
-          }) =>
-              i1.UserProvidedMacronizationsCompanion.insert(
-            workId: workId,
-            idx: idx,
-            macronizedWord: macronizedWord,
-          ),
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<String> idx = const i0.Value.absent(),
+                i0.Value<String> macronizedWord = const i0.Value.absent(),
+              }) => i1.UserProvidedMacronizationsCompanion(
+                workId: workId,
+                idx: idx,
+                macronizedWord: macronizedWord,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required String idx,
+                required String macronizedWord,
+              }) => i1.UserProvidedMacronizationsCompanion.insert(
+                workId: workId,
+                idx: idx,
+                macronizedWord: macronizedWord,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $UserProvidedMacronizationsProcessedTableManager
-    = i0.ProcessedTableManager<
-        i0.GeneratedDatabase,
-        i1.UserProvidedMacronizations,
+typedef $UserProvidedMacronizationsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.UserProvidedMacronizations,
+      i1.UserProvidedMacronization,
+      i1.$UserProvidedMacronizationsFilterComposer,
+      i1.$UserProvidedMacronizationsOrderingComposer,
+      i1.$UserProvidedMacronizationsAnnotationComposer,
+      $UserProvidedMacronizationsCreateCompanionBuilder,
+      $UserProvidedMacronizationsUpdateCompanionBuilder,
+      (
         i1.UserProvidedMacronization,
-        i1.$UserProvidedMacronizationsFilterComposer,
-        i1.$UserProvidedMacronizationsOrderingComposer,
-        i1.$UserProvidedMacronizationsAnnotationComposer,
-        $UserProvidedMacronizationsCreateCompanionBuilder,
-        $UserProvidedMacronizationsUpdateCompanionBuilder,
-        (
-          i1.UserProvidedMacronization,
-          i0.BaseReferences<i0.GeneratedDatabase, i1.UserProvidedMacronizations,
-              i1.UserProvidedMacronization>
-        ),
-        i1.UserProvidedMacronization,
-        i0.PrefetchHooks Function()>;
-typedef $AuthorsAndWorksCreateCompanionBuilder = i1.AuthorsAndWorksCompanion
-    Function({
-  required String authorId,
-  required String workId,
-});
-typedef $AuthorsAndWorksUpdateCompanionBuilder = i1.AuthorsAndWorksCompanion
-    Function({
-  i0.Value<String> authorId,
-  i0.Value<String> workId,
-});
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.UserProvidedMacronizations,
+          i1.UserProvidedMacronization
+        >,
+      ),
+      i1.UserProvidedMacronization,
+      i0.PrefetchHooks Function()
+    >;
+typedef $AuthorsAndWorksCreateCompanionBuilder =
+    i1.AuthorsAndWorksCompanion Function({
+      required String authorId,
+      required String workId,
+    });
+typedef $AuthorsAndWorksUpdateCompanionBuilder =
+    i1.AuthorsAndWorksCompanion Function({
+      i0.Value<String> authorId,
+      i0.Value<String> workId,
+    });
 
 class $AuthorsAndWorksFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.AuthorsAndWorks> {
@@ -1574,10 +1869,14 @@ class $AuthorsAndWorksFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<String> get authorId => $composableBuilder(
-      column: $table.authorId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.authorId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnFilters(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $AuthorsAndWorksOrderingComposer
@@ -1590,10 +1889,14 @@ class $AuthorsAndWorksOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<String> get authorId => $composableBuilder(
-      column: $table.authorId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.authorId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get workId => $composableBuilder(
-      column: $table.workId, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $AuthorsAndWorksAnnotationComposer
@@ -1612,25 +1915,33 @@ class $AuthorsAndWorksAnnotationComposer
       $composableBuilder(column: $table.workId, builder: (column) => column);
 }
 
-class $AuthorsAndWorksTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.AuthorsAndWorks,
-    i1.AuthorsAndWork,
-    i1.$AuthorsAndWorksFilterComposer,
-    i1.$AuthorsAndWorksOrderingComposer,
-    i1.$AuthorsAndWorksAnnotationComposer,
-    $AuthorsAndWorksCreateCompanionBuilder,
-    $AuthorsAndWorksUpdateCompanionBuilder,
-    (
-      i1.AuthorsAndWork,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.AuthorsAndWorks,
-          i1.AuthorsAndWork>
-    ),
-    i1.AuthorsAndWork,
-    i0.PrefetchHooks Function()> {
+class $AuthorsAndWorksTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.AuthorsAndWorks,
+          i1.AuthorsAndWork,
+          i1.$AuthorsAndWorksFilterComposer,
+          i1.$AuthorsAndWorksOrderingComposer,
+          i1.$AuthorsAndWorksAnnotationComposer,
+          $AuthorsAndWorksCreateCompanionBuilder,
+          $AuthorsAndWorksUpdateCompanionBuilder,
+          (
+            i1.AuthorsAndWork,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.AuthorsAndWorks,
+              i1.AuthorsAndWork
+            >,
+          ),
+          i1.AuthorsAndWork,
+          i0.PrefetchHooks Function()
+        > {
   $AuthorsAndWorksTableManager(
-      i0.GeneratedDatabase db, i1.AuthorsAndWorks table)
-      : super(i0.TableManagerState(
+    i0.GeneratedDatabase db,
+    i1.AuthorsAndWorks table,
+  ) : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -1639,45 +1950,49 @@ class $AuthorsAndWorksTableManager extends i0.RootTableManager<
               i1.$AuthorsAndWorksOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$AuthorsAndWorksAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<String> authorId = const i0.Value.absent(),
-            i0.Value<String> workId = const i0.Value.absent(),
-          }) =>
-              i1.AuthorsAndWorksCompanion(
-            authorId: authorId,
-            workId: workId,
-          ),
-          createCompanionCallback: ({
-            required String authorId,
-            required String workId,
-          }) =>
-              i1.AuthorsAndWorksCompanion.insert(
-            authorId: authorId,
-            workId: workId,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> authorId = const i0.Value.absent(),
+                i0.Value<String> workId = const i0.Value.absent(),
+              }) => i1.AuthorsAndWorksCompanion(
+                authorId: authorId,
+                workId: workId,
+              ),
+          createCompanionCallback:
+              ({required String authorId, required String workId}) =>
+                  i1.AuthorsAndWorksCompanion.insert(
+                    authorId: authorId,
+                    workId: workId,
+                  ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $AuthorsAndWorksProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.AuthorsAndWorks,
-    i1.AuthorsAndWork,
-    i1.$AuthorsAndWorksFilterComposer,
-    i1.$AuthorsAndWorksOrderingComposer,
-    i1.$AuthorsAndWorksAnnotationComposer,
-    $AuthorsAndWorksCreateCompanionBuilder,
-    $AuthorsAndWorksUpdateCompanionBuilder,
-    (
+typedef $AuthorsAndWorksProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.AuthorsAndWorks,
       i1.AuthorsAndWork,
-      i0.BaseReferences<i0.GeneratedDatabase, i1.AuthorsAndWorks,
-          i1.AuthorsAndWork>
-    ),
-    i1.AuthorsAndWork,
-    i0.PrefetchHooks Function()>;
+      i1.$AuthorsAndWorksFilterComposer,
+      i1.$AuthorsAndWorksOrderingComposer,
+      i1.$AuthorsAndWorksAnnotationComposer,
+      $AuthorsAndWorksCreateCompanionBuilder,
+      $AuthorsAndWorksUpdateCompanionBuilder,
+      (
+        i1.AuthorsAndWork,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.AuthorsAndWorks,
+          i1.AuthorsAndWork
+        >,
+      ),
+      i1.AuthorsAndWork,
+      i0.PrefetchHooks Function()
+    >;
 
 class Authors extends i0.Table with i0.TableInfo<Authors, i1.Author> {
   @override
@@ -1686,32 +2001,48 @@ class Authors extends i0.Table with i0.TableInfo<Authors, i1.Author> {
   Authors(this.attachedDatabase, [this._alias]);
   static const i0.VerificationMeta _idMeta = const i0.VerificationMeta('id');
   late final i0.GeneratedColumn<String> id = i0.GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints:
-          'NOT NULL CHECK (id LIKE \'________-____-____-____-____________\')');
-  static const i0.VerificationMeta _nameMeta =
-      const i0.VerificationMeta('name');
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (id LIKE \'________-____-____-____-____________\')',
+  );
+  static const i0.VerificationMeta _nameMeta = const i0.VerificationMeta(
+    'name',
+  );
   late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _aboutMeta =
-      const i0.VerificationMeta('about');
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _aboutMeta = const i0.VerificationMeta(
+    'about',
+  );
   late final i0.GeneratedColumn<String> about = i0.GeneratedColumn<String>(
-      'about', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _imageMeta =
-      const i0.VerificationMeta('image');
+    'about',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _imageMeta = const i0.VerificationMeta(
+    'image',
+  );
   late final i0.GeneratedColumn<i2.Uint8List> image =
-      i0.GeneratedColumn<i2.Uint8List>('image', aliasedName, false,
-          type: i0.DriftSqlType.blob,
-          requiredDuringInsert: true,
-          $customConstraints: 'NOT NULL');
+      i0.GeneratedColumn<i2.Uint8List>(
+        'image',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.blob,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
   @override
   List<i0.GeneratedColumn> get $columns => [id, name, about, image];
   @override
@@ -1720,8 +2051,10 @@ class Authors extends i0.Table with i0.TableInfo<Authors, i1.Author> {
   String get actualTableName => $name;
   static const String $name = 'Authors';
   @override
-  i0.VerificationContext validateIntegrity(i0.Insertable<i1.Author> instance,
-      {bool isInserting = false}) {
+  i0.VerificationContext validateIntegrity(
+    i0.Insertable<i1.Author> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -1731,19 +2064,25 @@ class Authors extends i0.Table with i0.TableInfo<Authors, i1.Author> {
     }
     if (data.containsKey('name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('about')) {
       context.handle(
-          _aboutMeta, about.isAcceptableOrUnknown(data['about']!, _aboutMeta));
+        _aboutMeta,
+        about.isAcceptableOrUnknown(data['about']!, _aboutMeta),
+      );
     } else if (isInserting) {
       context.missing(_aboutMeta);
     }
     if (data.containsKey('image')) {
       context.handle(
-          _imageMeta, image.isAcceptableOrUnknown(data['image']!, _imageMeta));
+        _imageMeta,
+        image.isAcceptableOrUnknown(data['image']!, _imageMeta),
+      );
     } else if (isInserting) {
       context.missing(_imageMeta);
     }
@@ -1756,14 +2095,22 @@ class Authors extends i0.Table with i0.TableInfo<Authors, i1.Author> {
   i1.Author map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.Author(
-      id: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}name'])!,
-      about: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}about'])!,
-      image: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.blob, data['${effectivePrefix}image'])!,
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      about: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      )!,
+      image: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.blob,
+        data['${effectivePrefix}image'],
+      )!,
     );
   }
 
@@ -1789,11 +2136,12 @@ class Author extends i0.DataClass implements i0.Insertable<i1.Author> {
 
   ///TODO: add check with length range so that it always looks ok from the page
   final i2.Uint8List image;
-  const Author(
-      {required this.id,
-      required this.name,
-      required this.about,
-      required this.image});
+  const Author({
+    required this.id,
+    required this.name,
+    required this.about,
+    required this.image,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -1813,8 +2161,10 @@ class Author extends i0.DataClass implements i0.Insertable<i1.Author> {
     );
   }
 
-  factory Author.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory Author.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return Author(
       id: serializer.fromJson<String>(json['id']),
@@ -1834,14 +2184,17 @@ class Author extends i0.DataClass implements i0.Insertable<i1.Author> {
     };
   }
 
-  i1.Author copyWith(
-          {String? id, String? name, String? about, i2.Uint8List? image}) =>
-      i1.Author(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        about: about ?? this.about,
-        image: image ?? this.image,
-      );
+  i1.Author copyWith({
+    String? id,
+    String? name,
+    String? about,
+    i2.Uint8List? image,
+  }) => i1.Author(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    about: about ?? this.about,
+    image: image ?? this.image,
+  );
   Author copyWithCompanion(i1.AuthorsCompanion data) {
     return Author(
       id: data.id.present ? data.id.value : this.id,
@@ -1891,10 +2244,10 @@ class AuthorsCompanion extends i0.UpdateCompanion<i1.Author> {
     required String name,
     required String about,
     required i2.Uint8List image,
-  })  : id = i0.Value(id),
-        name = i0.Value(name),
-        about = i0.Value(about),
-        image = i0.Value(image);
+  }) : id = i0.Value(id),
+       name = i0.Value(name),
+       about = i0.Value(about),
+       image = i0.Value(image);
   static i0.Insertable<i1.Author> custom({
     i0.Expression<String>? id,
     i0.Expression<String>? name,
@@ -1909,11 +2262,12 @@ class AuthorsCompanion extends i0.UpdateCompanion<i1.Author> {
     });
   }
 
-  i1.AuthorsCompanion copyWith(
-      {i0.Value<String>? id,
-      i0.Value<String>? name,
-      i0.Value<String>? about,
-      i0.Value<i2.Uint8List>? image}) {
+  i1.AuthorsCompanion copyWith({
+    i0.Value<String>? id,
+    i0.Value<String>? name,
+    i0.Value<String>? about,
+    i0.Value<i2.Uint8List>? image,
+  }) {
     return i1.AuthorsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -1958,25 +2312,35 @@ class AuthorAbbreviations extends i0.Table
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   AuthorAbbreviations(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _authorIdMeta =
-      const i0.VerificationMeta('authorId');
+  static const i0.VerificationMeta _authorIdMeta = const i0.VerificationMeta(
+    'authorId',
+  );
   late final i0.GeneratedColumn<String> authorId = i0.GeneratedColumn<String>(
-      'authorId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'authorId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _idMeta = const i0.VerificationMeta('id');
   late final i0.GeneratedColumn<int> id = i0.GeneratedColumn<int>(
-      'id', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (id >= 0)');
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (id >= 0)',
+  );
   static const i0.VerificationMeta _valMeta = const i0.VerificationMeta('val');
   late final i0.GeneratedColumn<String> val = i0.GeneratedColumn<String>(
-      'val', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'val',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [authorId, id, val];
   @override
@@ -1986,13 +2350,16 @@ class AuthorAbbreviations extends i0.Table
   static const String $name = 'AuthorAbbreviations';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.AuthorAbbreviation> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.AuthorAbbreviation> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('authorId')) {
-      context.handle(_authorIdMeta,
-          authorId.isAcceptableOrUnknown(data['authorId']!, _authorIdMeta));
+      context.handle(
+        _authorIdMeta,
+        authorId.isAcceptableOrUnknown(data['authorId']!, _authorIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_authorIdMeta);
     }
@@ -2003,7 +2370,9 @@ class AuthorAbbreviations extends i0.Table
     }
     if (data.containsKey('val')) {
       context.handle(
-          _valMeta, val.isAcceptableOrUnknown(data['val']!, _valMeta));
+        _valMeta,
+        val.isAcceptableOrUnknown(data['val']!, _valMeta),
+      );
     } else if (isInserting) {
       context.missing(_valMeta);
     }
@@ -2016,12 +2385,18 @@ class AuthorAbbreviations extends i0.Table
   i1.AuthorAbbreviation map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.AuthorAbbreviation(
-      authorId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}authorId'])!,
-      id: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}id'])!,
-      val: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}val'])!,
+      authorId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}authorId'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      val: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}val'],
+      )!,
     );
   }
 
@@ -2036,9 +2411,9 @@ class AuthorAbbreviations extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(authorId, id)',
-        'FOREIGN KEY(authorId)REFERENCES Authors(id)'
-      ];
+    'PRIMARY KEY(authorId, id)',
+    'FOREIGN KEY(authorId)REFERENCES Authors(id)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -2048,8 +2423,11 @@ class AuthorAbbreviation extends i0.DataClass
   final String authorId;
   final int id;
   final String val;
-  const AuthorAbbreviation(
-      {required this.authorId, required this.id, required this.val});
+  const AuthorAbbreviation({
+    required this.authorId,
+    required this.id,
+    required this.val,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -2067,8 +2445,10 @@ class AuthorAbbreviation extends i0.DataClass
     );
   }
 
-  factory AuthorAbbreviation.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory AuthorAbbreviation.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return AuthorAbbreviation(
       authorId: serializer.fromJson<String>(json['authorId']),
@@ -2135,9 +2515,9 @@ class AuthorAbbreviationsCompanion
     required String authorId,
     required int id,
     required String val,
-  })  : authorId = i0.Value(authorId),
-        id = i0.Value(id),
-        val = i0.Value(val);
+  }) : authorId = i0.Value(authorId),
+       id = i0.Value(id),
+       val = i0.Value(val);
   static i0.Insertable<i1.AuthorAbbreviation> custom({
     i0.Expression<String>? authorId,
     i0.Expression<int>? id,
@@ -2150,8 +2530,11 @@ class AuthorAbbreviationsCompanion
     });
   }
 
-  i1.AuthorAbbreviationsCompanion copyWith(
-      {i0.Value<String>? authorId, i0.Value<int>? id, i0.Value<String>? val}) {
+  i1.AuthorAbbreviationsCompanion copyWith({
+    i0.Value<String>? authorId,
+    i0.Value<int>? id,
+    i0.Value<String>? val,
+  }) {
     return i1.AuthorAbbreviationsCompanion(
       authorId: authorId ?? this.authorId,
       id: id ?? this.id,
@@ -2192,25 +2575,36 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
   Works(this.attachedDatabase, [this._alias]);
   static const i0.VerificationMeta _idMeta = const i0.VerificationMeta('id');
   late final i0.GeneratedColumn<String> id = i0.GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints:
-          'NOT NULL CHECK (id LIKE \'________-____-____-____-____________\')');
-  static const i0.VerificationMeta _nameMeta =
-      const i0.VerificationMeta('name');
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (id LIKE \'________-____-____-____-____________\')',
+  );
+  static const i0.VerificationMeta _nameMeta = const i0.VerificationMeta(
+    'name',
+  );
   late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _aboutMeta =
-      const i0.VerificationMeta('about');
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _aboutMeta = const i0.VerificationMeta(
+    'about',
+  );
   late final i0.GeneratedColumn<String> about = i0.GeneratedColumn<String>(
-      'about', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'about',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [id, name, about];
   @override
@@ -2219,8 +2613,10 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
   String get actualTableName => $name;
   static const String $name = 'Works';
   @override
-  i0.VerificationContext validateIntegrity(i0.Insertable<i1.Work> instance,
-      {bool isInserting = false}) {
+  i0.VerificationContext validateIntegrity(
+    i0.Insertable<i1.Work> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -2230,13 +2626,17 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
     }
     if (data.containsKey('name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('about')) {
       context.handle(
-          _aboutMeta, about.isAcceptableOrUnknown(data['about']!, _aboutMeta));
+        _aboutMeta,
+        about.isAcceptableOrUnknown(data['about']!, _aboutMeta),
+      );
     } else if (isInserting) {
       context.missing(_aboutMeta);
     }
@@ -2249,12 +2649,18 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
   i1.Work map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.Work(
-      id: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}name'])!,
-      about: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}about'])!,
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      about: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      )!,
     );
   }
 
@@ -2295,8 +2701,10 @@ class Work extends i0.DataClass implements i0.Insertable<i1.Work> {
     );
   }
 
-  factory Work.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory Work.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return Work(
       id: serializer.fromJson<String>(json['id']),
@@ -2315,10 +2723,10 @@ class Work extends i0.DataClass implements i0.Insertable<i1.Work> {
   }
 
   i1.Work copyWith({String? id, String? name, String? about}) => i1.Work(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        about: about ?? this.about,
-      );
+    id: id ?? this.id,
+    name: name ?? this.name,
+    about: about ?? this.about,
+  );
   Work copyWithCompanion(i1.WorksCompanion data) {
     return Work(
       id: data.id.present ? data.id.value : this.id,
@@ -2361,9 +2769,9 @@ class WorksCompanion extends i0.UpdateCompanion<i1.Work> {
     required String id,
     required String name,
     required String about,
-  })  : id = i0.Value(id),
-        name = i0.Value(name),
-        about = i0.Value(about);
+  }) : id = i0.Value(id),
+       name = i0.Value(name),
+       about = i0.Value(about);
   static i0.Insertable<i1.Work> custom({
     i0.Expression<String>? id,
     i0.Expression<String>? name,
@@ -2376,8 +2784,11 @@ class WorksCompanion extends i0.UpdateCompanion<i1.Work> {
     });
   }
 
-  i1.WorksCompanion copyWith(
-      {i0.Value<String>? id, i0.Value<String>? name, i0.Value<String>? about}) {
+  i1.WorksCompanion copyWith({
+    i0.Value<String>? id,
+    i0.Value<String>? name,
+    i0.Value<String>? about,
+  }) {
     return i1.WorksCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -2417,25 +2828,35 @@ class WorkAbbreviations extends i0.Table
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   WorkAbbreviations(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _workIdMeta =
-      const i0.VerificationMeta('workId');
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _idMeta = const i0.VerificationMeta('id');
   late final i0.GeneratedColumn<int> id = i0.GeneratedColumn<int>(
-      'id', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (id >= 0)');
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (id >= 0)',
+  );
   static const i0.VerificationMeta _valMeta = const i0.VerificationMeta('val');
   late final i0.GeneratedColumn<String> val = i0.GeneratedColumn<String>(
-      'val', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'val',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [workId, id, val];
   @override
@@ -2445,13 +2866,16 @@ class WorkAbbreviations extends i0.Table
   static const String $name = 'WorkAbbreviations';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.WorkAbbreviation> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.WorkAbbreviation> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('workId')) {
-      context.handle(_workIdMeta,
-          workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta));
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_workIdMeta);
     }
@@ -2462,7 +2886,9 @@ class WorkAbbreviations extends i0.Table
     }
     if (data.containsKey('val')) {
       context.handle(
-          _valMeta, val.isAcceptableOrUnknown(data['val']!, _valMeta));
+        _valMeta,
+        val.isAcceptableOrUnknown(data['val']!, _valMeta),
+      );
     } else if (isInserting) {
       context.missing(_valMeta);
     }
@@ -2475,12 +2901,18 @@ class WorkAbbreviations extends i0.Table
   i1.WorkAbbreviation map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.WorkAbbreviation(
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      id: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}id'])!,
-      val: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}val'])!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      val: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}val'],
+      )!,
     );
   }
 
@@ -2495,9 +2927,9 @@ class WorkAbbreviations extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(workId, id)',
-        'FOREIGN KEY(workId)REFERENCES Works(id)'
-      ];
+    'PRIMARY KEY(workId, id)',
+    'FOREIGN KEY(workId)REFERENCES Works(id)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -2507,8 +2939,11 @@ class WorkAbbreviation extends i0.DataClass
   final String workId;
   final int id;
   final String val;
-  const WorkAbbreviation(
-      {required this.workId, required this.id, required this.val});
+  const WorkAbbreviation({
+    required this.workId,
+    required this.id,
+    required this.val,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -2526,8 +2961,10 @@ class WorkAbbreviation extends i0.DataClass
     );
   }
 
-  factory WorkAbbreviation.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory WorkAbbreviation.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return WorkAbbreviation(
       workId: serializer.fromJson<String>(json['workId']),
@@ -2594,9 +3031,9 @@ class WorkAbbreviationsCompanion
     required String workId,
     required int id,
     required String val,
-  })  : workId = i0.Value(workId),
-        id = i0.Value(id),
-        val = i0.Value(val);
+  }) : workId = i0.Value(workId),
+       id = i0.Value(id),
+       val = i0.Value(val);
   static i0.Insertable<i1.WorkAbbreviation> custom({
     i0.Expression<String>? workId,
     i0.Expression<int>? id,
@@ -2609,8 +3046,11 @@ class WorkAbbreviationsCompanion
     });
   }
 
-  i1.WorkAbbreviationsCompanion copyWith(
-      {i0.Value<String>? workId, i0.Value<int>? id, i0.Value<String>? val}) {
+  i1.WorkAbbreviationsCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<int>? id,
+    i0.Value<String>? val,
+  }) {
     return i1.WorkAbbreviationsCompanion(
       workId: workId ?? this.workId,
       id: id ?? this.id,
@@ -2650,33 +3090,48 @@ class WorkContents extends i0.Table
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   WorkContents(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _workIdMeta =
-      const i0.VerificationMeta('workId');
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
   late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
-      'idx', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (idx >= 0)');
-  static const i0.VerificationMeta _wordMeta =
-      const i0.VerificationMeta('word');
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (idx >= 0)',
+  );
+  static const i0.VerificationMeta _wordMeta = const i0.VerificationMeta(
+    'word',
+  );
   late final i0.GeneratedColumn<String> word = i0.GeneratedColumn<String>(
-      'word', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'word',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _sourceReferenceMeta =
       const i0.VerificationMeta('sourceReference');
   late final i0.GeneratedColumn<String> sourceReference =
-      i0.GeneratedColumn<String>('sourceReference', aliasedName, false,
-          type: i0.DriftSqlType.string,
-          requiredDuringInsert: true,
-          $customConstraints: 'NOT NULL');
+      i0.GeneratedColumn<String>(
+        'sourceReference',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
   @override
   List<i0.GeneratedColumn> get $columns => [workId, idx, word, sourceReference];
   @override
@@ -2686,33 +3141,43 @@ class WorkContents extends i0.Table
   static const String $name = 'WorkContents';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.WorkContent> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.WorkContent> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('workId')) {
-      context.handle(_workIdMeta,
-          workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta));
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_workIdMeta);
     }
     if (data.containsKey('idx')) {
       context.handle(
-          _idxMeta, idx.isAcceptableOrUnknown(data['idx']!, _idxMeta));
+        _idxMeta,
+        idx.isAcceptableOrUnknown(data['idx']!, _idxMeta),
+      );
     } else if (isInserting) {
       context.missing(_idxMeta);
     }
     if (data.containsKey('word')) {
       context.handle(
-          _wordMeta, word.isAcceptableOrUnknown(data['word']!, _wordMeta));
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
     } else if (isInserting) {
       context.missing(_wordMeta);
     }
     if (data.containsKey('sourceReference')) {
       context.handle(
+        _sourceReferenceMeta,
+        sourceReference.isAcceptableOrUnknown(
+          data['sourceReference']!,
           _sourceReferenceMeta,
-          sourceReference.isAcceptableOrUnknown(
-              data['sourceReference']!, _sourceReferenceMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_sourceReferenceMeta);
     }
@@ -2725,14 +3190,22 @@ class WorkContents extends i0.Table
   i1.WorkContent map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.WorkContent(
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      idx: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}idx'])!,
-      word: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}word'])!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      word: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}word'],
+      )!,
       sourceReference: attachedDatabase.typeMapping.read(
-          i0.DriftSqlType.string, data['${effectivePrefix}sourceReference'])!,
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sourceReference'],
+      )!,
     );
   }
 
@@ -2747,9 +3220,9 @@ class WorkContents extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(workId, idx)',
-        'FOREIGN KEY(workId)REFERENCES Works(id)'
-      ];
+    'PRIMARY KEY(workId, idx)',
+    'FOREIGN KEY(workId)REFERENCES Works(id)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -2760,11 +3233,12 @@ class WorkContent extends i0.DataClass
   final int idx;
   final String word;
   final String sourceReference;
-  const WorkContent(
-      {required this.workId,
-      required this.idx,
-      required this.word,
-      required this.sourceReference});
+  const WorkContent({
+    required this.workId,
+    required this.idx,
+    required this.word,
+    required this.sourceReference,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -2784,8 +3258,10 @@ class WorkContent extends i0.DataClass
     );
   }
 
-  factory WorkContent.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory WorkContent.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return WorkContent(
       workId: serializer.fromJson<String>(json['workId']),
@@ -2805,14 +3281,17 @@ class WorkContent extends i0.DataClass
     };
   }
 
-  i1.WorkContent copyWith(
-          {String? workId, int? idx, String? word, String? sourceReference}) =>
-      i1.WorkContent(
-        workId: workId ?? this.workId,
-        idx: idx ?? this.idx,
-        word: word ?? this.word,
-        sourceReference: sourceReference ?? this.sourceReference,
-      );
+  i1.WorkContent copyWith({
+    String? workId,
+    int? idx,
+    String? word,
+    String? sourceReference,
+  }) => i1.WorkContent(
+    workId: workId ?? this.workId,
+    idx: idx ?? this.idx,
+    word: word ?? this.word,
+    sourceReference: sourceReference ?? this.sourceReference,
+  );
   WorkContent copyWithCompanion(i1.WorkContentsCompanion data) {
     return WorkContent(
       workId: data.workId.present ? data.workId.value : this.workId,
@@ -2863,10 +3342,10 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     required int idx,
     required String word,
     required String sourceReference,
-  })  : workId = i0.Value(workId),
-        idx = i0.Value(idx),
-        word = i0.Value(word),
-        sourceReference = i0.Value(sourceReference);
+  }) : workId = i0.Value(workId),
+       idx = i0.Value(idx),
+       word = i0.Value(word),
+       sourceReference = i0.Value(sourceReference);
   static i0.Insertable<i1.WorkContent> custom({
     i0.Expression<String>? workId,
     i0.Expression<int>? idx,
@@ -2881,11 +3360,12 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     });
   }
 
-  i1.WorkContentsCompanion copyWith(
-      {i0.Value<String>? workId,
-      i0.Value<int>? idx,
-      i0.Value<String>? word,
-      i0.Value<String>? sourceReference}) {
+  i1.WorkContentsCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<int>? idx,
+    i0.Value<String>? word,
+    i0.Value<String>? sourceReference,
+  }) {
     return i1.WorkContentsCompanion(
       workId: workId ?? this.workId,
       idx: idx ?? this.idx,
@@ -2930,66 +3410,104 @@ class WorkContentSubdivisions extends i0.Table
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   WorkContentSubdivisions(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _workIdMeta =
-      const i0.VerificationMeta('workId');
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _nodeMeta =
-      const i0.VerificationMeta('node');
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _nodeMeta = const i0.VerificationMeta(
+    'node',
+  );
   late final i0.GeneratedColumn<String> node = i0.GeneratedColumn<String>(
-      'node', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints:
-          'NOT NULL CHECK (node LIKE \'________-____-____-____-____________\')');
+    'node',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (node LIKE \'________-____-____-____-____________\')',
+  );
   static const i0.VerificationMeta _typMeta = const i0.VerificationMeta('typ');
   late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
-      'typ', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints:
-          'NOT NULL CHECK (typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'TITL\', \'PARA\'))');
+    'typ',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'TITL\', \'PARA\'))',
+  );
   static const i0.VerificationMeta _cntMeta = const i0.VerificationMeta('cnt');
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
-      'cnt', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (cnt >= 0)');
-  static const i0.VerificationMeta _nameMeta =
-      const i0.VerificationMeta('name');
+    'cnt',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (cnt >= 0)',
+  );
+  static const i0.VerificationMeta _nameMeta = const i0.VerificationMeta(
+    'name',
+  );
   late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _parentMeta =
-      const i0.VerificationMeta('parent');
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _parentMeta = const i0.VerificationMeta(
+    'parent',
+  );
   late final i0.GeneratedColumn<String> parent = i0.GeneratedColumn<String>(
-      'parent', aliasedName, true,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: false,
-      $customConstraints:
-          'CHECK (parent IS NULL OR parent LIKE \'________-____-____-____-____________\')');
-  static const i0.VerificationMeta _fromIndexMeta =
-      const i0.VerificationMeta('fromIndex');
+    'parent',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (parent IS NULL OR parent LIKE \'________-____-____-____-____________\')',
+  );
+  static const i0.VerificationMeta _fromIndexMeta = const i0.VerificationMeta(
+    'fromIndex',
+  );
   late final i0.GeneratedColumn<int> fromIndex = i0.GeneratedColumn<int>(
-      'fromIndex', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (fromIndex >= 0)');
-  static const i0.VerificationMeta _toIndexMeta =
-      const i0.VerificationMeta('toIndex');
+    'fromIndex',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (fromIndex >= 0)',
+  );
+  static const i0.VerificationMeta _toIndexMeta = const i0.VerificationMeta(
+    'toIndex',
+  );
   late final i0.GeneratedColumn<int> toIndex = i0.GeneratedColumn<int>(
-      'toIndex', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (toIndex >= 0)');
+    'toIndex',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (toIndex >= 0)',
+  );
   @override
-  List<i0.GeneratedColumn> get $columns =>
-      [workId, node, typ, cnt, name, parent, fromIndex, toIndex];
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    node,
+    typ,
+    cnt,
+    name,
+    parent,
+    fromIndex,
+    toIndex,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2997,53 +3515,70 @@ class WorkContentSubdivisions extends i0.Table
   static const String $name = 'WorkContentSubdivisions';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.WorkContentSubdivision> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.WorkContentSubdivision> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('workId')) {
-      context.handle(_workIdMeta,
-          workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta));
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_workIdMeta);
     }
     if (data.containsKey('node')) {
       context.handle(
-          _nodeMeta, node.isAcceptableOrUnknown(data['node']!, _nodeMeta));
+        _nodeMeta,
+        node.isAcceptableOrUnknown(data['node']!, _nodeMeta),
+      );
     } else if (isInserting) {
       context.missing(_nodeMeta);
     }
     if (data.containsKey('typ')) {
       context.handle(
-          _typMeta, typ.isAcceptableOrUnknown(data['typ']!, _typMeta));
+        _typMeta,
+        typ.isAcceptableOrUnknown(data['typ']!, _typMeta),
+      );
     } else if (isInserting) {
       context.missing(_typMeta);
     }
     if (data.containsKey('cnt')) {
       context.handle(
-          _cntMeta, cnt.isAcceptableOrUnknown(data['cnt']!, _cntMeta));
+        _cntMeta,
+        cnt.isAcceptableOrUnknown(data['cnt']!, _cntMeta),
+      );
     } else if (isInserting) {
       context.missing(_cntMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('parent')) {
-      context.handle(_parentMeta,
-          parent.isAcceptableOrUnknown(data['parent']!, _parentMeta));
+      context.handle(
+        _parentMeta,
+        parent.isAcceptableOrUnknown(data['parent']!, _parentMeta),
+      );
     }
     if (data.containsKey('fromIndex')) {
-      context.handle(_fromIndexMeta,
-          fromIndex.isAcceptableOrUnknown(data['fromIndex']!, _fromIndexMeta));
+      context.handle(
+        _fromIndexMeta,
+        fromIndex.isAcceptableOrUnknown(data['fromIndex']!, _fromIndexMeta),
+      );
     } else if (isInserting) {
       context.missing(_fromIndexMeta);
     }
     if (data.containsKey('toIndex')) {
-      context.handle(_toIndexMeta,
-          toIndex.isAcceptableOrUnknown(data['toIndex']!, _toIndexMeta));
+      context.handle(
+        _toIndexMeta,
+        toIndex.isAcceptableOrUnknown(data['toIndex']!, _toIndexMeta),
+      );
     } else if (isInserting) {
       context.missing(_toIndexMeta);
     }
@@ -3053,26 +3588,44 @@ class WorkContentSubdivisions extends i0.Table
   @override
   Set<i0.GeneratedColumn> get $primaryKey => {workId, node};
   @override
-  i1.WorkContentSubdivision map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  i1.WorkContentSubdivision map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.WorkContentSubdivision(
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      node: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}node'])!,
-      typ: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}typ'])!,
-      cnt: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}cnt'])!,
-      name: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}name'])!,
-      parent: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}parent']),
-      fromIndex: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}fromIndex'])!,
-      toIndex: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}toIndex'])!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      node: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}node'],
+      )!,
+      typ: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}typ'],
+      )!,
+      cnt: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}cnt'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      parent: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}parent'],
+      ),
+      fromIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}fromIndex'],
+      )!,
+      toIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}toIndex'],
+      )!,
     );
   }
 
@@ -3087,10 +3640,10 @@ class WorkContentSubdivisions extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(workId, node)',
-        'FOREIGN KEY(workId, fromIndex)REFERENCES WorkContents(workId, idx)',
-        'FOREIGN KEY(workId, toIndex)REFERENCES WorkContents(workId, idx)'
-      ];
+    'PRIMARY KEY(workId, node)',
+    'FOREIGN KEY(workId, fromIndex)REFERENCES WorkContents(workId, idx)',
+    'FOREIGN KEY(workId, toIndex)REFERENCES WorkContents(workId, idx)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -3107,15 +3660,16 @@ class WorkContentSubdivision extends i0.DataClass
   final String? parent;
   final int fromIndex;
   final int toIndex;
-  const WorkContentSubdivision(
-      {required this.workId,
-      required this.node,
-      required this.typ,
-      required this.cnt,
-      required this.name,
-      this.parent,
-      required this.fromIndex,
-      required this.toIndex});
+  const WorkContentSubdivision({
+    required this.workId,
+    required this.node,
+    required this.typ,
+    required this.cnt,
+    required this.name,
+    this.parent,
+    required this.fromIndex,
+    required this.toIndex,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -3147,8 +3701,10 @@ class WorkContentSubdivision extends i0.DataClass
     );
   }
 
-  factory WorkContentSubdivision.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory WorkContentSubdivision.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return WorkContentSubdivision(
       workId: serializer.fromJson<String>(json['workId']),
@@ -3176,27 +3732,28 @@ class WorkContentSubdivision extends i0.DataClass
     };
   }
 
-  i1.WorkContentSubdivision copyWith(
-          {String? workId,
-          String? node,
-          String? typ,
-          int? cnt,
-          String? name,
-          i0.Value<String?> parent = const i0.Value.absent(),
-          int? fromIndex,
-          int? toIndex}) =>
-      i1.WorkContentSubdivision(
-        workId: workId ?? this.workId,
-        node: node ?? this.node,
-        typ: typ ?? this.typ,
-        cnt: cnt ?? this.cnt,
-        name: name ?? this.name,
-        parent: parent.present ? parent.value : this.parent,
-        fromIndex: fromIndex ?? this.fromIndex,
-        toIndex: toIndex ?? this.toIndex,
-      );
+  i1.WorkContentSubdivision copyWith({
+    String? workId,
+    String? node,
+    String? typ,
+    int? cnt,
+    String? name,
+    i0.Value<String?> parent = const i0.Value.absent(),
+    int? fromIndex,
+    int? toIndex,
+  }) => i1.WorkContentSubdivision(
+    workId: workId ?? this.workId,
+    node: node ?? this.node,
+    typ: typ ?? this.typ,
+    cnt: cnt ?? this.cnt,
+    name: name ?? this.name,
+    parent: parent.present ? parent.value : this.parent,
+    fromIndex: fromIndex ?? this.fromIndex,
+    toIndex: toIndex ?? this.toIndex,
+  );
   WorkContentSubdivision copyWithCompanion(
-      i1.WorkContentSubdivisionsCompanion data) {
+    i1.WorkContentSubdivisionsCompanion data,
+  ) {
     return WorkContentSubdivision(
       workId: data.workId.present ? data.workId.value : this.workId,
       node: data.node.present ? data.node.value : this.node,
@@ -3270,13 +3827,13 @@ class WorkContentSubdivisionsCompanion
     this.parent = const i0.Value.absent(),
     required int fromIndex,
     required int toIndex,
-  })  : workId = i0.Value(workId),
-        node = i0.Value(node),
-        typ = i0.Value(typ),
-        cnt = i0.Value(cnt),
-        name = i0.Value(name),
-        fromIndex = i0.Value(fromIndex),
-        toIndex = i0.Value(toIndex);
+  }) : workId = i0.Value(workId),
+       node = i0.Value(node),
+       typ = i0.Value(typ),
+       cnt = i0.Value(cnt),
+       name = i0.Value(name),
+       fromIndex = i0.Value(fromIndex),
+       toIndex = i0.Value(toIndex);
   static i0.Insertable<i1.WorkContentSubdivision> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? node,
@@ -3299,15 +3856,16 @@ class WorkContentSubdivisionsCompanion
     });
   }
 
-  i1.WorkContentSubdivisionsCompanion copyWith(
-      {i0.Value<String>? workId,
-      i0.Value<String>? node,
-      i0.Value<String>? typ,
-      i0.Value<int>? cnt,
-      i0.Value<String>? name,
-      i0.Value<String?>? parent,
-      i0.Value<int>? fromIndex,
-      i0.Value<int>? toIndex}) {
+  i1.WorkContentSubdivisionsCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<String>? node,
+    i0.Value<String>? typ,
+    i0.Value<int>? cnt,
+    i0.Value<String>? name,
+    i0.Value<String?>? parent,
+    i0.Value<int>? fromIndex,
+    i0.Value<int>? toIndex,
+  }) {
     return i1.WorkContentSubdivisionsCompanion(
       workId: workId ?? this.workId,
       node: node ?? this.node,
@@ -3368,55 +3926,83 @@ class WorkContentSubdivisionsCompanion
 
 class WorkContentSupplementary extends i0.Table
     with
-        i0
-        .TableInfo<WorkContentSupplementary, i1.WorkContentSupplementaryData> {
+        i0.TableInfo<
+          WorkContentSupplementary,
+          i1.WorkContentSupplementaryData
+        > {
   @override
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   WorkContentSupplementary(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _workIdMeta =
-      const i0.VerificationMeta('workId');
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _typMeta = const i0.VerificationMeta('typ');
   late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
-      'typ', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints:
-          'NOT NULL CHECK (typ IN (\'NOTE\', \'GAP\', \'ABBR\'))');
+    'typ',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (typ IN (\'NOTE\', \'GAP\', \'ABBR\'))',
+  );
   static const i0.VerificationMeta _cntMeta = const i0.VerificationMeta('cnt');
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
-      'cnt', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (cnt >= 0)');
-  static const i0.VerificationMeta _fromIndexMeta =
-      const i0.VerificationMeta('fromIndex');
+    'cnt',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (cnt >= 0)',
+  );
+  static const i0.VerificationMeta _fromIndexMeta = const i0.VerificationMeta(
+    'fromIndex',
+  );
   late final i0.GeneratedColumn<int> fromIndex = i0.GeneratedColumn<int>(
-      'fromIndex', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _toIndexMeta =
-      const i0.VerificationMeta('toIndex');
+    'fromIndex',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _toIndexMeta = const i0.VerificationMeta(
+    'toIndex',
+  );
   late final i0.GeneratedColumn<int> toIndex = i0.GeneratedColumn<int>(
-      'toIndex', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'toIndex',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _valMeta = const i0.VerificationMeta('val');
   late final i0.GeneratedColumn<String> val = i0.GeneratedColumn<String>(
-      'val', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'val',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
-  List<i0.GeneratedColumn> get $columns =>
-      [workId, typ, cnt, fromIndex, toIndex, val];
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    typ,
+    cnt,
+    fromIndex,
+    toIndex,
+    val,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3424,43 +4010,56 @@ class WorkContentSupplementary extends i0.Table
   static const String $name = 'WorkContentSupplementary';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.WorkContentSupplementaryData> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.WorkContentSupplementaryData> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('workId')) {
-      context.handle(_workIdMeta,
-          workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta));
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_workIdMeta);
     }
     if (data.containsKey('typ')) {
       context.handle(
-          _typMeta, typ.isAcceptableOrUnknown(data['typ']!, _typMeta));
+        _typMeta,
+        typ.isAcceptableOrUnknown(data['typ']!, _typMeta),
+      );
     } else if (isInserting) {
       context.missing(_typMeta);
     }
     if (data.containsKey('cnt')) {
       context.handle(
-          _cntMeta, cnt.isAcceptableOrUnknown(data['cnt']!, _cntMeta));
+        _cntMeta,
+        cnt.isAcceptableOrUnknown(data['cnt']!, _cntMeta),
+      );
     } else if (isInserting) {
       context.missing(_cntMeta);
     }
     if (data.containsKey('fromIndex')) {
-      context.handle(_fromIndexMeta,
-          fromIndex.isAcceptableOrUnknown(data['fromIndex']!, _fromIndexMeta));
+      context.handle(
+        _fromIndexMeta,
+        fromIndex.isAcceptableOrUnknown(data['fromIndex']!, _fromIndexMeta),
+      );
     } else if (isInserting) {
       context.missing(_fromIndexMeta);
     }
     if (data.containsKey('toIndex')) {
-      context.handle(_toIndexMeta,
-          toIndex.isAcceptableOrUnknown(data['toIndex']!, _toIndexMeta));
+      context.handle(
+        _toIndexMeta,
+        toIndex.isAcceptableOrUnknown(data['toIndex']!, _toIndexMeta),
+      );
     } else if (isInserting) {
       context.missing(_toIndexMeta);
     }
     if (data.containsKey('val')) {
       context.handle(
-          _valMeta, val.isAcceptableOrUnknown(data['val']!, _valMeta));
+        _valMeta,
+        val.isAcceptableOrUnknown(data['val']!, _valMeta),
+      );
     } else if (isInserting) {
       context.missing(_valMeta);
     }
@@ -3470,22 +4069,36 @@ class WorkContentSupplementary extends i0.Table
   @override
   Set<i0.GeneratedColumn> get $primaryKey => {workId, typ, cnt};
   @override
-  i1.WorkContentSupplementaryData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  i1.WorkContentSupplementaryData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.WorkContentSupplementaryData(
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      typ: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}typ'])!,
-      cnt: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}cnt'])!,
-      fromIndex: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}fromIndex'])!,
-      toIndex: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}toIndex'])!,
-      val: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}val'])!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      typ: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}typ'],
+      )!,
+      cnt: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}cnt'],
+      )!,
+      fromIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}fromIndex'],
+      )!,
+      toIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}toIndex'],
+      )!,
+      val: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}val'],
+      )!,
     );
   }
 
@@ -3500,9 +4113,9 @@ class WorkContentSupplementary extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(workId, typ, cnt)',
-        'FOREIGN KEY(workId)REFERENCES Works(id)'
-      ];
+    'PRIMARY KEY(workId, typ, cnt)',
+    'FOREIGN KEY(workId)REFERENCES Works(id)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -3515,13 +4128,14 @@ class WorkContentSupplementaryData extends i0.DataClass
   final int fromIndex;
   final int toIndex;
   final String val;
-  const WorkContentSupplementaryData(
-      {required this.workId,
-      required this.typ,
-      required this.cnt,
-      required this.fromIndex,
-      required this.toIndex,
-      required this.val});
+  const WorkContentSupplementaryData({
+    required this.workId,
+    required this.typ,
+    required this.cnt,
+    required this.fromIndex,
+    required this.toIndex,
+    required this.val,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -3545,8 +4159,10 @@ class WorkContentSupplementaryData extends i0.DataClass
     );
   }
 
-  factory WorkContentSupplementaryData.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory WorkContentSupplementaryData.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return WorkContentSupplementaryData(
       workId: serializer.fromJson<String>(json['workId']),
@@ -3570,23 +4186,24 @@ class WorkContentSupplementaryData extends i0.DataClass
     };
   }
 
-  i1.WorkContentSupplementaryData copyWith(
-          {String? workId,
-          String? typ,
-          int? cnt,
-          int? fromIndex,
-          int? toIndex,
-          String? val}) =>
-      i1.WorkContentSupplementaryData(
-        workId: workId ?? this.workId,
-        typ: typ ?? this.typ,
-        cnt: cnt ?? this.cnt,
-        fromIndex: fromIndex ?? this.fromIndex,
-        toIndex: toIndex ?? this.toIndex,
-        val: val ?? this.val,
-      );
+  i1.WorkContentSupplementaryData copyWith({
+    String? workId,
+    String? typ,
+    int? cnt,
+    int? fromIndex,
+    int? toIndex,
+    String? val,
+  }) => i1.WorkContentSupplementaryData(
+    workId: workId ?? this.workId,
+    typ: typ ?? this.typ,
+    cnt: cnt ?? this.cnt,
+    fromIndex: fromIndex ?? this.fromIndex,
+    toIndex: toIndex ?? this.toIndex,
+    val: val ?? this.val,
+  );
   WorkContentSupplementaryData copyWithCompanion(
-      i1.WorkContentSupplementaryCompanion data) {
+    i1.WorkContentSupplementaryCompanion data,
+  ) {
     return WorkContentSupplementaryData(
       workId: data.workId.present ? data.workId.value : this.workId,
       typ: data.typ.present ? data.typ.value : this.typ,
@@ -3647,12 +4264,12 @@ class WorkContentSupplementaryCompanion
     required int fromIndex,
     required int toIndex,
     required String val,
-  })  : workId = i0.Value(workId),
-        typ = i0.Value(typ),
-        cnt = i0.Value(cnt),
-        fromIndex = i0.Value(fromIndex),
-        toIndex = i0.Value(toIndex),
-        val = i0.Value(val);
+  }) : workId = i0.Value(workId),
+       typ = i0.Value(typ),
+       cnt = i0.Value(cnt),
+       fromIndex = i0.Value(fromIndex),
+       toIndex = i0.Value(toIndex),
+       val = i0.Value(val);
   static i0.Insertable<i1.WorkContentSupplementaryData> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? typ,
@@ -3671,13 +4288,14 @@ class WorkContentSupplementaryCompanion
     });
   }
 
-  i1.WorkContentSupplementaryCompanion copyWith(
-      {i0.Value<String>? workId,
-      i0.Value<String>? typ,
-      i0.Value<int>? cnt,
-      i0.Value<int>? fromIndex,
-      i0.Value<int>? toIndex,
-      i0.Value<String>? val}) {
+  i1.WorkContentSupplementaryCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<String>? typ,
+    i0.Value<int>? cnt,
+    i0.Value<int>? fromIndex,
+    i0.Value<int>? toIndex,
+    i0.Value<String>? val,
+  }) {
     return i1.WorkContentSupplementaryCompanion(
       workId: workId ?? this.workId,
       typ: typ ?? this.typ,
@@ -3732,27 +4350,39 @@ class Macronizations extends i0.Table
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   Macronizations(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _wordMeta =
-      const i0.VerificationMeta('word');
+  static const i0.VerificationMeta _wordMeta = const i0.VerificationMeta(
+    'word',
+  );
   late final i0.GeneratedColumn<String> word = i0.GeneratedColumn<String>(
-      'word', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'word',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _macronizedWordMeta =
       const i0.VerificationMeta('macronizedWord');
   late final i0.GeneratedColumn<String> macronizedWord =
-      i0.GeneratedColumn<String>('macronizedWord', aliasedName, false,
-          type: i0.DriftSqlType.string,
-          requiredDuringInsert: true,
-          $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _isUncertainMeta =
-      const i0.VerificationMeta('isUncertain');
+      i0.GeneratedColumn<String>(
+        'macronizedWord',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
+  static const i0.VerificationMeta _isUncertainMeta = const i0.VerificationMeta(
+    'isUncertain',
+  );
   late final i0.GeneratedColumn<int> isUncertain = i0.GeneratedColumn<int>(
-      'isUncertain', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL CHECK (isUncertain IN (0, 1))');
+    'isUncertain',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (isUncertain IN (0, 1))',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [word, macronizedWord, isUncertain];
   @override
@@ -3762,29 +4392,38 @@ class Macronizations extends i0.Table
   static const String $name = 'Macronizations';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.Macronization> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.Macronization> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('word')) {
       context.handle(
-          _wordMeta, word.isAcceptableOrUnknown(data['word']!, _wordMeta));
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
     } else if (isInserting) {
       context.missing(_wordMeta);
     }
     if (data.containsKey('macronizedWord')) {
       context.handle(
+        _macronizedWordMeta,
+        macronizedWord.isAcceptableOrUnknown(
+          data['macronizedWord']!,
           _macronizedWordMeta,
-          macronizedWord.isAcceptableOrUnknown(
-              data['macronizedWord']!, _macronizedWordMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_macronizedWordMeta);
     }
     if (data.containsKey('isUncertain')) {
       context.handle(
+        _isUncertainMeta,
+        isUncertain.isAcceptableOrUnknown(
+          data['isUncertain']!,
           _isUncertainMeta,
-          isUncertain.isAcceptableOrUnknown(
-              data['isUncertain']!, _isUncertainMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_isUncertainMeta);
     }
@@ -3797,12 +4436,18 @@ class Macronizations extends i0.Table
   i1.Macronization map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.Macronization(
-      word: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}word'])!,
+      word: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}word'],
+      )!,
       macronizedWord: attachedDatabase.typeMapping.read(
-          i0.DriftSqlType.string, data['${effectivePrefix}macronizedWord'])!,
-      isUncertain: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}isUncertain'])!,
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronizedWord'],
+      )!,
+      isUncertain: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}isUncertain'],
+      )!,
     );
   }
 
@@ -3816,8 +4461,9 @@ class Macronizations extends i0.Table
   @override
   bool get isStrict => true;
   @override
-  List<String> get customConstraints =>
-      const ['PRIMARY KEY(word, macronizedWord)'];
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(word, macronizedWord)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -3827,10 +4473,11 @@ class Macronization extends i0.DataClass
   final String word;
   final String macronizedWord;
   final int isUncertain;
-  const Macronization(
-      {required this.word,
-      required this.macronizedWord,
-      required this.isUncertain});
+  const Macronization({
+    required this.word,
+    required this.macronizedWord,
+    required this.isUncertain,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -3848,8 +4495,10 @@ class Macronization extends i0.DataClass
     );
   }
 
-  factory Macronization.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory Macronization.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return Macronization(
       word: serializer.fromJson<String>(json['word']),
@@ -3867,21 +4516,24 @@ class Macronization extends i0.DataClass
     };
   }
 
-  i1.Macronization copyWith(
-          {String? word, String? macronizedWord, int? isUncertain}) =>
-      i1.Macronization(
-        word: word ?? this.word,
-        macronizedWord: macronizedWord ?? this.macronizedWord,
-        isUncertain: isUncertain ?? this.isUncertain,
-      );
+  i1.Macronization copyWith({
+    String? word,
+    String? macronizedWord,
+    int? isUncertain,
+  }) => i1.Macronization(
+    word: word ?? this.word,
+    macronizedWord: macronizedWord ?? this.macronizedWord,
+    isUncertain: isUncertain ?? this.isUncertain,
+  );
   Macronization copyWithCompanion(i1.MacronizationsCompanion data) {
     return Macronization(
       word: data.word.present ? data.word.value : this.word,
       macronizedWord: data.macronizedWord.present
           ? data.macronizedWord.value
           : this.macronizedWord,
-      isUncertain:
-          data.isUncertain.present ? data.isUncertain.value : this.isUncertain,
+      isUncertain: data.isUncertain.present
+          ? data.isUncertain.value
+          : this.isUncertain,
     );
   }
 
@@ -3919,9 +4571,9 @@ class MacronizationsCompanion extends i0.UpdateCompanion<i1.Macronization> {
     required String word,
     required String macronizedWord,
     required int isUncertain,
-  })  : word = i0.Value(word),
-        macronizedWord = i0.Value(macronizedWord),
-        isUncertain = i0.Value(isUncertain);
+  }) : word = i0.Value(word),
+       macronizedWord = i0.Value(macronizedWord),
+       isUncertain = i0.Value(isUncertain);
   static i0.Insertable<i1.Macronization> custom({
     i0.Expression<String>? word,
     i0.Expression<String>? macronizedWord,
@@ -3934,10 +4586,11 @@ class MacronizationsCompanion extends i0.UpdateCompanion<i1.Macronization> {
     });
   }
 
-  i1.MacronizationsCompanion copyWith(
-      {i0.Value<String>? word,
-      i0.Value<String>? macronizedWord,
-      i0.Value<int>? isUncertain}) {
+  i1.MacronizationsCompanion copyWith({
+    i0.Value<String>? word,
+    i0.Value<String>? macronizedWord,
+    i0.Value<int>? isUncertain,
+  }) {
     return i1.MacronizationsCompanion(
       word: word ?? this.word,
       macronizedWord: macronizedWord ?? this.macronizedWord,
@@ -3977,26 +4630,37 @@ class WorkMacronizations extends i0.Table
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   WorkMacronizations(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _workIdMeta =
-      const i0.VerificationMeta('workId');
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
   late final i0.GeneratedColumn<String> idx = i0.GeneratedColumn<String>(
-      'idx', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _macronizedWordMeta =
       const i0.VerificationMeta('macronizedWord');
   late final i0.GeneratedColumn<String> macronizedWord =
-      i0.GeneratedColumn<String>('macronizedWord', aliasedName, false,
-          type: i0.DriftSqlType.string,
-          requiredDuringInsert: true,
-          $customConstraints: 'NOT NULL');
+      i0.GeneratedColumn<String>(
+        'macronizedWord',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
   @override
   List<i0.GeneratedColumn> get $columns => [workId, idx, macronizedWord];
   @override
@@ -4006,27 +4670,35 @@ class WorkMacronizations extends i0.Table
   static const String $name = 'WorkMacronizations';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.WorkMacronization> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.WorkMacronization> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('workId')) {
-      context.handle(_workIdMeta,
-          workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta));
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_workIdMeta);
     }
     if (data.containsKey('idx')) {
       context.handle(
-          _idxMeta, idx.isAcceptableOrUnknown(data['idx']!, _idxMeta));
+        _idxMeta,
+        idx.isAcceptableOrUnknown(data['idx']!, _idxMeta),
+      );
     } else if (isInserting) {
       context.missing(_idxMeta);
     }
     if (data.containsKey('macronizedWord')) {
       context.handle(
+        _macronizedWordMeta,
+        macronizedWord.isAcceptableOrUnknown(
+          data['macronizedWord']!,
           _macronizedWordMeta,
-          macronizedWord.isAcceptableOrUnknown(
-              data['macronizedWord']!, _macronizedWordMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_macronizedWordMeta);
     }
@@ -4039,12 +4711,18 @@ class WorkMacronizations extends i0.Table
   i1.WorkMacronization map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.WorkMacronization(
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      idx: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}idx'])!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}idx'],
+      )!,
       macronizedWord: attachedDatabase.typeMapping.read(
-          i0.DriftSqlType.string, data['${effectivePrefix}macronizedWord'])!,
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronizedWord'],
+      )!,
     );
   }
 
@@ -4059,9 +4737,9 @@ class WorkMacronizations extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(workId, idx)',
-        'FOREIGN KEY(workId, idx)REFERENCES WorkContents(workId, idx)'
-      ];
+    'PRIMARY KEY(workId, idx)',
+    'FOREIGN KEY(workId, idx)REFERENCES WorkContents(workId, idx)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -4071,8 +4749,11 @@ class WorkMacronization extends i0.DataClass
   final String workId;
   final String idx;
   final String macronizedWord;
-  const WorkMacronization(
-      {required this.workId, required this.idx, required this.macronizedWord});
+  const WorkMacronization({
+    required this.workId,
+    required this.idx,
+    required this.macronizedWord,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -4090,8 +4771,10 @@ class WorkMacronization extends i0.DataClass
     );
   }
 
-  factory WorkMacronization.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory WorkMacronization.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return WorkMacronization(
       workId: serializer.fromJson<String>(json['workId']),
@@ -4109,13 +4792,15 @@ class WorkMacronization extends i0.DataClass
     };
   }
 
-  i1.WorkMacronization copyWith(
-          {String? workId, String? idx, String? macronizedWord}) =>
-      i1.WorkMacronization(
-        workId: workId ?? this.workId,
-        idx: idx ?? this.idx,
-        macronizedWord: macronizedWord ?? this.macronizedWord,
-      );
+  i1.WorkMacronization copyWith({
+    String? workId,
+    String? idx,
+    String? macronizedWord,
+  }) => i1.WorkMacronization(
+    workId: workId ?? this.workId,
+    idx: idx ?? this.idx,
+    macronizedWord: macronizedWord ?? this.macronizedWord,
+  );
   WorkMacronization copyWithCompanion(i1.WorkMacronizationsCompanion data) {
     return WorkMacronization(
       workId: data.workId.present ? data.workId.value : this.workId,
@@ -4161,9 +4846,9 @@ class WorkMacronizationsCompanion
     required String workId,
     required String idx,
     required String macronizedWord,
-  })  : workId = i0.Value(workId),
-        idx = i0.Value(idx),
-        macronizedWord = i0.Value(macronizedWord);
+  }) : workId = i0.Value(workId),
+       idx = i0.Value(idx),
+       macronizedWord = i0.Value(macronizedWord);
   static i0.Insertable<i1.WorkMacronization> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? idx,
@@ -4176,10 +4861,11 @@ class WorkMacronizationsCompanion
     });
   }
 
-  i1.WorkMacronizationsCompanion copyWith(
-      {i0.Value<String>? workId,
-      i0.Value<String>? idx,
-      i0.Value<String>? macronizedWord}) {
+  i1.WorkMacronizationsCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<String>? idx,
+    i0.Value<String>? macronizedWord,
+  }) {
     return i1.WorkMacronizationsCompanion(
       workId: workId ?? this.workId,
       idx: idx ?? this.idx,
@@ -4220,26 +4906,37 @@ class UserProvidedMacronizations extends i0.Table
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   UserProvidedMacronizations(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _workIdMeta =
-      const i0.VerificationMeta('workId');
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
   late final i0.GeneratedColumn<String> idx = i0.GeneratedColumn<String>(
-      'idx', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _macronizedWordMeta =
       const i0.VerificationMeta('macronizedWord');
   late final i0.GeneratedColumn<String> macronizedWord =
-      i0.GeneratedColumn<String>('macronizedWord', aliasedName, false,
-          type: i0.DriftSqlType.string,
-          requiredDuringInsert: true,
-          $customConstraints: 'NOT NULL');
+      i0.GeneratedColumn<String>(
+        'macronizedWord',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
   @override
   List<i0.GeneratedColumn> get $columns => [workId, idx, macronizedWord];
   @override
@@ -4249,27 +4946,35 @@ class UserProvidedMacronizations extends i0.Table
   static const String $name = 'UserProvidedMacronizations';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.UserProvidedMacronization> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.UserProvidedMacronization> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('workId')) {
-      context.handle(_workIdMeta,
-          workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta));
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_workIdMeta);
     }
     if (data.containsKey('idx')) {
       context.handle(
-          _idxMeta, idx.isAcceptableOrUnknown(data['idx']!, _idxMeta));
+        _idxMeta,
+        idx.isAcceptableOrUnknown(data['idx']!, _idxMeta),
+      );
     } else if (isInserting) {
       context.missing(_idxMeta);
     }
     if (data.containsKey('macronizedWord')) {
       context.handle(
+        _macronizedWordMeta,
+        macronizedWord.isAcceptableOrUnknown(
+          data['macronizedWord']!,
           _macronizedWordMeta,
-          macronizedWord.isAcceptableOrUnknown(
-              data['macronizedWord']!, _macronizedWordMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_macronizedWordMeta);
     }
@@ -4279,16 +4984,24 @@ class UserProvidedMacronizations extends i0.Table
   @override
   Set<i0.GeneratedColumn> get $primaryKey => {workId, idx};
   @override
-  i1.UserProvidedMacronization map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  i1.UserProvidedMacronization map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.UserProvidedMacronization(
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      idx: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}idx'])!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}idx'],
+      )!,
       macronizedWord: attachedDatabase.typeMapping.read(
-          i0.DriftSqlType.string, data['${effectivePrefix}macronizedWord'])!,
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronizedWord'],
+      )!,
     );
   }
 
@@ -4303,9 +5016,9 @@ class UserProvidedMacronizations extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(workId, idx)',
-        'FOREIGN KEY(workId, idx)REFERENCES WorkContents(workId, idx)'
-      ];
+    'PRIMARY KEY(workId, idx)',
+    'FOREIGN KEY(workId, idx)REFERENCES WorkContents(workId, idx)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -4315,8 +5028,11 @@ class UserProvidedMacronization extends i0.DataClass
   final String workId;
   final String idx;
   final String macronizedWord;
-  const UserProvidedMacronization(
-      {required this.workId, required this.idx, required this.macronizedWord});
+  const UserProvidedMacronization({
+    required this.workId,
+    required this.idx,
+    required this.macronizedWord,
+  });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
@@ -4334,8 +5050,10 @@ class UserProvidedMacronization extends i0.DataClass
     );
   }
 
-  factory UserProvidedMacronization.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory UserProvidedMacronization.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return UserProvidedMacronization(
       workId: serializer.fromJson<String>(json['workId']),
@@ -4353,15 +5071,18 @@ class UserProvidedMacronization extends i0.DataClass
     };
   }
 
-  i1.UserProvidedMacronization copyWith(
-          {String? workId, String? idx, String? macronizedWord}) =>
-      i1.UserProvidedMacronization(
-        workId: workId ?? this.workId,
-        idx: idx ?? this.idx,
-        macronizedWord: macronizedWord ?? this.macronizedWord,
-      );
+  i1.UserProvidedMacronization copyWith({
+    String? workId,
+    String? idx,
+    String? macronizedWord,
+  }) => i1.UserProvidedMacronization(
+    workId: workId ?? this.workId,
+    idx: idx ?? this.idx,
+    macronizedWord: macronizedWord ?? this.macronizedWord,
+  );
   UserProvidedMacronization copyWithCompanion(
-      i1.UserProvidedMacronizationsCompanion data) {
+    i1.UserProvidedMacronizationsCompanion data,
+  ) {
     return UserProvidedMacronization(
       workId: data.workId.present ? data.workId.value : this.workId,
       idx: data.idx.present ? data.idx.value : this.idx,
@@ -4406,9 +5127,9 @@ class UserProvidedMacronizationsCompanion
     required String workId,
     required String idx,
     required String macronizedWord,
-  })  : workId = i0.Value(workId),
-        idx = i0.Value(idx),
-        macronizedWord = i0.Value(macronizedWord);
+  }) : workId = i0.Value(workId),
+       idx = i0.Value(idx),
+       macronizedWord = i0.Value(macronizedWord);
   static i0.Insertable<i1.UserProvidedMacronization> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? idx,
@@ -4421,10 +5142,11 @@ class UserProvidedMacronizationsCompanion
     });
   }
 
-  i1.UserProvidedMacronizationsCompanion copyWith(
-      {i0.Value<String>? workId,
-      i0.Value<String>? idx,
-      i0.Value<String>? macronizedWord}) {
+  i1.UserProvidedMacronizationsCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<String>? idx,
+    i0.Value<String>? macronizedWord,
+  }) {
     return i1.UserProvidedMacronizationsCompanion(
       workId: workId ?? this.workId,
       idx: idx ?? this.idx,
@@ -4464,20 +5186,28 @@ class AuthorsAndWorks extends i0.Table
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
   AuthorsAndWorks(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _authorIdMeta =
-      const i0.VerificationMeta('authorId');
+  static const i0.VerificationMeta _authorIdMeta = const i0.VerificationMeta(
+    'authorId',
+  );
   late final i0.GeneratedColumn<String> authorId = i0.GeneratedColumn<String>(
-      'authorId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _workIdMeta =
-      const i0.VerificationMeta('workId');
+    'authorId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: true,
-      $customConstraints: 'NOT NULL');
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [authorId, workId];
   @override
@@ -4487,19 +5217,24 @@ class AuthorsAndWorks extends i0.Table
   static const String $name = 'AuthorsAndWorks';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.AuthorsAndWork> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.AuthorsAndWork> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('authorId')) {
-      context.handle(_authorIdMeta,
-          authorId.isAcceptableOrUnknown(data['authorId']!, _authorIdMeta));
+      context.handle(
+        _authorIdMeta,
+        authorId.isAcceptableOrUnknown(data['authorId']!, _authorIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_authorIdMeta);
     }
     if (data.containsKey('workId')) {
-      context.handle(_workIdMeta,
-          workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta));
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_workIdMeta);
     }
@@ -4512,10 +5247,14 @@ class AuthorsAndWorks extends i0.Table
   i1.AuthorsAndWork map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.AuthorsAndWork(
-      authorId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}authorId'])!,
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
+      authorId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}authorId'],
+      )!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
     );
   }
 
@@ -4530,10 +5269,10 @@ class AuthorsAndWorks extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-        'PRIMARY KEY(authorId, workId)',
-        'FOREIGN KEY(authorId)REFERENCES Authors(id)',
-        'FOREIGN KEY(workId)REFERENCES Works(id)'
-      ];
+    'PRIMARY KEY(authorId, workId)',
+    'FOREIGN KEY(authorId)REFERENCES Authors(id)',
+    'FOREIGN KEY(workId)REFERENCES Works(id)',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -4558,8 +5297,10 @@ class AuthorsAndWork extends i0.DataClass
     );
   }
 
-  factory AuthorsAndWork.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory AuthorsAndWork.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return AuthorsAndWork(
       authorId: serializer.fromJson<String>(json['authorId']),
@@ -4616,8 +5357,8 @@ class AuthorsAndWorksCompanion extends i0.UpdateCompanion<i1.AuthorsAndWork> {
   AuthorsAndWorksCompanion.insert({
     required String authorId,
     required String workId,
-  })  : authorId = i0.Value(authorId),
-        workId = i0.Value(workId);
+  }) : authorId = i0.Value(authorId),
+       workId = i0.Value(workId);
   static i0.Insertable<i1.AuthorsAndWork> custom({
     i0.Expression<String>? authorId,
     i0.Expression<String>? workId,
@@ -4628,8 +5369,10 @@ class AuthorsAndWorksCompanion extends i0.UpdateCompanion<i1.AuthorsAndWork> {
     });
   }
 
-  i1.AuthorsAndWorksCompanion copyWith(
-      {i0.Value<String>? authorId, i0.Value<String>? workId}) {
+  i1.AuthorsAndWorksCompanion copyWith({
+    i0.Value<String>? authorId,
+    i0.Value<String>? workId,
+  }) {
     return i1.AuthorsAndWorksCompanion(
       authorId: authorId ?? this.authorId,
       workId: workId ?? this.workId,
@@ -4668,19 +5411,21 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
   final int fromIndex;
   final int toIndex;
   final int depth;
-  const WorkContentSubdivisionsHierarchyData(
-      {required this.workId,
-      required this.node,
-      required this.typ,
-      required this.cnt,
-      required this.name,
-      this.parent,
-      required this.fromIndex,
-      required this.toIndex,
-      required this.depth});
+  const WorkContentSubdivisionsHierarchyData({
+    required this.workId,
+    required this.node,
+    required this.typ,
+    required this.cnt,
+    required this.name,
+    this.parent,
+    required this.fromIndex,
+    required this.toIndex,
+    required this.depth,
+  });
   factory WorkContentSubdivisionsHierarchyData.fromJson(
-      Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return WorkContentSubdivisionsHierarchyData(
       workId: serializer.fromJson<String>(json['workId']),
@@ -4710,27 +5455,27 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
     };
   }
 
-  i1.WorkContentSubdivisionsHierarchyData copyWith(
-          {String? workId,
-          String? node,
-          String? typ,
-          int? cnt,
-          String? name,
-          i0.Value<String?> parent = const i0.Value.absent(),
-          int? fromIndex,
-          int? toIndex,
-          int? depth}) =>
-      i1.WorkContentSubdivisionsHierarchyData(
-        workId: workId ?? this.workId,
-        node: node ?? this.node,
-        typ: typ ?? this.typ,
-        cnt: cnt ?? this.cnt,
-        name: name ?? this.name,
-        parent: parent.present ? parent.value : this.parent,
-        fromIndex: fromIndex ?? this.fromIndex,
-        toIndex: toIndex ?? this.toIndex,
-        depth: depth ?? this.depth,
-      );
+  i1.WorkContentSubdivisionsHierarchyData copyWith({
+    String? workId,
+    String? node,
+    String? typ,
+    int? cnt,
+    String? name,
+    i0.Value<String?> parent = const i0.Value.absent(),
+    int? fromIndex,
+    int? toIndex,
+    int? depth,
+  }) => i1.WorkContentSubdivisionsHierarchyData(
+    workId: workId ?? this.workId,
+    node: node ?? this.node,
+    typ: typ ?? this.typ,
+    cnt: cnt ?? this.cnt,
+    name: name ?? this.name,
+    parent: parent.present ? parent.value : this.parent,
+    fromIndex: fromIndex ?? this.fromIndex,
+    toIndex: toIndex ?? this.toIndex,
+    depth: depth ?? this.depth,
+  );
   @override
   String toString() {
     return (StringBuffer('WorkContentSubdivisionsHierarchyData(')
@@ -4749,7 +5494,16 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
 
   @override
   int get hashCode => Object.hash(
-      workId, node, typ, cnt, name, parent, fromIndex, toIndex, depth);
+    workId,
+    node,
+    typ,
+    cnt,
+    name,
+    parent,
+    fromIndex,
+    toIndex,
+    depth,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4765,80 +5519,140 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
           other.depth == this.depth);
 }
 
-class WorkContentSubdivisionsHierarchy extends i0.ViewInfo<
-    i1.WorkContentSubdivisionsHierarchy,
-    i1.WorkContentSubdivisionsHierarchyData> implements i0.HasResultSet {
+class WorkContentSubdivisionsHierarchy
+    extends
+        i0.ViewInfo<
+          i1.WorkContentSubdivisionsHierarchy,
+          i1.WorkContentSubdivisionsHierarchyData
+        >
+    implements i0.HasResultSet {
   final String? _alias;
   @override
   final i0.GeneratedDatabase attachedDatabase;
   WorkContentSubdivisionsHierarchy(this.attachedDatabase, [this._alias]);
   @override
-  List<i0.GeneratedColumn> get $columns =>
-      [workId, node, typ, cnt, name, parent, fromIndex, toIndex, depth];
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    node,
+    typ,
+    cnt,
+    name,
+    parent,
+    fromIndex,
+    toIndex,
+    depth,
+  ];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
   String get entityName => 'WorkContentSubdivisionsHierarchy';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
-        i0.SqlDialect.sqlite:
-            'CREATE VIEW WorkContentSubdivisionsHierarchy AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1 FROM WorkContentSubdivisions AS s INNER JOIN Subsets ON s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
-      };
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW WorkContentSubdivisionsHierarchy AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1 FROM WorkContentSubdivisions AS s INNER JOIN Subsets ON s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
+  };
   @override
   WorkContentSubdivisionsHierarchy get asDslTable => this;
   @override
-  i1.WorkContentSubdivisionsHierarchyData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  i1.WorkContentSubdivisionsHierarchyData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.WorkContentSubdivisionsHierarchyData(
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      node: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}node'])!,
-      typ: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}typ'])!,
-      cnt: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}cnt'])!,
-      name: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}name'])!,
-      parent: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}parent']),
-      fromIndex: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}fromIndex'])!,
-      toIndex: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}toIndex'])!,
-      depth: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}depth'])!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      node: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}node'],
+      )!,
+      typ: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}typ'],
+      )!,
+      cnt: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}cnt'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      parent: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}parent'],
+      ),
+      fromIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}fromIndex'],
+      )!,
+      toIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}toIndex'],
+      )!,
+      depth: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}depth'],
+      )!,
     );
   }
 
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> node = i0.GeneratedColumn<String>(
-      'node', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'node',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
-      'typ', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'typ',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
-      'cnt', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'cnt',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> parent = i0.GeneratedColumn<String>(
-      'parent', aliasedName, true,
-      type: i0.DriftSqlType.string);
+    'parent',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<int> fromIndex = i0.GeneratedColumn<int>(
-      'fromIndex', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'fromIndex',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<int> toIndex = i0.GeneratedColumn<int>(
-      'toIndex', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'toIndex',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<int> depth = i0.GeneratedColumn<int>(
-      'depth', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'depth',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   @override
   WorkContentSubdivisionsHierarchy createAlias(String alias) {
     return WorkContentSubdivisionsHierarchy(attachedDatabase, alias);
@@ -4856,14 +5670,17 @@ class LibraryAuthor extends i0.DataClass {
   final String about;
   final i2.Uint8List image;
   final int numberOfWorks;
-  const LibraryAuthor(
-      {required this.id,
-      required this.name,
-      required this.about,
-      required this.image,
-      required this.numberOfWorks});
-  factory LibraryAuthor.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  const LibraryAuthor({
+    required this.id,
+    required this.name,
+    required this.about,
+    required this.image,
+    required this.numberOfWorks,
+  });
+  factory LibraryAuthor.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LibraryAuthor(
       id: serializer.fromJson<String>(json['id']),
@@ -4885,19 +5702,19 @@ class LibraryAuthor extends i0.DataClass {
     };
   }
 
-  i1.LibraryAuthor copyWith(
-          {String? id,
-          String? name,
-          String? about,
-          i2.Uint8List? image,
-          int? numberOfWorks}) =>
-      i1.LibraryAuthor(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        about: about ?? this.about,
-        image: image ?? this.image,
-        numberOfWorks: numberOfWorks ?? this.numberOfWorks,
-      );
+  i1.LibraryAuthor copyWith({
+    String? id,
+    String? name,
+    String? about,
+    i2.Uint8List? image,
+    int? numberOfWorks,
+  }) => i1.LibraryAuthor(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    about: about ?? this.about,
+    image: image ?? this.image,
+    numberOfWorks: numberOfWorks ?? this.numberOfWorks,
+  );
   @override
   String toString() {
     return (StringBuffer('LibraryAuthor(')
@@ -4912,7 +5729,12 @@ class LibraryAuthor extends i0.DataClass {
 
   @override
   int get hashCode => Object.hash(
-      id, name, about, i0.$driftBlobEquality.hash(image), numberOfWorks);
+    id,
+    name,
+    about,
+    i0.$driftBlobEquality.hash(image),
+    numberOfWorks,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4931,51 +5753,82 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
   final i0.GeneratedDatabase attachedDatabase;
   LibraryAuthors(this.attachedDatabase, [this._alias]);
   @override
-  List<i0.GeneratedColumn> get $columns =>
-      [id, name, about, image, numberOfWorks];
+  List<i0.GeneratedColumn> get $columns => [
+    id,
+    name,
+    about,
+    image,
+    numberOfWorks,
+  ];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
   String get entityName => 'library.Authors';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
-        i0.SqlDialect.sqlite:
-            'CREATE VIEW "library.Authors" AS SELECT Authors.id, Authors.name, Authors.about, Authors.image, COUNT(*)OVER (PARTITION BY AuthorsAndWorks.workId RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfWorks FROM Authors LEFT JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId',
-      };
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.Authors" AS SELECT Authors.id, Authors.name, Authors.about, Authors.image, COUNT(*)OVER (PARTITION BY AuthorsAndWorks.workId RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfWorks FROM Authors LEFT JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId',
+  };
   @override
   LibraryAuthors get asDslTable => this;
   @override
   i1.LibraryAuthor map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.LibraryAuthor(
-      id: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}name'])!,
-      about: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}about'])!,
-      image: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.blob, data['${effectivePrefix}image'])!,
-      numberOfWorks: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}numberOfWorks'])!,
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      about: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      )!,
+      image: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.blob,
+        data['${effectivePrefix}image'],
+      )!,
+      numberOfWorks: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}numberOfWorks'],
+      )!,
     );
   }
 
   late final i0.GeneratedColumn<String> id = i0.GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> about = i0.GeneratedColumn<String>(
-      'about', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'about',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<i2.Uint8List> image =
-      i0.GeneratedColumn<i2.Uint8List>('image', aliasedName, false,
-          type: i0.DriftSqlType.blob);
+      i0.GeneratedColumn<i2.Uint8List>(
+        'image',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.blob,
+      );
   late final i0.GeneratedColumn<int> numberOfWorks = i0.GeneratedColumn<int>(
-      'numberOfWorks', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'numberOfWorks',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   @override
   LibraryAuthors createAlias(String alias) {
     return LibraryAuthors(attachedDatabase, alias);
@@ -4995,16 +5848,19 @@ class LibraryAuthorDetail extends i0.DataClass {
   final String workId;
   final String workName;
   final int numberOfWords;
-  const LibraryAuthorDetail(
-      {required this.id,
-      required this.name,
-      required this.about,
-      required this.image,
-      required this.workId,
-      required this.workName,
-      required this.numberOfWords});
-  factory LibraryAuthorDetail.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  const LibraryAuthorDetail({
+    required this.id,
+    required this.name,
+    required this.about,
+    required this.image,
+    required this.workId,
+    required this.workName,
+    required this.numberOfWords,
+  });
+  factory LibraryAuthorDetail.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LibraryAuthorDetail(
       id: serializer.fromJson<String>(json['id']),
@@ -5030,23 +5886,23 @@ class LibraryAuthorDetail extends i0.DataClass {
     };
   }
 
-  i1.LibraryAuthorDetail copyWith(
-          {String? id,
-          String? name,
-          String? about,
-          i2.Uint8List? image,
-          String? workId,
-          String? workName,
-          int? numberOfWords}) =>
-      i1.LibraryAuthorDetail(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        about: about ?? this.about,
-        image: image ?? this.image,
-        workId: workId ?? this.workId,
-        workName: workName ?? this.workName,
-        numberOfWords: numberOfWords ?? this.numberOfWords,
-      );
+  i1.LibraryAuthorDetail copyWith({
+    String? id,
+    String? name,
+    String? about,
+    i2.Uint8List? image,
+    String? workId,
+    String? workName,
+    int? numberOfWords,
+  }) => i1.LibraryAuthorDetail(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    about: about ?? this.about,
+    image: image ?? this.image,
+    workId: workId ?? this.workId,
+    workName: workName ?? this.workName,
+    numberOfWords: numberOfWords ?? this.numberOfWords,
+  );
   @override
   String toString() {
     return (StringBuffer('LibraryAuthorDetail(')
@@ -5062,8 +5918,15 @@ class LibraryAuthorDetail extends i0.DataClass {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, about,
-      i0.$driftBlobEquality.hash(image), workId, workName, numberOfWords);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    about,
+    i0.$driftBlobEquality.hash(image),
+    workId,
+    workName,
+    numberOfWords,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5085,61 +5948,104 @@ class LibraryAuthorDetails
   final i0.GeneratedDatabase attachedDatabase;
   LibraryAuthorDetails(this.attachedDatabase, [this._alias]);
   @override
-  List<i0.GeneratedColumn> get $columns =>
-      [id, name, about, image, workId, workName, numberOfWords];
+  List<i0.GeneratedColumn> get $columns => [
+    id,
+    name,
+    about,
+    image,
+    workId,
+    workName,
+    numberOfWords,
+  ];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
   String get entityName => 'library.AuthorDetails';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
-        i0.SqlDialect.sqlite:
-            'CREATE VIEW "library.AuthorDetails" AS WITH Aux AS (SELECT Authors.id, Authors.name, Authors.about, Authors.image, AuthorsAndWorks.workId, Works.name AS workName FROM Authors INNER JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId INNER JOIN Works ON AuthorsAndWorks.workId = Works.id), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.workId = WorkContents.workId WHERE WorkContents.word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords FROM Aux INNER JOIN WorksContents ON Aux.workId = WorksContents.workId',
-      };
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.AuthorDetails" AS WITH Aux AS (SELECT Authors.id, Authors.name, Authors.about, Authors.image, AuthorsAndWorks.workId, Works.name AS workName FROM Authors INNER JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId INNER JOIN Works ON AuthorsAndWorks.workId = Works.id), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.workId = WorkContents.workId WHERE WorkContents.word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords FROM Aux INNER JOIN WorksContents ON Aux.workId = WorksContents.workId',
+  };
   @override
   LibraryAuthorDetails get asDslTable => this;
   @override
   i1.LibraryAuthorDetail map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.LibraryAuthorDetail(
-      id: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}name'])!,
-      about: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}about'])!,
-      image: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.blob, data['${effectivePrefix}image'])!,
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      workName: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workName'])!,
-      numberOfWords: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}numberOfWords'])!,
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      about: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      )!,
+      image: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.blob,
+        data['${effectivePrefix}image'],
+      )!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      workName: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workName'],
+      )!,
+      numberOfWords: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}numberOfWords'],
+      )!,
     );
   }
 
   late final i0.GeneratedColumn<String> id = i0.GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> about = i0.GeneratedColumn<String>(
-      'about', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'about',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<i2.Uint8List> image =
-      i0.GeneratedColumn<i2.Uint8List>('image', aliasedName, false,
-          type: i0.DriftSqlType.blob);
+      i0.GeneratedColumn<i2.Uint8List>(
+        'image',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.blob,
+      );
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> workName = i0.GeneratedColumn<String>(
-      'workName', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'workName',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<int> numberOfWords = i0.GeneratedColumn<int>(
-      'numberOfWords', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'numberOfWords',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   @override
   LibraryAuthorDetails createAlias(String alias) {
     return LibraryAuthorDetails(attachedDatabase, alias);
@@ -5148,8 +6054,12 @@ class LibraryAuthorDetails
   @override
   i0.Query? get query => null;
   @override
-  Set<String> get readTables =>
-      const {'Authors', 'AuthorsAndWorks', 'Works', 'WorkContents'};
+  Set<String> get readTables => const {
+    'Authors',
+    'AuthorsAndWorks',
+    'Works',
+    'WorkContents',
+  };
 }
 
 class LibraryWorkDetail extends i0.DataClass {
@@ -5159,15 +6069,18 @@ class LibraryWorkDetail extends i0.DataClass {
   final int numberOfWords;
   final String? authorId;
   final String? authorName;
-  const LibraryWorkDetail(
-      {required this.id,
-      required this.name,
-      required this.about,
-      required this.numberOfWords,
-      this.authorId,
-      this.authorName});
-  factory LibraryWorkDetail.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  const LibraryWorkDetail({
+    required this.id,
+    required this.name,
+    required this.about,
+    required this.numberOfWords,
+    this.authorId,
+    this.authorName,
+  });
+  factory LibraryWorkDetail.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LibraryWorkDetail(
       id: serializer.fromJson<String>(json['id']),
@@ -5191,21 +6104,21 @@ class LibraryWorkDetail extends i0.DataClass {
     };
   }
 
-  i1.LibraryWorkDetail copyWith(
-          {String? id,
-          String? name,
-          String? about,
-          int? numberOfWords,
-          i0.Value<String?> authorId = const i0.Value.absent(),
-          i0.Value<String?> authorName = const i0.Value.absent()}) =>
-      i1.LibraryWorkDetail(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        about: about ?? this.about,
-        numberOfWords: numberOfWords ?? this.numberOfWords,
-        authorId: authorId.present ? authorId.value : this.authorId,
-        authorName: authorName.present ? authorName.value : this.authorName,
-      );
+  i1.LibraryWorkDetail copyWith({
+    String? id,
+    String? name,
+    String? about,
+    int? numberOfWords,
+    i0.Value<String?> authorId = const i0.Value.absent(),
+    i0.Value<String?> authorName = const i0.Value.absent(),
+  }) => i1.LibraryWorkDetail(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    about: about ?? this.about,
+    numberOfWords: numberOfWords ?? this.numberOfWords,
+    authorId: authorId.present ? authorId.value : this.authorId,
+    authorName: authorName.present ? authorName.value : this.authorName,
+  );
   @override
   String toString() {
     return (StringBuffer('LibraryWorkDetail(')
@@ -5242,56 +6155,92 @@ class LibraryWorkDetails
   final i0.GeneratedDatabase attachedDatabase;
   LibraryWorkDetails(this.attachedDatabase, [this._alias]);
   @override
-  List<i0.GeneratedColumn> get $columns =>
-      [id, name, about, numberOfWords, authorId, authorName];
+  List<i0.GeneratedColumn> get $columns => [
+    id,
+    name,
+    about,
+    numberOfWords,
+    authorId,
+    authorName,
+  ];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
   String get entityName => 'library.WorkDetails';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
-        i0.SqlDialect.sqlite:
-            'CREATE VIEW "library.WorkDetails" AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.id = WorkContents.workId WHERE word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords, AuthorsAndWorks.authorId, Authors.name AS authorName FROM Aux INNER JOIN WorksContents ON Aux.id = WorksContents.workId LEFT OUTER JOIN AuthorsAndWorks ON Aux.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id',
-      };
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.WorkDetails" AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.id = WorkContents.workId WHERE word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords, AuthorsAndWorks.authorId, Authors.name AS authorName FROM Aux INNER JOIN WorksContents ON Aux.id = WorksContents.workId LEFT OUTER JOIN AuthorsAndWorks ON Aux.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id',
+  };
   @override
   LibraryWorkDetails get asDslTable => this;
   @override
   i1.LibraryWorkDetail map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.LibraryWorkDetail(
-      id: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}name'])!,
-      about: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}about'])!,
-      numberOfWords: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}numberOfWords'])!,
-      authorId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}authorId']),
-      authorName: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}authorName']),
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      about: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}about'],
+      )!,
+      numberOfWords: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}numberOfWords'],
+      )!,
+      authorId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}authorId'],
+      ),
+      authorName: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}authorName'],
+      ),
     );
   }
 
   late final i0.GeneratedColumn<String> id = i0.GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> about = i0.GeneratedColumn<String>(
-      'about', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'about',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<int> numberOfWords = i0.GeneratedColumn<int>(
-      'numberOfWords', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'numberOfWords',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<String> authorId = i0.GeneratedColumn<String>(
-      'authorId', aliasedName, true,
-      type: i0.DriftSqlType.string);
+    'authorId',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> authorName = i0.GeneratedColumn<String>(
-      'authorName', aliasedName, true,
-      type: i0.DriftSqlType.string);
+    'authorName',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
   @override
   LibraryWorkDetails createAlias(String alias) {
     return LibraryWorkDetails(attachedDatabase, alias);
@@ -5300,8 +6249,12 @@ class LibraryWorkDetails
   @override
   i0.Query? get query => null;
   @override
-  Set<String> get readTables =>
-      const {'Works', 'WorkContents', 'AuthorsAndWorks', 'Authors'};
+  Set<String> get readTables => const {
+    'Works',
+    'WorkContents',
+    'AuthorsAndWorks',
+    'Authors',
+  };
 }
 
 class LibraryWorkContent extends i0.DataClass {
@@ -5313,17 +6266,20 @@ class LibraryWorkContent extends i0.DataClass {
   final String typ;
   final int depth;
   final String sourceReference;
-  const LibraryWorkContent(
-      {required this.workId,
-      this.parent,
-      required this.node,
-      required this.idx,
-      required this.word,
-      required this.typ,
-      required this.depth,
-      required this.sourceReference});
-  factory LibraryWorkContent.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  const LibraryWorkContent({
+    required this.workId,
+    this.parent,
+    required this.node,
+    required this.idx,
+    required this.word,
+    required this.typ,
+    required this.depth,
+    required this.sourceReference,
+  });
+  factory LibraryWorkContent.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LibraryWorkContent(
       workId: serializer.fromJson<String>(json['workId']),
@@ -5351,25 +6307,25 @@ class LibraryWorkContent extends i0.DataClass {
     };
   }
 
-  i1.LibraryWorkContent copyWith(
-          {String? workId,
-          i0.Value<String?> parent = const i0.Value.absent(),
-          String? node,
-          int? idx,
-          String? word,
-          String? typ,
-          int? depth,
-          String? sourceReference}) =>
-      i1.LibraryWorkContent(
-        workId: workId ?? this.workId,
-        parent: parent.present ? parent.value : this.parent,
-        node: node ?? this.node,
-        idx: idx ?? this.idx,
-        word: word ?? this.word,
-        typ: typ ?? this.typ,
-        depth: depth ?? this.depth,
-        sourceReference: sourceReference ?? this.sourceReference,
-      );
+  i1.LibraryWorkContent copyWith({
+    String? workId,
+    i0.Value<String?> parent = const i0.Value.absent(),
+    String? node,
+    int? idx,
+    String? word,
+    String? typ,
+    int? depth,
+    String? sourceReference,
+  }) => i1.LibraryWorkContent(
+    workId: workId ?? this.workId,
+    parent: parent.present ? parent.value : this.parent,
+    node: node ?? this.node,
+    idx: idx ?? this.idx,
+    word: word ?? this.word,
+    typ: typ ?? this.typ,
+    depth: depth ?? this.depth,
+    sourceReference: sourceReference ?? this.sourceReference,
+  );
   @override
   String toString() {
     return (StringBuffer('LibraryWorkContent(')
@@ -5410,66 +6366,115 @@ class LibraryWorkContents
   final i0.GeneratedDatabase attachedDatabase;
   LibraryWorkContents(this.attachedDatabase, [this._alias]);
   @override
-  List<i0.GeneratedColumn> get $columns =>
-      [workId, parent, node, idx, word, typ, depth, sourceReference];
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    parent,
+    node,
+    idx,
+    word,
+    typ,
+    depth,
+    sourceReference,
+  ];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
   String get entityName => 'library.WorkContents';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
-        i0.SqlDialect.sqlite:
-            'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN WorkContentSubdivisionsHierarchy AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
-      };
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN WorkContentSubdivisionsHierarchy AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+  };
   @override
   LibraryWorkContents get asDslTable => this;
   @override
   i1.LibraryWorkContent map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.LibraryWorkContent(
-      workId: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}workId'])!,
-      parent: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}parent']),
-      node: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}node'])!,
-      idx: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}idx'])!,
-      word: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}word'])!,
-      typ: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}typ'])!,
-      depth: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}depth'])!,
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      parent: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}parent'],
+      ),
+      node: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}node'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      word: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}word'],
+      )!,
+      typ: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}typ'],
+      )!,
+      depth: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}depth'],
+      )!,
       sourceReference: attachedDatabase.typeMapping.read(
-          i0.DriftSqlType.string, data['${effectivePrefix}sourceReference'])!,
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sourceReference'],
+      )!,
     );
   }
 
   late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-      'workId', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> parent = i0.GeneratedColumn<String>(
-      'parent', aliasedName, true,
-      type: i0.DriftSqlType.string);
+    'parent',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> node = i0.GeneratedColumn<String>(
-      'node', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'node',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
-      'idx', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<String> word = i0.GeneratedColumn<String>(
-      'word', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'word',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
-      'typ', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'typ',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<int> depth = i0.GeneratedColumn<int>(
-      'depth', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'depth',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<String> sourceReference =
-      i0.GeneratedColumn<String>('sourceReference', aliasedName, false,
-          type: i0.DriftSqlType.string);
+      i0.GeneratedColumn<String>(
+        'sourceReference',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
   @override
   LibraryWorkContents createAlias(String alias) {
     return LibraryWorkContents(attachedDatabase, alias);
@@ -5478,8 +6483,10 @@ class LibraryWorkContents
   @override
   i0.Query? get query => null;
   @override
-  Set<String> get readTables =>
-      const {'WorkContents', 'WorkContentSubdivisions'};
+  Set<String> get readTables => const {
+    'WorkContents',
+    'WorkContentSubdivisions',
+  };
 }
 
 class LibraryWorkIndexe extends i0.DataClass {
@@ -5491,17 +6498,20 @@ class LibraryWorkIndexe extends i0.DataClass {
   final int fromIndex;
   final int toIndex;
   final String name;
-  const LibraryWorkIndexe(
-      {this.parent,
-      required this.node,
-      required this.depth,
-      required this.typ,
-      required this.cnt,
-      required this.fromIndex,
-      required this.toIndex,
-      required this.name});
-  factory LibraryWorkIndexe.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  const LibraryWorkIndexe({
+    this.parent,
+    required this.node,
+    required this.depth,
+    required this.typ,
+    required this.cnt,
+    required this.fromIndex,
+    required this.toIndex,
+    required this.name,
+  });
+  factory LibraryWorkIndexe.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LibraryWorkIndexe(
       parent: serializer.fromJson<String?>(json['parent']),
@@ -5529,25 +6539,25 @@ class LibraryWorkIndexe extends i0.DataClass {
     };
   }
 
-  i1.LibraryWorkIndexe copyWith(
-          {i0.Value<String?> parent = const i0.Value.absent(),
-          String? node,
-          int? depth,
-          String? typ,
-          int? cnt,
-          int? fromIndex,
-          int? toIndex,
-          String? name}) =>
-      i1.LibraryWorkIndexe(
-        parent: parent.present ? parent.value : this.parent,
-        node: node ?? this.node,
-        depth: depth ?? this.depth,
-        typ: typ ?? this.typ,
-        cnt: cnt ?? this.cnt,
-        fromIndex: fromIndex ?? this.fromIndex,
-        toIndex: toIndex ?? this.toIndex,
-        name: name ?? this.name,
-      );
+  i1.LibraryWorkIndexe copyWith({
+    i0.Value<String?> parent = const i0.Value.absent(),
+    String? node,
+    int? depth,
+    String? typ,
+    int? cnt,
+    int? fromIndex,
+    int? toIndex,
+    String? name,
+  }) => i1.LibraryWorkIndexe(
+    parent: parent.present ? parent.value : this.parent,
+    node: node ?? this.node,
+    depth: depth ?? this.depth,
+    typ: typ ?? this.typ,
+    cnt: cnt ?? this.cnt,
+    fromIndex: fromIndex ?? this.fromIndex,
+    toIndex: toIndex ?? this.toIndex,
+    name: name ?? this.name,
+  );
   @override
   String toString() {
     return (StringBuffer('LibraryWorkIndexe(')
@@ -5588,66 +6598,114 @@ class LibraryWorkIndexes
   final i0.GeneratedDatabase attachedDatabase;
   LibraryWorkIndexes(this.attachedDatabase, [this._alias]);
   @override
-  List<i0.GeneratedColumn> get $columns =>
-      [parent, node, depth, typ, cnt, fromIndex, toIndex, name];
+  List<i0.GeneratedColumn> get $columns => [
+    parent,
+    node,
+    depth,
+    typ,
+    cnt,
+    fromIndex,
+    toIndex,
+    name,
+  ];
   @override
   String get aliasedName => _alias ?? entityName;
   @override
   String get entityName => 'library.WorkIndexes';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
-        i0.SqlDialect.sqlite:
-            'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name FROM WorkContentSubdivisionsHierarchy AS SubdivsHierarchy INNER JOIN WorkContentSubdivisionsHierarchy AS Titles ON SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ ORDER BY SubdivsHierarchy.fromindex',
-      };
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name FROM WorkContentSubdivisionsHierarchy AS SubdivsHierarchy INNER JOIN WorkContentSubdivisionsHierarchy AS Titles ON SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ ORDER BY SubdivsHierarchy.fromindex',
+  };
   @override
   LibraryWorkIndexes get asDslTable => this;
   @override
   i1.LibraryWorkIndexe map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.LibraryWorkIndexe(
-      parent: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}parent']),
-      node: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}node'])!,
-      depth: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}depth'])!,
-      typ: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}typ'])!,
-      cnt: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}cnt'])!,
-      fromIndex: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}fromIndex'])!,
-      toIndex: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}toIndex'])!,
-      name: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}name'])!,
+      parent: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}parent'],
+      ),
+      node: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}node'],
+      )!,
+      depth: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}depth'],
+      )!,
+      typ: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}typ'],
+      )!,
+      cnt: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}cnt'],
+      )!,
+      fromIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}fromIndex'],
+      )!,
+      toIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}toIndex'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
     );
   }
 
   late final i0.GeneratedColumn<String> parent = i0.GeneratedColumn<String>(
-      'parent', aliasedName, true,
-      type: i0.DriftSqlType.string);
+    'parent',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> node = i0.GeneratedColumn<String>(
-      'node', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'node',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<int> depth = i0.GeneratedColumn<int>(
-      'depth', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'depth',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
-      'typ', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'typ',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
-      'cnt', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'cnt',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<int> fromIndex = i0.GeneratedColumn<int>(
-      'fromIndex', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'fromIndex',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<int> toIndex = i0.GeneratedColumn<int>(
-      'toIndex', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'toIndex',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   @override
   LibraryWorkIndexes createAlias(String alias) {
     return LibraryWorkIndexes(attachedDatabase, alias);
@@ -5662,99 +6720,98 @@ class LibraryWorkIndexes
 class LibraryDrift extends i3.ModularAccessor {
   LibraryDrift(i0.GeneratedDatabase db) : super(db);
   i0.Selectable<i4.Author> getLibraryAuthors() {
-    return customSelect('SELECT * FROM "library.Authors"',
-        variables: [],
-        readsFrom: {
-          authors,
-          authorsAndWorks,
-        }).map((i0.QueryRow row) => i4.Author(
-          id: row.read<String>('id'),
-          name: row.read<String>('name'),
-          about: row.read<String>('about'),
-          image: row.read<i2.Uint8List>('image'),
-          numberOfWorks: row.read<int>('numberOfWorks'),
-        ));
+    return customSelect(
+      'SELECT * FROM "library.Authors"',
+      variables: [],
+      readsFrom: {authors, authorsAndWorks},
+    ).map(
+      (i0.QueryRow row) => i4.Author(
+        id: row.read<String>('id'),
+        name: row.read<String>('name'),
+        about: row.read<String>('about'),
+        image: row.read<i2.Uint8List>('image'),
+        numberOfWorks: row.read<int>('numberOfWorks'),
+      ),
+    );
   }
 
   i0.Selectable<i1.LibraryAuthorDetail> getLibraryAuthorDetails(String var1) {
-    return customSelect('SELECT * FROM "library.AuthorDetails" WHERE id = ?1',
-        variables: [
-          i0.Variable<String>(var1)
-        ],
-        readsFrom: {
-          authors,
-          authorsAndWorks,
-          works,
-          workContents,
-        }).asyncMap(libraryAuthorDetails.mapFromRow);
+    return customSelect(
+      'SELECT * FROM "library.AuthorDetails" WHERE id = ?1',
+      variables: [i0.Variable<String>(var1)],
+      readsFrom: {authors, authorsAndWorks, works, workContents},
+    ).asyncMap(libraryAuthorDetails.mapFromRow);
   }
 
   i0.Selectable<i5.WorkDetails> getLibraryWorkDetails(String var1) {
-    return customSelect('SELECT * FROM "library.WorkDetails" WHERE id = ?1',
-        variables: [
-          i0.Variable<String>(var1)
-        ],
-        readsFrom: {
-          works,
-          workContents,
-          authorsAndWorks,
-          authors,
-        }).map((i0.QueryRow row) => i5.WorkDetails(
-          id: row.read<String>('id'),
-          name: row.read<String>('name'),
-          about: row.read<String>('about'),
-          numberOfWords: row.read<int>('numberOfWords'),
-          authorId: row.readNullable<String>('authorId'),
-          authorName: row.readNullable<String>('authorName'),
-        ));
+    return customSelect(
+      'SELECT * FROM "library.WorkDetails" WHERE id = ?1',
+      variables: [i0.Variable<String>(var1)],
+      readsFrom: {works, workContents, authorsAndWorks, authors},
+    ).map(
+      (i0.QueryRow row) => i5.WorkDetails(
+        id: row.read<String>('id'),
+        name: row.read<String>('name'),
+        about: row.read<String>('about'),
+        numberOfWords: row.read<int>('numberOfWords'),
+        authorId: row.readNullable<String>('authorId'),
+        authorName: row.readNullable<String>('authorName'),
+      ),
+    );
   }
 
   i0.Selectable<i6.WorkContentsSegment> getLibraryWorkContentsPartial(
-      String var1, int var2, int var3) {
+    String var1,
+    int var2,
+    int var3,
+  ) {
     return customSelect(
-        'SELECT * FROM "library.WorkContents" WHERE workId = ?1 AND idx BETWEEN ?2 AND ?3',
-        variables: [
-          i0.Variable<String>(var1),
-          i0.Variable<int>(var2),
-          i0.Variable<int>(var3)
-        ],
-        readsFrom: {
-          workContents,
-          workContentSubdivisions,
-        }).map((i0.QueryRow row) => i6.WorkContentsSegment(
-          workId: row.read<String>('workId'),
-          parent: row.readNullable<String>('parent'),
-          node: row.read<String>('node'),
-          idx: row.read<int>('idx'),
-          word: row.read<String>('word'),
-          typ: row.read<String>('typ'),
-          depth: row.read<int>('depth'),
-          sourceReference: row.read<String>('sourceReference'),
-        ));
+      'SELECT * FROM "library.WorkContents" WHERE workId = ?1 AND idx BETWEEN ?2 AND ?3',
+      variables: [
+        i0.Variable<String>(var1),
+        i0.Variable<int>(var2),
+        i0.Variable<int>(var3),
+      ],
+      readsFrom: {workContents, workContentSubdivisions},
+    ).map(
+      (i0.QueryRow row) => i6.WorkContentsSegment(
+        workId: row.read<String>('workId'),
+        parent: row.readNullable<String>('parent'),
+        node: row.read<String>('node'),
+        idx: row.read<int>('idx'),
+        word: row.read<String>('word'),
+        typ: row.read<String>('typ'),
+        depth: row.read<int>('depth'),
+        sourceReference: row.read<String>('sourceReference'),
+      ),
+    );
   }
 
-  i1.LibraryAuthors get libraryAuthors =>
-      i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.LibraryAuthors>('library.Authors');
-  i1.Authors get authors => i3.ReadDatabaseContainer(attachedDatabase)
-      .resultSet<i1.Authors>('Authors');
-  i1.AuthorsAndWorks get authorsAndWorks =>
-      i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.AuthorsAndWorks>('AuthorsAndWorks');
-  i1.LibraryAuthorDetails get libraryAuthorDetails =>
-      i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.LibraryAuthorDetails>('library.AuthorDetails');
+  i1.LibraryAuthors get libraryAuthors => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.LibraryAuthors>('library.Authors');
+  i1.Authors get authors => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.Authors>('Authors');
+  i1.AuthorsAndWorks get authorsAndWorks => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.AuthorsAndWorks>('AuthorsAndWorks');
+  i1.LibraryAuthorDetails get libraryAuthorDetails => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.LibraryAuthorDetails>('library.AuthorDetails');
   i1.Works get works =>
       i3.ReadDatabaseContainer(attachedDatabase).resultSet<i1.Works>('Works');
-  i1.WorkContents get workContents => i3.ReadDatabaseContainer(attachedDatabase)
-      .resultSet<i1.WorkContents>('WorkContents');
-  i1.LibraryWorkDetails get libraryWorkDetails =>
-      i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.LibraryWorkDetails>('library.WorkDetails');
-  i1.LibraryWorkContents get libraryWorkContents =>
-      i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.LibraryWorkContents>('library.WorkContents');
+  i1.WorkContents get workContents => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.WorkContents>('WorkContents');
+  i1.LibraryWorkDetails get libraryWorkDetails => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.LibraryWorkDetails>('library.WorkDetails');
+  i1.LibraryWorkContents get libraryWorkContents => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.LibraryWorkContents>('library.WorkContents');
   i1.WorkContentSubdivisions get workContentSubdivisions =>
-      i3.ReadDatabaseContainer(attachedDatabase)
-          .resultSet<i1.WorkContentSubdivisions>('WorkContentSubdivisions');
+      i3.ReadDatabaseContainer(
+        attachedDatabase,
+      ).resultSet<i1.WorkContentSubdivisions>('WorkContentSubdivisions');
 }

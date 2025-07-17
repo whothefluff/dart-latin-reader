@@ -41,24 +41,15 @@ class DictionaryEntrySensesFamily
   const DictionaryEntrySensesFamily();
 
   /// See also [dictionaryEntrySenses].
-  DictionaryEntrySensesProvider call(
-    String dictionary,
-    String lemma,
-  ) {
-    return DictionaryEntrySensesProvider(
-      dictionary,
-      lemma,
-    );
+  DictionaryEntrySensesProvider call(String dictionary, String lemma) {
+    return DictionaryEntrySensesProvider(dictionary, lemma);
   }
 
   @override
   DictionaryEntrySensesProvider getProviderOverride(
     covariant DictionaryEntrySensesProvider provider,
   ) {
-    return call(
-      provider.dictionary,
-      provider.lemma,
-    );
+    return call(provider.dictionary, provider.lemma);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -80,27 +71,24 @@ class DictionaryEntrySensesFamily
 class DictionaryEntrySensesProvider
     extends AutoDisposeFutureProvider<DictionaryEntrySenses> {
   /// See also [dictionaryEntrySenses].
-  DictionaryEntrySensesProvider(
-    String dictionary,
-    String lemma,
-  ) : this._internal(
-          (ref) => dictionaryEntrySenses(
-            ref as DictionaryEntrySensesRef,
-            dictionary,
-            lemma,
-          ),
-          from: dictionaryEntrySensesProvider,
-          name: r'dictionaryEntrySensesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$dictionaryEntrySensesHash,
-          dependencies: DictionaryEntrySensesFamily._dependencies,
-          allTransitiveDependencies:
-              DictionaryEntrySensesFamily._allTransitiveDependencies,
-          dictionary: dictionary,
-          lemma: lemma,
-        );
+  DictionaryEntrySensesProvider(String dictionary, String lemma)
+    : this._internal(
+        (ref) => dictionaryEntrySenses(
+          ref as DictionaryEntrySensesRef,
+          dictionary,
+          lemma,
+        ),
+        from: dictionaryEntrySensesProvider,
+        name: r'dictionaryEntrySensesProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$dictionaryEntrySensesHash,
+        dependencies: DictionaryEntrySensesFamily._dependencies,
+        allTransitiveDependencies:
+            DictionaryEntrySensesFamily._allTransitiveDependencies,
+        dictionary: dictionary,
+        lemma: lemma,
+      );
 
   DictionaryEntrySensesProvider._internal(
     super._createNotifier, {
@@ -119,7 +107,7 @@ class DictionaryEntrySensesProvider
   @override
   Override overrideWith(
     FutureOr<DictionaryEntrySenses> Function(DictionaryEntrySensesRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -179,5 +167,6 @@ class _DictionaryEntrySensesProviderElement
   @override
   String get lemma => (origin as DictionaryEntrySensesProvider).lemma;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

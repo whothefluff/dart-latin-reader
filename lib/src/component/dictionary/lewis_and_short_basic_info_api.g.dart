@@ -39,21 +39,15 @@ class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfo>> {
   const LnsBasicInfoFamily();
 
   /// See also [lnsBasicInfo].
-  LnsBasicInfoProvider call(
-    Iterable<String> lemmas,
-  ) {
-    return LnsBasicInfoProvider(
-      lemmas,
-    );
+  LnsBasicInfoProvider call(Iterable<String> lemmas) {
+    return LnsBasicInfoProvider(lemmas);
   }
 
   @override
   LnsBasicInfoProvider getProviderOverride(
     covariant LnsBasicInfoProvider provider,
   ) {
-    return call(
-      provider.lemmas,
-    );
+    return call(provider.lemmas);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -74,24 +68,19 @@ class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfo>> {
 /// See also [lnsBasicInfo].
 class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
   /// See also [lnsBasicInfo].
-  LnsBasicInfoProvider(
-    Iterable<String> lemmas,
-  ) : this._internal(
-          (ref) => lnsBasicInfo(
-            ref as LnsBasicInfoRef,
-            lemmas,
-          ),
-          from: lnsBasicInfoProvider,
-          name: r'lnsBasicInfoProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$lnsBasicInfoHash,
-          dependencies: LnsBasicInfoFamily._dependencies,
-          allTransitiveDependencies:
-              LnsBasicInfoFamily._allTransitiveDependencies,
-          lemmas: lemmas,
-        );
+  LnsBasicInfoProvider(Iterable<String> lemmas)
+    : this._internal(
+        (ref) => lnsBasicInfo(ref as LnsBasicInfoRef, lemmas),
+        from: lnsBasicInfoProvider,
+        name: r'lnsBasicInfoProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$lnsBasicInfoHash,
+        dependencies: LnsBasicInfoFamily._dependencies,
+        allTransitiveDependencies:
+            LnsBasicInfoFamily._allTransitiveDependencies,
+        lemmas: lemmas,
+      );
 
   LnsBasicInfoProvider._internal(
     super._createNotifier, {
@@ -157,5 +146,6 @@ class _LnsBasicInfoProviderElement
   @override
   Iterable<String> get lemmas => (origin as LnsBasicInfoProvider).lemmas;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

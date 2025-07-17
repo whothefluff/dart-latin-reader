@@ -1,14 +1,18 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/morph_analysis/morph_analysis.drift.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
+import 'morph_analysis.drift.dart';
 
 part 'morphological_details_api.g.dart';
 
@@ -37,23 +41,26 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
     this._db,
   ) {
     _analysisKeysQueries = {
-      (hasMacrons: true): (String form) =>
-          _db.morphAnalysisDrift.getAnalysisKeysOfMacronized(form),
-      (hasMacrons: false): (String form) =>
-          _db.morphAnalysisDrift.getAnalysisKeysOf(form),
+      (hasMacrons: true): (String form) => _db.morphAnalysisDrift.getAnalysisKeysOfMacronized(form),
+      (hasMacrons: false): (String form) => _db.morphAnalysisDrift.getAnalysisKeysOf(form),
     };
   }
 
   final AppDb _db;
-  late final Map<({bool hasMacrons}),
-                 MultiSelectable<AnalysisKey> Function(String form)> 
+  // dart format off
+  late final Map<({bool hasMacrons}), 
+                 MultiSelectable<AnalysisKey> Function(String form)>
       _analysisKeysQueries;
+  // dart format on
 
   @override
   Future<Analyses> getMorphAnalyses(AnalysisKeys keys) async {
     log.info('MorphologicalDataRepository - retrieving analyses from db');
-    final dbData = 
-         await (_db.select(_db.morphAnalysisDrift.morphologyAnalyses)..where(_keysMatch(keys))).get();
+    // dart format off
+    final dbData = await 
+        (_db.select(_db.morphAnalysisDrift.morphologyAnalyses)
+        ..where(_keysMatch(keys))).get();
+    // dart format on
     return Analyses(dbData.map(_toDomain));
   }
 
@@ -66,57 +73,55 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   Future<AnalysisKeys> getMorphAnalysisKeys(String form) async {
     log.info('MorphologicalDataRepository - retrieving $form analyses from db');
     final formHasMacrons = form.contains(RegExp('[āēīōūĀĒĪŌŪ]'));
-    final dbData =
-        await _analysisKeysQueries[(hasMacrons: formHasMacrons)]!(form).get();
+    final dbData = await _analysisKeysQueries[(hasMacrons: formHasMacrons)]!(form).get();
     return AnalysisKeys(dbData);
   }
 
-  Expression<bool> Function(MorphologyAnalyses a) _keysMatch(
-    AnalysisKeys keys,
-  ) =>
+  Expression<bool> Function(MorphologyAnalyses a) _keysMatch(AnalysisKeys keys) =>
       (a) => Expression.or(
-            keys.map((k) => Expression.and([
-                  a.form.equals(k.form),
-                  a.item.equals(k.item),
-                  a.cnt.equals(k.cnt)
-                ])),
-          );
+        keys.map(
+          (k) => Expression.and([
+            a.form.equals(k.form),
+            a.item.equals(k.item),
+            a.cnt.equals(k.cnt),
+          ]),
+        ),
+      );
 
   Analysis _toDomain(MorphologyAnalysis e) => Analysis(
-        form: e.form,
-        item: e.item,
-        cnt: e.cnt,
-        macronizedForm: e.macronizedForm,
-        dictionaryRef: e.dictionaryRef,
-        partOfSpeech: e.partOfSpeech,
-        stem: e.stem,
-        suffix: e.suffix,
-        segmentsInfo: e.segmentsInfo,
-        gender: e.gender,
-        number: e.number,
-        declension: e.declension,
-        gramCase: e.gramCase,
-        verbForm: e.verbForm,
-        tense: e.tense,
-        voice: e.voice,
-        person: e.person,
-        additional: e.additional,
-      );
-//
+    form: e.form,
+    item: e.item,
+    cnt: e.cnt,
+    macronizedForm: e.macronizedForm,
+    dictionaryRef: e.dictionaryRef,
+    partOfSpeech: e.partOfSpeech,
+    stem: e.stem,
+    suffix: e.suffix,
+    segmentsInfo: e.segmentsInfo,
+    gender: e.gender,
+    number: e.number,
+    declension: e.declension,
+    gramCase: e.gramCase,
+    verbForm: e.verbForm,
+    tense: e.tense,
+    voice: e.voice,
+    person: e.person,
+    additional: e.additional,
+  );
+  //
 }
 
 //interactors
 
 abstract interface class IMorphologicalDataRepository {
-//
+  //
   Future<Analyses> getMorphAnalyses(AnalysisKeys keys);
 
   Future<AnalysisKeys> getMorphAnalysisKeys(String form);
-//
+  //
 }
 
-class GetMorphologicalAnalysesUseCase
-    implements IGetMorphologicalAnalysesUseCase {
+class GetMorphologicalAnalysesUseCase implements IGetMorphologicalAnalysesUseCase {
   GetMorphologicalAnalysesUseCase(
     this._repository,
     this._keys,
@@ -127,11 +132,10 @@ class GetMorphologicalAnalysesUseCase
 
   @override
   Future<Analyses> invoke() async => _repository.getMorphAnalyses(_keys);
-//
+  //
 }
 
-class GetMorphologicalAnalysisKeysUseCase
-    implements IGetMorphologicalAnalysisKeysUseCase {
+class GetMorphologicalAnalysisKeysUseCase implements IGetMorphologicalAnalysisKeysUseCase {
   GetMorphologicalAnalysisKeysUseCase(
     this._repository,
     this._form,
@@ -142,21 +146,21 @@ class GetMorphologicalAnalysisKeysUseCase
 
   @override
   Future<AnalysisKeys> invoke() async => _repository.getMorphAnalysisKeys(_form);
-//
+  //
 }
 
 //domain
 
 abstract interface class IGetMorphologicalAnalysesUseCase {
-//
+  //
   Future<Analyses> invoke();
-//
+  //
 }
 
 abstract interface class IGetMorphologicalAnalysisKeysUseCase {
-//
+  //
   Future<AnalysisKeys> invoke();
-//
+  //
 }
 
 @immutable
@@ -211,17 +215,13 @@ class Analysis {
   String toString() => 'Analysis{form: $form, item: $item, cnt: $cnt}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Analysis &&
-        other.form == form &&
-        other.item == item &&
-        other.cnt == cnt;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Analysis && other.form == form && other.item == item && other.cnt == cnt);
 
   @override
   int get hashCode => Object.hash(form, item, cnt);
-//
+  //
 }
 
 @immutable
@@ -230,35 +230,46 @@ extension type const AnalysisKeys._(UnmodifiableListView<AnalysisKey> unm)
   AnalysisKeys(Iterable<AnalysisKey> iter) : this._(UnmodifiableListView(iter));
 
   AnalysisKeys.fromJson(String source)
-      : this((jsonDecode(source) as List).expand((formEntry) {
+    : this(
+        (jsonDecode(source) as List).expand((formEntry) {
           final formData = formEntry as List;
           final items = formData[1] as List;
           return items.expand((itemEntry) {
             final itemData = itemEntry as List;
             final counts = itemData[1] as List;
-            return counts.map((cnt) => AnalysisKey(
-                  form: formData[0] as String,
-                  item: itemData[0] as int,
-                  cnt: cnt as int,
-                ));
+            return counts.map(
+              (cnt) => AnalysisKey(
+                form: formData[0] as String,
+                item: itemData[0] as int,
+                cnt: cnt as int,
+              ),
+            );
           });
-        }));
+        }),
+      );
 
   String toJson() {
-    final forms = <String, Map<int, List<int>>>{};
+    // dart format off
+    final forms = <String, 
+                   Map<int, 
+                       List<int>>>{};
+    // dart format on
     forEach((k) {
       final l = (forms[k.form] ??= {})[k.item] ??= [];
       return l.add(k.cnt);
     });
     final compact = forms.entries
-        .map((form) => [
-              form.key,
-              form.value.entries.map((i) => [i.key, i.value]).toList()
-            ])
+        .map(
+          (form) => [
+            form.key,
+            form.value.entries.map((i) => [i.key, i.value]).toList(),
+          ],
+        )
         .toList();
     return jsonEncode(compact);
   }
-//
+
+  //
 }
 
 extension type const AnalysisKey._(({String form, int item, int cnt}) _record) {

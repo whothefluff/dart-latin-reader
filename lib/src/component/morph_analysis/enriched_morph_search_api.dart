@@ -1,24 +1,24 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart'
-    hide IDictionaryRepository;
-import 'package:latin_reader/src/component/morph_analysis/enriched_resolver.dart';
-import 'package:latin_reader/src/component/morph_analysis/morphological_search_api.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/provider_ext.dart';
+import '../dictionary/lewis_and_short_basic_info_api.dart' hide IDictionaryRepository;
+import 'enriched_resolver.dart';
+import 'morphological_search_api.dart';
 
 part 'enriched_morph_search_api.g.dart';
 
 //infrastructure
 
 @riverpod
-Future<EnrichedResults> enrichedMorphologicalSearch(
-  Ref ref,
-  String form,
-) async {
+Future<EnrichedResults> enrichedMorphologicalSearch(Ref ref, String form) async {
   log.info(() => '@riverpod - enrichedMorphologicalSearch');
   ref.cacheFor(const Duration(minutes: 5));
   final results = await ref.watch(morphologicalSearchProvider(form).future);
@@ -30,8 +30,7 @@ Future<EnrichedResults> enrichedMorphologicalSearch(
 
 // interactors
 
-class SearchEnrichedMorphologicalDataUseCase
-    implements ISearchEnrichedMorphologicalDataUseCase {
+class SearchEnrichedMorphologicalDataUseCase implements ISearchEnrichedMorphologicalDataUseCase {
   SearchEnrichedMorphologicalDataUseCase({
     required this.results,
     required this.repo,
@@ -46,14 +45,12 @@ class SearchEnrichedMorphologicalDataUseCase
     final enrichedItems = await resolver.resolveAndEnrich(
       items: results,
       getDictRef: (result) => result.dictionaryRef,
-      createEnriched: (result, lnsInfo) => EnrichedResult(
-        base: result,
-        lns: lnsInfo,
-      ),
+      createEnriched: (result, lnsInfo) => EnrichedResult(base: result, lns: lnsInfo),
     );
     return EnrichedResults(enrichedItems);
   }
-//
+
+  //
 }
 
 //domain
@@ -65,8 +62,7 @@ abstract interface class ISearchEnrichedMorphologicalDataUseCase {
 @immutable
 extension type const EnrichedResults._(UnmodifiableListView<EnrichedResult> unm)
     implements UnmodifiableListView<EnrichedResult> {
-  EnrichedResults(Iterable<EnrichedResult> iter)
-      : this._(UnmodifiableListView(iter));
+  EnrichedResults(Iterable<EnrichedResult> iter) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
@@ -84,11 +80,13 @@ class EnrichedResult {
   int get item => base.item;
   int get cnt => base.cnt;
   String? get macronizedForm => base.macronizedForm;
+
   /// Contains the value as it is found in the morphological analysis (which
   /// does not match the dictionary perfectly)
   String get dictionaryRef => base.dictionaryRef;
   String? get partOfSpeech => base.partOfSpeech;
   String? get additional => base.additional;
+
   /// Contains the value as it is actually found in the dictionary
   String? get lnsLemma => lns.lemma;
   String? get lnsInflection => lns.inflection;
@@ -103,5 +101,5 @@ class EnrichedResult {
 
   @override
   int get hashCode => base.hashCode;
-//
+  //
 }

@@ -13,8 +13,9 @@ String _$dictionariesHash() => r'8edffb15c5641f93c3e843b8e659936bbcd41a1d';
 final dictionariesProvider = AutoDisposeFutureProvider<Dictionaries>.internal(
   dictionaries,
   name: r'dictionariesProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$dictionariesHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$dictionariesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

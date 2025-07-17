@@ -40,21 +40,15 @@ class MorphologicalAnalysesFamily extends Family<AsyncValue<Analyses>> {
   const MorphologicalAnalysesFamily();
 
   /// See also [morphologicalAnalyses].
-  MorphologicalAnalysesProvider call(
-    AnalysisKeys keys,
-  ) {
-    return MorphologicalAnalysesProvider(
-      keys,
-    );
+  MorphologicalAnalysesProvider call(AnalysisKeys keys) {
+    return MorphologicalAnalysesProvider(keys);
   }
 
   @override
   MorphologicalAnalysesProvider getProviderOverride(
     covariant MorphologicalAnalysesProvider provider,
   ) {
-    return call(
-      provider.keys,
-    );
+    return call(provider.keys);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -76,24 +70,19 @@ class MorphologicalAnalysesFamily extends Family<AsyncValue<Analyses>> {
 class MorphologicalAnalysesProvider
     extends AutoDisposeFutureProvider<Analyses> {
   /// See also [morphologicalAnalyses].
-  MorphologicalAnalysesProvider(
-    AnalysisKeys keys,
-  ) : this._internal(
-          (ref) => morphologicalAnalyses(
-            ref as MorphologicalAnalysesRef,
-            keys,
-          ),
-          from: morphologicalAnalysesProvider,
-          name: r'morphologicalAnalysesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$morphologicalAnalysesHash,
-          dependencies: MorphologicalAnalysesFamily._dependencies,
-          allTransitiveDependencies:
-              MorphologicalAnalysesFamily._allTransitiveDependencies,
-          keys: keys,
-        );
+  MorphologicalAnalysesProvider(AnalysisKeys keys)
+    : this._internal(
+        (ref) => morphologicalAnalyses(ref as MorphologicalAnalysesRef, keys),
+        from: morphologicalAnalysesProvider,
+        name: r'morphologicalAnalysesProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$morphologicalAnalysesHash,
+        dependencies: MorphologicalAnalysesFamily._dependencies,
+        allTransitiveDependencies:
+            MorphologicalAnalysesFamily._allTransitiveDependencies,
+        keys: keys,
+      );
 
   MorphologicalAnalysesProvider._internal(
     super._createNotifier, {
@@ -173,21 +162,15 @@ class MorphologicalAnalysisKeysFamily extends Family<AsyncValue<AnalysisKeys>> {
   const MorphologicalAnalysisKeysFamily();
 
   /// See also [morphologicalAnalysisKeys].
-  MorphologicalAnalysisKeysProvider call(
-    String form,
-  ) {
-    return MorphologicalAnalysisKeysProvider(
-      form,
-    );
+  MorphologicalAnalysisKeysProvider call(String form) {
+    return MorphologicalAnalysisKeysProvider(form);
   }
 
   @override
   MorphologicalAnalysisKeysProvider getProviderOverride(
     covariant MorphologicalAnalysisKeysProvider provider,
   ) {
-    return call(
-      provider.form,
-    );
+    return call(provider.form);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -209,24 +192,22 @@ class MorphologicalAnalysisKeysFamily extends Family<AsyncValue<AnalysisKeys>> {
 class MorphologicalAnalysisKeysProvider
     extends AutoDisposeFutureProvider<AnalysisKeys> {
   /// See also [morphologicalAnalysisKeys].
-  MorphologicalAnalysisKeysProvider(
-    String form,
-  ) : this._internal(
-          (ref) => morphologicalAnalysisKeys(
-            ref as MorphologicalAnalysisKeysRef,
-            form,
-          ),
-          from: morphologicalAnalysisKeysProvider,
-          name: r'morphologicalAnalysisKeysProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$morphologicalAnalysisKeysHash,
-          dependencies: MorphologicalAnalysisKeysFamily._dependencies,
-          allTransitiveDependencies:
-              MorphologicalAnalysisKeysFamily._allTransitiveDependencies,
-          form: form,
-        );
+  MorphologicalAnalysisKeysProvider(String form)
+    : this._internal(
+        (ref) => morphologicalAnalysisKeys(
+          ref as MorphologicalAnalysisKeysRef,
+          form,
+        ),
+        from: morphologicalAnalysisKeysProvider,
+        name: r'morphologicalAnalysisKeysProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$morphologicalAnalysisKeysHash,
+        dependencies: MorphologicalAnalysisKeysFamily._dependencies,
+        allTransitiveDependencies:
+            MorphologicalAnalysisKeysFamily._allTransitiveDependencies,
+        form: form,
+      );
 
   MorphologicalAnalysisKeysProvider._internal(
     super._createNotifier, {
@@ -243,7 +224,7 @@ class MorphologicalAnalysisKeysProvider
   @override
   Override overrideWith(
     FutureOr<AnalysisKeys> Function(MorphologicalAnalysisKeysRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -294,5 +275,6 @@ class _MorphologicalAnalysisKeysProviderElement
   @override
   String get form => (origin as MorphologicalAnalysisKeysProvider).form;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

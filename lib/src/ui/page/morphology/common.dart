@@ -4,25 +4,31 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/src/component/dictionary/dictionaries_api.dart';
-import 'package:latin_reader/src/component/morph_analysis/enriched_morph_details_api.dart';
-import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
-import 'package:latin_reader/src/ui/router/config.dart';
-import 'package:latin_reader/src/ui/widget/show_error.dart';
-import 'package:latin_reader/src/ui/widget/show_loading.dart';
 
+import '../../../component/dictionary/dictionaries_api.dart';
+import '../../../component/morph_analysis/enriched_morph_details_api.dart';
+import '../../../component/morph_analysis/morphological_details_api.dart';
+import '../../router/config.dart';
+import '../../widget/show_error.dart';
+import '../../widget/show_loading.dart';
+
+// Called from limited and controlled places
 // ignore: avoid_annotating_with_dynamic
-({String title, String dictRef, String? pos, String? add}) Function(dynamic r)
-    consolidatedForm() => (r) => (
-          // ignore: avoid_dynamic_calls
-          title: r.macronizedForm ?? r.form,
-          // ignore: avoid_dynamic_calls
-          dictRef: r.dictionaryRef,
-          // ignore: avoid_dynamic_calls
-          pos: r.partOfSpeech,
-          // ignore: avoid_dynamic_calls
-          add: r.additional,
-        );
+({String title, String dictRef, String? pos, String? add}) Function(dynamic r) consolidatedForm() =>
+    (r) => (
+      // Same
+      // ignore: avoid_dynamic_calls
+      title: r.macronizedForm ?? r.form,
+      // Same
+      // ignore: avoid_dynamic_calls
+      dictRef: r.dictionaryRef,
+      // Same
+      // ignore: avoid_dynamic_calls
+      pos: r.partOfSpeech,
+      // Same
+      // ignore: avoid_dynamic_calls
+      add: r.additional,
+    );
 
 /// A reusable widget that fetches and displays morphological analysis details
 /// taking AnalysisKeys [keys]
@@ -35,12 +41,13 @@ class MorphologicalDataView extends ConsumerWidget {
   final AnalysisKeys keys;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ref.watch(enrichedMorphologicalAnalysesProvider(keys)).when(
-            data: (data) => _MorphDataSlides(analyses: data),
-            error: showError(ref, enrichedMorphologicalAnalysesProvider(keys)),
-            loading: showLoading,
-          );
+  Widget build(context, ref) => ref
+      .watch(enrichedMorphologicalAnalysesProvider(keys))
+      .when(
+        data: (data) => _MorphDataSlides(analyses: data),
+        error: showError(ref, enrichedMorphologicalAnalysesProvider(keys)),
+        loading: showLoading,
+      );
 }
 
 /// There will be one "slide" for each entry in the grouping logic, which is
@@ -61,17 +68,18 @@ class _MorphDataSlides extends StatefulWidget {
 
   @override
   State<_MorphDataSlides> createState() => _MorphDataSlidesState();
-//
+  //
 }
 
-class _MorphDataSlidesState extends State<_MorphDataSlides>
-    with TickerProviderStateMixin {
-//
+class _MorphDataSlidesState extends State<_MorphDataSlides> with TickerProviderStateMixin {
+  //
   /// Each entry will correspond to a slide
-  late final Map<({String? add, String dictRef, String? pos, String title}),
-                 List<EnrichedAnalysis>> 
+  // dart format off
+  late final Map<({String? add, String dictRef, String? pos, String title}), 
+                  List<EnrichedAnalysis>>
       _groupedAnalyses;
-  final _animationDuration = kTabScrollDuration;
+  // dart format on
+  final Duration _animationDuration = kTabScrollDuration;
   late PageController _pageViewController;
   late TabController _tabController;
   int _currentPageIndex = 0;
@@ -82,10 +90,7 @@ class _MorphDataSlidesState extends State<_MorphDataSlides>
     super.initState();
     _pageViewController = PageController(initialPage: _currentPageIndex);
     _groupedAnalyses = widget.analyses.groupListsBy(consolidatedForm());
-    _tabController = TabController(
-      length: _groupedAnalyses.length,
-      vsync: this,
-    );
+    _tabController = TabController(length: _groupedAnalyses.length, vsync: this);
   }
 
   @override
@@ -111,13 +116,12 @@ class _MorphDataSlidesState extends State<_MorphDataSlides>
           // Some padding so it doesn't fill the entire screen
           // Wrapped in Align to make the card only as tall as its contents
           children: analysisCards
-              .map((c) => Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: cardInsets,
-                      child: c,
-                    ),
-                  ))
+              .map(
+                (c) => Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(padding: cardInsets, child: c),
+                ),
+              )
               .toList(),
         ),
         _PageIndicator(
@@ -163,7 +167,8 @@ class _MorphDataSlidesState extends State<_MorphDataSlides>
       _tabController.animateTo(index, duration: _animationDuration);
     }
   }
-//
+
+  //
 }
 
 bool _isOnDesktopOrWeb() {
@@ -200,7 +205,7 @@ class _MorphEntryCard extends ConsumerWidget {
             const SizedBox(height: 10),
             const Divider(thickness: 3),
             _commonSection(theme, groupedData.commonProperties),
-            _differencesSection(theme, groupedData),
+            ?_differencesSection(theme, groupedData),
           ],
         ),
       ),
@@ -218,15 +223,14 @@ class _MorphEntryCard extends ConsumerWidget {
         ..._styledGroup(textStyle, [
           Text(_lexicalForm(firstAnalysis)),
           Text(firstAnalysis.partOfSpeech),
-          // TODO(whothefluff): change for null-aware element when possible (next dart v)
-          if (firstAnalysis.additional != null) Text(firstAnalysis.additional!),
+          ?_additional(firstAnalysis),
         ]),
         ...[
           Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: dictButton(themeColor, firstAnalysis, context, ref),
-          )
-        ]
+          ),
+        ],
       ],
     );
   }
@@ -236,72 +240,53 @@ class _MorphEntryCard extends ConsumerWidget {
     EnrichedAnalysis firstAnalysis,
     BuildContext context,
     WidgetRef ref,
-  ) =>
-      ActionChip(
-        avatar: Icon(
-          Icons.translate,
-          color: themeColor.secondary,
-        ),
-        label: const Text('View in Dictionary'),
-        onPressed: () async {
-          // We could create a provider specifically for this but this call
-          // should remain extremely fast forever
-          final dictionaries = await ref.read(dictionariesProvider.future);
-          final lns = dictionaries.singleWhere(
-            (d) => d.name == 'Lewis & Short',
-          );
-          if (context.mounted) {
-            await DictionaryEntryRoute(
-              lns.id,
-              firstAnalysis.lnsLemma,
-            ).push<void>(context);
-          }
-        },
-      );
+  ) => ActionChip(
+    avatar: Icon(Icons.translate, color: themeColor.secondary),
+    label: const Text('View in Dictionary'),
+    onPressed: () async {
+      // We could create a provider specifically for this but this call
+      // should remain extremely fast forever
+      final dictionaries = await ref.read(dictionariesProvider.future);
+      final lns = dictionaries.singleWhere((d) => d.name == 'Lewis & Short');
+      if (context.mounted) {
+        await DictionaryEntryRoute(lns.id, firstAnalysis.lnsLemma).push<void>(context);
+      }
+    },
+  );
 
   String _lexicalForm(EnrichedAnalysis analysis) =>
       '${analysis.dictionaryRef.replaceAll(RegExp(r'\d'), '')}${analysis.lnsInflection != null ? ', ${analysis.lnsInflection}' : ''}';
 
-  Widget _commonSection(
-    ThemeData theme,
-    Map<String, String> commonProperties,
-  ) =>
-      Column(
-        crossAxisAlignment: _cardContentAlignment,
-        children: commonProperties.entries
-            .map((e) => _detailRow(theme, e.key, e.value))
-            .toList(),
-      );
+  Text? _additional(EnrichedAnalysis analysis) =>
+      analysis.additional != null ? Text(analysis.additional!) : null;
 
-  Widget _differencesSection(
-    ThemeData theme,
-    _GroupedAnalysisData groupedData,
-  ) {
-    // TODO(whothefluff): change method usage for null-aware element when possible (next dart v)
+  Widget _commonSection(ThemeData theme, Map<String, String> commonProperties) => Column(
+    crossAxisAlignment: _cardContentAlignment,
+    children: commonProperties.entries.map((e) => _detailRow(theme, e.key, e.value)).toList(),
+  );
+
+  Widget? _differencesSection(ThemeData theme, _GroupedAnalysisData groupedData) {
     final themeTextStyle = theme.textTheme.titleSmall;
     final themeColor = theme.colorScheme;
     final textStyle = themeTextStyle?.copyWith(color: themeColor.secondary);
     final content = groupedData.differences
         .where((diffMap) => diffMap.isNotEmpty)
-        .mapIndexed((index, diffMap) => [
-              const Divider(),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 6.0),
-                child: Text('Reading ${index + 1}', style: textStyle),
-              ),
-              ...diffMap.entries.map((entry) => _detailRow(
-                    theme,
-                    entry.key,
-                    entry.value,
-                  )),
-            ])
+        .mapIndexed(
+          (index, diffMap) => [
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 6.0),
+              child: Text('Reading ${index + 1}', style: textStyle),
+            ),
+            ...diffMap.entries.map((entry) => _detailRow(theme, entry.key, entry.value)),
+          ],
+        )
         // Flatten List<List<Widget>> into List<Widget>
         .expand((widgets) => widgets)
         .toList();
-    return Column(
-      crossAxisAlignment: _cardContentAlignment,
-      children: content,
-    );
+    return content.isNotEmpty
+        ? Column(crossAxisAlignment: _cardContentAlignment, children: content)
+        : null;
   }
 
   Widget _detailRow(ThemeData theme, String label, String value) {
@@ -324,13 +309,8 @@ class _MorphEntryCard extends ConsumerWidget {
   }
 
   List<Widget> _styledGroup(TextStyle style, List<Widget> childrenToStyle) =>
-      childrenToStyle
-          .map((child) => DefaultTextStyle.merge(
-                style: style,
-                child: child,
-              ))
-          .toList();
-//
+      childrenToStyle.map((child) => DefaultTextStyle.merge(style: style, child: child)).toList();
+  //
 }
 
 /// Helper class to encapsulate the grouping logic *within* a PageView Card
@@ -349,6 +329,8 @@ class _GroupedAnalysisData {
 
   bool get hasDifferences => differences.any((d) => d.isNotEmpty);
 
+  // Versatility preferred over clarity
+  // ignore: specify_nonobvious_property_types
   static final _propertyExtractors = [
     (label: 'Stem', value: (EnrichedAnalysis a) => a.stem),
     (label: 'Suffix', value: (EnrichedAnalysis a) => a.suffix),
@@ -365,10 +347,7 @@ class _GroupedAnalysisData {
 
   void _computeGroupedProperties() {
     final common = <String, String>{};
-    final differencesList = List<Map<String, String>>.generate(
-      analyses.length,
-      (_) => {},
-    );
+    final differencesList = List<Map<String, String>>.generate(analyses.length, (_) => {});
     // Iterate over each property label once only
     for (final e in _propertyExtractors) {
       final label = e.label;
@@ -389,7 +368,8 @@ class _GroupedAnalysisData {
     commonProperties = common;
     differences = differencesList;
   }
-//
+
+  //
 }
 
 class _PageIndicator extends StatelessWidget {
@@ -414,25 +394,25 @@ class _PageIndicator extends StatelessWidget {
     if (totalPages <= 1) {
       return const SizedBox.shrink();
     }
-    final themeColor = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // TODO(whothefluff): change method usage for null-aware element when possible (next dart v)
-        if (isOnDesktopOrWeb) _goLeftButton(),
+        ?goLeftButtonForDesktop(),
         // Use Flexible to allow TabPageSelector to take necessary space but not more
         Flexible(
           child: TabPageSelector(
             controller: tabController,
-            selectedColor: themeColor.primary,
+            selectedColor: ColorScheme.of(context).primary,
           ),
         ),
-        if (isOnDesktopOrWeb) _goRightButton(),
+        ?_goRightButtonForDesktop(),
       ],
     );
   }
 
-  IconButton _goRightButton() => IconButton(
+  IconButton? _goRightButtonForDesktop() {
+    if (isOnDesktopOrWeb) {
+      return IconButton(
         tooltip: 'Next',
         onPressed: () {
           // Use totalPages for the upper bound check
@@ -442,16 +422,22 @@ class _PageIndicator extends StatelessWidget {
         },
         icon: const Icon(Icons.arrow_right_rounded),
       );
+    } else {
+      return null;
+    }
+  }
 
-  IconButton _goLeftButton() => IconButton(
-        tooltip: 'Previous',
-        onPressed: () {
-          // First page has constant index
-          if (currentPageIndex != 0) {
-            onPageChangeRequestedByButton(currentPageIndex - 1);
-          }
-        },
-        icon: const Icon(Icons.arrow_left_rounded),
-      );
-//
+  IconButton? goLeftButtonForDesktop() => isOnDesktopOrWeb
+      ? IconButton(
+          tooltip: 'Previous',
+          onPressed: () {
+            // First page has constant index
+            if (currentPageIndex != 0) {
+              onPageChangeRequestedByButton(currentPageIndex - 1);
+            }
+          },
+          icon: const Icon(Icons.arrow_left_rounded),
+        )
+      : null;
+  //
 }

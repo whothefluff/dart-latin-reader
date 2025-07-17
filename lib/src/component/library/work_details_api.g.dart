@@ -39,21 +39,15 @@ class WorkDetailsFamily extends Family<AsyncValue<WorkDetails>> {
   const WorkDetailsFamily();
 
   /// See also [workDetails].
-  WorkDetailsProvider call(
-    String work,
-  ) {
-    return WorkDetailsProvider(
-      work,
-    );
+  WorkDetailsProvider call(String work) {
+    return WorkDetailsProvider(work);
   }
 
   @override
   WorkDetailsProvider getProviderOverride(
     covariant WorkDetailsProvider provider,
   ) {
-    return call(
-      provider.work,
-    );
+    return call(provider.work);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -74,24 +68,18 @@ class WorkDetailsFamily extends Family<AsyncValue<WorkDetails>> {
 /// See also [workDetails].
 class WorkDetailsProvider extends AutoDisposeFutureProvider<WorkDetails> {
   /// See also [workDetails].
-  WorkDetailsProvider(
-    String work,
-  ) : this._internal(
-          (ref) => workDetails(
-            ref as WorkDetailsRef,
-            work,
-          ),
-          from: workDetailsProvider,
-          name: r'workDetailsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$workDetailsHash,
-          dependencies: WorkDetailsFamily._dependencies,
-          allTransitiveDependencies:
-              WorkDetailsFamily._allTransitiveDependencies,
-          work: work,
-        );
+  WorkDetailsProvider(String work)
+    : this._internal(
+        (ref) => workDetails(ref as WorkDetailsRef, work),
+        from: workDetailsProvider,
+        name: r'workDetailsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$workDetailsHash,
+        dependencies: WorkDetailsFamily._dependencies,
+        allTransitiveDependencies: WorkDetailsFamily._allTransitiveDependencies,
+        work: work,
+      );
 
   WorkDetailsProvider._internal(
     super._createNotifier, {
@@ -150,11 +138,13 @@ mixin WorkDetailsRef on AutoDisposeFutureProviderRef<WorkDetails> {
 }
 
 class _WorkDetailsProviderElement
-    extends AutoDisposeFutureProviderElement<WorkDetails> with WorkDetailsRef {
+    extends AutoDisposeFutureProviderElement<WorkDetails>
+    with WorkDetailsRef {
   _WorkDetailsProviderElement(super.provider);
 
   @override
   String get work => (origin as WorkDetailsProvider).work;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

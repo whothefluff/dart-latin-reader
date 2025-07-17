@@ -41,21 +41,15 @@ class EnrichedMorphologicalSearchFamily
   const EnrichedMorphologicalSearchFamily();
 
   /// See also [enrichedMorphologicalSearch].
-  EnrichedMorphologicalSearchProvider call(
-    String form,
-  ) {
-    return EnrichedMorphologicalSearchProvider(
-      form,
-    );
+  EnrichedMorphologicalSearchProvider call(String form) {
+    return EnrichedMorphologicalSearchProvider(form);
   }
 
   @override
   EnrichedMorphologicalSearchProvider getProviderOverride(
     covariant EnrichedMorphologicalSearchProvider provider,
   ) {
-    return call(
-      provider.form,
-    );
+    return call(provider.form);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -77,24 +71,22 @@ class EnrichedMorphologicalSearchFamily
 class EnrichedMorphologicalSearchProvider
     extends AutoDisposeFutureProvider<EnrichedResults> {
   /// See also [enrichedMorphologicalSearch].
-  EnrichedMorphologicalSearchProvider(
-    String form,
-  ) : this._internal(
-          (ref) => enrichedMorphologicalSearch(
-            ref as EnrichedMorphologicalSearchRef,
-            form,
-          ),
-          from: enrichedMorphologicalSearchProvider,
-          name: r'enrichedMorphologicalSearchProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$enrichedMorphologicalSearchHash,
-          dependencies: EnrichedMorphologicalSearchFamily._dependencies,
-          allTransitiveDependencies:
-              EnrichedMorphologicalSearchFamily._allTransitiveDependencies,
-          form: form,
-        );
+  EnrichedMorphologicalSearchProvider(String form)
+    : this._internal(
+        (ref) => enrichedMorphologicalSearch(
+          ref as EnrichedMorphologicalSearchRef,
+          form,
+        ),
+        from: enrichedMorphologicalSearchProvider,
+        name: r'enrichedMorphologicalSearchProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$enrichedMorphologicalSearchHash,
+        dependencies: EnrichedMorphologicalSearchFamily._dependencies,
+        allTransitiveDependencies:
+            EnrichedMorphologicalSearchFamily._allTransitiveDependencies,
+        form: form,
+      );
 
   EnrichedMorphologicalSearchProvider._internal(
     super._createNotifier, {
@@ -111,7 +103,7 @@ class EnrichedMorphologicalSearchProvider
   @override
   Override overrideWith(
     FutureOr<EnrichedResults> Function(EnrichedMorphologicalSearchRef provider)
-        create,
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -162,5 +154,6 @@ class _EnrichedMorphologicalSearchProviderElement
   @override
   String get form => (origin as EnrichedMorphologicalSearchProvider).form;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

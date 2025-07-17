@@ -46,20 +46,14 @@ class DictionaryAlphabetLetterPositionFamily
     String dictionary,
     String letter,
   ) {
-    return DictionaryAlphabetLetterPositionProvider(
-      dictionary,
-      letter,
-    );
+    return DictionaryAlphabetLetterPositionProvider(dictionary, letter);
   }
 
   @override
   DictionaryAlphabetLetterPositionProvider getProviderOverride(
     covariant DictionaryAlphabetLetterPositionProvider provider,
   ) {
-    return call(
-      provider.dictionary,
-      provider.letter,
-    );
+    return call(provider.dictionary, provider.letter);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -81,27 +75,24 @@ class DictionaryAlphabetLetterPositionFamily
 class DictionaryAlphabetLetterPositionProvider
     extends AutoDisposeFutureProvider<DictionaryAlphabetLetterPosition> {
   /// See also [dictionaryAlphabetLetterPosition].
-  DictionaryAlphabetLetterPositionProvider(
-    String dictionary,
-    String letter,
-  ) : this._internal(
-          (ref) => dictionaryAlphabetLetterPosition(
-            ref as DictionaryAlphabetLetterPositionRef,
-            dictionary,
-            letter,
-          ),
-          from: dictionaryAlphabetLetterPositionProvider,
-          name: r'dictionaryAlphabetLetterPositionProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$dictionaryAlphabetLetterPositionHash,
-          dependencies: DictionaryAlphabetLetterPositionFamily._dependencies,
-          allTransitiveDependencies:
-              DictionaryAlphabetLetterPositionFamily._allTransitiveDependencies,
-          dictionary: dictionary,
-          letter: letter,
-        );
+  DictionaryAlphabetLetterPositionProvider(String dictionary, String letter)
+    : this._internal(
+        (ref) => dictionaryAlphabetLetterPosition(
+          ref as DictionaryAlphabetLetterPositionRef,
+          dictionary,
+          letter,
+        ),
+        from: dictionaryAlphabetLetterPositionProvider,
+        name: r'dictionaryAlphabetLetterPositionProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$dictionaryAlphabetLetterPositionHash,
+        dependencies: DictionaryAlphabetLetterPositionFamily._dependencies,
+        allTransitiveDependencies:
+            DictionaryAlphabetLetterPositionFamily._allTransitiveDependencies,
+        dictionary: dictionary,
+        letter: letter,
+      );
 
   DictionaryAlphabetLetterPositionProvider._internal(
     super._createNotifier, {
@@ -120,8 +111,9 @@ class DictionaryAlphabetLetterPositionProvider
   @override
   Override overrideWith(
     FutureOr<DictionaryAlphabetLetterPosition> Function(
-            DictionaryAlphabetLetterPositionRef provider)
-        create,
+      DictionaryAlphabetLetterPositionRef provider,
+    )
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -140,7 +132,7 @@ class DictionaryAlphabetLetterPositionProvider
 
   @override
   AutoDisposeFutureProviderElement<DictionaryAlphabetLetterPosition>
-      createElement() {
+  createElement() {
     return _DictionaryAlphabetLetterPositionProviderElement(this);
   }
 
@@ -184,5 +176,6 @@ class _DictionaryAlphabetLetterPositionProviderElement
   String get letter =>
       (origin as DictionaryAlphabetLetterPositionProvider).letter;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

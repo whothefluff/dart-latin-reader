@@ -1,11 +1,15 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
 
 part 'author_details_api.g.dart';
 
@@ -31,25 +35,31 @@ class LibraryRepository implements ILibraryRepository {
     final dbData = await _db.libraryDrift.getLibraryAuthorDetails(author).get();
     final firstLine = dbData.first;
     return AuthorDetails(
-        id: firstLine.id,
-        name: firstLine.name,
-        about: firstLine.about,
-        image: firstLine.image,
-        works: UnmodifiableListView(dbData.map((e) => (
-              id: e.workId,
-              name: e.workName,
-              numberOfWords: e.numberOfWords,
-            ))));
+      id: firstLine.id,
+      name: firstLine.name,
+      about: firstLine.about,
+      image: firstLine.image,
+      works: UnmodifiableListView(
+        dbData.map(
+          (e) => (
+            id: e.workId,
+            name: e.workName,
+            numberOfWords: e.numberOfWords,
+          ),
+        ),
+      ),
+    );
   }
-//
+
+  //
 }
 
 //interactors
 
 abstract interface class ILibraryRepository {
-//
+  //
   Future<AuthorDetails> getAuthorDetailsOf(String author);
-//
+  //
 }
 
 class GetAuthorDetailsUseCase implements IGetAuthorDetailsUseCase {
@@ -62,17 +72,16 @@ class GetAuthorDetailsUseCase implements IGetAuthorDetailsUseCase {
   final String _author;
 
   @override
-  Future<AuthorDetails> invoke() async =>
-      _repository.getAuthorDetailsOf(_author);
-//
+  Future<AuthorDetails> invoke() async => _repository.getAuthorDetailsOf(_author);
+  //
 }
 
 //domain
 
 abstract interface class IGetAuthorDetailsUseCase {
-//
+  //
   Future<AuthorDetails> invoke();
-//
+  //
 }
 
 @immutable
@@ -89,23 +98,16 @@ class AuthorDetails {
   final String name;
   final String about;
   final Uint8List image;
-  final UnmodifiableListView<
-      ({
-        String id,
-        String name,
-        int numberOfWords,
-      })> works;
+  final UnmodifiableListView<({String id, String name, int numberOfWords})> works;
 
   @override
   String toString() => 'AuthorDetails{name: $name}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is AuthorDetails && other.id == id;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is AuthorDetails && other.id == id);
 
   @override
   int get hashCode => id.hashCode;
-//
+  //
 }

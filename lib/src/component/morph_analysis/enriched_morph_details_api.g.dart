@@ -42,21 +42,15 @@ class EnrichedMorphologicalAnalysesFamily
   const EnrichedMorphologicalAnalysesFamily();
 
   /// See also [enrichedMorphologicalAnalyses].
-  EnrichedMorphologicalAnalysesProvider call(
-    AnalysisKeys keys,
-  ) {
-    return EnrichedMorphologicalAnalysesProvider(
-      keys,
-    );
+  EnrichedMorphologicalAnalysesProvider call(AnalysisKeys keys) {
+    return EnrichedMorphologicalAnalysesProvider(keys);
   }
 
   @override
   EnrichedMorphologicalAnalysesProvider getProviderOverride(
     covariant EnrichedMorphologicalAnalysesProvider provider,
   ) {
-    return call(
-      provider.keys,
-    );
+    return call(provider.keys);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -78,24 +72,22 @@ class EnrichedMorphologicalAnalysesFamily
 class EnrichedMorphologicalAnalysesProvider
     extends AutoDisposeFutureProvider<EnrichedAnalyses> {
   /// See also [enrichedMorphologicalAnalyses].
-  EnrichedMorphologicalAnalysesProvider(
-    AnalysisKeys keys,
-  ) : this._internal(
-          (ref) => enrichedMorphologicalAnalyses(
-            ref as EnrichedMorphologicalAnalysesRef,
-            keys,
-          ),
-          from: enrichedMorphologicalAnalysesProvider,
-          name: r'enrichedMorphologicalAnalysesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$enrichedMorphologicalAnalysesHash,
-          dependencies: EnrichedMorphologicalAnalysesFamily._dependencies,
-          allTransitiveDependencies:
-              EnrichedMorphologicalAnalysesFamily._allTransitiveDependencies,
-          keys: keys,
-        );
+  EnrichedMorphologicalAnalysesProvider(AnalysisKeys keys)
+    : this._internal(
+        (ref) => enrichedMorphologicalAnalyses(
+          ref as EnrichedMorphologicalAnalysesRef,
+          keys,
+        ),
+        from: enrichedMorphologicalAnalysesProvider,
+        name: r'enrichedMorphologicalAnalysesProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$enrichedMorphologicalAnalysesHash,
+        dependencies: EnrichedMorphologicalAnalysesFamily._dependencies,
+        allTransitiveDependencies:
+            EnrichedMorphologicalAnalysesFamily._allTransitiveDependencies,
+        keys: keys,
+      );
 
   EnrichedMorphologicalAnalysesProvider._internal(
     super._createNotifier, {
@@ -112,8 +104,9 @@ class EnrichedMorphologicalAnalysesProvider
   @override
   Override overrideWith(
     FutureOr<EnrichedAnalyses> Function(
-            EnrichedMorphologicalAnalysesRef provider)
-        create,
+      EnrichedMorphologicalAnalysesRef provider,
+    )
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -165,5 +158,6 @@ class _EnrichedMorphologicalAnalysesProviderElement
   AnalysisKeys get keys =>
       (origin as EnrichedMorphologicalAnalysesProvider).keys;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

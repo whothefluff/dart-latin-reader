@@ -2,10 +2,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/src/component/library/author_details_api.dart';
-import 'package:latin_reader/src/ui/router/config.dart';
-import 'package:latin_reader/src/ui/widget/show_error.dart';
-import 'package:latin_reader/src/ui/widget/show_loading.dart';
+
+import '../../../component/library/author_details_api.dart';
+import '../../router/config.dart';
+import '../../widget/show_error.dart';
+import '../../widget/show_loading.dart';
 
 class AuthorDetailsPage extends ConsumerWidget {
   const AuthorDetailsPage(
@@ -16,16 +17,22 @@ class AuthorDetailsPage extends ConsumerWidget {
   final String authorId;
 
   @override
-  Widget build(context, ref) => ref.watch(authorDetailsProvider(authorId)).when(
-        data: (authorDetails) => Scaffold(
-          appBar: AppBar(
-            title: Text(authorDetails.name),
-          ),
-          body: worksList(context, authorDetails),
+  Widget build(context, ref) {
+    final authorDetailsAsync = ref.watch(authorDetailsProvider(authorId));
+    return Scaffold(
+      appBar: AppBar(
+        title: authorDetailsAsync.maybeWhen(
+          data: (authorDetails) => Text(authorDetails.name),
+          orElse: () => const Text('My App'),
         ),
+      ),
+      body: authorDetailsAsync.when(
+        data: (authorDetails) => worksList(context, authorDetails),
         loading: showLoading,
         error: showError(ref, authorDetailsProvider(authorId)),
-      );
+      ),
+    );
+  }
 
   Widget worksList(BuildContext context, AuthorDetails authorDetails) {
     final allItems = [
@@ -38,8 +45,7 @@ class AuthorDetailsPage extends ConsumerWidget {
     );
   }
 
-  Iterable<ListTile> workItems(
-          BuildContext context, AuthorDetails authorDetails) =>
+  Iterable<ListTile> workItems(BuildContext context, AuthorDetails authorDetails) =>
       authorDetails.works.map(
         (work) => ListTile(
           title: Row(
@@ -55,43 +61,43 @@ class AuthorDetailsPage extends ConsumerWidget {
       );
 
   Widget authorItem(BuildContext context, AuthorDetails author) => Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Card(
+      child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Wrap(
-              alignment: WrapAlignment.spaceAround,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                authorImage(author.image),
-                aboutAuthor(context, author.about),
-              ],
-            ),
-          ),
+        child: Wrap(
+          alignment: WrapAlignment.spaceAround,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            authorImage(author.image),
+            aboutAuthor(context, author.about),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 
   Padding authorImage(Uint8List image) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Image.memory(
-          image,
-          filterQuality: FilterQuality.high,
-          isAntiAlias: true,
-          height: 200,
-        ),
-      );
+    padding: const EdgeInsets.all(8.0),
+    child: Image.memory(
+      image,
+      filterQuality: FilterQuality.high,
+      isAntiAlias: true,
+      height: 200,
+    ),
+  );
 
   Padding aboutAuthor(BuildContext context, String about) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: RichText(
-            text: TextSpan(
-              text: about,
-              style: DefaultTextStyle.of(context).style,
-            ),
-          ),
+    padding: const EdgeInsets.all(8.0),
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 800),
+      child: RichText(
+        text: TextSpan(
+          text: about,
+          style: DefaultTextStyle.of(context).style,
         ),
-      );
-//
+      ),
+    ),
+  );
+  //
 }

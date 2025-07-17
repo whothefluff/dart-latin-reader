@@ -1,11 +1,15 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
 
 part 'dictionary_entry_senses_api.g.dart';
 
@@ -13,7 +17,10 @@ part 'dictionary_entry_senses_api.g.dart';
 
 @riverpod
 Future<DictionaryEntrySenses> dictionaryEntrySenses(
-    Ref ref, String dictionary, String lemma) async {
+  Ref ref,
+  String dictionary,
+  String lemma,
+) async {
   log.info(() => '@riverpod - dictionaryEntrySenses');
   ref.cacheFor(const Duration(minutes: 5));
   final db = await ref.watch(dbProvider.future);
@@ -29,24 +36,21 @@ class DictionaryRepository implements IDictionaryRepository {
   final AppDb _db;
 
   @override
-  Future<DictionaryEntrySenses> getEntrySensesOf(
-      String dictionary, String lemma) async {
+  Future<DictionaryEntrySenses> getEntrySensesOf(String dictionary, String lemma) async {
     log.info('DictionaryRepository - reading dictionary entry senses from db');
-    final dbData = await _db.dictionaryDrift
-        .getDictionaryEntrySenses(dictionary, lemma)
-        .get();
+    final dbData = await _db.dictionaryDrift.getDictionaryEntrySenses(dictionary, lemma).get();
     return DictionaryEntrySenses(dbData);
   }
-//
+
+  //
 }
 
 //interactors
 
 abstract interface class IDictionaryRepository {
-//
-  Future<DictionaryEntrySenses> getEntrySensesOf(
-      String dictionary, String lemma);
-//
+  //
+  Future<DictionaryEntrySenses> getEntrySensesOf(String dictionary, String lemma);
+  //
 }
 
 class GetEntrySensesUseCase implements IGetEntrySensesUseCase {
@@ -61,25 +65,22 @@ class GetEntrySensesUseCase implements IGetEntrySensesUseCase {
   final String _lemma;
 
   @override
-  Future<DictionaryEntrySenses> invoke() async =>
-      _repository.getEntrySensesOf(_dictionary, _lemma);
-//
+  Future<DictionaryEntrySenses> invoke() async => _repository.getEntrySensesOf(_dictionary, _lemma);
+  //
 }
 
 //domain
 
 abstract interface class IGetEntrySensesUseCase {
-//
+  //
   Future<DictionaryEntrySenses> invoke();
-//
+  //
 }
 
 @immutable
-extension type const DictionaryEntrySenses._(
-        UnmodifiableListView<EntrySense> unm)
+extension type const DictionaryEntrySenses._(UnmodifiableListView<EntrySense> unm)
     implements UnmodifiableListView<EntrySense> {
-  DictionaryEntrySenses(Iterable<EntrySense> iter)
-      : this._(UnmodifiableListView(iter));
+  DictionaryEntrySenses(Iterable<EntrySense> iter) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
@@ -93,21 +94,18 @@ class EntrySense {
   final String prettyLevel;
   final String content;
   final List<EntrySenseQuote> _quotes;
-  late final UnmodifiableListView<EntrySenseQuote> quotes =
-      UnmodifiableListView(_quotes);
+  late final UnmodifiableListView<EntrySenseQuote> quotes = UnmodifiableListView(_quotes);
 
   @override
   String toString() => 'EntrySense{prettyLevel: $prettyLevel}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is EntrySense && other.prettyLevel == prettyLevel;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is EntrySense && other.prettyLevel == prettyLevel);
 
   @override
   int get hashCode => prettyLevel.hashCode;
-//
+  //
 }
 
 @immutable
@@ -126,12 +124,10 @@ class EntrySenseQuote {
   String toString() => 'EntrySenseQuote{seq: $seq}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is EntrySenseQuote && other.seq == seq;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is EntrySenseQuote && other.seq == seq);
 
   @override
   int get hashCode => seq.hashCode;
-//
+  //
 }

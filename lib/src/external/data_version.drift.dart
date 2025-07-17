@@ -3,14 +3,16 @@
 import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/external/data_version.drift.dart' as i1;
 
-typedef $DataVersionCreateCompanionBuilder = i1.DataVersionCompanion Function({
-  i0.Value<int> idx,
-  i0.Value<String> createdAt,
-});
-typedef $DataVersionUpdateCompanionBuilder = i1.DataVersionCompanion Function({
-  i0.Value<int> idx,
-  i0.Value<String> createdAt,
-});
+typedef $DataVersionCreateCompanionBuilder =
+    i1.DataVersionCompanion Function({
+      i0.Value<int> idx,
+      i0.Value<String> createdAt,
+    });
+typedef $DataVersionUpdateCompanionBuilder =
+    i1.DataVersionCompanion Function({
+      i0.Value<int> idx,
+      i0.Value<String> createdAt,
+    });
 
 class $DataVersionFilterComposer
     extends i0.Composer<i0.GeneratedDatabase, i1.DataVersion> {
@@ -22,10 +24,14 @@ class $DataVersionFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnFilters<int> get idx => $composableBuilder(
-      column: $table.idx, builder: (column) => i0.ColumnFilters(column));
+    column: $table.idx,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 
   i0.ColumnFilters<String> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => i0.ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $DataVersionOrderingComposer
@@ -38,11 +44,14 @@ class $DataVersionOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   i0.ColumnOrderings<int> get idx => $composableBuilder(
-      column: $table.idx, builder: (column) => i0.ColumnOrderings(column));
+    column: $table.idx,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 
   i0.ColumnOrderings<String> get createdAt => $composableBuilder(
-      column: $table.createdAt,
-      builder: (column) => i0.ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $DataVersionAnnotationComposer
@@ -61,24 +70,31 @@ class $DataVersionAnnotationComposer
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
-class $DataVersionTableManager extends i0.RootTableManager<
-    i0.GeneratedDatabase,
-    i1.DataVersion,
-    i1.DataVersionData,
-    i1.$DataVersionFilterComposer,
-    i1.$DataVersionOrderingComposer,
-    i1.$DataVersionAnnotationComposer,
-    $DataVersionCreateCompanionBuilder,
-    $DataVersionUpdateCompanionBuilder,
-    (
-      i1.DataVersionData,
-      i0
-      .BaseReferences<i0.GeneratedDatabase, i1.DataVersion, i1.DataVersionData>
-    ),
-    i1.DataVersionData,
-    i0.PrefetchHooks Function()> {
+class $DataVersionTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.DataVersion,
+          i1.DataVersionData,
+          i1.$DataVersionFilterComposer,
+          i1.$DataVersionOrderingComposer,
+          i1.$DataVersionAnnotationComposer,
+          $DataVersionCreateCompanionBuilder,
+          $DataVersionUpdateCompanionBuilder,
+          (
+            i1.DataVersionData,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.DataVersion,
+              i1.DataVersionData
+            >,
+          ),
+          i1.DataVersionData,
+          i0.PrefetchHooks Function()
+        > {
   $DataVersionTableManager(i0.GeneratedDatabase db, i1.DataVersion table)
-      : super(i0.TableManagerState(
+    : super(
+        i0.TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -87,45 +103,48 @@ class $DataVersionTableManager extends i0.RootTableManager<
               i1.$DataVersionOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               i1.$DataVersionAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            i0.Value<int> idx = const i0.Value.absent(),
-            i0.Value<String> createdAt = const i0.Value.absent(),
-          }) =>
-              i1.DataVersionCompanion(
-            idx: idx,
-            createdAt: createdAt,
-          ),
-          createCompanionCallback: ({
-            i0.Value<int> idx = const i0.Value.absent(),
-            i0.Value<String> createdAt = const i0.Value.absent(),
-          }) =>
-              i1.DataVersionCompanion.insert(
-            idx: idx,
-            createdAt: createdAt,
-          ),
+          updateCompanionCallback:
+              ({
+                i0.Value<int> idx = const i0.Value.absent(),
+                i0.Value<String> createdAt = const i0.Value.absent(),
+              }) => i1.DataVersionCompanion(idx: idx, createdAt: createdAt),
+          createCompanionCallback:
+              ({
+                i0.Value<int> idx = const i0.Value.absent(),
+                i0.Value<String> createdAt = const i0.Value.absent(),
+              }) => i1.DataVersionCompanion.insert(
+                idx: idx,
+                createdAt: createdAt,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $DataVersionProcessedTableManager = i0.ProcessedTableManager<
-    i0.GeneratedDatabase,
-    i1.DataVersion,
-    i1.DataVersionData,
-    i1.$DataVersionFilterComposer,
-    i1.$DataVersionOrderingComposer,
-    i1.$DataVersionAnnotationComposer,
-    $DataVersionCreateCompanionBuilder,
-    $DataVersionUpdateCompanionBuilder,
-    (
+typedef $DataVersionProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.DataVersion,
       i1.DataVersionData,
-      i0
-      .BaseReferences<i0.GeneratedDatabase, i1.DataVersion, i1.DataVersionData>
-    ),
-    i1.DataVersionData,
-    i0.PrefetchHooks Function()>;
+      i1.$DataVersionFilterComposer,
+      i1.$DataVersionOrderingComposer,
+      i1.$DataVersionAnnotationComposer,
+      $DataVersionCreateCompanionBuilder,
+      $DataVersionUpdateCompanionBuilder,
+      (
+        i1.DataVersionData,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.DataVersion,
+          i1.DataVersionData
+        >,
+      ),
+      i1.DataVersionData,
+      i0.PrefetchHooks Function()
+    >;
 
 class DataVersion extends i0.Table
     with i0.TableInfo<DataVersion, i1.DataVersionData> {
@@ -135,18 +154,25 @@ class DataVersion extends i0.Table
   DataVersion(this.attachedDatabase, [this._alias]);
   static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
   late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
-      'idx', aliasedName, false,
-      type: i0.DriftSqlType.int,
-      requiredDuringInsert: false,
-      $customConstraints: 'NOT NULL');
-  static const i0.VerificationMeta _createdAtMeta =
-      const i0.VerificationMeta('createdAt');
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _createdAtMeta = const i0.VerificationMeta(
+    'createdAt',
+  );
   late final i0.GeneratedColumn<String> createdAt = i0.GeneratedColumn<String>(
-      'createdAt', aliasedName, false,
-      type: i0.DriftSqlType.string,
-      requiredDuringInsert: false,
-      $customConstraints: 'NOT NULL DEFAULT CURRENT_TIMESTAMP',
-      defaultValue: const i0.CustomExpression('CURRENT_TIMESTAMP'));
+    'createdAt',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT CURRENT_TIMESTAMP',
+    defaultValue: const i0.CustomExpression('CURRENT_TIMESTAMP'),
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [idx, createdAt];
   @override
@@ -156,17 +182,22 @@ class DataVersion extends i0.Table
   static const String $name = 'DataVersion';
   @override
   i0.VerificationContext validateIntegrity(
-      i0.Insertable<i1.DataVersionData> instance,
-      {bool isInserting = false}) {
+    i0.Insertable<i1.DataVersionData> instance, {
+    bool isInserting = false,
+  }) {
     final context = i0.VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('idx')) {
       context.handle(
-          _idxMeta, idx.isAcceptableOrUnknown(data['idx']!, _idxMeta));
+        _idxMeta,
+        idx.isAcceptableOrUnknown(data['idx']!, _idxMeta),
+      );
     }
     if (data.containsKey('createdAt')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['createdAt']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['createdAt']!, _createdAtMeta),
+      );
     }
     return context;
   }
@@ -177,10 +208,14 @@ class DataVersion extends i0.Table
   i1.DataVersionData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.DataVersionData(
-      idx: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}idx'])!,
-      createdAt: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}createdAt'])!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}createdAt'],
+      )!,
     );
   }
 
@@ -217,8 +252,10 @@ class DataVersionData extends i0.DataClass
     );
   }
 
-  factory DataVersionData.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory DataVersionData.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return DataVersionData(
       idx: serializer.fromJson<int>(json['idx']),
@@ -286,8 +323,10 @@ class DataVersionCompanion extends i0.UpdateCompanion<i1.DataVersionData> {
     });
   }
 
-  i1.DataVersionCompanion copyWith(
-      {i0.Value<int>? idx, i0.Value<String>? createdAt}) {
+  i1.DataVersionCompanion copyWith({
+    i0.Value<int>? idx,
+    i0.Value<String>? createdAt,
+  }) {
     return i1.DataVersionCompanion(
       idx: idx ?? this.idx,
       createdAt: createdAt ?? this.createdAt,
@@ -320,8 +359,10 @@ class LatestDataVersionData extends i0.DataClass {
   final int idx;
   final String createdAt;
   const LatestDataVersionData({required this.idx, required this.createdAt});
-  factory LatestDataVersionData.fromJson(Map<String, dynamic> json,
-      {i0.ValueSerializer? serializer}) {
+  factory LatestDataVersionData.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LatestDataVersionData(
       idx: serializer.fromJson<int>(json['idx']),
@@ -376,29 +417,41 @@ class LatestDataVersion
   String get entityName => 'LatestDataVersion';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
-        i0.SqlDialect.sqlite:
-            'CREATE VIEW LatestDataVersion AS SELECT * FROM DataVersion ORDER BY idx DESC LIMIT 1',
-      };
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW LatestDataVersion AS SELECT * FROM DataVersion ORDER BY idx DESC LIMIT 1',
+  };
   @override
   LatestDataVersion get asDslTable => this;
   @override
-  i1.LatestDataVersionData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  i1.LatestDataVersionData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.LatestDataVersionData(
-      idx: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.int, data['${effectivePrefix}idx'])!,
-      createdAt: attachedDatabase.typeMapping
-          .read(i0.DriftSqlType.string, data['${effectivePrefix}createdAt'])!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}createdAt'],
+      )!,
     );
   }
 
   late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
-      'idx', aliasedName, false,
-      type: i0.DriftSqlType.int);
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumn<String> createdAt = i0.GeneratedColumn<String>(
-      'createdAt', aliasedName, false,
-      type: i0.DriftSqlType.string);
+    'createdAt',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   @override
   LatestDataVersion createAlias(String alias) {
     return LatestDataVersion(attachedDatabase, alias);

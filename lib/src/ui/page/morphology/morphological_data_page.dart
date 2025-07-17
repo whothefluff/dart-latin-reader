@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
-import 'package:latin_reader/src/ui/page/morphology/common.dart';
+
+import '../../../component/morph_analysis/morphological_details_api.dart';
+import 'common.dart';
 
 ///While in theory any number of keys would work, the assumption is that all
 ///share the same form. This is relevant for example when showing the title of
@@ -15,8 +16,8 @@ class MorphologicalDataPage extends StatelessWidget {
 
   @override
   Widget build(context) => Scaffold(
-        appBar: AppBar(title: Text(keys.first.form)),
-        body: MorphologicalDataView(keys: keys),
-      );
-//
+    appBar: AppBar(title: Text(keys.first.form)),
+    body: MorphologicalDataView(keys: keys),
+  );
+  //
 }

@@ -1,19 +1,22 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
 
 part 'work_contents_api.g.dart';
 
 //infrastructure
 
 @riverpod
-Future<WorkContentsSegments> workContents(
-    Ref ref, String id, int fromIndex, int toIndex) async {
+Future<WorkContentsSegments> workContents(Ref ref, String id, int fromIndex, int toIndex) async {
   log.info(() => '@riverpod - workContents');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
@@ -27,26 +30,23 @@ class LibraryRepository implements ILibraryRepository {
   final AppDb _db;
 
   @override
-  Future<WorkContentsSegments> getWorkContents(
-      String id, int fromIndex, int toIndex) async {
-    log.info(
-      'LibraryRepository - reading work contents ($fromIndex - $toIndex) from db',
-    );
+  Future<WorkContentsSegments> getWorkContents(String id, int fromIndex, int toIndex) async {
+    log.info('LibraryRepository - reading work contents ($fromIndex - $toIndex) from db');
     final dbData = await _db.libraryDrift
         .getLibraryWorkContentsPartial(id, fromIndex, toIndex)
         .get();
     return WorkContentsSegments(dbData);
   }
-//
+
+  //
 }
 
 //interactors
 
 abstract interface class ILibraryRepository {
-//
-  Future<WorkContentsSegments> getWorkContents(
-      String id, int fromIndex, int toIndex);
-//
+  //
+  Future<WorkContentsSegments> getWorkContents(String id, int fromIndex, int toIndex);
+  //
 }
 
 class GetPartialWorkContentsUseCase implements IGetPartialWorkContentsUseCase {
@@ -65,23 +65,21 @@ class GetPartialWorkContentsUseCase implements IGetPartialWorkContentsUseCase {
   @override
   Future<WorkContentsSegments> invoke() async =>
       _repository.getWorkContents(_id, _fromIndex, _toIndex);
-//
+  //
 }
 
 //domain
 
 abstract interface class IGetPartialWorkContentsUseCase {
-//
+  //
   Future<WorkContentsSegments> invoke();
-//
+  //
 }
 
 @immutable
-extension type const WorkContentsSegments._(
-        UnmodifiableListView<WorkContentsSegment> unm)
+extension type const WorkContentsSegments._(UnmodifiableListView<WorkContentsSegment> unm)
     implements UnmodifiableListView<WorkContentsSegment> {
-  WorkContentsSegments(Iterable<WorkContentsSegment> iter)
-      : this._(UnmodifiableListView(iter));
+  WorkContentsSegments(Iterable<WorkContentsSegment> iter) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
@@ -110,12 +108,11 @@ class WorkContentsSegment {
   String toString() => 'WorkContentsSegment{index: $idx, word: $word}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is WorkContentsSegment && other.workId == workId && other.idx == idx;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WorkContentsSegment && other.workId == workId && other.idx == idx);
 
   @override
   int get hashCode => Object.hash(workId, idx);
-//
+  //
 }

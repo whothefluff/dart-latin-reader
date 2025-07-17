@@ -1,14 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/dictionary/db_util.dart'
-    as dict_util;
-import 'package:latin_reader/src/component/library/db_util.dart' as libr_util;
-import 'package:latin_reader/src/component/morph_analysis/db_util.dart'
-    as morp_util;
-import 'package:latin_reader/src/external/data_version.drift.dart';
-import 'package:latin_reader/src/external/database.dart';
 import 'package:sqlite3/sqlite3.dart';
+
+import '../../logger.dart';
+import '../component/dictionary/db_util.dart' as dict_util;
+import '../component/library/db_util.dart' as libr_util;
+import '../component/morph_analysis/db_util.dart' as morp_util;
+import 'data_version.drift.dart';
+import 'database.dart';
 
 const path = 'assets/preprocessed_data/';
 
@@ -21,6 +20,9 @@ void setupRegExp(Database db) {
       final input = args[1]! as String;
       return RegExp(regexPattern).hasMatch(input) ? 1 : 0;
     },
+    deterministic: true,
+    // Necessary for using it in table definition's checks
+    directOnly: false,
   );
 }
 
@@ -48,22 +50,21 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
   ];
   await db.transaction(() async {
     await operations.fold(
-        Future<void>.value(),
-        (previousFuture, op) => previousFuture.then((_) async {
-              log.info(() => 'populateDatabaseFromCsv() - deleting ${op.id}');
-              await op.delete(db);
-              log.info(() => 'populateDatabaseFromCsv() - inserting ${op.id}');
-              await op.insert(db);
-            }));
+      Future<void>.value(),
+      (previousFuture, op) => previousFuture.then((_) async {
+        log.info(() => 'populateDatabaseFromCsv() - deleting ${op.id}');
+        await op.delete(db);
+        log.info(() => 'populateDatabaseFromCsv() - inserting ${op.id}');
+        await op.insert(db);
+      }),
+    );
   });
 }
 
 Future<void> updateDatabaseVersion(AppDb db) async {
   log.info(() => 'updateDatabaseVersion() - updating data version');
   final assetVersion = await getDataVersion();
-  await db.into(db.dataVersion).insertOnConflictUpdate(
-        DataVersionCompanion(
-          idx: Value(assetVersion),
-        ),
-      );
+  await db
+      .into(db.dataVersion)
+      .insertOnConflictUpdate(DataVersionCompanion(idx: Value(assetVersion)));
 }

@@ -1,3 +1,4 @@
+// Will not fail
 // ignore_for_file: avoid_dynamic_calls
 
 import 'package:flutter/services.dart';
@@ -9,7 +10,7 @@ class AppConfig {
 
   static final AppConfig _instance = AppConfig._();
   static late final YamlMap _config;
-  static final _levels = {
+  static final Map<String, Level> _levels = {
     'ALL': Level.ALL,
     'FINEST': Level.FINEST,
     'FINER': Level.FINER,
@@ -29,13 +30,10 @@ class AppConfig {
     _config = loadYaml(configString) as YamlMap;
   }
 
-  bool get logDbStatements =>
-      _config['database.log_statements'] as bool? ?? false;
+  bool get logDbStatements => _config['database.log_statements'] as bool? ?? false;
 
-  Level get consoleLogLevel =>
-      _levels[_config['log']['console']['level']] ?? Level.ALL;
+  Level get consoleLogLevel => _levels[_config['log']['console']['level']] ?? Level.ALL;
 
-  Level get fileLogLevel =>
-      _levels[_config['log']['file']['level']] ?? Level.OFF;
-//
+  Level get fileLogLevel => _levels[_config['log']['file']['level']] ?? Level.OFF;
+  //
 }

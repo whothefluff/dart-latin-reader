@@ -1,12 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/morph_analysis/enriched_morph_search_api.dart';
-import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
-import 'package:latin_reader/src/ui/page/morphology/common.dart';
-import 'package:latin_reader/src/ui/router/config.dart';
-import 'package:latin_reader/src/ui/widget/show_error.dart';
+
+import '../../../../logger.dart';
+import '../../../component/morph_analysis/enriched_morph_search_api.dart';
+import '../../../component/morph_analysis/morphological_details_api.dart';
+import '../../router/config.dart';
+import '../../widget/show_error.dart';
+import 'common.dart';
 
 /// This page has a weird state, so much so that hot reload doesn't even work
 class MorphologicalSearchPage extends ConsumerStatefulWidget {
@@ -15,13 +16,12 @@ class MorphologicalSearchPage extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<MorphologicalSearchPage> createState() =>
-      _MorphologyPageState();
-//
+  ConsumerState<MorphologicalSearchPage> createState() => _MorphologyPageState();
+  //
 }
 
 class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
-//
+  //
   AnalysisKeys _selectedKeys = AnalysisKeys(const []);
   final SearchController _searchController = SearchController();
   bool _isSearching = false;
@@ -35,11 +35,9 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
   /// Called when a search result is selected
   Future<void> _handleResultSelected(EnrichedResults results) async {
     setState(() {
-      _selectedKeys = AnalysisKeys(results.map((r) => AnalysisKey(
-            form: r.form,
-            item: r.item,
-            cnt: r.cnt,
-          )));
+      _selectedKeys = AnalysisKeys(
+        results.map((r) => AnalysisKey(form: r.form, item: r.item, cnt: r.cnt)),
+      );
       _searchController.closeView(_searchController.text);
     });
     log.info(() => 'MorphologyPage - selecting $_selectedKeys');
@@ -70,7 +68,9 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                   }
                   log.info(() => 'MorphologyPage - searching for: $searchTerm');
                   try {
-                    final results = await ref.watch(enrichedMorphologicalSearchProvider(searchTerm).future);
+                    final results = await ref.watch(
+                      enrichedMorphologicalSearchProvider(searchTerm).future,
+                    );
                     // Reset searching state
                     if (_isSearching) {
                       setState(() => _isSearching = false);
@@ -89,15 +89,12 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                             result.add,
                           ].where((e) => e != null).join(' • ');
                           return ListTile(
-                            title: Text.rich(TextSpan(
-                              text: '${result.title} ',
-                              children: [
-                                TextSpan(
-                                  text: result.dictRef,
-                                  style: dictRefStyle,
-                                )
-                              ],
-                            )),
+                            title: Text.rich(
+                              TextSpan(
+                                text: '${result.title} ',
+                                children: [TextSpan(text: result.dictRef, style: dictRefStyle)],
+                              ),
+                            ),
                             subtitle: Text(details),
                             onTap: () => _handleResultSelected(
                               EnrichedResults(groupedRes[result]!),
@@ -108,13 +105,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                     ];
                   } on Exception catch (e, stack) {
                     return [
-                      showError(
-                        ref,
-                        enrichedMorphologicalSearchProvider(searchTerm),
-                      )(
-                        e,
-                        stack,
-                      ),
+                      showError(ref, enrichedMorphologicalSearchProvider(searchTerm))(e, stack),
                     ];
                   }
                 },
@@ -131,13 +122,10 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
         ],
       ),
       body: Column(
-        children: [
-          Expanded(
-            child: MorphologicalDataView(keys: _selectedKeys),
-          ),
-        ],
+        children: [Expanded(child: MorphologicalDataView(keys: _selectedKeys))],
       ),
     );
   }
-//
+
+  //
 }

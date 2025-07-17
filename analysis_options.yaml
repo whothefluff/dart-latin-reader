@@ -117,15 +117,30 @@ linter:
     - use_string_buffers
     - use_test_throws_matchers
     - use_to_and_as_if_applicable
-    # - use_truncating_division
+    - invalid_runtime_check_with_js_interop_types
+    - unnecessary_library_name
+    - strict_top_level_inference
+    - unnecessary_underscores
+    - use_truncating_division
+    - always_put_control_body_on_new_line
+    - prefer_relative_imports
+    - avoid_final_parameters #only because 'parameter_assignments' is on
+    - document_ignores
+    - missing_whitespace_between_adjacent_strings
+    - one_member_abstracts
+    - unnecessary_ignore
+    - use_null_aware_elements
 #experimental
     - annotate_redeclares
-    # - avoid_futureor_void
+    - avoid_futureor_void
     - invalid_case_patterns
-    # - omit_obvious_local_variable_types
-    # - specify_nonobvious_local_variable_types
+    - omit_obvious_local_variable_types
     - unnecessary_null_checks
     - use_late_for_private_fields_and_variables
+    - implicit_reopen
+    - no_default_cases
+    - specify_nonobvious_property_types
+    - unsafe_variance
 
 
 
@@ -145,3 +160,7 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.drift.dart"
+    
+formatter:
+  page_width: 100
+  trailing_commas: preserve

@@ -39,21 +39,15 @@ class DictionaryEntriesFamily extends Family<AsyncValue<DictionaryEntries>> {
   const DictionaryEntriesFamily();
 
   /// See also [dictionaryEntries].
-  DictionaryEntriesProvider call(
-    String dictionary,
-  ) {
-    return DictionaryEntriesProvider(
-      dictionary,
-    );
+  DictionaryEntriesProvider call(String dictionary) {
+    return DictionaryEntriesProvider(dictionary);
   }
 
   @override
   DictionaryEntriesProvider getProviderOverride(
     covariant DictionaryEntriesProvider provider,
   ) {
-    return call(
-      provider.dictionary,
-    );
+    return call(provider.dictionary);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -75,24 +69,19 @@ class DictionaryEntriesFamily extends Family<AsyncValue<DictionaryEntries>> {
 class DictionaryEntriesProvider
     extends AutoDisposeFutureProvider<DictionaryEntries> {
   /// See also [dictionaryEntries].
-  DictionaryEntriesProvider(
-    String dictionary,
-  ) : this._internal(
-          (ref) => dictionaryEntries(
-            ref as DictionaryEntriesRef,
-            dictionary,
-          ),
-          from: dictionaryEntriesProvider,
-          name: r'dictionaryEntriesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$dictionaryEntriesHash,
-          dependencies: DictionaryEntriesFamily._dependencies,
-          allTransitiveDependencies:
-              DictionaryEntriesFamily._allTransitiveDependencies,
-          dictionary: dictionary,
-        );
+  DictionaryEntriesProvider(String dictionary)
+    : this._internal(
+        (ref) => dictionaryEntries(ref as DictionaryEntriesRef, dictionary),
+        from: dictionaryEntriesProvider,
+        name: r'dictionaryEntriesProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$dictionaryEntriesHash,
+        dependencies: DictionaryEntriesFamily._dependencies,
+        allTransitiveDependencies:
+            DictionaryEntriesFamily._allTransitiveDependencies,
+        dictionary: dictionary,
+      );
 
   DictionaryEntriesProvider._internal(
     super._createNotifier, {
@@ -158,5 +147,6 @@ class _DictionaryEntriesProviderElement
   @override
   String get dictionary => (origin as DictionaryEntriesProvider).dictionary;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

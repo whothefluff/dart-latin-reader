@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:latin_reader/app_config.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'app_config.dart';
 
 final Logger log = Logger('');
 
@@ -15,8 +16,12 @@ void configureLogging() {
     final message = '$identifier$content';
     if (kDebugMode) {
       print(message);
-      if (r.error != null) print('Error: ${r.error}');
-      if (r.stackTrace != null) print('StackTrace: ${r.stackTrace}');
+      if (r.error != null) {
+        print('Error: ${r.error}');
+      }
+      if (r.stackTrace != null) {
+        print('StackTrace: ${r.stackTrace}');
+      }
     }
     if (writeSuccessful) {
       try {
@@ -26,7 +31,9 @@ void configureLogging() {
         final optStackTrace = r.stackTrace != null ? '\n${r.stackTrace}' : '';
         await file.writeAsString('$message$optError$optStackTrace\n');
       } on Exception catch (e) {
-        if (kDebugMode) print('Failed to write file log: $e');
+        if (kDebugMode) {
+          print('Failed to write file log: $e');
+        }
         writeSuccessful = false;
       }
     }
