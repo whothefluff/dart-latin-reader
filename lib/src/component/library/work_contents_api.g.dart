@@ -39,27 +39,15 @@ class WorkContentsFamily extends Family<AsyncValue<WorkContentsSegments>> {
   const WorkContentsFamily();
 
   /// See also [workContents].
-  WorkContentsProvider call(
-    String id,
-    int fromIndex,
-    int toIndex,
-  ) {
-    return WorkContentsProvider(
-      id,
-      fromIndex,
-      toIndex,
-    );
+  WorkContentsProvider call(String id, int fromIndex, int toIndex) {
+    return WorkContentsProvider(id, fromIndex, toIndex);
   }
 
   @override
   WorkContentsProvider getProviderOverride(
     covariant WorkContentsProvider provider,
   ) {
-    return call(
-      provider.id,
-      provider.fromIndex,
-      provider.toIndex,
-    );
+    return call(provider.id, provider.fromIndex, provider.toIndex);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -81,30 +69,21 @@ class WorkContentsFamily extends Family<AsyncValue<WorkContentsSegments>> {
 class WorkContentsProvider
     extends AutoDisposeFutureProvider<WorkContentsSegments> {
   /// See also [workContents].
-  WorkContentsProvider(
-    String id,
-    int fromIndex,
-    int toIndex,
-  ) : this._internal(
-          (ref) => workContents(
-            ref as WorkContentsRef,
-            id,
-            fromIndex,
-            toIndex,
-          ),
-          from: workContentsProvider,
-          name: r'workContentsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$workContentsHash,
-          dependencies: WorkContentsFamily._dependencies,
-          allTransitiveDependencies:
-              WorkContentsFamily._allTransitiveDependencies,
-          id: id,
-          fromIndex: fromIndex,
-          toIndex: toIndex,
-        );
+  WorkContentsProvider(String id, int fromIndex, int toIndex)
+    : this._internal(
+        (ref) => workContents(ref as WorkContentsRef, id, fromIndex, toIndex),
+        from: workContentsProvider,
+        name: r'workContentsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$workContentsHash,
+        dependencies: WorkContentsFamily._dependencies,
+        allTransitiveDependencies:
+            WorkContentsFamily._allTransitiveDependencies,
+        id: id,
+        fromIndex: fromIndex,
+        toIndex: toIndex,
+      );
 
   WorkContentsProvider._internal(
     super._createNotifier, {
@@ -191,5 +170,6 @@ class _WorkContentsProviderElement
   @override
   int get toIndex => (origin as WorkContentsProvider).toIndex;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

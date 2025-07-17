@@ -1,9 +1,13 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
 
 part 'work_details_api.g.dart';
 
@@ -26,19 +30,19 @@ class LibraryRepository implements ILibraryRepository {
   @override
   Future<WorkDetails> getWorkDetailsOf(String work) async {
     log.info('LibraryRepository - reading dictionaries from db');
-    final dbData =
-        await _db.libraryDrift.getLibraryWorkDetails(work).getSingle();
+    final dbData = await _db.libraryDrift.getLibraryWorkDetails(work).getSingle();
     return dbData;
   }
-//
+
+  //
 }
 
 //interactors
 
 abstract interface class ILibraryRepository {
-//
+  //
   Future<WorkDetails> getWorkDetailsOf(String work);
-//
+  //
 }
 
 class GetWorkDetailsUseCase implements IGetWorkDetailsUseCase {
@@ -52,15 +56,15 @@ class GetWorkDetailsUseCase implements IGetWorkDetailsUseCase {
 
   @override
   Future<WorkDetails> invoke() async => _repository.getWorkDetailsOf(_work);
-//
+  //
 }
 
 //domain
 
 abstract interface class IGetWorkDetailsUseCase {
-//
+  //
   Future<WorkDetails> invoke();
-//
+  //
 }
 
 @immutable
@@ -85,12 +89,10 @@ class WorkDetails {
   String toString() => 'WorkDetails{name: $name}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is WorkDetails && other.id == id;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is WorkDetails && other.id == id);
 
   @override
   int get hashCode => id.hashCode;
-//
+  //
 }

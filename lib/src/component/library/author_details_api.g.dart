@@ -39,21 +39,15 @@ class AuthorDetailsFamily extends Family<AsyncValue<AuthorDetails>> {
   const AuthorDetailsFamily();
 
   /// See also [authorDetails].
-  AuthorDetailsProvider call(
-    String author,
-  ) {
-    return AuthorDetailsProvider(
-      author,
-    );
+  AuthorDetailsProvider call(String author) {
+    return AuthorDetailsProvider(author);
   }
 
   @override
   AuthorDetailsProvider getProviderOverride(
     covariant AuthorDetailsProvider provider,
   ) {
-    return call(
-      provider.author,
-    );
+    return call(provider.author);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -74,24 +68,19 @@ class AuthorDetailsFamily extends Family<AsyncValue<AuthorDetails>> {
 /// See also [authorDetails].
 class AuthorDetailsProvider extends AutoDisposeFutureProvider<AuthorDetails> {
   /// See also [authorDetails].
-  AuthorDetailsProvider(
-    String author,
-  ) : this._internal(
-          (ref) => authorDetails(
-            ref as AuthorDetailsRef,
-            author,
-          ),
-          from: authorDetailsProvider,
-          name: r'authorDetailsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$authorDetailsHash,
-          dependencies: AuthorDetailsFamily._dependencies,
-          allTransitiveDependencies:
-              AuthorDetailsFamily._allTransitiveDependencies,
-          author: author,
-        );
+  AuthorDetailsProvider(String author)
+    : this._internal(
+        (ref) => authorDetails(ref as AuthorDetailsRef, author),
+        from: authorDetailsProvider,
+        name: r'authorDetailsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$authorDetailsHash,
+        dependencies: AuthorDetailsFamily._dependencies,
+        allTransitiveDependencies:
+            AuthorDetailsFamily._allTransitiveDependencies,
+        author: author,
+      );
 
   AuthorDetailsProvider._internal(
     super._createNotifier, {
@@ -157,5 +146,6 @@ class _AuthorDetailsProviderElement
   @override
   String get author => (origin as AuthorDetailsProvider).author;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

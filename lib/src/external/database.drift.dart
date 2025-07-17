@@ -20,11 +20,13 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i1.SearchableMorphDetInflections searchableMorphDetInflections =
       i1.SearchableMorphDetInflections(this);
   late final i1.MorphologyPeek morphologyPeek = i1.MorphologyPeek(this);
-  late final i1.MorphologyAnalyses morphologyAnalyses =
-      i1.MorphologyAnalyses(this);
+  late final i1.MorphologyAnalyses morphologyAnalyses = i1.MorphologyAnalyses(
+    this,
+  );
   late final i2.Dictionaries dictionaries = i2.Dictionaries(this);
-  late final i2.DictionaryEntries dictionaryEntries =
-      i2.DictionaryEntries(this);
+  late final i2.DictionaryEntries dictionaryEntries = i2.DictionaryEntries(
+    this,
+  );
   late final i2.DictionaryAlphabets dictionaryAlphabets =
       i2.DictionaryAlphabets(this);
   late final i2.DictEntrySenses dictEntrySenses = i2.DictEntrySenses(this);
@@ -38,77 +40,84 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i3.AuthorAbbreviations authorAbbreviations =
       i3.AuthorAbbreviations(this);
   late final i3.Works works = i3.Works(this);
-  late final i3.WorkAbbreviations workAbbreviations =
-      i3.WorkAbbreviations(this);
+  late final i3.WorkAbbreviations workAbbreviations = i3.WorkAbbreviations(
+    this,
+  );
   late final i3.WorkContents workContents = i3.WorkContents(this);
   late final i3.WorkContentSubdivisions workContentSubdivisions =
       i3.WorkContentSubdivisions(this);
   late final i3.WorkContentSupplementary workContentSupplementary =
       i3.WorkContentSupplementary(this);
   late final i3.Macronizations macronizations = i3.Macronizations(this);
-  late final i3.WorkMacronizations workMacronizations =
-      i3.WorkMacronizations(this);
+  late final i3.WorkMacronizations workMacronizations = i3.WorkMacronizations(
+    this,
+  );
   late final i3.UserProvidedMacronizations userProvidedMacronizations =
       i3.UserProvidedMacronizations(this);
   late final i3.AuthorsAndWorks authorsAndWorks = i3.AuthorsAndWorks(this);
   late final i3.WorkContentSubdivisionsHierarchy
-      workContentSubdivisionsHierarchy =
-      i3.WorkContentSubdivisionsHierarchy(this);
+  workContentSubdivisionsHierarchy = i3.WorkContentSubdivisionsHierarchy(this);
   late final i3.LibraryAuthors libraryAuthors = i3.LibraryAuthors(this);
   late final i3.LibraryAuthorDetails libraryAuthorDetails =
       i3.LibraryAuthorDetails(this);
-  late final i3.LibraryWorkDetails libraryWorkDetails =
-      i3.LibraryWorkDetails(this);
+  late final i3.LibraryWorkDetails libraryWorkDetails = i3.LibraryWorkDetails(
+    this,
+  );
   late final i3.LibraryWorkContents libraryWorkContents =
       i3.LibraryWorkContents(this);
-  late final i3.LibraryWorkIndexes libraryWorkIndexes =
-      i3.LibraryWorkIndexes(this);
+  late final i3.LibraryWorkIndexes libraryWorkIndexes = i3.LibraryWorkIndexes(
+    this,
+  );
   late final i4.DataVersion dataVersion = i4.DataVersion(this);
-  late final i4.LatestDataVersion latestDataVersion =
-      i4.LatestDataVersion(this);
-  i3.LibraryDrift get libraryDrift => i5.ReadDatabaseContainer(this)
-      .accessor<i3.LibraryDrift>(i3.LibraryDrift.new);
-  i2.DictionaryDrift get dictionaryDrift => i5.ReadDatabaseContainer(this)
-      .accessor<i2.DictionaryDrift>(i2.DictionaryDrift.new);
-  i1.MorphAnalysisDrift get morphAnalysisDrift => i5.ReadDatabaseContainer(this)
-      .accessor<i1.MorphAnalysisDrift>(i1.MorphAnalysisDrift.new);
+  late final i4.LatestDataVersion latestDataVersion = i4.LatestDataVersion(
+    this,
+  );
+  i3.LibraryDrift get libraryDrift => i5.ReadDatabaseContainer(
+    this,
+  ).accessor<i3.LibraryDrift>(i3.LibraryDrift.new);
+  i2.DictionaryDrift get dictionaryDrift => i5.ReadDatabaseContainer(
+    this,
+  ).accessor<i2.DictionaryDrift>(i2.DictionaryDrift.new);
+  i1.MorphAnalysisDrift get morphAnalysisDrift => i5.ReadDatabaseContainer(
+    this,
+  ).accessor<i1.MorphAnalysisDrift>(i1.MorphAnalysisDrift.new);
   @override
   Iterable<i0.TableInfo<i0.Table, Object?>> get allTables =>
       allSchemaEntities.whereType<i0.TableInfo<i0.Table, Object?>>();
   @override
   List<i0.DatabaseSchemaEntity> get allSchemaEntities => [
-        morphologicalDetails,
-        morphologicalDetailInflections,
-        searchableMorphDetInflections,
-        morphologyPeek,
-        morphologyAnalyses,
-        dictionaries,
-        dictionaryEntries,
-        dictionaryAlphabets,
-        dictEntrySenses,
-        dictEntrySenseQuotes,
-        dictionaryDictionaries,
-        dictionaryDictionaryEntries,
-        authors,
-        authorAbbreviations,
-        works,
-        workAbbreviations,
-        workContents,
-        workContentSubdivisions,
-        workContentSupplementary,
-        macronizations,
-        workMacronizations,
-        userProvidedMacronizations,
-        authorsAndWorks,
-        workContentSubdivisionsHierarchy,
-        libraryAuthors,
-        libraryAuthorDetails,
-        libraryWorkDetails,
-        libraryWorkContents,
-        libraryWorkIndexes,
-        dataVersion,
-        latestDataVersion
-      ];
+    morphologicalDetails,
+    morphologicalDetailInflections,
+    searchableMorphDetInflections,
+    morphologyPeek,
+    morphologyAnalyses,
+    dictionaries,
+    dictionaryEntries,
+    dictionaryAlphabets,
+    dictEntrySenses,
+    dictEntrySenseQuotes,
+    dictionaryDictionaries,
+    dictionaryDictionaryEntries,
+    authors,
+    authorAbbreviations,
+    works,
+    workAbbreviations,
+    workContents,
+    workContentSubdivisions,
+    workContentSupplementary,
+    macronizations,
+    workMacronizations,
+    userProvidedMacronizations,
+    authorsAndWorks,
+    workContentSubdivisionsHierarchy,
+    libraryAuthors,
+    libraryAuthorDetails,
+    libraryWorkDetails,
+    libraryWorkContents,
+    libraryWorkIndexes,
+    dataVersion,
+    latestDataVersion,
+  ];
   @override
   i0.DriftDatabaseOptions get options =>
       const i0.DriftDatabaseOptions(storeDateTimeAsText: true);
@@ -120,13 +129,17 @@ class $AppDbManager {
   i1.$MorphologicalDetailsTableManager get morphologicalDetails =>
       i1.$MorphologicalDetailsTableManager(_db, _db.morphologicalDetails);
   i1.$MorphologicalDetailInflectionsTableManager
-      get morphologicalDetailInflections =>
-          i1.$MorphologicalDetailInflectionsTableManager(
-              _db, _db.morphologicalDetailInflections);
+  get morphologicalDetailInflections =>
+      i1.$MorphologicalDetailInflectionsTableManager(
+        _db,
+        _db.morphologicalDetailInflections,
+      );
   i1.$SearchableMorphDetInflectionsTableManager
-      get searchableMorphDetInflections =>
-          i1.$SearchableMorphDetInflectionsTableManager(
-              _db, _db.searchableMorphDetInflections);
+  get searchableMorphDetInflections =>
+      i1.$SearchableMorphDetInflectionsTableManager(
+        _db,
+        _db.searchableMorphDetInflections,
+      );
   i2.$DictionariesTableManager get dictionaries =>
       i2.$DictionariesTableManager(_db, _db.dictionaries);
   i2.$DictionaryEntriesTableManager get dictionaryEntries =>
@@ -156,7 +169,9 @@ class $AppDbManager {
       i3.$WorkMacronizationsTableManager(_db, _db.workMacronizations);
   i3.$UserProvidedMacronizationsTableManager get userProvidedMacronizations =>
       i3.$UserProvidedMacronizationsTableManager(
-          _db, _db.userProvidedMacronizations);
+        _db,
+        _db.userProvidedMacronizations,
+      );
   i3.$AuthorsAndWorksTableManager get authorsAndWorks =>
       i3.$AuthorsAndWorksTableManager(_db, _db.authorsAndWorks);
   i4.$DataVersionTableManager get dataVersion =>
@@ -164,9 +179,7 @@ class $AppDbManager {
 }
 
 extension DefineFunctions on i6.CommonDatabase {
-  void defineFunctions({
-    required int Function(String, String) regexp,
-  }) {
+  void defineFunctions({required int Function(String, String) regexp}) {
     createFunction(
       functionName: 'regexp',
       argumentCount: const i6.AllowedArgumentCount(2),

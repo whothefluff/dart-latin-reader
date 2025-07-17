@@ -1,7 +1,9 @@
-// Create a new file: dictionary_ref_resolver.dart
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart';
+
+import '../dictionary/lewis_and_short_basic_info_api.dart';
 
 //infrastructure
 
@@ -128,9 +130,7 @@ class DictionaryRefResolver {
         .map((e) => createEnriched(e, lnsInfoByMorphDictRef[getDictRef(e)]!));
   }
 
-  ({Set<String> lemmas, Map<String, String> toOriginal}) _assimilated(
-    Set<String> originalLemmas,
-  ) =>
+  ({Set<String> lemmas, Map<String, String> toOriginal}) _assimilated(Set<String> originalLemmas) =>
       originalLemmas.fold(
         (lemmas: <String>{}, toOriginal: <String, String>{}),
         (acc, original) {
@@ -152,11 +152,11 @@ class DictionaryRefResolver {
       )
       .replaceAll('-', '')
       .replaceAll('_', '');
-//
+  //
 }
 
 abstract interface class IDictionaryRepository {
-//
+  //
   Future<LnsBasicInfo> getLnsInfoFor(Iterable<String> lemmas);
-//
+  //
 }

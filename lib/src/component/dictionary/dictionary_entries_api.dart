@@ -1,11 +1,15 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
 
 part 'dictionary_entries_api.g.dart';
 
@@ -30,19 +34,19 @@ class DictionaryRepository implements IDictionaryRepository {
   @override
   Future<DictionaryEntries> getEntriesOf(String dictionary) async {
     log.info('DictionaryRepository - reading dictionary entries from db');
-    final dbData =
-        await _db.dictionaryDrift.getDictionaryEntries(dictionary).get();
+    final dbData = await _db.dictionaryDrift.getDictionaryEntries(dictionary).get();
     return DictionaryEntries(dbData);
   }
-//
+
+  //
 }
 
 //interactors
 
 abstract interface class IDictionaryRepository {
-//
+  //
   Future<DictionaryEntries> getEntriesOf(String dictionary);
-//
+  //
 }
 
 class GetEntriesUseCase implements IGetEntriesUseCase {
@@ -55,17 +59,16 @@ class GetEntriesUseCase implements IGetEntriesUseCase {
   final String _dictionary;
 
   @override
-  Future<DictionaryEntries> invoke() async =>
-      _repository.getEntriesOf(_dictionary);
-//
+  Future<DictionaryEntries> invoke() async => _repository.getEntriesOf(_dictionary);
+  //
 }
 
 //domain
 
 abstract interface class IGetEntriesUseCase {
-//
+  //
   Future<DictionaryEntries> invoke();
-//
+  //
 }
 
 @immutable
@@ -94,14 +97,11 @@ class Entry {
   String toString() => 'Entry{lemma: $lemma}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Entry &&
-        other.dictionary == dictionary &&
-        other.lemma == lemma;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Entry && other.dictionary == dictionary && other.lemma == lemma);
 
   @override
   int get hashCode => Object.hash(dictionary, lemma);
-//
+  //
 }

@@ -1,28 +1,40 @@
 // ignore_for_file: type=lint
+// dart format off 
+//the formatter is off so that the style can more easily match that of the adapted classes
+
+import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-///This is a copy of [showModalBottomSheet] but for a togglable navigation rail.
+/// This is a copy of [showModalBottomSheet] but for a togglable navigation rail.
+/// Based on flutter SDK 3.32.5
+/// Basically copies code from bottom_sheet.dart to create a custom NavigationRail class
+/// Changes height to width and vertical gestures for horizontal gestures
 
+// These constants are based on contants in bottom_sheet.dart like _bottomSheetEnterDuration
 const Duration _navRailEnterDuration = Duration(milliseconds: 250);
 const Duration _navRailExitDuration = Duration(milliseconds: 200);
 const Curve _modalNavRailCurve = Easing.standardDecelerate;
 const double _minFlingVelocity = 700.0;
 const double _closeProgressThreshold = 0.5;
-const double _defaultScrollControlDisabledMaxWidthRatio = 0.25;
+const double _defaultScrollControlDisabledMaxWidthRatio = 9.0 / 16.0;
 
-typedef _SizeChangeCallback<Size> = void Function(Size size);
+//Based on BottomSheetDragStartHandler
+/// A callback for when the user begins dragging the navigation rail.
+///
+/// Used by [NavigationRail.onDragStart].
+typedef NavigationRailDragStartHandler = void Function(DragStartDetails details);
 
-typedef NavigationRailDragStartHandler = void Function(
-    DragStartDetails details);
+//Based on BottomSheetDragEndHandler
+/// A callback for when the user stops dragging the navigation rail.
+///
+/// Used by [NavigationRail.onDragEnd].
+typedef NavigationRailDragEndHandler =
+    void Function(DragEndDetails details, {required bool isClosing});
 
-typedef NavigationRailDragEndHandler = void Function(
-  DragEndDetails details, {
-  required bool isClosing,
-});
-
+//Based on function showModalBottomSheet
 Future<T?> showModalNavigationRail<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -34,8 +46,7 @@ Future<T?> showModalNavigationRail<T>({
   BoxConstraints? constraints,
   Color? barrierColor,
   bool isScrollControlled = false,
-  double scrollControlDisabledMaxWidthRatio =
-      _defaultScrollControlDisabledMaxWidthRatio,
+  double scrollControlDisabledMaxWidthRatio = _defaultScrollControlDisabledMaxWidthRatio,
   bool useRootNavigator = false,
   bool isDismissible = true,
   bool enableDrag = true,
@@ -45,40 +56,41 @@ Future<T?> showModalNavigationRail<T>({
   AnimationController? transitionAnimationController,
   Offset? anchorPoint,
   AnimationStyle? sheetAnimationStyle,
+  bool? requestFocus,
 }) {
   assert(debugCheckHasMediaQuery(context));
   assert(debugCheckHasMaterialLocalizations(context));
 
-  final NavigatorState navigator =
-      Navigator.of(context, rootNavigator: useRootNavigator);
+  final NavigatorState navigator = Navigator.of(context, rootNavigator: useRootNavigator);
   final MaterialLocalizations localizations = MaterialLocalizations.of(context);
-  return navigator.push(ModalNavigationRailRoute<T>(
-    builder: builder,
-    capturedThemes:
-        InheritedTheme.capture(from: context, to: navigator.context),
-    isScrollControlled: isScrollControlled,
-    scrollControlDisabledMaxWidthtRatio: scrollControlDisabledMaxWidthRatio,
-    barrierLabel: barrierLabel ?? localizations.scrimLabel,
-    barrierOnTapHint:
-        localizations.scrimOnTapHint(localizations.popupMenuLabel),
-    backgroundColor: backgroundColor,
-    elevation: elevation,
-    shape: shape,
-    clipBehavior: clipBehavior,
-    constraints: constraints,
-    isDismissible: isDismissible,
-    modalBarrierColor:
-        barrierColor ?? Theme.of(context).bottomSheetTheme.modalBarrierColor,
-    enableDrag: enableDrag,
-    showDragHandle: showDragHandle,
-    settings: routeSettings,
-    transitionAnimationController: transitionAnimationController,
-    anchorPoint: anchorPoint,
-    useSafeArea: useSafeArea,
-    sheetAnimationStyle: sheetAnimationStyle,
-  ));
+  return navigator.push(
+    ModalNavigationRailRoute<T>(
+      builder: builder,
+      capturedThemes: InheritedTheme.capture(from: context, to: navigator.context),
+      isScrollControlled: isScrollControlled,
+      scrollControlDisabledMaxWidthRatio: scrollControlDisabledMaxWidthRatio,
+      barrierLabel: barrierLabel ?? localizations.scrimLabel,
+      barrierOnTapHint: localizations.scrimOnTapHint(localizations.popupMenuLabel),
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+      constraints: constraints,
+      isDismissible: isDismissible,
+      modalBarrierColor: barrierColor ?? Theme.of(context).bottomSheetTheme.modalBarrierColor,
+      enableDrag: enableDrag,
+      showDragHandle: showDragHandle,
+      settings: routeSettings,
+      transitionAnimationController: transitionAnimationController,
+      anchorPoint: anchorPoint,
+      useSafeArea: useSafeArea,
+      sheetAnimationStyle: sheetAnimationStyle,
+      requestFocus: requestFocus,
+    ),
+  );
 }
 
+// based on ModalBottomSheetRoute
 class ModalNavigationRailRoute<T> extends PopupRoute<T> {
   ModalNavigationRailRoute({
     required this.builder,
@@ -95,16 +107,16 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
     this.enableDrag = true,
     this.showDragHandle,
     required this.isScrollControlled,
-    this.scrollControlDisabledMaxWidthtRatio =
-        _defaultScrollControlDisabledMaxWidthRatio,
+    this.scrollControlDisabledMaxWidthRatio = _defaultScrollControlDisabledMaxWidthRatio,
     super.settings,
+    super.requestFocus,
     this.transitionAnimationController,
     this.anchorPoint,
     this.useSafeArea = false,
     this.sheetAnimationStyle,
   });
 
-  /// A builder for the contents of the sheet.
+  /// A builder for the contents of the rail.
   ///
   /// The navigation rail will wrap the widget produced by this builder in a
   /// [Material] widget.
@@ -125,12 +137,12 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
   /// to have the navigation rail be draggable.
   final bool isScrollControlled;
 
-  /// The max height constraint ratio for the navigation rail
+  /// The max width constraint ratio for the navigation rail
   /// when [isScrollControlled] is set to false,
   /// no ratio will be applied when [isScrollControlled] is set to true.
   ///
-  /// Defaults to 9 / 16.
-  final double scrollControlDisabledMaxWidthtRatio;
+  /// Defaults to 1 / 4.
+  final double scrollControlDisabledMaxWidthRatio;
 
   /// The navigation rail's background color.
   ///
@@ -169,17 +181,7 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
 
   /// Defines minimum and maximum sizes for a [NavigationRail].
   ///
-  /// If null, the ambient [ThemeData.bottomSheetTheme]'s
-  /// [BottomSheetThemeData.constraints] will be used. If that
-  /// is null and [ThemeData.useMaterial3] is true, then the navigation rail
-  /// will have a max width of 640dp. If [ThemeData.useMaterial3] is false, then
-  /// the navigation rail's size will be constrained by its parent
-  /// (usually a [Scaffold]). In this case, consider limiting the width by
-  /// setting smaller constraints for large screens.
-  ///
-  /// If constraints are specified (either in this property or in the
-  /// theme), the navigation rail will be aligned to the bottom-center of
-  /// the available space. Otherwise, no alignment is applied.
+  /// If null, the defaults of [NavigationRail] apply
   final BoxConstraints? constraints;
 
   /// Specifies the color of the modal barrier that darkens everything below the
@@ -277,8 +279,7 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
   ///  * [ModalBarrier], which uses this field as onTapHint when it has an onTap action.
   final String? barrierOnTapHint;
 
-  final ValueNotifier<EdgeInsets> _clipDetailsNotifier =
-      ValueNotifier<EdgeInsets>(EdgeInsets.zero);
+  final ValueNotifier<EdgeInsets> _clipDetailsNotifier = ValueNotifier<EdgeInsets>(EdgeInsets.zero);
 
   @override
   void dispose() {
@@ -299,10 +300,17 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
   }
 
   @override
-  Duration get transitionDuration => _navRailEnterDuration;
+  Duration get transitionDuration =>
+      transitionAnimationController?.duration ??
+      sheetAnimationStyle?.duration ??
+      _navRailEnterDuration;
 
   @override
-  Duration get reverseTransitionDuration => _navRailExitDuration;
+  Duration get reverseTransitionDuration =>
+      transitionAnimationController?.reverseDuration ??
+      transitionAnimationController?.duration ??
+      sheetAnimationStyle?.reverseDuration ??
+      _navRailExitDuration;
 
   @override
   bool get barrierDismissible => isDismissible;
@@ -331,24 +339,28 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
   }
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
     final Widget content = DisplayFeatureSubScreen(
       anchorPoint: anchorPoint,
       child: Builder(
         builder: (BuildContext context) {
-          final BottomSheetThemeData sheetTheme =
-              Theme.of(context).bottomSheetTheme;
+          final BottomSheetThemeData sheetTheme = Theme.of(context).bottomSheetTheme;
           final BottomSheetThemeData defaults = Theme.of(context).useMaterial3
               ? _NavigationRailDefaultsM3(context)
               : const BottomSheetThemeData();
           return _ModalNavigationRail<T>(
             route: this,
-            backgroundColor: backgroundColor ??
+            backgroundColor:
+                backgroundColor ??
                 sheetTheme.modalBackgroundColor ??
                 sheetTheme.backgroundColor ??
                 defaults.backgroundColor,
-            elevation: elevation ??
+            elevation:
+                elevation ??
                 sheetTheme.modalElevation ??
                 sheetTheme.elevation ??
                 defaults.modalElevation,
@@ -356,11 +368,9 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
             clipBehavior: clipBehavior,
             constraints: constraints,
             isScrollControlled: isScrollControlled,
-            scrollControlDisabledMaxWidthRatio:
-                scrollControlDisabledMaxWidthtRatio,
+            scrollControlDisabledMaxWidthRatio: scrollControlDisabledMaxWidthRatio,
             enableDrag: enableDrag,
-            showDragHandle: showDragHandle ??
-                (enableDrag && (sheetTheme.showDragHandle ?? false)),
+            showDragHandle: showDragHandle ?? (enableDrag && (sheetTheme.showDragHandle ?? false)),
           );
         },
       ),
@@ -368,11 +378,7 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
 
     final Widget navRail = useSafeArea
         ? SafeArea(bottom: false, child: content)
-        : MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: content,
-          );
+        : MediaQuery.removePadding(context: context, removeTop: true, child: content);
 
     return capturedThemes?.wrap(navRail) ?? navRail;
   }
@@ -385,18 +391,16 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
       final Animation<Color?> color = animation!.drive(
         ColorTween(
           begin: barrierColor.withValues(alpha: 0.0),
-          end:
-              barrierColor, // changedInternalState is called if barrierColor updates
-        ).chain(CurveTween(
-            curve:
-                barrierCurve)), // changedInternalState is called if barrierCurve updates
+          end: barrierColor, // changedInternalState is called if barrierColor updates
+        ).chain(
+          CurveTween(curve: barrierCurve),
+        ), // changedInternalState is called if barrierCurve updates
       );
       return AnimatedModalBarrier(
         color: color,
         dismissible:
             barrierDismissible, // changedInternalState is called if barrierDismissible updates
-        semanticsLabel:
-            barrierLabel, // changedInternalState is called if barrierLabel updates
+        semanticsLabel: barrierLabel, // changedInternalState is called if barrierLabel updates
         barrierSemanticsDismissible: semanticsDismissible,
         clipDetailsNotifier: _clipDetailsNotifier,
         semanticsOnTapHint: barrierOnTapHint,
@@ -405,8 +409,7 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
       return ModalBarrier(
         dismissible:
             barrierDismissible, // changedInternalState is called if barrierDismissible updates
-        semanticsLabel:
-            barrierLabel, // changedInternalState is called if barrierLabel updates
+        semanticsLabel: barrierLabel, // changedInternalState is called if barrierLabel updates
         barrierSemanticsDismissible: semanticsDismissible,
         clipDetailsNotifier: _clipDetailsNotifier,
         semanticsOnTapHint: barrierOnTapHint,
@@ -415,18 +418,20 @@ class ModalNavigationRailRoute<T> extends PopupRoute<T> {
   }
 }
 
+// Based (mostyl) on _BottomSheetDefaultsM3
 class _NavigationRailDefaultsM3 extends BottomSheetThemeData {
   _NavigationRailDefaultsM3(this.context)
-      : super(
-          elevation: 1.0,
-          modalElevation: 1.0,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          constraints: const BoxConstraints(maxWidth: 640),
-        );
+    : super(
+        elevation: 1.0,
+        modalElevation: 1.0,
+        shape: const RoundedRectangleBorder(), //Sharp borders to match the navigation rail
+        //constraints: const BoxConstraints(maxWidth: 640), //Useless since my width is already constrained
+      );
 
   final BuildContext context;
   late final ColorScheme _colors = Theme.of(context).colorScheme;
 
+  //from _NavigationRailDefaultsM3 in navigation_rail.dart to match color
   @override
   Color? get backgroundColor => _colors.surface;
 
@@ -442,10 +447,11 @@ class _NavigationRailDefaultsM3 extends BottomSheetThemeData {
   @override
   Size? get dragHandleSize => const Size(32, 4);
 
-  @override
-  BoxConstraints? get constraints => const BoxConstraints(maxWidth: 640.0);
+  //@override
+  //BoxConstraints? get constraints => const BoxConstraints(maxWidth: 640.0); ////Useless since my width is already constrained
 }
 
+// Based on _ModalBottomSheet
 class _ModalNavigationRail<T> extends StatefulWidget {
   const _ModalNavigationRail({
     super.key,
@@ -456,8 +462,7 @@ class _ModalNavigationRail<T> extends StatefulWidget {
     this.clipBehavior,
     this.constraints,
     this.isScrollControlled = false,
-    this.scrollControlDisabledMaxWidthRatio =
-        _defaultScrollControlDisabledMaxWidthRatio,
+    this.scrollControlDisabledMaxWidthRatio = _defaultScrollControlDisabledMaxWidthRatio,
     this.enableDrag = true,
     this.showDragHandle = false,
   });
@@ -477,6 +482,7 @@ class _ModalNavigationRail<T> extends StatefulWidget {
   _ModalNavigationRailState<T> createState() => _ModalNavigationRailState<T>();
 }
 
+// Based on _ModalBottomSheetState
 class _ModalNavigationRailState<T> extends State<_ModalNavigationRail<T>> {
   ParametricCurve<double> animationCurve = _modalNavRailCurve;
 
@@ -504,18 +510,14 @@ class _ModalNavigationRailState<T> extends State<_ModalNavigationRail<T>> {
 
   void handleDragEnd(DragEndDetails details, {bool? isClosing}) {
     // Allow the navigation rail to animate smoothly from its current position.
-    animationCurve = Split(
-      widget.route.animation!.value,
-      endCurve: _modalNavRailCurve,
-    );
+    animationCurve = Split(widget.route.animation!.value, endCurve: _modalNavRailCurve);
   }
 
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
     assert(debugCheckHasMaterialLocalizations(context));
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     final String routeLabel = _getRouteLabel(localizations);
 
     return AnimatedBuilder(
@@ -539,9 +541,7 @@ class _ModalNavigationRailState<T> extends State<_ModalNavigationRail<T>> {
         onDragEnd: handleDragEnd,
       ),
       builder: (BuildContext context, Widget? child) {
-        final double animationValue = animationCurve.transform(
-          widget.route.animation!.value,
-        );
+        final double animationValue = animationCurve.transform(widget.route.animation!.value);
         return Semantics(
           scopesRoute: true,
           namesRoute: true,
@@ -550,14 +550,11 @@ class _ModalNavigationRailState<T> extends State<_ModalNavigationRail<T>> {
           child: ClipRect(
             child: _NavigationRailLayoutWithSizeListener(
               onChildSizeChanged: (Size size) {
-                widget.route._didChangeBarrierSemanticsClip(
-                  _getNewClipDetails(size),
-                );
+                widget.route._didChangeBarrierSemanticsClip(_getNewClipDetails(size));
               },
               animationValue: animationValue,
               isScrollControlled: widget.isScrollControlled,
-              scrollControlDisabledMaxWidthRatio:
-                  widget.scrollControlDisabledMaxWidthRatio,
+              scrollControlDisabledMaxWidthRatio: widget.scrollControlDisabledMaxWidthRatio,
               child: child,
             ),
           ),
@@ -567,8 +564,8 @@ class _ModalNavigationRailState<T> extends State<_ModalNavigationRail<T>> {
   }
 }
 
-class _NavigationRailLayoutWithSizeListener
-    extends SingleChildRenderObjectWidget {
+// Based on _BottomSheetLayoutWithSizeListener
+class _NavigationRailLayoutWithSizeListener extends SingleChildRenderObjectWidget {
   const _NavigationRailLayoutWithSizeListener({
     required this.onChildSizeChanged,
     required this.animationValue,
@@ -577,14 +574,13 @@ class _NavigationRailLayoutWithSizeListener
     super.child,
   });
 
-  final _SizeChangeCallback<Size> onChildSizeChanged;
+  final ValueChanged<Size> onChildSizeChanged;
   final double animationValue;
   final bool isScrollControlled;
   final double scrollControlDisabledMaxWidthRatio;
 
   @override
-  _RenderNavigationRailLayoutWithSizeListener createRenderObject(
-      BuildContext context) {
+  _RenderNavigationRailLayoutWithSizeListener createRenderObject(BuildContext context) {
     return _RenderNavigationRailLayoutWithSizeListener(
       onChildSizeChanged: onChildSizeChanged,
       animationValue: animationValue,
@@ -594,35 +590,36 @@ class _NavigationRailLayoutWithSizeListener
   }
 
   @override
-  void updateRenderObject(BuildContext context,
-      _RenderNavigationRailLayoutWithSizeListener renderObject) {
+  void updateRenderObject(
+    BuildContext context,
+    _RenderNavigationRailLayoutWithSizeListener renderObject,
+  ) {
     renderObject.onChildSizeChanged = onChildSizeChanged;
     renderObject.animationValue = animationValue;
     renderObject.isScrollControlled = isScrollControlled;
-    renderObject.scrollControlDisabledMaxWidthtRatio =
-        scrollControlDisabledMaxWidthRatio;
+    renderObject.scrollControlDisabledMaxWidthRatio = scrollControlDisabledMaxWidthRatio;
   }
 }
 
+// Based on _RenderBottomSheetLayoutWithSizeListener
 class _RenderNavigationRailLayoutWithSizeListener extends RenderShiftedBox {
   _RenderNavigationRailLayoutWithSizeListener({
     RenderBox? child,
-    required _SizeChangeCallback<Size> onChildSizeChanged,
+    required ValueChanged<Size> onChildSizeChanged,
     required double animationValue,
     required bool isScrollControlled,
     required double scrollControlDisabledMaxWidthRatio,
-  })  : _onChildSizeChanged = onChildSizeChanged,
-        _animationValue = animationValue,
-        _isScrollControlled = isScrollControlled,
-        _scrollControlDisabledMaxWidthRatio =
-            scrollControlDisabledMaxWidthRatio,
-        super(child);
+  }) : _onChildSizeChanged = onChildSizeChanged,
+       _animationValue = animationValue,
+       _isScrollControlled = isScrollControlled,
+       _scrollControlDisabledMaxWidthRatio = scrollControlDisabledMaxWidthRatio,
+       super(child);
 
   Size _lastSize = Size.zero;
 
-  _SizeChangeCallback<Size> get onChildSizeChanged => _onChildSizeChanged;
-  _SizeChangeCallback<Size> _onChildSizeChanged;
-  set onChildSizeChanged(_SizeChangeCallback<Size> newCallback) {
+  ValueChanged<Size> get onChildSizeChanged => _onChildSizeChanged;
+  ValueChanged<Size> _onChildSizeChanged;
+  set onChildSizeChanged(ValueChanged<Size> newCallback) {
     if (_onChildSizeChanged == newCallback) {
       return;
     }
@@ -653,10 +650,9 @@ class _RenderNavigationRailLayoutWithSizeListener extends RenderShiftedBox {
     markNeedsLayout();
   }
 
-  double get scrollControlDisabledMaxWidthtRatio =>
-      _scrollControlDisabledMaxWidthRatio;
+  double get scrollControlDisabledMaxWidthRatio => _scrollControlDisabledMaxWidthRatio;
   double _scrollControlDisabledMaxWidthRatio;
-  set scrollControlDisabledMaxWidthtRatio(double newValue) {
+  set scrollControlDisabledMaxWidthRatio(double newValue) {
     if (_scrollControlDisabledMaxWidthRatio == newValue) {
       return;
     }
@@ -665,64 +661,28 @@ class _RenderNavigationRailLayoutWithSizeListener extends RenderShiftedBox {
     markNeedsLayout();
   }
 
-  Size _getSize(BoxConstraints constraints) {
-    return constraints.constrain(constraints.biggest);
-  }
+  @override
+  double computeMinIntrinsicWidth(double height) => 0.0;
 
   @override
-  double computeMinIntrinsicWidth(double height) {
-    final double width =
-        _getSize(BoxConstraints.tightForFinite(height: height)).width;
-    if (width.isFinite) {
-      return width;
-    }
-    return 0.0;
-  }
+  double computeMaxIntrinsicWidth(double height) => 0.0;
 
   @override
-  double computeMaxIntrinsicWidth(double height) {
-    final double width =
-        _getSize(BoxConstraints.tightForFinite(height: height)).width;
-    if (width.isFinite) {
-      return width;
-    }
-    return 0.0;
-  }
+  double computeMinIntrinsicHeight(double width) => 0.0;
 
   @override
-  double computeMinIntrinsicHeight(double width) {
-    final double height =
-        _getSize(BoxConstraints.tightForFinite(width: width)).height;
-    if (height.isFinite) {
-      return height;
-    }
-    return 0.0;
-  }
+  double computeMaxIntrinsicHeight(double width) => 0.0;
 
   @override
-  double computeMaxIntrinsicHeight(double width) {
-    final double height =
-        _getSize(BoxConstraints.tightForFinite(width: width)).height;
-    if (height.isFinite) {
-      return height;
-    }
-    return 0.0;
-  }
+  Size computeDryLayout(BoxConstraints constraints) => constraints.biggest;
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    return _getSize(constraints);
-  }
-
-  @override
-  double? computeDryBaseline(
-      covariant BoxConstraints constraints, TextBaseline baseline) {
+  double? computeDryBaseline(covariant BoxConstraints constraints, TextBaseline baseline) {
     final RenderBox? child = this.child;
     if (child == null) {
       return null;
     }
-    final BoxConstraints childConstraints =
-        _getConstraintsForChild(constraints);
+    final BoxConstraints childConstraints = _getConstraintsForChild(constraints);
     final double? result = child.getDryBaseline(childConstraints, baseline);
     if (result == null) {
       return null;
@@ -730,18 +690,16 @@ class _RenderNavigationRailLayoutWithSizeListener extends RenderShiftedBox {
     final Size childSize = childConstraints.isTight
         ? childConstraints.smallest
         : child.getDryLayout(childConstraints);
-    return result + _getPositionForChild(_getSize(constraints), childSize).dy;
+    return result + _getPositionForChild(constraints.biggest, childSize).dy;
   }
 
   BoxConstraints _getConstraintsForChild(BoxConstraints constraints) {
-    final double maxWidth = isScrollControlled
-        ? constraints.maxWidth
-        : constraints.maxWidth * _scrollControlDisabledMaxWidthRatio;
     return BoxConstraints(
       minHeight: constraints.maxHeight,
       maxHeight: constraints.maxHeight,
-      minWidth: 0.0,
-      maxWidth: maxWidth,
+      maxWidth: isScrollControlled
+          ? constraints.maxWidth
+          : constraints.maxWidth * scrollControlDisabledMaxWidthRatio,
     );
   }
 
@@ -751,18 +709,17 @@ class _RenderNavigationRailLayoutWithSizeListener extends RenderShiftedBox {
 
   @override
   void performLayout() {
-    size = _getSize(constraints);
+    size = constraints.biggest;
     final RenderBox? child = this.child;
     if (child == null) {
       return;
     }
 
-    final BoxConstraints childConstraints =
-        _getConstraintsForChild(constraints);
+    final BoxConstraints childConstraints = _getConstraintsForChild(constraints);
     assert(childConstraints.debugAssertIsValid(isAppliedConstraint: true));
-    child.layout(childConstraints, parentUsesSize: true);
+    child.layout(childConstraints, parentUsesSize: !childConstraints.isTight);
     final BoxParentData childParentData = child.parentData! as BoxParentData;
-    final Size childSize = child.size;
+    final Size childSize = childConstraints.isTight ? childConstraints.smallest : child.size;
     childParentData.offset = _getPositionForChild(size, childSize);
 
     if (_lastSize != childSize) {
@@ -772,6 +729,7 @@ class _RenderNavigationRailLayoutWithSizeListener extends RenderShiftedBox {
   }
 }
 
+// Based on BottomSheet
 class NavigationRail extends StatefulWidget {
   /// Creates a navigation rail.
   ///
@@ -919,12 +877,9 @@ class NavigationRail extends StatefulWidget {
   /// Defines minimum and maximum sizes for a [NavigationRail].
   ///
   /// If null, then the ambient [ThemeData.bottomSheetTheme]'s
-  /// [BottomSheetThemeData.constraints] will be used. If that
-  /// is null and [ThemeData.useMaterial3] is true, then the navigation rail
-  /// will have a max width of 640dp. If [ThemeData.useMaterial3] is false, then
-  /// the navigation rail's size will be constrained by its parent
-  /// (usually a [Scaffold]). In this case, consider limiting the width by
-  /// setting smaller constraints for large screens.
+  /// [BottomSheetThemeData.constraints] will be used. If [ThemeData.useMaterial3]
+  /// is false, then the navigation rail's size will be constrained by its parent
+  /// (usually a [Scaffold]).
   ///
   /// If constraints are specified (either in this property or in the
   /// theme), the navigation rail will be aligned to the bottom-center of
@@ -946,8 +901,7 @@ class NavigationRail extends StatefulWidget {
   }) {
     return AnimationController(
       duration: sheetAnimationStyle?.duration ?? _navRailEnterDuration,
-      reverseDuration:
-          sheetAnimationStyle?.reverseDuration ?? _navRailExitDuration,
+      reverseDuration: sheetAnimationStyle?.reverseDuration ?? _navRailExitDuration,
       debugLabel: 'NavigationRail',
       vsync: vsync,
     );
@@ -958,13 +912,11 @@ class _NavigationRailState extends State<NavigationRail> {
   final GlobalKey _childKey = GlobalKey(debugLabel: 'NavigationRail child');
 
   double get _childWidth {
-    final RenderBox renderBox =
-        _childKey.currentContext!.findRenderObject()! as RenderBox;
+    final RenderBox renderBox = _childKey.currentContext!.findRenderObject()! as RenderBox;
     return renderBox.size.width;
   }
 
-  bool get _dismissUnderway =>
-      widget.animationController!.status == AnimationStatus.reverse;
+  bool get _dismissUnderway => widget.animationController!.status == AnimationStatus.reverse;
 
   Set<WidgetState> dragHandleMaterialState = <WidgetState>{};
 
@@ -977,8 +929,7 @@ class _NavigationRailState extends State<NavigationRail> {
 
   void _handleDragUpdate(DragUpdateDetails details) {
     assert(
-      (widget.enableDrag || (widget.showDragHandle ?? false)) &&
-          widget.animationController != null,
+      (widget.enableDrag || (widget.showDragHandle ?? false)) && widget.animationController != null,
       "'NavigationRail.animationController' cannot be null when 'NavigationRail.enableDrag' or 'NavigationRail.showDragHandle' is true. "
       "Use 'NavigationRail.createAnimationController' to create one, or provide another AnimationController.",
     );
@@ -990,8 +941,7 @@ class _NavigationRailState extends State<NavigationRail> {
 
   void _handleDragEnd(DragEndDetails details) {
     assert(
-      (widget.enableDrag || (widget.showDragHandle ?? false)) &&
-          widget.animationController != null,
+      (widget.enableDrag || (widget.showDragHandle ?? false)) && widget.animationController != null,
       "'NavigationRail.animationController' cannot be null when 'NavigationRail.enableDrag' or 'NavigationRail.showDragHandle' is true. "
       "Use 'NavigationRail.createAnimationController' to create one, or provide another AnimationController.",
     );
@@ -1003,8 +953,7 @@ class _NavigationRailState extends State<NavigationRail> {
     });
     bool isClosing = false;
     if (details.velocity.pixelsPerSecond.dx < -_minFlingVelocity) {
-      final double flingVelocity =
-          -details.velocity.pixelsPerSecond.dx / _childWidth;
+      final double flingVelocity = -details.velocity.pixelsPerSecond.dx / _childWidth;
       if (widget.animationController!.value > 0.0) {
         widget.animationController!.fling(velocity: flingVelocity);
       }
@@ -1020,10 +969,7 @@ class _NavigationRailState extends State<NavigationRail> {
       widget.animationController!.forward();
     }
 
-    widget.onDragEnd?.call(
-      details,
-      isClosing: isClosing,
-    );
+    widget.onDragEnd?.call(details, isClosing: isClosing);
 
     if (isClosing) {
       widget.onClosing();
@@ -1031,8 +977,7 @@ class _NavigationRailState extends State<NavigationRail> {
   }
 
   bool extentChanged(DraggableScrollableNotification notification) {
-    if (notification.extent == notification.minExtent &&
-        notification.shouldCloseOnMinExtent) {
+    if (notification.extent == notification.minExtent && notification.shouldCloseOnMinExtent) {
       widget.onClosing();
     }
     return false;
@@ -1052,33 +997,24 @@ class _NavigationRailState extends State<NavigationRail> {
 
   @override
   Widget build(BuildContext context) {
-    final BottomSheetThemeData bottomSheetTheme =
-        Theme.of(context).bottomSheetTheme;
+    final BottomSheetThemeData bottomSheetTheme = Theme.of(context).bottomSheetTheme;
     final bool useMaterial3 = Theme.of(context).useMaterial3;
     final BottomSheetThemeData defaults = useMaterial3
         ? _NavigationRailDefaultsM3(context)
         : const BottomSheetThemeData();
-    final BoxConstraints? constraints = widget.constraints ??
-        bottomSheetTheme.constraints ??
-        defaults.constraints;
-    final Color? color = widget.backgroundColor ??
-        bottomSheetTheme.backgroundColor ??
-        defaults.backgroundColor;
-    final Color? surfaceTintColor =
-        bottomSheetTheme.surfaceTintColor ?? defaults.surfaceTintColor;
-    final Color? shadowColor = widget.shadowColor ??
-        bottomSheetTheme.shadowColor ??
-        defaults.shadowColor;
-    final double elevation = widget.elevation ??
-        bottomSheetTheme.elevation ??
-        defaults.elevation ??
-        0;
-    final ShapeBorder? shape =
-        widget.shape ?? bottomSheetTheme.shape ?? defaults.shape;
-    final Clip clipBehavior =
-        widget.clipBehavior ?? bottomSheetTheme.clipBehavior ?? Clip.none;
-    final bool showDragHandle = widget.showDragHandle ??
-        (widget.enableDrag && (bottomSheetTheme.showDragHandle ?? false));
+    final BoxConstraints? constraints =
+        widget.constraints ?? bottomSheetTheme.constraints ?? defaults.constraints;
+    final Color? color =
+        widget.backgroundColor ?? bottomSheetTheme.backgroundColor ?? defaults.backgroundColor;
+    final Color? surfaceTintColor = bottomSheetTheme.surfaceTintColor ?? defaults.surfaceTintColor;
+    final Color? shadowColor =
+        widget.shadowColor ?? bottomSheetTheme.shadowColor ?? defaults.shadowColor;
+    final double elevation =
+        widget.elevation ?? bottomSheetTheme.elevation ?? defaults.elevation ?? 0;
+    final ShapeBorder? shape = widget.shape ?? bottomSheetTheme.shape ?? defaults.shape;
+    final Clip clipBehavior = widget.clipBehavior ?? bottomSheetTheme.clipBehavior ?? Clip.none;
+    final bool showDragHandle =
+        widget.showDragHandle ?? (widget.enableDrag && (bottomSheetTheme.showDragHandle ?? false));
 
     Widget? dragHandle;
     if (showDragHandle) {
@@ -1119,8 +1055,7 @@ class _NavigationRailState extends State<NavigationRail> {
                 children: <Widget>[
                   dragHandle!,
                   Padding(
-                    padding:
-                        const EdgeInsets.only(top: kMinInteractiveDimension),
+                    padding: const EdgeInsets.only(top: kMinInteractiveDimension),
                     child: widget.builder(context),
                   ),
                 ],
@@ -1132,10 +1067,7 @@ class _NavigationRailState extends State<NavigationRail> {
       navRail = Align(
         alignment: Alignment.centerLeft,
         widthFactor: 1.0,
-        child: ConstrainedBox(
-          constraints: constraints,
-          child: navRail,
-        ),
+        child: ConstrainedBox(constraints: constraints, child: navRail),
       );
     }
 
@@ -1150,6 +1082,7 @@ class _NavigationRailState extends State<NavigationRail> {
   }
 }
 
+// Based on _BottomSheetGestureDetector
 class _NavigationRailGestureDetector extends StatelessWidget {
   const _NavigationRailGestureDetector({
     required this.child,
@@ -1168,23 +1101,24 @@ class _NavigationRailGestureDetector extends StatelessWidget {
     return RawGestureDetector(
       excludeFromSemantics: true,
       gestures: <Type, GestureRecognizerFactory<GestureRecognizer>>{
-        HorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<
-            HorizontalDragGestureRecognizer>(
-          () => HorizontalDragGestureRecognizer(debugOwner: this),
-          (HorizontalDragGestureRecognizer instance) {
-            instance
-              ..onStart = onHorizontalDragStart
-              ..onUpdate = onHorizontalDragUpdate
-              ..onEnd = onHorizontalDragEnd
-              ..onlyAcceptDragOnThreshold = true;
-          },
-        ),
+        HorizontalDragGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<HorizontalDragGestureRecognizer>(
+              () => HorizontalDragGestureRecognizer(debugOwner: this),
+              (HorizontalDragGestureRecognizer instance) {
+                instance
+                  ..onStart = onHorizontalDragStart
+                  ..onUpdate = onHorizontalDragUpdate
+                  ..onEnd = onHorizontalDragEnd
+                  ..onlyAcceptDragOnThreshold = true;
+              },
+            ),
       },
       child: child,
     );
   }
 }
 
+// Based on _DragHandle
 class _DragHandle extends StatelessWidget {
   const _DragHandle({
     required this.onSemanticsTap,
@@ -1202,12 +1136,10 @@ class _DragHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BottomSheetThemeData bottomSheetTheme =
-        Theme.of(context).bottomSheetTheme;
+    final BottomSheetThemeData bottomSheetTheme = Theme.of(context).bottomSheetTheme;
     final BottomSheetThemeData m3Defaults = _NavigationRailDefaultsM3(context);
-    final Size handleSize = dragHandleSize ??
-        bottomSheetTheme.dragHandleSize ??
-        m3Defaults.dragHandleSize!;
+    final Size handleSize =
+        dragHandleSize ?? bottomSheetTheme.dragHandleSize ?? m3Defaults.dragHandleSize!;
 
     return MouseRegion(
       onEnter: (PointerEnterEvent event) => handleHover(true),
@@ -1217,18 +1149,20 @@ class _DragHandle extends StatelessWidget {
         container: true,
         onTap: onSemanticsTap,
         child: SizedBox(
-          height: kMinInteractiveDimension,
-          width: kMinInteractiveDimension,
+          width: math.max(handleSize.width, kMinInteractiveDimension),
+          height: math.max(handleSize.height, kMinInteractiveDimension),
           child: Center(
             child: Container(
               height: handleSize.height,
               width: handleSize.width,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(handleSize.height / 2),
-                color: WidgetStateProperty.resolveAs<Color?>(
-                        dragHandleColor, materialState) ??
+                color:
+                    WidgetStateProperty.resolveAs<Color?>(dragHandleColor, materialState) ??
                     WidgetStateProperty.resolveAs<Color?>(
-                        bottomSheetTheme.dragHandleColor, materialState) ??
+                      bottomSheetTheme.dragHandleColor,
+                      materialState,
+                    ) ??
                     m3Defaults.dragHandleColor,
               ),
             ),

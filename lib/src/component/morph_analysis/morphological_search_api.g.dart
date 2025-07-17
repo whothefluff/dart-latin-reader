@@ -40,21 +40,15 @@ class MorphologicalSearchFamily extends Family<AsyncValue<Results>> {
   const MorphologicalSearchFamily();
 
   /// See also [morphologicalSearch].
-  MorphologicalSearchProvider call(
-    String form,
-  ) {
-    return MorphologicalSearchProvider(
-      form,
-    );
+  MorphologicalSearchProvider call(String form) {
+    return MorphologicalSearchProvider(form);
   }
 
   @override
   MorphologicalSearchProvider getProviderOverride(
     covariant MorphologicalSearchProvider provider,
   ) {
-    return call(
-      provider.form,
-    );
+    return call(provider.form);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -75,24 +69,19 @@ class MorphologicalSearchFamily extends Family<AsyncValue<Results>> {
 /// See also [morphologicalSearch].
 class MorphologicalSearchProvider extends AutoDisposeFutureProvider<Results> {
   /// See also [morphologicalSearch].
-  MorphologicalSearchProvider(
-    String form,
-  ) : this._internal(
-          (ref) => morphologicalSearch(
-            ref as MorphologicalSearchRef,
-            form,
-          ),
-          from: morphologicalSearchProvider,
-          name: r'morphologicalSearchProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$morphologicalSearchHash,
-          dependencies: MorphologicalSearchFamily._dependencies,
-          allTransitiveDependencies:
-              MorphologicalSearchFamily._allTransitiveDependencies,
-          form: form,
-        );
+  MorphologicalSearchProvider(String form)
+    : this._internal(
+        (ref) => morphologicalSearch(ref as MorphologicalSearchRef, form),
+        from: morphologicalSearchProvider,
+        name: r'morphologicalSearchProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$morphologicalSearchHash,
+        dependencies: MorphologicalSearchFamily._dependencies,
+        allTransitiveDependencies:
+            MorphologicalSearchFamily._allTransitiveDependencies,
+        form: form,
+      );
 
   MorphologicalSearchProvider._internal(
     super._createNotifier, {
@@ -158,5 +147,6 @@ class _MorphologicalSearchProviderElement
   @override
   String get form => (origin as MorphologicalSearchProvider).form;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

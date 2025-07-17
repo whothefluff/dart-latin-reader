@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
-import 'package:latin_reader/src/ui/page/dictionary/dictionaries_page.dart';
-import 'package:latin_reader/src/ui/page/dictionary/dictionary_entries_page.dart';
-import 'package:latin_reader/src/ui/page/dictionary/dictionary_entry_page.dart';
-import 'package:latin_reader/src/ui/page/library/author_details_page.dart';
-import 'package:latin_reader/src/ui/page/library/authors_page.dart';
-import 'package:latin_reader/src/ui/page/library/text_page.dart';
-import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
-import 'package:latin_reader/src/ui/page/morphology/morphological_data_page.dart';
-import 'package:latin_reader/src/ui/page/morphology/morphological_search_page.dart';
-import 'package:latin_reader/src/ui/page/word_frequency_page.dart';
-import 'package:latin_reader/src/ui/page/word_lookup_page.dart';
-import 'package:latin_reader/src/ui/settings/settings_controller.dart';
-import 'package:latin_reader/src/ui/settings/settings_view.dart';
+
+import '../../component/morph_analysis/morphological_details_api.dart';
+import '../page/dictionary/dictionaries_page.dart';
+import '../page/dictionary/dictionary_entries_page.dart';
+import '../page/dictionary/dictionary_entry_page.dart';
+import '../page/library/author_details_page.dart';
+import '../page/library/authors_page.dart';
+import '../page/library/text_page.dart';
+import '../page/library/work_details_page.dart';
+import '../page/morphology/morphological_data_page.dart';
+import '../page/morphology/morphological_search_page.dart';
+import '../page/word_frequency_page.dart';
+import '../page/word_lookup_page.dart';
+import '../settings/settings_controller.dart';
+import '../settings/settings_view.dart';
 
 part 'config.g.dart';
 
-const mainBranches = [
+const List<({String id, NavigationDestination navDest})> mainBranches = [
   (
     id: '/library',
     navDest: NavigationDestination(
@@ -61,19 +62,19 @@ const mainBranches = [
 
 const pagesWithoutNavBar = ['/library/reader/:workId'];
 
-const pagesWithoutNavRail = [...pagesWithoutNavBar];
+const List<String> pagesWithoutNavRail = [...pagesWithoutNavBar];
 
 @TypedGoRoute<SettingsRoute>(path: '/settings')
-class SettingsRoute extends GoRouteData {
+class SettingsRoute extends GoRouteData with _$SettingsRoute {
   const SettingsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => Consumer(
-        builder: (_, ref, __) {
-          final controller = ref.watch(settingsControllerProvider);
-          return SettingsView(controller: controller);
-        },
-      );
+  Widget build(context, state) => Consumer(
+    builder: (_, ref, _) {
+      final controller = ref.watch(settingsControllerProvider);
+      return SettingsView(controller: controller);
+    },
+  );
 }
 
 @TypedStatefulShellRoute<MainRoute>(
@@ -103,18 +104,14 @@ class SettingsRoute extends GoRouteData {
           routes: [
             TypedGoRoute<DictionaryEntriesRoute>(
               path: ':dictionaryId',
-              routes: [
-                TypedGoRoute<DictionaryEntryRoute>(path: 'entries/:lemma')
-              ],
+              routes: [TypedGoRoute<DictionaryEntryRoute>(path: 'entries/:lemma')],
             ),
           ],
         ),
       ],
     ),
     TypedStatefulShellBranch<WordFrequencyBranch>(
-      routes: <TypedRoute<RouteData>>[
-        TypedGoRoute<WordFrequencyRoute>(path: '/word-frequency'),
-      ],
+      routes: <TypedRoute<RouteData>>[TypedGoRoute<WordFrequencyRoute>(path: '/word-frequency')],
     ),
     TypedStatefulShellBranch<MorphologyBranch>(
       routes: [
@@ -123,13 +120,10 @@ class SettingsRoute extends GoRouteData {
       ],
     ),
     TypedStatefulShellBranch<WordLookupBranch>(
-      routes: <TypedRoute<RouteData>>[
-        TypedGoRoute<WordLookupRoute>(path: '/word-lookup'),
-      ],
+      routes: <TypedRoute<RouteData>>[TypedGoRoute<WordLookupRoute>(path: '/word-lookup')],
     ),
   ],
 )
-
 /// Serves as a type definition for the router's shell navigation structure.
 ///
 /// The class is intentionally kept as a minimal implementation, serving
@@ -160,29 +154,27 @@ class WordLookupBranch extends StatefulShellBranchData {
   const WordLookupBranch();
 }
 
-class LibraryRoute extends GoRouteData {
+class LibraryRoute extends GoRouteData with _$LibraryRoute {
   const LibraryRoute();
 
   @override
-
   /// overriding redirect doesn't do shit to avoid the exception
   Widget build(context, state) => const AuthorsRoute().build(context, state);
 
   @override
-  String? redirect(context, state) =>
-      state.fullPath == '/library' ? '/library/authors' : null;
-//
+  String? redirect(context, state) => state.fullPath == '/library' ? '/library/authors' : null;
+  //
 }
 
-class AuthorsRoute extends GoRouteData {
+class AuthorsRoute extends GoRouteData with _$AuthorsRoute {
   const AuthorsRoute();
 
   @override
   Widget build(context, state) => const AuthorsPage();
-//
+  //
 }
 
-class AuthorDetailsRoute extends GoRouteData {
+class AuthorDetailsRoute extends GoRouteData with _$AuthorDetailsRoute {
   const AuthorDetailsRoute(
     this.authorId,
   );
@@ -191,18 +183,18 @@ class AuthorDetailsRoute extends GoRouteData {
 
   @override
   Widget build(context, state) => AuthorDetailsPage(authorId);
-//
+  //
 }
 
-class WorksRoute extends GoRouteData {
+class WorksRoute extends GoRouteData with _$WorksRoute {
   const WorksRoute();
 
   @override
   Widget build(context, state) => const Icon(Icons.error);
-//
+  //
 }
 
-class WorkDetailsRoute extends GoRouteData {
+class WorkDetailsRoute extends GoRouteData with _$WorkDetailsRoute {
   const WorkDetailsRoute(
     this.workId,
   );
@@ -211,10 +203,10 @@ class WorkDetailsRoute extends GoRouteData {
 
   @override
   Widget build(context, state) => WorkDetailsPage(workId);
-//
+  //
 }
 
-class ReaderRoute extends GoRouteData {
+class ReaderRoute extends GoRouteData with _$ReaderRoute {
   const ReaderRoute(
     this.workId,
   );
@@ -223,22 +215,21 @@ class ReaderRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(context, state) => MaterialPage(
-        fullscreenDialog: true,
-        child: TextPage(workId),
-      );
-//
+    fullscreenDialog: true,
+    child: TextPage(workId),
+  );
+  //
 }
 
-class DictionariesRoute extends GoRouteData {
+class DictionariesRoute extends GoRouteData with _$DictionariesRoute {
   const DictionariesRoute();
 
   @override
-  Page<void> buildPage(context, state) =>
-      const MaterialPage(child: DictionariesPage());
-//
+  Page<void> buildPage(context, state) => const MaterialPage(child: DictionariesPage());
+  //
 }
 
-class DictionaryEntriesRoute extends GoRouteData {
+class DictionaryEntriesRoute extends GoRouteData with _$DictionaryEntriesRoute {
   const DictionaryEntriesRoute(
     this.dictionaryId,
   );
@@ -246,12 +237,11 @@ class DictionaryEntriesRoute extends GoRouteData {
   final String dictionaryId;
 
   @override
-  Page<void> buildPage(context, state) =>
-      MaterialPage(child: DictionaryEntriesPage(dictionaryId));
-//
+  Page<void> buildPage(context, state) => MaterialPage(child: DictionaryEntriesPage(dictionaryId));
+  //
 }
 
-class DictionaryEntryRoute extends GoRouteData {
+class DictionaryEntryRoute extends GoRouteData with _$DictionaryEntryRoute {
   const DictionaryEntryRoute(
     this.dictionaryId,
     this.lemma,
@@ -263,26 +253,26 @@ class DictionaryEntryRoute extends GoRouteData {
   @override
   Page<void> buildPage(context, state) =>
       MaterialPage(child: DictionaryEntryPage(dictionaryId, lemma));
-//
+  //
 }
 
-class WordFrequencyRoute extends GoRouteData {
+class WordFrequencyRoute extends GoRouteData with _$WordFrequencyRoute {
   const WordFrequencyRoute();
 
   @override
   Widget build(context, state) => const WordFrequencyPage();
-//
+  //
 }
 
-class MorphologicalSearchRoute extends GoRouteData {
+class MorphologicalSearchRoute extends GoRouteData with _$MorphologicalSearchRoute {
   const MorphologicalSearchRoute();
 
   @override
   Widget build(context, state) => const MorphologicalSearchPage();
-//
+  //
 }
 
-class MorphologicalDataRoute extends GoRouteData {
+class MorphologicalDataRoute extends GoRouteData with _$MorphologicalDataRoute {
   const MorphologicalDataRoute(
     this.keys,
   );
@@ -291,13 +281,13 @@ class MorphologicalDataRoute extends GoRouteData {
 
   @override
   Widget build(context, state) => MorphologicalDataPage(AnalysisKeys.fromJson(keys));
-//
+  //
 }
 
-class WordLookupRoute extends GoRouteData {
+class WordLookupRoute extends GoRouteData with _$WordLookupRoute {
   const WordLookupRoute();
 
   @override
   Widget build(context, state) => const WordLookupPage();
-//
+  //
 }

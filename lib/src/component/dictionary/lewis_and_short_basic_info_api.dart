@@ -1,13 +1,17 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/dictionary/dictionary.drift.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
+import 'dictionary.drift.dart';
 
 part 'lewis_and_short_basic_info_api.g.dart';
 
@@ -35,31 +39,40 @@ class DictionaryRepository implements IDictionaryRepository {
     final dictId = _db.selectOnly(_db.dictionaries)
       ..addColumns([_db.dictionaries.id])
       ..where(_db.dictionaries.name.equals('Lewis & Short'));
-    final dbData = await (_db.selectOnly(_db.dictionaryEntries)
-          ..addColumns([
-            _db.dictionaryEntries.lemma,
-            _db.dictionaryEntries.partOfSpeech,
-            _db.dictionaryEntries.inflection,
-          ])
-          ..where(_db.dictionaryEntries.dictionary.equalsExp(subqueryExpression(dictId)) &
-              _db.dictionaryEntries.lemma.isIn(lemmas)))
-        .get();
-    return LnsBasicInfo(dbData
-        .map((row) => LnsBasicInfoEntry(
-            lemma: row.read(_db.dictionaryEntries.lemma)!,
-            inflection: row.read(_db.dictionaryEntries.inflection),
-            partOfSpeech: row.read(_db.dictionaryEntries.partOfSpeech)))
-        .toList());
+    final dbData =
+        await (_db.selectOnly(_db.dictionaryEntries)
+              ..addColumns([
+                _db.dictionaryEntries.lemma,
+                _db.dictionaryEntries.partOfSpeech,
+                _db.dictionaryEntries.inflection,
+              ])
+              ..where(
+                _db.dictionaryEntries.dictionary.equalsExp(subqueryExpression(dictId)) &
+                    _db.dictionaryEntries.lemma.isIn(lemmas),
+              ))
+            .get();
+    return LnsBasicInfo(
+      dbData
+          .map(
+            (row) => LnsBasicInfoEntry(
+              lemma: row.read(_db.dictionaryEntries.lemma)!,
+              inflection: row.read(_db.dictionaryEntries.inflection),
+              partOfSpeech: row.read(_db.dictionaryEntries.partOfSpeech),
+            ),
+          )
+          .toList(),
+    );
   }
-//
+
+  //
 }
 
 //interactors
 
 abstract interface class IDictionaryRepository {
-//
+  //
   Future<LnsBasicInfo> getLnsInfoFor(Iterable<String> lemmas);
-//
+  //
 }
 
 class GetLnsBasicInfoUseCase implements IGetLnsBasicInfoUseCase {
@@ -73,22 +86,21 @@ class GetLnsBasicInfoUseCase implements IGetLnsBasicInfoUseCase {
 
   @override
   Future<LnsBasicInfo> invoke() async => _repository.getLnsInfoFor(_lemmas);
-//
+  //
 }
 
 //domain
 
 abstract interface class IGetLnsBasicInfoUseCase {
-//
+  //
   Future<LnsBasicInfo> invoke();
-//
+  //
 }
 
 @immutable
 extension type const LnsBasicInfo._(UnmodifiableListView<LnsBasicInfoEntry> unm)
     implements UnmodifiableListView<LnsBasicInfoEntry> {
-  LnsBasicInfo(Iterable<LnsBasicInfoEntry> iter)
-      : this._(UnmodifiableListView(iter));
+  LnsBasicInfo(Iterable<LnsBasicInfoEntry> iter) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
@@ -107,12 +119,10 @@ class LnsBasicInfoEntry {
   String toString() => 'LnsBasicInfoEntry{lemma: $lemma}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is LnsBasicInfoEntry && other.lemma == lemma;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is LnsBasicInfoEntry && other.lemma == lemma);
 
   @override
   int get hashCode => lemma.hashCode;
-//
+  //
 }

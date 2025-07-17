@@ -1,12 +1,16 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/external/database.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/database.dart';
+import '../../external/provider_ext.dart';
 
 part 'morphological_search_api.g.dart';
 
@@ -22,11 +26,9 @@ Future<Results> morphologicalSearch(Ref ref, String form) async {
 }
 
 class MorphologicalDataRepository implements IMorphologicalDataRepository {
-  MorphologicalDataRepository(
-    this._db,
-  ) {
+  MorphologicalDataRepository(this._db) {
     _runnableQueries = {
-      (hasMacrons: true, useLike: true): (String form) => 
+      (hasMacrons: true, useLike: true): (String form) =>
           _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithLike(form),
       (hasMacrons: true, useLike: false): (String form) =>
           _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithFts(form),
@@ -38,9 +40,12 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   }
 
   final AppDb _db;
-  late final Map<({bool hasMacrons, bool useLike}),
-                 MultiSelectable<Result> Function(String form)> 
+
+  // dart format off
+  late final Map<({bool hasMacrons, bool useLike}), 
+                 MultiSelectable<Result> Function(String form)>
       _runnableQueries;
+    // dart format on
 
   /// If the input contains macrons, the query will look for them explicitely
   /// and as they were specified
@@ -82,7 +87,7 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   bool _hasMacrons(String form) => form.contains(RegExp('[āēīōūĀĒĪŌŪ]'));
 
   /// Any weird characters default to LIKE, since MATCH can return errors and
-  /// we can't use advanced FTS5 syntax for a table column that exclusively 
+  /// we can't use advanced FTS5 syntax for a table column that exclusively
   /// stores single words
   bool _useLikeLogic(String form) => form.length < 3 || form.contains(RegExp(r'[^\wāēīōūĀĒĪŌŪ]'));
 
@@ -92,40 +97,41 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   ///
   /// In any other case return the original string
   String _sanitizeQuotes(String form) =>
-      ((form.startsWith('"') && form.endsWith('"')) ||
-              (form.startsWith("'") && form.endsWith("'")))
-          ? form.substring(1, form.length - 1)
-          : form;
+      ((form.startsWith('"') && form.endsWith('"')) || (form.startsWith("'") && form.endsWith("'")))
+      ? form.substring(1, form.length - 1)
+      : form;
 
-//
+  //
 }
 
 //interactors
 
 abstract interface class IMorphologicalDataRepository {
-//
+  //
   Future<Results> getSearchResults(String form);
-//
+  //
 }
 
-class SearchMorphologicalDataUseCase
-    implements ISearchMorphologicalDataUseCase {
-  SearchMorphologicalDataUseCase(this._repository, this._form);
+class SearchMorphologicalDataUseCase implements ISearchMorphologicalDataUseCase {
+  SearchMorphologicalDataUseCase(
+    this._repository,
+    this._form,
+  );
 
   final IMorphologicalDataRepository _repository;
   final String _form;
 
   @override
   Future<Results> invoke() async => _repository.getSearchResults(_form);
-//
+  //
 }
 
 //domain
 
 abstract interface class ISearchMorphologicalDataUseCase {
-//
+  //
   Future<Results> invoke();
-//
+  //
 }
 
 @immutable
@@ -158,15 +164,11 @@ class Result {
   String toString() => 'Result{form: $form, item: $item, cnt: $cnt}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Result &&
-        other.form == form &&
-        other.item == item &&
-        other.cnt == cnt;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Result && other.form == form && other.item == item && other.cnt == cnt);
 
   @override
   int get hashCode => Object.hash(form, item, cnt);
-//
+  //
 }

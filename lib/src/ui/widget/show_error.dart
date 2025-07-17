@@ -6,14 +6,14 @@ Widget Function(Object error, StackTrace _) showError(
   ProviderBase<Object> provider,
 ) =>
     (e, _) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(e.toString()),
-              TextButton(
-                onPressed: () => ref.refresh(provider),
-                child: const Text('Retry'),
-              ),
-            ],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(e.toString()),
+          TextButton(
+            onPressed: () => ref.refresh(provider),
+            child: const Text('Retry'),
           ),
-        );
+        ],
+      ),
+    );

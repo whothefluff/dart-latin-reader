@@ -6,363 +6,428 @@ part of 'config.dart';
 // GoRouterGenerator
 // **************************************************************************
 
-List<RouteBase> get $appRoutes => [
-      $settingsRoute,
-      $mainRoute,
-    ];
+List<RouteBase> get $appRoutes => [$settingsRoute, $mainRoute];
 
-RouteBase get $settingsRoute => GoRouteData.$route(
-      path: '/settings',
-      factory: $SettingsRouteExtension._fromState,
-    );
+RouteBase get $settingsRoute =>
+    GoRouteData.$route(path: '/settings', factory: _$SettingsRoute._fromState);
 
-extension $SettingsRouteExtension on SettingsRoute {
+mixin _$SettingsRoute on GoRouteData {
   static SettingsRoute _fromState(GoRouterState state) => const SettingsRoute();
 
-  String get location => GoRouteData.$location(
-        '/settings',
-      );
+  @override
+  String get location => GoRouteData.$location('/settings');
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
 RouteBase get $mainRoute => StatefulShellRouteData.$route(
-      factory: $MainRouteExtension._fromState,
-      branches: [
-        StatefulShellBranchData.$branch(
+  factory: $MainRouteExtension._fromState,
+  branches: [
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/library',
+
+          factory: _$LibraryRoute._fromState,
           routes: [
             GoRouteData.$route(
-              path: '/library',
-              factory: $LibraryRouteExtension._fromState,
+              path: 'authors',
+
+              factory: _$AuthorsRoute._fromState,
               routes: [
                 GoRouteData.$route(
-                  path: 'authors',
-                  factory: $AuthorsRouteExtension._fromState,
-                  routes: [
-                    GoRouteData.$route(
-                      path: ':authorId',
-                      factory: $AuthorDetailsRouteExtension._fromState,
-                    ),
-                  ],
-                ),
-                GoRouteData.$route(
-                  path: 'works',
-                  factory: $WorksRouteExtension._fromState,
-                  routes: [
-                    GoRouteData.$route(
-                      path: ':workId',
-                      factory: $WorkDetailsRouteExtension._fromState,
-                    ),
-                  ],
-                ),
-                GoRouteData.$route(
-                  path: 'reader/:workId',
-                  factory: $ReaderRouteExtension._fromState,
+                  path: ':authorId',
+
+                  factory: _$AuthorDetailsRoute._fromState,
                 ),
               ],
             ),
-          ],
-        ),
-        StatefulShellBranchData.$branch(
-          routes: [
             GoRouteData.$route(
-              path: '/dictionaries',
-              factory: $DictionariesRouteExtension._fromState,
+              path: 'works',
+
+              factory: _$WorksRoute._fromState,
               routes: [
                 GoRouteData.$route(
-                  path: ':dictionaryId',
-                  factory: $DictionaryEntriesRouteExtension._fromState,
-                  routes: [
-                    GoRouteData.$route(
-                      path: 'entries/:lemma',
-                      factory: $DictionaryEntryRouteExtension._fromState,
-                    ),
-                  ],
+                  path: ':workId',
+
+                  factory: _$WorkDetailsRoute._fromState,
                 ),
               ],
             ),
-          ],
-        ),
-        StatefulShellBranchData.$branch(
-          routes: [
             GoRouteData.$route(
-              path: '/word-frequency',
-              factory: $WordFrequencyRouteExtension._fromState,
-            ),
-          ],
-        ),
-        StatefulShellBranchData.$branch(
-          routes: [
-            GoRouteData.$route(
-              path: '/morph-search',
-              factory: $MorphologicalSearchRouteExtension._fromState,
-            ),
-            GoRouteData.$route(
-              path: '/morph-detail/:keys',
-              factory: $MorphologicalDataRouteExtension._fromState,
-            ),
-          ],
-        ),
-        StatefulShellBranchData.$branch(
-          routes: [
-            GoRouteData.$route(
-              path: '/word-lookup',
-              factory: $WordLookupRouteExtension._fromState,
+              path: 'reader/:workId',
+
+              factory: _$ReaderRoute._fromState,
             ),
           ],
         ),
       ],
-    );
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/dictionaries',
+
+          factory: _$DictionariesRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: ':dictionaryId',
+
+              factory: _$DictionaryEntriesRoute._fromState,
+              routes: [
+                GoRouteData.$route(
+                  path: 'entries/:lemma',
+
+                  factory: _$DictionaryEntryRoute._fromState,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/word-frequency',
+
+          factory: _$WordFrequencyRoute._fromState,
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/morph-search',
+
+          factory: _$MorphologicalSearchRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: '/morph-detail/:keys',
+
+          factory: _$MorphologicalDataRoute._fromState,
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/word-lookup',
+
+          factory: _$WordLookupRoute._fromState,
+        ),
+      ],
+    ),
+  ],
+);
 
 extension $MainRouteExtension on MainRoute {
   static MainRoute _fromState(GoRouterState state) => const MainRoute();
 }
 
-extension $LibraryRouteExtension on LibraryRoute {
+mixin _$LibraryRoute on GoRouteData {
   static LibraryRoute _fromState(GoRouterState state) => const LibraryRoute();
 
-  String get location => GoRouteData.$location(
-        '/library',
-      );
+  @override
+  String get location => GoRouteData.$location('/library');
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $AuthorsRouteExtension on AuthorsRoute {
+mixin _$AuthorsRoute on GoRouteData {
   static AuthorsRoute _fromState(GoRouterState state) => const AuthorsRoute();
 
-  String get location => GoRouteData.$location(
-        '/library/authors',
-      );
+  @override
+  String get location => GoRouteData.$location('/library/authors');
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $AuthorDetailsRouteExtension on AuthorDetailsRoute {
+mixin _$AuthorDetailsRoute on GoRouteData {
   static AuthorDetailsRoute _fromState(GoRouterState state) =>
-      AuthorDetailsRoute(
-        state.pathParameters['authorId']!,
-      );
+      AuthorDetailsRoute(state.pathParameters['authorId']!);
 
+  AuthorDetailsRoute get _self => this as AuthorDetailsRoute;
+
+  @override
   String get location => GoRouteData.$location(
-        '/library/authors/${Uri.encodeComponent(authorId)}',
-      );
+    '/library/authors/${Uri.encodeComponent(_self.authorId)}',
+  );
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $WorksRouteExtension on WorksRoute {
+mixin _$WorksRoute on GoRouteData {
   static WorksRoute _fromState(GoRouterState state) => const WorksRoute();
 
-  String get location => GoRouteData.$location(
-        '/library/works',
-      );
+  @override
+  String get location => GoRouteData.$location('/library/works');
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $WorkDetailsRouteExtension on WorkDetailsRoute {
-  static WorkDetailsRoute _fromState(GoRouterState state) => WorkDetailsRoute(
-        state.pathParameters['workId']!,
-      );
+mixin _$WorkDetailsRoute on GoRouteData {
+  static WorkDetailsRoute _fromState(GoRouterState state) =>
+      WorkDetailsRoute(state.pathParameters['workId']!);
 
+  WorkDetailsRoute get _self => this as WorkDetailsRoute;
+
+  @override
   String get location => GoRouteData.$location(
-        '/library/works/${Uri.encodeComponent(workId)}',
-      );
+    '/library/works/${Uri.encodeComponent(_self.workId)}',
+  );
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $ReaderRouteExtension on ReaderRoute {
-  static ReaderRoute _fromState(GoRouterState state) => ReaderRoute(
-        state.pathParameters['workId']!,
-      );
+mixin _$ReaderRoute on GoRouteData {
+  static ReaderRoute _fromState(GoRouterState state) =>
+      ReaderRoute(state.pathParameters['workId']!);
 
+  ReaderRoute get _self => this as ReaderRoute;
+
+  @override
   String get location => GoRouteData.$location(
-        '/library/reader/${Uri.encodeComponent(workId)}',
-      );
+    '/library/reader/${Uri.encodeComponent(_self.workId)}',
+  );
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $DictionariesRouteExtension on DictionariesRoute {
+mixin _$DictionariesRoute on GoRouteData {
   static DictionariesRoute _fromState(GoRouterState state) =>
       const DictionariesRoute();
 
-  String get location => GoRouteData.$location(
-        '/dictionaries',
-      );
+  @override
+  String get location => GoRouteData.$location('/dictionaries');
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $DictionaryEntriesRouteExtension on DictionaryEntriesRoute {
+mixin _$DictionaryEntriesRoute on GoRouteData {
   static DictionaryEntriesRoute _fromState(GoRouterState state) =>
-      DictionaryEntriesRoute(
-        state.pathParameters['dictionaryId']!,
-      );
+      DictionaryEntriesRoute(state.pathParameters['dictionaryId']!);
 
+  DictionaryEntriesRoute get _self => this as DictionaryEntriesRoute;
+
+  @override
   String get location => GoRouteData.$location(
-        '/dictionaries/${Uri.encodeComponent(dictionaryId)}',
-      );
+    '/dictionaries/${Uri.encodeComponent(_self.dictionaryId)}',
+  );
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $DictionaryEntryRouteExtension on DictionaryEntryRoute {
+mixin _$DictionaryEntryRoute on GoRouteData {
   static DictionaryEntryRoute _fromState(GoRouterState state) =>
       DictionaryEntryRoute(
         state.pathParameters['dictionaryId']!,
         state.pathParameters['lemma']!,
       );
 
-  String get location => GoRouteData.$location(
-        '/dictionaries/${Uri.encodeComponent(dictionaryId)}/entries/${Uri.encodeComponent(lemma)}',
-      );
+  DictionaryEntryRoute get _self => this as DictionaryEntryRoute;
 
+  @override
+  String get location => GoRouteData.$location(
+    '/dictionaries/${Uri.encodeComponent(_self.dictionaryId)}/entries/${Uri.encodeComponent(_self.lemma)}',
+  );
+
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $WordFrequencyRouteExtension on WordFrequencyRoute {
+mixin _$WordFrequencyRoute on GoRouteData {
   static WordFrequencyRoute _fromState(GoRouterState state) =>
       const WordFrequencyRoute();
 
-  String get location => GoRouteData.$location(
-        '/word-frequency',
-      );
+  @override
+  String get location => GoRouteData.$location('/word-frequency');
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $MorphologicalSearchRouteExtension on MorphologicalSearchRoute {
+mixin _$MorphologicalSearchRoute on GoRouteData {
   static MorphologicalSearchRoute _fromState(GoRouterState state) =>
       const MorphologicalSearchRoute();
 
-  String get location => GoRouteData.$location(
-        '/morph-search',
-      );
+  @override
+  String get location => GoRouteData.$location('/morph-search');
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $MorphologicalDataRouteExtension on MorphologicalDataRoute {
+mixin _$MorphologicalDataRoute on GoRouteData {
   static MorphologicalDataRoute _fromState(GoRouterState state) =>
-      MorphologicalDataRoute(
-        state.pathParameters['keys']!,
-      );
+      MorphologicalDataRoute(state.pathParameters['keys']!);
 
-  String get location => GoRouteData.$location(
-        '/morph-detail/${Uri.encodeComponent(keys)}',
-      );
+  MorphologicalDataRoute get _self => this as MorphologicalDataRoute;
 
+  @override
+  String get location =>
+      GoRouteData.$location('/morph-detail/${Uri.encodeComponent(_self.keys)}');
+
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $WordLookupRouteExtension on WordLookupRoute {
+mixin _$WordLookupRoute on GoRouteData {
   static WordLookupRoute _fromState(GoRouterState state) =>
       const WordLookupRoute();
 
-  String get location => GoRouteData.$location(
-        '/word-lookup',
-      );
+  @override
+  String get location => GoRouteData.$location('/word-lookup');
 
+  @override
   void go(BuildContext context) => context.go(location);
 
+  @override
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
+  @override
   void pushReplacement(BuildContext context) =>
       context.pushReplacement(location);
 
+  @override
   void replace(BuildContext context) => context.replace(location);
 }

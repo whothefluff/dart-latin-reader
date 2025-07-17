@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_reader/src/component/library/work_details_api.dart';
-import 'package:latin_reader/src/ui/router/config.dart';
-import 'package:latin_reader/src/ui/widget/show_error.dart';
-import 'package:latin_reader/src/ui/widget/show_loading.dart';
+
+import '../../../component/library/work_details_api.dart';
+import '../../router/config.dart';
+import '../../widget/show_error.dart';
+import '../../widget/show_loading.dart';
 
 class WorkDetailsPage extends ConsumerWidget {
   const WorkDetailsPage(
@@ -15,40 +16,47 @@ class WorkDetailsPage extends ConsumerWidget {
   final String workId;
 
   @override
-  Widget build(context, ref) => ref.watch(workDetailsProvider(workId)).when(
-        data: (workDetails) => Scaffold(
-          appBar: AppBar(
-            title: Text(workDetails.name),
-          ),
-          body: ListView(
-            children: [
-              BookThingy(
-                id: workDetails.id,
-                title: workDetails.name,
-                numberOfWords: workDetails.numberOfWords,
-                authorId: workDetails.authorId,
-                authorName: workDetails.authorName,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        text: workDetails.about,
-                        style: DefaultTextStyle.of(context).style,
-                      ),
+  Widget build(context, ref) {
+    final workDetailsAsync = ref.watch(workDetailsProvider(workId));
+    return Scaffold(
+      appBar: AppBar(
+        title: workDetailsAsync.maybeWhen(
+          data: (workDetails) => Text(workDetails.name),
+          orElse: () => const Text('Work details'),
+        ),
+      ),
+      body: workDetailsAsync.when(
+        data: (workDetails) => ListView(
+          children: [
+            BookThingy(
+              id: workDetails.id,
+              title: workDetails.name,
+              numberOfWords: workDetails.numberOfWords,
+              authorId: workDetails.authorId,
+              authorName: workDetails.authorName,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      text: workDetails.about,
+                      style: DefaultTextStyle.of(context).style,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         loading: showLoading,
         error: showError(ref, workDetailsProvider(workId)),
-      );
-//
+      ),
+    );
+  }
+
+  //
 }
 
 class BookThingy extends StatelessWidget {
@@ -66,14 +74,10 @@ class BookThingy extends StatelessWidget {
   final int numberOfWords;
   final String? authorId;
   final String? authorName;
-
-  static const boxConstraints = BoxConstraints(
-    maxWidth: 200,
-    maxHeight: 400,
-  );
+  static const boxConstraints = BoxConstraints(maxWidth: 200, maxHeight: 400);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     final cover = Flexible(
       child: Padding(
         padding: const EdgeInsets.all(8),
@@ -82,7 +86,6 @@ class BookThingy extends StatelessWidget {
         ),
       ),
     );
-
     final basicInfo = Flexible(
       flex: 2,
       child: Padding(
@@ -94,7 +97,6 @@ class BookThingy extends StatelessWidget {
         ),
       ),
     );
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
@@ -110,6 +112,8 @@ class BookThingy extends StatelessWidget {
       ),
     );
   }
+
+  //
 }
 
 class PseudoCover extends StatelessWidget {
@@ -124,46 +128,36 @@ class PseudoCover extends StatelessWidget {
   static const proportion = (2, 3);
 
   @override
-  Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    final secondaryColor = Theme.of(context).colorScheme.secondary;
-    final onPrimaryColor = Theme.of(context).colorScheme.onPrimary;
-    final onSecondaryColor = Theme.of(context).colorScheme.onSecondary;
-
+  Widget build(context) {
+    final themeColor = ColorScheme.of(context);
     final upper = Expanded(
       flex: proportion.$1,
       child: Container(
-        color: primaryColor,
+        color: themeColor.primary,
         padding: const EdgeInsets.all(8),
         child: Center(
           child: Text(
             bookAuthor ?? 'Unknown',
-            style: TextStyle(
-              color: onPrimaryColor,
-            ),
+            style: TextStyle(color: themeColor.onPrimary),
             textAlign: TextAlign.center,
           ),
         ),
       ),
     );
-
     final lower = Expanded(
       flex: proportion.$2,
       child: Container(
-        color: secondaryColor,
+        color: themeColor.secondary,
         padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Text(
             bookTitle,
-            style: TextStyle(
-              color: onSecondaryColor,
-            ),
+            style: TextStyle(color: themeColor.onSecondary),
             textAlign: TextAlign.center,
           ),
         ),
       ),
     );
-
     return ConstrainedBox(
       constraints: BookThingy.boxConstraints,
       child: AspectRatio(
@@ -177,6 +171,8 @@ class PseudoCover extends StatelessWidget {
       ),
     );
   }
+
+  //
 }
 
 class Details extends StatelessWidget {
@@ -192,41 +188,42 @@ class Details extends StatelessWidget {
   final int numberOfWords;
 
   @override
-  Widget build(BuildContext context) => ConstrainedBox(
-        constraints: BookThingy.boxConstraints,
-        child: AspectRatio(
-          aspectRatio: 3 / 2,
-          child: Column(
+  Widget build(context) => ConstrainedBox(
+    constraints: BookThingy.boxConstraints,
+    child: AspectRatio(
+      aspectRatio: 3 / 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text('Number of words: $numberOfWords')],
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Number of words: $numberOfWords'),
-                ],
-              ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FilledButton(
-                    onPressed: () async {
-                      await ReaderRoute(workId).push<void>(context);
-                    },
-                    child: const Text('Read'),
-                  ),
-                  if (authorId != null) ...{
-                    TextButton(
-                      // TODO(whothefluff): push('/author/id'), if prev stack is different author
-                      onPressed: () => context.pop(),
-                      child: const Text('Go to author'),
-                    ),
-                  }
-                ],
-              )
+              readButton(context),
+              ?_toAuthorButton(context),
             ],
           ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
+
+  FilledButton readButton(BuildContext context) => FilledButton(
+    onPressed: () async => ReaderRoute(workId).push<void>(context),
+    child: const Text('Read'),
+  );
+
+  TextButton? _toAuthorButton(BuildContext context) => authorId != null
+      ? TextButton(
+          // TODO(whothefluff): push('/author/id'), if prev stack is different author
+          onPressed: () => context.pop(),
+          child: const Text('Go to author'),
+        )
+      : null;
+  //
 }

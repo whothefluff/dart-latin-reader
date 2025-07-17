@@ -1,24 +1,24 @@
+// Exception for APIs
+// ignore_for_file: one_member_abstracts
+
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latin_reader/logger.dart';
-import 'package:latin_reader/src/component/dictionary/lewis_and_short_basic_info_api.dart'
-    hide IDictionaryRepository;
-import 'package:latin_reader/src/component/morph_analysis/enriched_resolver.dart';
-import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
-import 'package:latin_reader/src/external/provider_ext.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../logger.dart';
+import '../../external/provider_ext.dart';
+import '../dictionary/lewis_and_short_basic_info_api.dart' hide IDictionaryRepository;
+import 'enriched_resolver.dart';
+import 'morphological_details_api.dart';
 
 part 'enriched_morph_details_api.g.dart';
 
 //infrastructure
 
 @riverpod
-Future<EnrichedAnalyses> enrichedMorphologicalAnalyses(
-  Ref ref,
-  AnalysisKeys keys,
-) async {
+Future<EnrichedAnalyses> enrichedMorphologicalAnalyses(Ref ref, AnalysisKeys keys) async {
   log.info(() => '@riverpod - enrichedMorphologicalAnalyses');
   ref.cacheFor(const Duration(minutes: 5));
   final analyses = await ref.watch(morphologicalAnalysesProvider(keys).future);
@@ -30,8 +30,7 @@ Future<EnrichedAnalyses> enrichedMorphologicalAnalyses(
 
 // interactors
 
-class GetEnrichedMorphologicalAnalysesUseCase
-    implements IGetEnrichedMorphologicalAnalysesUseCase {
+class GetEnrichedMorphologicalAnalysesUseCase implements IGetEnrichedMorphologicalAnalysesUseCase {
   GetEnrichedMorphologicalAnalysesUseCase({
     required this.analyses,
     required this.repo,
@@ -46,14 +45,12 @@ class GetEnrichedMorphologicalAnalysesUseCase
     final enrichedItems = await resolver.resolveAndEnrich(
       items: analyses,
       getDictRef: (analysis) => analysis.dictionaryRef,
-      createEnriched: (analysis, lnsInfo) => EnrichedAnalysis(
-        base: analysis,
-        lns: lnsInfo,
-      ),
+      createEnriched: (analysis, lnsInfo) => EnrichedAnalysis(base: analysis, lns: lnsInfo),
     );
     return EnrichedAnalyses(enrichedItems);
   }
-//
+
+  //
 }
 
 //domain
@@ -63,11 +60,9 @@ abstract interface class IGetEnrichedMorphologicalAnalysesUseCase {
 }
 
 @immutable
-extension type const EnrichedAnalyses._(
-        UnmodifiableListView<EnrichedAnalysis> unm)
+extension type const EnrichedAnalyses._(UnmodifiableListView<EnrichedAnalysis> unm)
     implements UnmodifiableListView<EnrichedAnalysis> {
-  EnrichedAnalyses(Iterable<EnrichedAnalysis> iter)
-      : this._(UnmodifiableListView(iter));
+  EnrichedAnalyses(Iterable<EnrichedAnalysis> iter) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
@@ -107,12 +102,10 @@ class EnrichedAnalysis {
   String toString() => 'EnrichedAnalysis{form: $form, item: $item, cnt: $cnt}';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is EnrichedAnalysis && other.base == base;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is EnrichedAnalysis && other.base == base);
 
   @override
   int get hashCode => base.hashCode;
-//
+  //
 }

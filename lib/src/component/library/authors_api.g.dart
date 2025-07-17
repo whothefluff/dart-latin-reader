@@ -13,8 +13,9 @@ String _$authorsHash() => r'a564a2d33686e6f415456d1730467d01a94e505b';
 final authorsProvider = AutoDisposeFutureProvider<Authors>.internal(
   authors,
   name: r'authorsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$authorsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$authorsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
