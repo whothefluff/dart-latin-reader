@@ -101,8 +101,8 @@ getDictionaryEntrySenses WITH EntrySense: SELECT prettyLevel,
                                                               translation 
                                                            FROM DictEntrySenseQuotes 
                                                            WHERE dictionary = Senses.dictionary 
-                                                                 AND lemma = Senses.lvl 
-                                                                 AND lemma = Senses.lvl
+                                                                 AND lemma = Senses.lemma 
+                                                                 AND lvl = Senses.lvl
                                                            ORDER BY dictionary, lemma, lvl, seq ) AS Quotes
                                               FROM DictEntrySenses AS Senses 
                                               WHERE dictionary = ? AND lemma = ?
