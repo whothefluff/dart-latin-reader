@@ -3329,7 +3329,7 @@ class DictionaryDrift extends i2.ModularAccessor {
     String var2,
   ) {
     return customSelect(
-      'SELECT prettyLevel, content, Senses.dictionary AS "\$n_0", Senses.lvl AS "\$n_1", Senses.lvl AS "\$n_2" FROM DictEntrySenses AS Senses WHERE dictionary = ?1 AND lemma = ?2 ORDER BY dictionary, lemma, lvl',
+      'SELECT prettyLevel, content, Senses.dictionary AS "\$n_0", Senses.lemma AS "\$n_1", Senses.lvl AS "\$n_2" FROM DictEntrySenses AS Senses WHERE dictionary = ?1 AND lemma = ?2 ORDER BY dictionary, lemma, lvl',
       variables: [i0.Variable<String>(var1), i0.Variable<String>(var2)],
       readsFrom: {dictEntrySenses, dictEntrySenseQuotes},
     ).asyncMap(
@@ -3338,7 +3338,7 @@ class DictionaryDrift extends i2.ModularAccessor {
         content: row.read<String>('content'),
         quotes:
             await customSelect(
-                  'SELECT seq, content, translation FROM DictEntrySenseQuotes WHERE dictionary = ?1 AND lemma = ?2 AND lemma = ?3 ORDER BY dictionary, lemma, lvl, seq',
+                  'SELECT seq, content, translation FROM DictEntrySenseQuotes WHERE dictionary = ?1 AND lemma = ?2 AND lvl = ?3 ORDER BY dictionary, lemma, lvl, seq',
                   variables: [
                     i0.Variable<String>(row.read('\$n_0')),
                     i0.Variable<String>(row.read('\$n_1')),
