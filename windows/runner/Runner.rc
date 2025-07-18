@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "latin_reader" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "latin_reader" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.magnetys. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.magnetys. All rights reserved." "\0"
             VALUE "OriginalFilename", "latin_reader.exe" "\0"
             VALUE "ProductName", "latin_reader" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
