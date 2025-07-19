@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,9 +17,11 @@ import '../../widget/navigation_rail.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 
-const _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')'];
+/// Line terminator that will be stable across all platforms even after rendering
+const _lineTerminator = '\n';
+const _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')', ']'];
+const _openingPunctSigns = ['(', '['];
 const _blank = ' ';
-final String _lineTerminator = Platform.lineTerminator;
 
 enum _PageFlow {
   previous,
@@ -300,84 +300,49 @@ class _GestureHandler {
   //
 }
 
-class _WordSelector {
-  _WordSelector({
-    required this.segments,
-    required this.textKey,
-  });
-
-  final WorkContentsSegments segments;
-  final GlobalKey textKey;
-  String? _cachedVisibleText;
-  String? selected;
-
-  void clearSelectedWord() {
-    selected = null;
-  }
-
-  void synchronize(SelectedContent? content) {
-    _refreshCache();
-    if (_cachedVisibleText != null) {
-      if (content != null && content.plainText.isNotEmpty) {
-        if (_isFullWordSelected(content, _cachedVisibleText!)) {
-          selected = content.plainText;
-        } else {
-          clearSelectedWord();
-        }
-      } else {
-        clearSelectedWord();
-      }
+class _TextSelector {
+  //
+  String? singleWord(TextSelection selection, String visibleText) {
+    // Ignore selected spaces at word boundary
+    final trimmedSelectedText = selection.textInside(visibleText).trim();
+    if (trimmedSelectedText.isNotEmpty &&
+        _isFullWordSelected(trimmedSelectedText, visibleText, selection)) {
+      log.info(() => '_StyledWordList - word "$trimmedSelectedText" selected');
+      return trimmedSelectedText;
     } else {
-      clearSelectedWord();
+      log.info(() => '_StyledWordList - no word selected');
+      return null;
     }
   }
 
-  void invalidateCacheWhenElementsChange(WorkContentsSegments oldSegments) {
-    if (segments != oldSegments) {
-      _cachedVisibleText = null;
-    }
+  bool _isFullWordSelected(
+    String trimmedSelectedText,
+    String visibleText,
+    TextSelection textSelection,
+  ) {
+    // Also handles selections starting with whitespace
+    final actualWordStart = visibleText.indexOf(trimmedSelectedText, textSelection.start);
+    final previousChar = actualWordStart > 0 ? visibleText[actualWordStart - 1] : null;
+    final startIsValid =
+        previousChar == null ||
+        previousChar == _blank ||
+        previousChar == _lineTerminator ||
+        _closingPunctSigns.contains(previousChar) ||
+        _openingPunctSigns.contains(previousChar);
+    final actualWordEnd = actualWordStart + trimmedSelectedText.length;
+    final nextChar = actualWordEnd < visibleText.length ? visibleText[actualWordEnd] : null;
+    final endIsValid =
+        nextChar == null ||
+        nextChar == _blank ||
+        _closingPunctSigns.contains(nextChar) ||
+        _openingPunctSigns.contains(nextChar); // Unlikely, but typos occur
+    final middleIsValid =
+        !trimmedSelectedText.contains(_blank) &&
+        !_closingPunctSigns.any(trimmedSelectedText.contains) &&
+        !_openingPunctSigns.any(trimmedSelectedText.contains);
+    return startIsValid && endIsValid && middleIsValid;
   }
 
-  void _refreshCache() {
-    if (_cachedVisibleText == null) {
-      final renderObject = textKey.currentContext?.findRenderObject();
-      if (renderObject is RenderParagraph) {
-        _cachedVisibleText = renderObject.text.toPlainText();
-      } else if (renderObject is RenderBox) {
-        RenderParagraph? paragraph;
-        renderObject.visitChildren((child) {
-          if (child is RenderParagraph) {
-            paragraph = child;
-          }
-        });
-        _cachedVisibleText = paragraph?.text.toPlainText();
-      }
-    }
-  }
-
-  bool _isFullWordSelected(SelectedContent content, String fullText) {
-    final selectedText = content.plainText;
-    final selStart = fullText.indexOf(selectedText);
-    if (selStart == -1) {
-      return false;
-    } else {
-      final selEnd = selStart + selectedText.length;
-      final previousChar = selStart > 0 ? fullText[selStart - 1] : null;
-      final startIsValid =
-          previousChar == null ||
-          previousChar == _blank ||
-          previousChar == _lineTerminator ||
-          _closingPunctSigns.contains(previousChar);
-      final nextChar = selEnd < fullText.length ? fullText[selEnd] : null;
-      final endIsValid =
-          nextChar == null || nextChar == _blank || _closingPunctSigns.contains(nextChar);
-      final middleIsValid =
-          !selectedText.contains(_blank) && !_closingPunctSigns.any(selectedText.contains);
-      return startIsValid && endIsValid && middleIsValid;
-    }
-  }
-
-  bool fullSingleWordSelected() => selected != null;
   //
 }
 
@@ -397,15 +362,22 @@ class _WordDetailsButton extends ContextMenuButtonItem {
   final BuildContext context;
 
   static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
+    ContextMenuController.removeAny();
     final results = await ref.watch(enrichedMorphologicalSearchProvider('"$word"').future);
-    // Not all searches will return analyses
     if (results.isNotEmpty) {
-      ContextMenuController.removeAny();
       final selectedKeys = AnalysisKeys(
         results.map((r) => AnalysisKey(form: r.form, item: r.item, cnt: r.cnt)),
       );
       if (context.mounted) {
         return MorphologicalDataRoute(selectedKeys.toJson()).push(context);
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Not found'),
+          ),
+        );
       }
     }
   }
@@ -560,10 +532,9 @@ class _StyledWordList extends ConsumerStatefulWidget {
 
 class _StyledWordListState extends ConsumerState<_StyledWordList> {
   //
-  final GlobalKey<State<StatefulWidget>> _textKey = GlobalKey();
-  late _GestureHandler _gestureHandler;
-  late final _wordSelector = _WordSelector(segments: widget.segments, textKey: _textKey);
+  final _textSelector = _TextSelector();
   var _wordSelectionButtons = <ContextMenuButtonItem>[];
+  late _GestureHandler _gestureHandler;
 
   @override
   void initState() {
@@ -574,12 +545,6 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
       onNavMenuToggle: _handleNavMenuToggle,
       customAdaptiveScaffoldKey: customAdaptiveScaffoldKey,
     );
-  }
-
-  @override
-  void didUpdateWidget(covariant _StyledWordList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _wordSelector.invalidateCacheWhenElementsChange(oldWidget.segments);
   }
 
   @override
@@ -605,7 +570,8 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
             onDoubleTap: () => _gestureHandler.onNavMenuToggle(context),
             child: Container(
               padding: const EdgeInsets.only(left: 20, right: 20),
-              child: _buildSelectionArea(context, widget.pageConstraints),
+              // Use a LayoutBuilder to get the correct constraints
+              child: LayoutBuilder(builder: _buildSelectionArea),
             ),
           ),
         ),
@@ -645,22 +611,35 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     return Card(
       child: Padding(
         padding: padding,
+        // Use a LayoutBuilder to get the correct constraints
         child: LayoutBuilder(builder: _buildSelectionArea),
       ),
     );
   }
 
-  Widget _buildSelectionArea(BuildContext context, BoxConstraints constraints) => SelectionArea(
-    onSelectionChanged: _handleSelectionChanged,
-    contextMenuBuilder: _buildContextMenu,
-    child: _buildTextWithOverflowDetection(context, constraints),
-  );
+  Widget _buildSelectionArea(BuildContext context, BoxConstraints constraints) {
+    // Built using the constraints given by SizedBox
+    final visibleTextSpan = _buildTextWithOverflowDetection(context, constraints);
+    return SelectableText.rich(
+      visibleTextSpan,
+      onSelectionChanged: (selection, cause) =>
+          _handleSelectionChanged(selection, cause, visibleTextSpan.toPlainText()),
+      contextMenuBuilder: _buildContextMenu,
+      // The scrollbar may appear when resizing with the default physics
+      scrollPhysics: const NeverScrollableScrollPhysics(),
+    );
+  }
 
-  void _handleSelectionChanged(SelectedContent? content) {
-    _wordSelector.synchronize(content);
+  void _handleSelectionChanged(
+    TextSelection selection,
+    SelectionChangedCause? cause,
+    String visibleText,
+  ) {
+    log.info(() => '_StyledWordList - user selected text "${selection.textInside(visibleText)}"');
+    final selectedWord = _textSelector.singleWord(selection, visibleText);
     setState(() {
-      if (_wordSelector.fullSingleWordSelected()) {
-        final selectedWord = _wordSelector.selected!;
+      if (selectedWord != null) {
+        // TODO(whothefluff): add button for "using macrons" (exact match) when macrons are added
         _wordSelectionButtons = [
           _WordDetailsButton(word: selectedWord, ref: ref, context: context),
         ];
@@ -670,7 +649,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     });
   }
 
-  Widget _buildContextMenu(BuildContext context, SelectableRegionState state) =>
+  Widget _buildContextMenu(BuildContext context, EditableTextState state) =>
       AdaptiveTextSelectionToolbar.buttonItems(
         anchors: state.contextMenuAnchors,
         buttonItems: [
@@ -683,7 +662,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     MediaQuery.of(context);
   }
 
-  Widget _buildTextWithOverflowDetection(BuildContext context, BoxConstraints constraints) {
+  TextSpan _buildTextWithOverflowDetection(BuildContext context, BoxConstraints constraints) {
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
     final allSpans = _TextRenderer(
       TextTheme.of(context),
@@ -708,10 +687,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
         widget.segments[visible.last].idx,
       ),
     );
-    return Text.rich(
-      key: _textKey,
-      TextSpan(children: allSpans.sublist(visible.first, visible.last + 1)),
-    );
+    return TextSpan(children: allSpans.sublist(visible.first, visible.last + 1));
   }
 
   //
