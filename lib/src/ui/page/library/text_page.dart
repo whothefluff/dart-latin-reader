@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../logger.dart';
 import '../../../component/library/work_contents_api.dart';
 import '../../../component/library/work_details_api.dart';
+import '../../../component/morph_analysis/enriched_morph_search_api.dart';
+import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../app.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold.dart';
@@ -379,14 +381,35 @@ class _WordSelector {
   //
 }
 
-class _WordSelectionButton extends ContextMenuButtonItem {
-  _WordSelectionButton({
+/// This context menu button will first navigate to the morphological
+/// information page
+///
+/// From there, it's possible to go to the desired dictionary entry (which, in
+/// case it can belong to several words, the user will have to choose)
+class _WordDetailsButton extends ContextMenuButtonItem {
+  _WordDetailsButton({
     required String word,
-  }) : super(onPressed: () => _onPressed(word), label: 'See details for "$word"');
+    required this.ref,
+    required this.context,
+  }) : super(onPressed: () => _onPressed(word, ref, context), label: 'See details for "$word"');
 
-  static void _onPressed(String word) {
-    // TODO(whothefluff): show details
+  final WidgetRef ref;
+  final BuildContext context;
+
+  static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
+    final results = await ref.watch(enrichedMorphologicalSearchProvider('"$word"').future);
+    // Not all searches will return analyses
+    if (results.isNotEmpty) {
+      ContextMenuController.removeAny();
+      final selectedKeys = AnalysisKeys(
+        results.map((r) => AnalysisKey(form: r.form, item: r.item, cnt: r.cnt)),
+      );
+      if (context.mounted) {
+        return MorphologicalDataRoute(selectedKeys.toJson()).push(context);
+      }
+    }
   }
+
   //
 }
 
@@ -509,7 +532,7 @@ class _VisibleSegmentRange {
   //
 }
 
-class _StyledWordList extends StatefulWidget {
+class _StyledWordList extends ConsumerStatefulWidget {
   const _StyledWordList({
     required this.segments,
     required this.onNavigateNext,
@@ -535,7 +558,7 @@ class _StyledWordList extends StatefulWidget {
   //
 }
 
-class _StyledWordListState extends State<_StyledWordList> {
+class _StyledWordListState extends ConsumerState<_StyledWordList> {
   //
   final GlobalKey<State<StatefulWidget>> _textKey = GlobalKey();
   late _GestureHandler _gestureHandler;
@@ -638,7 +661,9 @@ class _StyledWordListState extends State<_StyledWordList> {
     setState(() {
       if (_wordSelector.fullSingleWordSelected()) {
         final selectedWord = _wordSelector.selected!;
-        _wordSelectionButtons = [_WordSelectionButton(word: selectedWord)];
+        _wordSelectionButtons = [
+          _WordDetailsButton(word: selectedWord, ref: ref, context: context),
+        ];
       } else {
         _wordSelectionButtons = [];
       }
@@ -661,7 +686,7 @@ class _StyledWordListState extends State<_StyledWordList> {
   Widget _buildTextWithOverflowDetection(BuildContext context, BoxConstraints constraints) {
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
     final allSpans = _TextRenderer(
-      Theme.of(context).textTheme,
+      TextTheme.of(context),
       widget.segments,
     ).createSpans();
     textPainter
