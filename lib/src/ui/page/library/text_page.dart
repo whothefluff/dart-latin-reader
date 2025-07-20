@@ -110,7 +110,7 @@ class TextPageState extends ConsumerState<TextPage> {
   }
 
   void _loadNextPage() {
-    log.info(() => 'TextPage - attempting to navigate to next page');
+    log.info(() => 'attempting to navigate to next page');
     setState(() {
       if (_currentLastVisibleIndex != _workSize) {
         _pageFlow = _PageFlow.next;
@@ -121,7 +121,7 @@ class TextPageState extends ConsumerState<TextPage> {
   }
 
   void _loadPreviousPage() {
-    log.info(() => 'TextPage - attempting to navigate to previous page');
+    log.info(() => 'attempting to navigate to previous page');
     setState(() {
       if (_currentFirstVisibleIndex != 0) {
         _pageFlow = _PageFlow.previous;
@@ -229,10 +229,10 @@ class _GestureHandler {
 
   void handleTap(_PageFlow pageFlow) {
     if (pageFlow == _PageFlow.next) {
-      log.info(() => 'TextPage - handling right tap');
+      log.info(() => 'handling right tap');
       onNavigateNext();
     } else if (pageFlow == _PageFlow.previous) {
-      log.info(() => 'TextPage - handling left tap');
+      log.info(() => 'handling left tap');
       onNavigatePrevious();
     }
   }
@@ -240,10 +240,10 @@ class _GestureHandler {
   void handleSwipe(double? velocity) {
     if (velocity != null) {
       if (velocity < 0) {
-        log.info(() => 'TextPage - handling left swipe');
+        log.info(() => 'handling left swipe');
         onNavigateNext();
       } else if (velocity > 0) {
-        log.info(() => 'TextPage - handling right swipe');
+        log.info(() => 'handling right swipe');
         onNavigatePrevious();
       }
     }
@@ -311,10 +311,10 @@ class _TextSelector {
     final trimmedSelectedText = selection.textInside(visibleText).trim();
     if (trimmedSelectedText.isNotEmpty &&
         _isFullWordSelected(trimmedSelectedText, visibleText, selection)) {
-      log.info(() => '_StyledWordList - word "$trimmedSelectedText" selected');
+      log.info(() => 'word "$trimmedSelectedText" selected');
       return trimmedSelectedText;
     } else {
-      log.info(() => '_StyledWordList - no word selected');
+      log.info(() => 'no word selected');
       return null;
     }
   }
@@ -384,6 +384,7 @@ class _WordDetailsButton extends ContextMenuButtonItem {
   final BuildContext context;
 
   static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
+    log.entry(args: [word]);
     ContextMenuController.removeAny();
     // Using double quotes will force an exact match, avoiding a text search
     final results = await ref.watch(enrichedMorphologicalSearchProvider('"$word"').future);
@@ -392,13 +393,17 @@ class _WordDetailsButton extends ContextMenuButtonItem {
         results.map((r) => AnalysisKey(form: r.form, item: r.item, cnt: r.cnt)),
       );
       if (context.mounted) {
+        log.exit<void>();
         return MorphologicalDataRoute(selectedKeys.toJson()).push(context);
       }
     } else {
+      log.warning(() => 'Nothing found when using morph data button with "$word"');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Not found'),
+        log.exit(
+          r: ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Not found'),
+            ),
           ),
         );
       }
@@ -423,20 +428,29 @@ class _WiktionaryButton extends ContextMenuButtonItem {
   final BuildContext context;
 
   static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
+    log.entry(args: [word]);
     ContextMenuController.removeAny();
     final queryWord = (await _isProperNoun(word, ref)) ? _capitalize(word) : word.toLowerCase();
     try {
-      if (!await launchUrl(Uri.parse('https://en.wiktionary.org/wiki/$queryWord#Latin'))) {
+      if (await launchUrl(Uri.parse('https://en.wiktionary.org/wiki/$queryWord#Latin'))) {
+        log.exit<void>();
+      } else {
+        log.warning(() => 'Could not launch browser when using Wiktionary button');
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not launch browser')),
+          log.exit(
+            r: ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Could not launch browser')),
+            ),
           );
         }
       }
-    } on Exception {
+    } on Exception catch (e) {
+      log.catching(e);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Browser error')),
+        log.exit(
+          r: ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Browser error')),
+          ),
         );
       }
     }
@@ -453,13 +467,14 @@ class _WiktionaryButton extends ContextMenuButtonItem {
   /// whole line is upper case (like in titles). These checks come with their
   /// own problems
   static Future<bool> _isProperNoun(String word, WidgetRef ref) async {
+    log.entry(args: [word]);
     var isProperName = false;
     if (word == _capitalize(word)) {
       // The assumption is that the provider will not find proper names
       final results = await ref.watch(enrichedMorphologicalSearchProvider('"$word"').future);
       isProperName = results.isEmpty;
     }
-    return isProperName;
+    return log.exit(r: isProperName)!;
   }
 
   static String _capitalize(String word) => '${word[0].toUpperCase()}${word.substring(1)}';
@@ -716,7 +731,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     SelectionChangedCause? cause,
     String visibleText,
   ) {
-    log.info(() => '_StyledWordList - user selected text "${selection.textInside(visibleText)}"');
+    log.info(() => 'user selected text "${selection.textInside(visibleText)}"');
     final selectedWord = _textSelector.singleWord(selection, visibleText);
     setState(() {
       if (selectedWord != null) {
@@ -762,7 +777,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
       constraints,
     );
     // dart format off
-    log.info(() => 'TextPage - displaying new range (${widget.segments[visible.first].idx} - ${widget.segments[visible.last].idx})');
+    log.info(() => 'displaying new range (${widget.segments[visible.first].idx} - ${widget.segments[visible.last].idx})');
     // dart format on
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => widget.onVisibleIndicesChanged(

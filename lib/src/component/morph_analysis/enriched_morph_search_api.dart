@@ -19,7 +19,7 @@ part 'enriched_morph_search_api.g.dart';
 
 @riverpod
 Future<EnrichedResults> enrichedMorphologicalSearch(Ref ref, String form) async {
-  log.info(() => '@riverpod - enrichedMorphologicalSearch');
+  log.info(() => '@riverpod - using $form');
   ref.cacheFor(const Duration(minutes: 5));
   final results = await ref.watch(morphologicalSearchProvider(form).future);
   return SearchEnrichedMorphologicalDataUseCase(

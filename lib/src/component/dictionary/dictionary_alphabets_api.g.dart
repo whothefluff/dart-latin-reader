@@ -7,7 +7,7 @@ part of 'dictionary_alphabets_api.dart';
 // **************************************************************************
 
 String _$dictionaryAlphabetLetterPositionHash() =>
-    r'71b0768cb8be1ae170a72ee57c711bfc3625fb8a';
+    r'4d085e187857cf502f0cc916e38b4e48180c2278';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -15,7 +15,7 @@ part 'work_details_api.g.dart';
 
 @riverpod
 Future<WorkDetails> workDetails(Ref ref, String work) async {
-  log.info(() => '@riverpod - workDetails');
+  log.info(() => '@riverpod - using $work');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = LibraryRepository(db);
@@ -29,7 +29,7 @@ class LibraryRepository implements ILibraryRepository {
 
   @override
   Future<WorkDetails> getWorkDetailsOf(String work) async {
-    log.info('LibraryRepository - reading dictionaries from db');
+    log.fine('reading details of work "$work" from db');
     final dbData = await _db.libraryDrift.getLibraryWorkDetails(work).getSingle();
     return dbData;
   }

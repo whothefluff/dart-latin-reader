@@ -52,9 +52,9 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
     await operations.fold(
       Future<void>.value(),
       (previousFuture, op) => previousFuture.then((_) async {
-        log.info(() => 'populateDatabaseFromCsv() - deleting ${op.id}');
+        log.fine(() => 'deleting ${op.id}');
         await op.delete(db);
-        log.info(() => 'populateDatabaseFromCsv() - inserting ${op.id}');
+        log.fine(() => 'inserting ${op.id}');
         await op.insert(db);
       }),
     );
@@ -62,7 +62,7 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
 }
 
 Future<void> updateDatabaseVersion(AppDb db) async {
-  log.info(() => 'updateDatabaseVersion() - updating data version');
+  log.fine(() => 'updating data version');
   final assetVersion = await getDataVersion();
   await db
       .into(db.dataVersion)

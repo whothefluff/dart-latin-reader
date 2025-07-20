@@ -2,5 +2,8 @@ database.log_statements: false
 log:
   console:
     level: ALL
+    using: 
+      api: false #both at same time not recommended
+      print: true
   file:
      level: SEVERE

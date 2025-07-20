@@ -7,7 +7,7 @@ part of 'morphological_details_api.dart';
 // **************************************************************************
 
 String _$morphologicalAnalysesHash() =>
-    r'906b4c68651a1d63b3380bbd0b70a68c4ff759c4';
+    r'289ef353576feab0019105437f07ffca9577d4c4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -150,7 +150,7 @@ class _MorphologicalAnalysesProviderElement
 }
 
 String _$morphologicalAnalysisKeysHash() =>
-    r'e14be07d935b87007c90edf0f8ccdf7f8b8d3a59';
+    r'cc84378a1ea6376e2895b668990f9694c6ce6486';
 
 /// See also [morphologicalAnalysisKeys].
 @ProviderFor(morphologicalAnalysisKeys)

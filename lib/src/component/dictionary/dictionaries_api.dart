@@ -17,7 +17,7 @@ part 'dictionaries_api.g.dart';
 
 @riverpod
 Future<Dictionaries> dictionaries(Ref ref) async {
-  log.info(() => '@riverpod - dictionaries');
+  log.info(() => '@riverpod');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = DictionaryRepository(db);
@@ -33,7 +33,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
   @override
   Future<Dictionaries> getDictionaries() async {
-    log.info('DictionaryRepository - reading dictionaries from db');
+    log.fine('reading all dictionaries from db');
     final dbData = await _db.dictionaryDrift.getDictionaries().get();
     return Dictionaries(dbData);
   }
