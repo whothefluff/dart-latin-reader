@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../logger.dart';
 import '../../../component/library/work_contents_api.dart';
@@ -301,7 +302,10 @@ class _GestureHandler {
 }
 
 class _TextSelector {
-  //
+  /// If the user selected exactly just a full word (with no other words or
+  /// symbols), this word will be returned stripped of whitespace
+  ///
+  /// Otherwise null
   String? singleWord(TextSelection selection, String visibleText) {
     // Ignore selected spaces at word boundary
     final trimmedSelectedText = selection.textInside(visibleText).trim();
@@ -343,6 +347,24 @@ class _TextSelector {
     return startIsValid && endIsValid && middleIsValid;
   }
 
+  /*   /// Finds the first non-whitespace character that comes before the
+  /// [selectedWord], if any. Ignores the previous batch of visible text, which
+  /// is an obvious limitation
+  ///
+  /// This method assumes that the selection will contain only this one word
+  /// instance and nothing else
+  String? charBeforeWord(TextSelection selection, String visibleText, String selectedWord) {
+    final wordStartIndex = visibleText.indexOf(selectedWord, selection.start);
+    // Iterate backwards from the character immediately preceding the word
+    for (var i = wordStartIndex - 1; i >= 0; i--) {
+      final char = visibleText[i];
+      if (char.trim().isNotEmpty) {
+        return char;
+      }
+    }
+    return null;
+  } */
+
   //
 }
 
@@ -363,6 +385,7 @@ class _WordDetailsButton extends ContextMenuButtonItem {
 
   static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
     ContextMenuController.removeAny();
+    // Using double quotes will force an exact match, avoiding a text search
     final results = await ref.watch(enrichedMorphologicalSearchProvider('"$word"').future);
     if (results.isNotEmpty) {
       final selectedKeys = AnalysisKeys(
@@ -382,6 +405,64 @@ class _WordDetailsButton extends ContextMenuButtonItem {
     }
   }
 
+  //
+}
+
+/// This context menu button will navigate to the English Wiktionary
+class _WiktionaryButton extends ContextMenuButtonItem {
+  _WiktionaryButton({
+    required String word,
+    required this.ref,
+    required this.context,
+  }) : super(
+         label: 'Look up in Wiktionary',
+         onPressed: () => _onPressed(word, ref, context),
+       );
+
+  final WidgetRef ref;
+  final BuildContext context;
+
+  static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
+    ContextMenuController.removeAny();
+    final queryWord = (await _isProperNoun(word, ref)) ? _capitalize(word) : word.toLowerCase();
+    try {
+      if (!await launchUrl(Uri.parse('https://en.wiktionary.org/wiki/$queryWord#Latin'))) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not launch browser')),
+          );
+        }
+      }
+    } on Exception {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Browser error')),
+        );
+      }
+    }
+  }
+
+  /// Returns true if the word refers to a single person, place, etc.
+  ///
+  /// For Latin words that might exist both as a common and a proper noun, it
+  /// will return *false* (eg Lupus vs lupus)
+  ///
+  /// The logic could potentially be improved but it would require checking the
+  /// previous character (to see if it's capitalized because it appears after a
+  /// '.') and detecting whether the word starts with upper case because the
+  /// whole line is upper case (like in titles). These checks come with their
+  /// own problems
+  static Future<bool> _isProperNoun(String word, WidgetRef ref) async {
+    var isProperName = false;
+    if (word == _capitalize(word)) {
+      // The assumption is that the provider will not find proper names
+      final results = await ref.watch(enrichedMorphologicalSearchProvider('"$word"').future);
+      isProperName = results.isEmpty;
+    }
+    return isProperName;
+  }
+
+  static String _capitalize(String word) => '${word[0].toUpperCase()}${word.substring(1)}';
   //
 }
 
@@ -640,8 +721,10 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     setState(() {
       if (selectedWord != null) {
         // TODO(whothefluff): add button for "using macrons" (exact match) when macrons are added
+        // although this will not be possible for the wiktionary
         _wordSelectionButtons = [
           _WordDetailsButton(word: selectedWord, ref: ref, context: context),
+          _WiktionaryButton(word: selectedWord, ref: ref, context: context),
         ];
       } else {
         _wordSelectionButtons = [];
