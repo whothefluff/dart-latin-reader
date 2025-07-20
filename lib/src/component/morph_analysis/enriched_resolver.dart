@@ -92,7 +92,7 @@ class DictionaryRefResolver {
       (await repo.getLnsInfoFor(suffixedLemmas)).map(
         (e) => MapEntry(
           // Original morphDictRef
-          e.lemma.replaceFirst(r'1$', ''),
+          e.lemma.replaceFirst(RegExp(r'1$'), ''),
           e,
         ),
       ),
