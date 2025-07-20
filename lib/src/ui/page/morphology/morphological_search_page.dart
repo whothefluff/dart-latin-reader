@@ -40,7 +40,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
       );
       _searchController.closeView(_searchController.text);
     });
-    log.info(() => 'MorphologyPage - selecting $_selectedKeys');
+    log.info(() => 'selecting $_selectedKeys');
   }
 
   @override
@@ -66,7 +66,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                   if (!_isSearching) {
                     setState(() => _isSearching = true);
                   }
-                  log.info(() => 'MorphologyPage - searching for: $searchTerm');
+                  log.info(() => 'searching for: $searchTerm');
                   try {
                     final results = await ref.watch(
                       enrichedMorphologicalSearchProvider(searchTerm).future,
@@ -104,6 +104,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                       ),
                     ];
                   } on Exception catch (e, stack) {
+                    log.catching(e);
                     return [
                       showError(ref, enrichedMorphologicalSearchProvider(searchTerm))(e, stack),
                     ];

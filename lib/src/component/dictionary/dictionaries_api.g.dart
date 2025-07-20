@@ -6,7 +6,7 @@ part of 'dictionaries_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dictionariesHash() => r'8edffb15c5641f93c3e843b8e659936bbcd41a1d';
+String _$dictionariesHash() => r'6d46e2fdd9f2f761bd446894a46f07dcaa5fed5d';
 
 /// See also [dictionaries].
 @ProviderFor(dictionaries)

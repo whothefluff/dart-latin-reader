@@ -21,7 +21,7 @@ Future<DictionaryEntrySenses> dictionaryEntrySenses(
   String dictionary,
   String lemma,
 ) async {
-  log.info(() => '@riverpod - dictionaryEntrySenses');
+  log.info(() => '@riverpod - using $dictionary, $lemma');
   ref.cacheFor(const Duration(minutes: 5));
   final db = await ref.watch(dbProvider.future);
   final repo = DictionaryRepository(db);
@@ -37,7 +37,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
   @override
   Future<DictionaryEntrySenses> getEntrySensesOf(String dictionary, String lemma) async {
-    log.info('DictionaryRepository - reading dictionary entry senses from db');
+    log.fine('reading entry senses of "$lemma" in "$dictionary" from db');
     final dbData = await _db.dictionaryDrift.getDictionaryEntrySenses(dictionary, lemma).get();
     return DictionaryEntrySenses(dbData);
   }

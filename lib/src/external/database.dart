@@ -18,7 +18,7 @@ part 'database.g.dart';
 
 @riverpod
 Future<AppDb> db(Ref ref) async {
-  log.info(() => '@riverpod - initializing AppDb');
+  log.info(() => '@riverpod');
   return AppDb();
 }
 
@@ -36,7 +36,7 @@ class AppDb extends $AppDb {
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {
-      log.info(() => 'DB events - creation migration started');
+      log.fine(() => 'DB events - creation migration started');
       await customStatement('PRAGMA journal_mode = MEMORY;');
       await customStatement('PRAGMA synchronous = OFF;');
       await customStatement('PRAGMA foreign_keys = ON;');
@@ -45,7 +45,7 @@ class AppDb extends $AppDb {
       await util.updateDatabaseVersion(this);
     },
     beforeOpen: (d) async {
-      log.info(() => 'DB events - database ready');
+      log.fine(() => 'DB events - database ready');
       await customStatement('PRAGMA journal_mode = OFF;');
       await customStatement('PRAGMA temp_store = MEMORY;');
     },
@@ -60,20 +60,20 @@ class AppDb extends $AppDb {
 }
 
 LazyDatabase _openConnection() => LazyDatabase(() async {
-  log.info(() => '_openConnection() - getting path');
+  log.fine(() => 'getting path');
   final supportDirectory = await getApplicationCacheDirectory();
   final filePath = p.join(supportDirectory.path, 'data.db');
-  log.info(() => '_openConnection() - using directory at $filePath');
+  log.info(() => 'using directory at $filePath');
   final file = File(filePath);
   if (Platform.isAndroid) {
     await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
   }
-  log.info(() => '_openConnection() - handling database file');
+  log.info(() => 'handling database file');
   return NativeDatabase.createInBackground(
     file,
     logStatements: AppConfig.instance.logDbStatements,
     setup: (db) {
-      log.info(() => '_openConnection() - setting functions');
+      log.fine(() => 'setting functions');
       util.setupRegExp(db);
     },
   );

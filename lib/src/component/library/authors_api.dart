@@ -17,7 +17,7 @@ part 'authors_api.g.dart';
 
 @riverpod
 Future<Authors> authors(Ref ref) async {
-  log.info(() => '@riverpod - authors');
+  log.info(() => '@riverpod');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = LibraryRepository(db);
@@ -31,7 +31,7 @@ class LibraryRepository implements ILibraryRepository {
 
   @override
   Future<Authors> getAuthors() async {
-    log.info('LibraryRepository - reading authors from db');
+    log.fine('reading all authors from db');
     final dbData = await _db.libraryDrift.getLibraryAuthors().get();
     return Authors(dbData);
   }

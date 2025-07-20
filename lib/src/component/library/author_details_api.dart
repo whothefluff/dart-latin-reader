@@ -17,7 +17,7 @@ part 'author_details_api.g.dart';
 
 @riverpod
 Future<AuthorDetails> authorDetails(Ref ref, String author) async {
-  log.info(() => '@riverpod - authorDetails');
+  log.info(() => '@riverpod - using $author');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = LibraryRepository(db);
@@ -31,7 +31,7 @@ class LibraryRepository implements ILibraryRepository {
 
   @override
   Future<AuthorDetails> getAuthorDetailsOf(String author) async {
-    log.info(() => 'LibraryRepository - reading author details from db');
+    log.fine(() => 'reading details of author "$author" from db');
     final dbData = await _db.libraryDrift.getLibraryAuthorDetails(author).get();
     final firstLine = dbData.first;
     return AuthorDetails(

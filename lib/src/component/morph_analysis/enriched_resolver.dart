@@ -3,6 +3,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../logger.dart';
 import '../dictionary/lewis_and_short_basic_info_api.dart';
 
 //infrastructure
@@ -68,10 +69,13 @@ class DictionaryRefResolver {
     required String Function(T item) getDictRef,
     required U Function(T item, LnsBasicInfoEntry lnsInfo) createEnriched,
   }) async {
+    log.entry(args: items);
     // Get all unique dictionary references from the source items.
     final pureLemmas = items.map(getDictRef).toSet();
+    log.fine(() => 'original lemmas: $pureLemmas');
     // First, look for exact lemmas but with '-' replacements
     final assimilated = _assimilated(pureLemmas);
+    log.fine(() => 'assimilated lemmas: $assimilated');
     final assimilatedMatches = Map.fromEntries(
       (await repo.getLnsInfoFor(assimilated.lemmas)).map(
         (e) => MapEntry(
@@ -83,11 +87,15 @@ class DictionaryRefResolver {
     );
     // For the lemmas with no matches, look for lemma AND '1'
     final matchedALemmas = assimilatedMatches.keys.toSet();
+    // dart format off
+    log.fine(() => 'assimilated lemmas found: ${assimilatedMatches.values.map((e) => e.lemma).toSet()}');
+    // dart format on
     final unmatchedALemmas = assimilated.lemmas.difference(matchedALemmas);
     final suffixedLemmas = unmatchedALemmas
         .where((e) => !e.endsWith('1'))
         .map((e) => '${e}1')
         .toSet();
+    log.fine(() => 'suffixed lemmas: $suffixedLemmas');
     final suffixedMatches = Map.fromEntries(
       (await repo.getLnsInfoFor(suffixedLemmas)).map(
         (e) => MapEntry(
@@ -99,11 +107,13 @@ class DictionaryRefResolver {
     );
     // For lemmas still with no matches, look for lema WITHOUT trailing '1'
     final matchedSLemmas = suffixedMatches.keys.toSet();
+    log.fine(() => 'suffixed lemmas found: ${suffixedMatches.values.map((e) => e.lemma).toSet()}');
     final unmatchedSLemmas = unmatchedALemmas.difference(matchedSLemmas);
     final normalizedLemmas = unmatchedSLemmas
         .where((e) => e.endsWith('1'))
         .map((e) => e.replaceFirst(RegExp(r'1$'), ''))
         .toSet();
+    log.fine(() => 'normalized lemmas: $normalizedLemmas');
     final normalizedMatches = Map.fromEntries(
       (await repo.getLnsInfoFor(normalizedLemmas)).map(
         (e) => MapEntry(
@@ -113,6 +123,9 @@ class DictionaryRefResolver {
         ),
       ),
     );
+    // dart format off
+    log.fine(() => 'normalized lemmas found: ${normalizedMatches.values.map((e) => e.lemma).toSet()}');
+    // dart format on
     // Put all found results together
     final allMatches = {
       ...assimilatedMatches,
@@ -123,11 +136,13 @@ class DictionaryRefResolver {
     final lnsInfoByMorphDictRef = allMatches.map(
       (key, value) => MapEntry(assimilated.toOriginal[key] ?? key, value),
     );
-    return items
-        // Filter out entries without matches
-        .where((i) => lnsInfoByMorphDictRef.containsKey(getDictRef(i)))
-        // Create entries with additional dict data
-        .map((e) => createEnriched(e, lnsInfoByMorphDictRef[getDictRef(e)]!));
+    return log.exit<Iterable<U>>(
+      r: items
+          // Filter out entries without matches
+          .where((i) => lnsInfoByMorphDictRef.containsKey(getDictRef(i)))
+          // Create entries with additional dict data
+          .map((e) => createEnriched(e, lnsInfoByMorphDictRef[getDictRef(e)]!)),
+    )!;
   }
 
   ({Set<String> lemmas, Map<String, String> toOriginal}) _assimilated(Set<String> originalLemmas) =>

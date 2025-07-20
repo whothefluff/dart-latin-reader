@@ -17,7 +17,7 @@ part 'work_contents_api.g.dart';
 
 @riverpod
 Future<WorkContentsSegments> workContents(Ref ref, String id, int fromIndex, int toIndex) async {
-  log.info(() => '@riverpod - workContents');
+  log.info(() => '@riverpod - with $id, $fromIndex, $toIndex');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = LibraryRepository(db);
@@ -31,7 +31,7 @@ class LibraryRepository implements ILibraryRepository {
 
   @override
   Future<WorkContentsSegments> getWorkContents(String id, int fromIndex, int toIndex) async {
-    log.info('LibraryRepository - reading work contents ($fromIndex - $toIndex) from db');
+    log.fine('reading contents ($fromIndex - $toIndex) of work "$id" from db');
     final dbData = await _db.libraryDrift
         .getLibraryWorkContentsPartial(id, fromIndex, toIndex)
         .get();

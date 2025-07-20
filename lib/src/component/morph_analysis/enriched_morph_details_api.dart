@@ -19,7 +19,7 @@ part 'enriched_morph_details_api.g.dart';
 
 @riverpod
 Future<EnrichedAnalyses> enrichedMorphologicalAnalyses(Ref ref, AnalysisKeys keys) async {
-  log.info(() => '@riverpod - enrichedMorphologicalAnalyses');
+  log.info(() => '@riverpod - using $keys');
   ref.cacheFor(const Duration(minutes: 5));
   final analyses = await ref.watch(morphologicalAnalysesProvider(keys).future);
   return GetEnrichedMorphologicalAnalysesUseCase(

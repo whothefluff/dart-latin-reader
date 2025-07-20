@@ -17,7 +17,7 @@ part 'dictionary_entries_api.g.dart';
 
 @riverpod
 Future<DictionaryEntries> dictionaryEntries(Ref ref, String dictionary) async {
-  log.info(() => '@riverpod - dictionaryEntries');
+  log.info(() => '@riverpod - using $dictionary');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = DictionaryRepository(db);
@@ -33,7 +33,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
   @override
   Future<DictionaryEntries> getEntriesOf(String dictionary) async {
-    log.info('DictionaryRepository - reading dictionary entries from db');
+    log.fine('reading all entries of dictionary "$dictionary" from db');
     final dbData = await _db.dictionaryDrift.getDictionaryEntries(dictionary).get();
     return DictionaryEntries(dbData);
   }

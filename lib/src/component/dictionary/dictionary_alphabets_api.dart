@@ -15,9 +15,10 @@ Future<DictionaryAlphabetLetterPosition> dictionaryAlphabetLetterPosition(
   String dictionary,
   String letter,
 ) async {
-  log.info(() => '@riverpod - dictionaryAlphabetLetterPosition');
+  log.info(() => '@riverpod - using $dictionary, $letter');
   ref.cacheFor(const Duration(minutes: 120));
   final db = await ref.watch(dbProvider.future);
+  log.fine('reading position of alphabet letter "$letter" in dict "$dictionary"');
   final dbData = await db.dictionaryDrift
       .getDictionaryAlphabetLetterPosition(dictionary, letter)
       .getSingle();

@@ -6,7 +6,7 @@ part of 'lewis_and_short_basic_info_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lnsBasicInfoHash() => r'1056cb95ddd871608810e3f11f265ddac84f298e';
+String _$lnsBasicInfoHash() => r'ed3033cb1a1f904b29de9102dd17adb60790aac4';
 
 /// Copied from Dart SDK
 class _SystemHash {

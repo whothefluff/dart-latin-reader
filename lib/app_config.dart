@@ -10,7 +10,7 @@ class AppConfig {
 
   static final AppConfig _instance = AppConfig._();
   static late final YamlMap _config;
-  static final Map<String, Level> _levels = {
+  static final Map<String, Level> _logLevels = {
     'ALL': Level.ALL,
     'FINEST': Level.FINEST,
     'FINER': Level.FINER,
@@ -32,8 +32,12 @@ class AppConfig {
 
   bool get logDbStatements => _config['database.log_statements'] as bool? ?? false;
 
-  Level get consoleLogLevel => _levels[_config['log']['console']['level']] ?? Level.ALL;
+  Level get consoleLogLevel => _logLevels[_config['log']['console']['level']] ?? Level.ALL;
 
-  Level get fileLogLevel => _levels[_config['log']['file']['level']] ?? Level.OFF;
+  Level get fileLogLevel => _logLevels[_config['log']['file']['level']] ?? Level.OFF;
+
+  bool get logUsesApi => _config['log']?['console']?['using']?['api'] as bool? ?? false;
+
+  bool get logUsesPrint => _config['log']?['console']?['using']?['print'] as bool? ?? true;
   //
 }

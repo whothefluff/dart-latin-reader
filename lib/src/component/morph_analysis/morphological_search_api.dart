@@ -18,7 +18,7 @@ part 'morphological_search_api.g.dart';
 
 @riverpod
 Future<Results> morphologicalSearch(Ref ref, String form) async {
-  log.info(() => '@riverpod - morphologicalSearch');
+  log.info(() => '@riverpod - using $form');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = MorphologicalDataRepository(db);
@@ -28,14 +28,22 @@ Future<Results> morphologicalSearch(Ref ref, String form) async {
 class MorphologicalDataRepository implements IMorphologicalDataRepository {
   MorphologicalDataRepository(this._db) {
     _runnableQueries = {
-      (hasMacrons: true, useLike: true): (String form) =>
-          _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithLike(form),
-      (hasMacrons: true, useLike: false): (String form) =>
-          _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithFts(form),
-      (hasMacrons: false, useLike: true): (String form) =>
-          _db.morphAnalysisDrift.searchMorphologicalDataWithLike(form),
-      (hasMacrons: false, useLike: false): (String form) =>
-          _db.morphAnalysisDrift.searchMorphologicalDataWithFts(form),
+      (hasMacrons: true, useLike: true): (String form) {
+        log.fine(() => 'WHERE macronizedForm LIKE "$form"');
+        return _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithLike(form);
+      },
+      (hasMacrons: true, useLike: false): (String form) {
+        log.fine(() => 'WHERE macronizedForm MATCH "$form"');
+        return _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithFts(form);
+      },
+      (hasMacrons: false, useLike: true): (String form) {
+        log.fine(() => 'WHERE form LIKE "$form"');
+        return _db.morphAnalysisDrift.searchMorphologicalDataWithLike(form);
+      },
+      (hasMacrons: false, useLike: false): (String form) {
+        log.fine(() => 'WHERE form MATCH "$form"');
+        return _db.morphAnalysisDrift.searchMorphologicalDataWithFts(form);
+      },
     };
   }
 
@@ -74,7 +82,6 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
       );
       final runQuery = _runnableQueries[key]!;
       final parsedInput = _sanitizeQuotes(_sanitizeWildcards(form));
-      log.info('MorphologicalDataRepository - searching $parsedInput in db');
       final dbData = await runQuery(parsedInput).get();
       return Results(dbData);
     } else {

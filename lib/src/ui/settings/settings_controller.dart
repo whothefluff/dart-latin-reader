@@ -11,13 +11,13 @@ part 'settings_controller.g.dart';
 SettingsService settingsService(Ref ref) => SettingsService();
 
 final settingsControllerProvider = Provider<SettingsController>((ref) {
-  log.info(() => '@riverpod - settingsController');
+  log.info(() => '@riverpod');
   final settingsService = ref.watch(settingsServiceProvider);
   return SettingsController(settingsService);
 });
 
 final settingsInitializerProvider = FutureProvider<void>((ref) async {
-  log.info(() => '@riverpod - settingsInitializer');
+  log.info(() => '@riverpod');
   final controller = ref.watch(settingsControllerProvider);
   await controller.loadSettings();
 });

@@ -20,7 +20,7 @@ part 'morphological_details_api.g.dart';
 
 @riverpod
 Future<Analyses> morphologicalAnalyses(Ref ref, AnalysisKeys keys) async {
-  log.info(() => '@riverpod - morphologicalAnalyses');
+  log.info(() => '@riverpod - using $keys');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = MorphologicalDataRepository(db);
@@ -29,7 +29,7 @@ Future<Analyses> morphologicalAnalyses(Ref ref, AnalysisKeys keys) async {
 
 @riverpod
 Future<AnalysisKeys> morphologicalAnalysisKeys(Ref ref, String form) async {
-  log.info(() => '@riverpod - morphologicalAnalysisKeys');
+  log.info(() => '@riverpod - using $form');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = MorphologicalDataRepository(db);
@@ -41,8 +41,14 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
     this._db,
   ) {
     _analysisKeysQueries = {
-      (hasMacrons: true): (String form) => _db.morphAnalysisDrift.getAnalysisKeysOfMacronized(form),
-      (hasMacrons: false): (String form) => _db.morphAnalysisDrift.getAnalysisKeysOf(form),
+      (hasMacrons: true): (String form) {
+        log.fine(() => 'retrieve AnalysisKeys WHERE macronizedForm LIKE "$form"');
+        return _db.morphAnalysisDrift.getAnalysisKeysOfMacronized(form);
+      },
+      (hasMacrons: false): (String form) {
+        log.fine(() => 'retrieve AnalysisKeys WHERE form LIKE "$form"');
+        return _db.morphAnalysisDrift.getAnalysisKeysOf(form);
+      },
     };
   }
 
@@ -55,7 +61,7 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
 
   @override
   Future<Analyses> getMorphAnalyses(AnalysisKeys keys) async {
-    log.info('MorphologicalDataRepository - retrieving analyses from db');
+    log.fine('retrieving analyses of $keys from db');
     // dart format off
     final dbData = await 
         (_db.select(_db.morphAnalysisDrift.morphologyAnalyses)
@@ -71,7 +77,6 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   /// the result can contain macrons or not contain any)
   @override
   Future<AnalysisKeys> getMorphAnalysisKeys(String form) async {
-    log.info('MorphologicalDataRepository - retrieving $form analyses from db');
     final formHasMacrons = form.contains(RegExp('[āēīōūĀĒĪŌŪ]'));
     final dbData = await _analysisKeysQueries[(hasMacrons: formHasMacrons)]!(form).get();
     return AnalysisKeys(dbData);

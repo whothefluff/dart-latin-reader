@@ -19,7 +19,7 @@ part 'lewis_and_short_basic_info_api.g.dart';
 
 @riverpod
 Future<LnsBasicInfo> lnsBasicInfo(Ref ref, Iterable<String> lemmas) async {
-  log.info(() => '@riverpod - lnsBasicInfo');
+  log.info(() => '@riverpod - using $lemmas');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = DictionaryRepository(db.dictionaryDrift);
@@ -35,7 +35,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
   @override
   Future<LnsBasicInfo> getLnsInfoFor(lemmas) async {
-    log.info('DictionaryRepository - reading L&S from db');
+    log.fine('reading L&S lemmas $lemmas from db');
     final dictId = _db.selectOnly(_db.dictionaries)
       ..addColumns([_db.dictionaries.id])
       ..where(_db.dictionaries.name.equals('Lewis & Short'));

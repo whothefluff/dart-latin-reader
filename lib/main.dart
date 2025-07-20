@@ -10,7 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppConfig.instance.load();
   configureLogging();
-  log.info(() => 'main() - calling runApp');
+  log.info(() => 'calling runApp');
   runApp(
     const ProviderScope(
       child: App(),

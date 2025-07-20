@@ -7,7 +7,7 @@ part of 'dictionary_entry_senses_api.dart';
 // **************************************************************************
 
 String _$dictionaryEntrySensesHash() =>
-    r'f10688de0c23510ad74366583abe7ffd7c3fb0ad';
+    r'8fad5cd789a1ea80f0ab3577bffed5d7206a7be3';
 
 /// Copied from Dart SDK
 class _SystemHash {
