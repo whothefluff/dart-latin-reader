@@ -27,7 +27,7 @@ dependencies:
   path_provider: ^2.1.5
   riverpod_annotation: ^2.6.1
   sqlite3: ^2.7.7
-  sqlite3_flutter_libs: ^0.5.36
+  sqlite3_flutter_libs: ^0.5.38
   stack_trace: ^1.12.1
   url_launcher: ^6.3.2
   yaml: ^3.1.3
