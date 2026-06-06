@@ -48,6 +48,7 @@ CREATE TABLE "WorkContents"(
     "idx" INTEGER NOT NULL CHECK( idx >= 0 ),
     "word" TEXT NOT NULL,
     "sourceReference" TEXT NOT NULL,
+    "properNounState" INTEGER CHECK( properNounState IN (0, 1, 2) ), --NULL = unknown, 0 = no, 1 = yes, 2 = either/both
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
 ) 
@@ -84,28 +85,29 @@ CREATE TABLE "WorkContentSupplementary"(
 STRICT, 
 WITHOUT ROWID;
 
-CREATE TABLE "Macronizations"(
+CREATE TABLE "UnambiguousMacronizations"(
     "word" TEXT NOT NULL,
     "macronizedWord" TEXT NOT NULL,
-    "isUncertain" INTEGER NOT NULL CHECK( isUncertain IN (0,1) ),
-    PRIMARY KEY( word, macronizedWord )
+    PRIMARY KEY( word ),
+    UNIQUE( word, macronizedWord )
 ) 
 STRICT, 
 WITHOUT ROWID;
 
 CREATE TABLE "WorkMacronizations"(
     "workId" TEXT NOT NULL,
-    "idx" TEXT NOT NULL,
+    "wordIdx" INTEGER NOT NULL,
     "macronizedWord" TEXT NOT NULL,
-    PRIMARY KEY( workId, idx ),
-    FOREIGN KEY( workId, idx ) REFERENCES WorkContents( workId, idx )
+    "uncertaintyBitMask" INTEGER NOT NULL, --1 for uncertain
+    PRIMARY KEY( workId, wordIdx ),
+    FOREIGN KEY( workId, wordIdx ) REFERENCES WorkContents( workId, idx )
 )
 STRICT,
 WITHOUT ROWID;
 
 CREATE TABLE "UserProvidedMacronizations"(
     "workId" TEXT NOT NULL,
-    "idx" TEXT NOT NULL,
+    "idx" INTEGER NOT NULL,
     "macronizedWord" TEXT NOT NULL,
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId, idx ) REFERENCES WorkContents( workId, idx )
@@ -247,3 +249,39 @@ CREATE VIEW "library.WorkIndexes" AS
             ON SubdivsHierarchy.node = Titles.parent
                AND 'TITL' = Titles.typ
         ORDER BY SubdivsHierarchy.fromindex;
+
+CREATE VIEW "library.MacronizedWorkContents" AS
+    SELECT WorkContents.workId,
+           WorkContents.idx,
+           WorkContents.word,
+           COALESCE( UserProvidedMacronizations.macronizedWord,
+                     WorkMacronizations.macronizedWord,
+                     ExactUnambiguous.macronizedWord,
+                     -- If the exact match fails but the lowercase fallback succeeds (e.g., for common nouns at the start of a sentence), 
+                     -- we preserve the original capitalization:
+                     CASE WHEN LowerUnambiguous.macronizedWord IS NOT NULL AND SUBSTR( WorkContents.word, 1, 1 ) = UPPER( SUBSTR( WorkContents.word, 1, 1 ) )
+                          THEN UPPER( SUBSTR( LowerUnambiguous.macronizedWord, 1, 1 ) ) || SUBSTR( LowerUnambiguous.macronizedWord, 2 )
+                          ELSE LowerUnambiguous.macronizedWord 
+                     END,
+                     WorkContents.word ) AS macronizedWord,
+           CASE WHEN UserProvidedMacronizations.macronizedWord IS NOT NULL THEN 0
+                WHEN WorkMacronizations.macronizedWord IS NOT NULL THEN WorkMacronizations.uncertaintyBitMask
+                WHEN ExactUnambiguous.macronizedWord IS NOT NULL THEN 0
+                WHEN LowerUnambiguous.macronizedWord IS NOT NULL THEN 0
+                ELSE 1
+           END AS uncertaintyBitMask,
+           WorkContents.sourceReference,
+           WorkContents.properNounState
+        FROM WorkContents
+        LEFT JOIN UserProvidedMacronizations
+            ON WorkContents.workId = UserProvidedMacronizations.workId
+               AND WorkContents.idx = UserProvidedMacronizations.idx
+        LEFT JOIN WorkMacronizations
+            ON WorkContents.workId = WorkMacronizations.workId
+               AND WorkContents.idx = WorkMacronizations.wordIdx
+        LEFT JOIN UnambiguousMacronizations AS ExactUnambiguous -- one-to-one
+            ON ( ( WorkContents.properNounState = TRUE OR WorkContents.properNounState = 2 )
+                 AND WorkContents.word = ExactUnambiguous.word )
+        LEFT JOIN UnambiguousMacronizations AS LowerUnambiguous -- one-to-one
+            ON ( ( WorkContents.properNounState = FALSE OR WorkContents.properNounState = 2 )
+                 AND LOWER( WorkContents.word ) = LowerUnambiguous.word );

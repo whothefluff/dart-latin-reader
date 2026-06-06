@@ -1,8 +1,8 @@
-import 'package:csv/csv.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/services.dart';
 
 import '../../external/database.dart';
+import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'morph_analysis.drift.dart';
 
@@ -18,7 +18,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${_path}morphological_details.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch((b) {
         //ignore these entries, which won't have inflections anyway
         bool dictRefIsSet(List<dynamic> x) => x[2].toString().isNotEmpty;
@@ -46,7 +46,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${_path}morphological_detail_inflections.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.morphologicalDetailInflections,

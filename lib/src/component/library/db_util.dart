@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:csv/csv.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/services.dart';
 
 import '../../external/database.dart';
+import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'library.drift.dart';
 
@@ -20,7 +20,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}authors.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.authors,
@@ -46,7 +46,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}author_abbreviations.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.authorAbbreviations,
@@ -71,7 +71,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}works.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.works,
@@ -96,7 +96,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}work_contents.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.workContents,
@@ -108,6 +108,7 @@ final operations = [
                   idx: Value(row[1] as int),
                   word: Value(row[2].toString()),
                   sourceReference: Value(row[3].toString()),
+                  properNounState: intValue(row[4].toString()),
                 ),
               ),
           mode: InsertMode.insertOrRollback,
@@ -122,7 +123,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}work_content_subdivisions.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.workContentSubdivisions,
@@ -152,7 +153,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}work_content_supplementary.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.workContentSupplementary,
@@ -174,13 +175,88 @@ final operations = [
     },
   ),
   (
+    id: 'UnambiguousMacronizations',
+    delete: (AppDb db) async {
+      await db.delete(db.unambiguousMacronizations).go();
+    },
+    insert: (AppDb db) async {
+      final csvData = await rootBundle.loadString('${path}unambiguous_macronizations.csv');
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
+      await db.batch(
+        (b) => b.insertAll(
+          db.unambiguousMacronizations,
+          rows
+              .skip(1)
+              .map(
+                (row) => UnambiguousMacronizationsCompanion(
+                  word: Value(row[0].toString()),
+                  macronizedWord: Value(row[1].toString()),
+                ),
+              ),
+          mode: InsertMode.insertOrRollback,
+        ),
+      );
+    },
+  ),
+  (
+    id: 'WorkMacronizations',
+    delete: (AppDb db) async {
+      await db.delete(db.workMacronizations).go();
+    },
+    insert: (AppDb db) async {
+      final csvData = await rootBundle.loadString('${path}work_macronizations.csv');
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
+      await db.batch(
+        (b) => b.insertAll(
+          db.workMacronizations,
+          rows
+              .skip(1)
+              .map(
+                (row) => WorkMacronizationsCompanion(
+                  workId: Value(row[0].toString()),
+                  wordIdx: Value(row[1] as int),
+                  macronizedWord: Value(row[2].toString()),
+                  uncertaintyBitMask: Value(row[3] as int),
+                ),
+              ),
+          mode: InsertMode.insertOrRollback,
+        ),
+      );
+    },
+  ),
+  (
+    id: 'UserProvidedMacronizations',
+    delete: (AppDb db) async {
+      await db.delete(db.userProvidedMacronizations).go();
+    },
+    insert: (AppDb db) async {
+      final csvData = await rootBundle.loadString('${path}user_provided_macronizations.csv');
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
+      await db.batch(
+        (b) => b.insertAll(
+          db.userProvidedMacronizations,
+          rows
+              .skip(1)
+              .map(
+                (row) => UserProvidedMacronizationsCompanion(
+                  workId: Value(row[0].toString()),
+                  idx: Value(row[1] as int),
+                  macronizedWord: Value(row[2].toString()),
+                ),
+              ),
+          mode: InsertMode.insertOrRollback,
+        ),
+      );
+    },
+  ),
+  (
     id: 'AuthorsAndWorks',
     delete: (AppDb db) async {
       await db.delete(db.authorsAndWorks).go();
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}authors_and_works.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.authorsAndWorks,

@@ -1,8 +1,8 @@
-import 'package:csv/csv.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../../external/database.dart';
+import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'dictionary.drift.dart';
 
@@ -18,7 +18,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}dictionaries.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.dictionaries,
@@ -45,7 +45,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}dictionary_entries.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.dictionaryEntries,
@@ -73,7 +73,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}dict_entry_senses.csv');
-      final rows = const CsvToListConverter().convert(csvData, shouldParseNumbers: false);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.dictEntrySenses,
@@ -100,7 +100,7 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}dict_entry_sense_quotes.csv');
-      final rows = const CsvToListConverter().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
           db.dictEntrySenseQuotes,
