@@ -48,7 +48,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
       i3.WorkContentSubdivisions(this);
   late final i3.WorkContentSupplementary workContentSupplementary =
       i3.WorkContentSupplementary(this);
-  late final i3.Macronizations macronizations = i3.Macronizations(this);
+  late final i3.UnambiguousMacronizations unambiguousMacronizations =
+      i3.UnambiguousMacronizations(this);
   late final i3.WorkMacronizations workMacronizations = i3.WorkMacronizations(
     this,
   );
@@ -68,6 +69,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i3.LibraryWorkIndexes libraryWorkIndexes = i3.LibraryWorkIndexes(
     this,
   );
+  late final i3.LibraryMacronizedWorkContents libraryMacronizedWorkContents =
+      i3.LibraryMacronizedWorkContents(this);
   late final i4.DataVersion dataVersion = i4.DataVersion(this);
   late final i4.LatestDataVersion latestDataVersion = i4.LatestDataVersion(
     this,
@@ -105,7 +108,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
     workContents,
     workContentSubdivisions,
     workContentSupplementary,
-    macronizations,
+    unambiguousMacronizations,
     workMacronizations,
     userProvidedMacronizations,
     authorsAndWorks,
@@ -115,6 +118,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
     libraryWorkDetails,
     libraryWorkContents,
     libraryWorkIndexes,
+    libraryMacronizedWorkContents,
     dataVersion,
     latestDataVersion,
   ];
@@ -163,8 +167,11 @@ class $AppDbManager {
       i3.$WorkContentSubdivisionsTableManager(_db, _db.workContentSubdivisions);
   i3.$WorkContentSupplementaryTableManager get workContentSupplementary => i3
       .$WorkContentSupplementaryTableManager(_db, _db.workContentSupplementary);
-  i3.$MacronizationsTableManager get macronizations =>
-      i3.$MacronizationsTableManager(_db, _db.macronizations);
+  i3.$UnambiguousMacronizationsTableManager get unambiguousMacronizations =>
+      i3.$UnambiguousMacronizationsTableManager(
+        _db,
+        _db.unambiguousMacronizations,
+      );
   i3.$WorkMacronizationsTableManager get workMacronizations =>
       i3.$WorkMacronizationsTableManager(_db, _db.workMacronizations);
   i3.$UserProvidedMacronizationsTableManager get userProvidedMacronizations =>

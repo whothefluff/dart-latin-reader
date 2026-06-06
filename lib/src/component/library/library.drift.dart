@@ -663,6 +663,7 @@ typedef $WorkContentsCreateCompanionBuilder =
       required int idx,
       required String word,
       required String sourceReference,
+      i0.Value<int?> properNounState,
     });
 typedef $WorkContentsUpdateCompanionBuilder =
     i1.WorkContentsCompanion Function({
@@ -670,6 +671,7 @@ typedef $WorkContentsUpdateCompanionBuilder =
       i0.Value<int> idx,
       i0.Value<String> word,
       i0.Value<String> sourceReference,
+      i0.Value<int?> properNounState,
     });
 
 class $WorkContentsFilterComposer
@@ -698,6 +700,11 @@ class $WorkContentsFilterComposer
 
   i0.ColumnFilters<String> get sourceReference => $composableBuilder(
     column: $table.sourceReference,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get properNounState => $composableBuilder(
+    column: $table.properNounState,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -730,6 +737,11 @@ class $WorkContentsOrderingComposer
     column: $table.sourceReference,
     builder: (column) => i0.ColumnOrderings(column),
   );
+
+  i0.ColumnOrderings<int> get properNounState => $composableBuilder(
+    column: $table.properNounState,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorkContentsAnnotationComposer
@@ -752,6 +764,11 @@ class $WorkContentsAnnotationComposer
 
   i0.GeneratedColumn<String> get sourceReference => $composableBuilder(
     column: $table.sourceReference,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<int> get properNounState => $composableBuilder(
+    column: $table.properNounState,
     builder: (column) => column,
   );
 }
@@ -795,11 +812,13 @@ class $WorkContentsTableManager
                 i0.Value<int> idx = const i0.Value.absent(),
                 i0.Value<String> word = const i0.Value.absent(),
                 i0.Value<String> sourceReference = const i0.Value.absent(),
+                i0.Value<int?> properNounState = const i0.Value.absent(),
               }) => i1.WorkContentsCompanion(
                 workId: workId,
                 idx: idx,
                 word: word,
                 sourceReference: sourceReference,
+                properNounState: properNounState,
               ),
           createCompanionCallback:
               ({
@@ -807,11 +826,13 @@ class $WorkContentsTableManager
                 required int idx,
                 required String word,
                 required String sourceReference,
+                i0.Value<int?> properNounState = const i0.Value.absent(),
               }) => i1.WorkContentsCompanion.insert(
                 workId: workId,
                 idx: idx,
                 word: word,
                 sourceReference: sourceReference,
+                properNounState: properNounState,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -1335,22 +1356,20 @@ typedef $WorkContentSupplementaryProcessedTableManager =
       i1.WorkContentSupplementaryData,
       i0.PrefetchHooks Function()
     >;
-typedef $MacronizationsCreateCompanionBuilder =
-    i1.MacronizationsCompanion Function({
+typedef $UnambiguousMacronizationsCreateCompanionBuilder =
+    i1.UnambiguousMacronizationsCompanion Function({
       required String word,
       required String macronizedWord,
-      required int isUncertain,
     });
-typedef $MacronizationsUpdateCompanionBuilder =
-    i1.MacronizationsCompanion Function({
+typedef $UnambiguousMacronizationsUpdateCompanionBuilder =
+    i1.UnambiguousMacronizationsCompanion Function({
       i0.Value<String> word,
       i0.Value<String> macronizedWord,
-      i0.Value<int> isUncertain,
     });
 
-class $MacronizationsFilterComposer
-    extends i0.Composer<i0.GeneratedDatabase, i1.Macronizations> {
-  $MacronizationsFilterComposer({
+class $UnambiguousMacronizationsFilterComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.UnambiguousMacronizations> {
+  $UnambiguousMacronizationsFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1366,16 +1385,11 @@ class $MacronizationsFilterComposer
     column: $table.macronizedWord,
     builder: (column) => i0.ColumnFilters(column),
   );
-
-  i0.ColumnFilters<int> get isUncertain => $composableBuilder(
-    column: $table.isUncertain,
-    builder: (column) => i0.ColumnFilters(column),
-  );
 }
 
-class $MacronizationsOrderingComposer
-    extends i0.Composer<i0.GeneratedDatabase, i1.Macronizations> {
-  $MacronizationsOrderingComposer({
+class $UnambiguousMacronizationsOrderingComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.UnambiguousMacronizations> {
+  $UnambiguousMacronizationsOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1391,16 +1405,11 @@ class $MacronizationsOrderingComposer
     column: $table.macronizedWord,
     builder: (column) => i0.ColumnOrderings(column),
   );
-
-  i0.ColumnOrderings<int> get isUncertain => $composableBuilder(
-    column: $table.isUncertain,
-    builder: (column) => i0.ColumnOrderings(column),
-  );
 }
 
-class $MacronizationsAnnotationComposer
-    extends i0.Composer<i0.GeneratedDatabase, i1.Macronizations> {
-  $MacronizationsAnnotationComposer({
+class $UnambiguousMacronizationsAnnotationComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.UnambiguousMacronizations> {
+  $UnambiguousMacronizationsAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1414,66 +1423,63 @@ class $MacronizationsAnnotationComposer
     column: $table.macronizedWord,
     builder: (column) => column,
   );
-
-  i0.GeneratedColumn<int> get isUncertain => $composableBuilder(
-    column: $table.isUncertain,
-    builder: (column) => column,
-  );
 }
 
-class $MacronizationsTableManager
+class $UnambiguousMacronizationsTableManager
     extends
         i0.RootTableManager<
           i0.GeneratedDatabase,
-          i1.Macronizations,
-          i1.Macronization,
-          i1.$MacronizationsFilterComposer,
-          i1.$MacronizationsOrderingComposer,
-          i1.$MacronizationsAnnotationComposer,
-          $MacronizationsCreateCompanionBuilder,
-          $MacronizationsUpdateCompanionBuilder,
+          i1.UnambiguousMacronizations,
+          i1.UnambiguousMacronization,
+          i1.$UnambiguousMacronizationsFilterComposer,
+          i1.$UnambiguousMacronizationsOrderingComposer,
+          i1.$UnambiguousMacronizationsAnnotationComposer,
+          $UnambiguousMacronizationsCreateCompanionBuilder,
+          $UnambiguousMacronizationsUpdateCompanionBuilder,
           (
-            i1.Macronization,
+            i1.UnambiguousMacronization,
             i0.BaseReferences<
               i0.GeneratedDatabase,
-              i1.Macronizations,
-              i1.Macronization
+              i1.UnambiguousMacronizations,
+              i1.UnambiguousMacronization
             >,
           ),
-          i1.Macronization,
+          i1.UnambiguousMacronization,
           i0.PrefetchHooks Function()
         > {
-  $MacronizationsTableManager(i0.GeneratedDatabase db, i1.Macronizations table)
-    : super(
+  $UnambiguousMacronizationsTableManager(
+    i0.GeneratedDatabase db,
+    i1.UnambiguousMacronizations table,
+  ) : super(
         i0.TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              i1.$MacronizationsFilterComposer($db: db, $table: table),
+          createFilteringComposer: () => i1
+              .$UnambiguousMacronizationsFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              i1.$MacronizationsOrderingComposer($db: db, $table: table),
+              i1.$UnambiguousMacronizationsOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
           createComputedFieldComposer: () =>
-              i1.$MacronizationsAnnotationComposer($db: db, $table: table),
+              i1.$UnambiguousMacronizationsAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback:
               ({
                 i0.Value<String> word = const i0.Value.absent(),
                 i0.Value<String> macronizedWord = const i0.Value.absent(),
-                i0.Value<int> isUncertain = const i0.Value.absent(),
-              }) => i1.MacronizationsCompanion(
+              }) => i1.UnambiguousMacronizationsCompanion(
                 word: word,
                 macronizedWord: macronizedWord,
-                isUncertain: isUncertain,
               ),
           createCompanionCallback:
-              ({
-                required String word,
-                required String macronizedWord,
-                required int isUncertain,
-              }) => i1.MacronizationsCompanion.insert(
-                word: word,
-                macronizedWord: macronizedWord,
-                isUncertain: isUncertain,
-              ),
+              ({required String word, required String macronizedWord}) =>
+                  i1.UnambiguousMacronizationsCompanion.insert(
+                    word: word,
+                    macronizedWord: macronizedWord,
+                  ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
               .toList(),
@@ -1482,38 +1488,40 @@ class $MacronizationsTableManager
       );
 }
 
-typedef $MacronizationsProcessedTableManager =
+typedef $UnambiguousMacronizationsProcessedTableManager =
     i0.ProcessedTableManager<
       i0.GeneratedDatabase,
-      i1.Macronizations,
-      i1.Macronization,
-      i1.$MacronizationsFilterComposer,
-      i1.$MacronizationsOrderingComposer,
-      i1.$MacronizationsAnnotationComposer,
-      $MacronizationsCreateCompanionBuilder,
-      $MacronizationsUpdateCompanionBuilder,
+      i1.UnambiguousMacronizations,
+      i1.UnambiguousMacronization,
+      i1.$UnambiguousMacronizationsFilterComposer,
+      i1.$UnambiguousMacronizationsOrderingComposer,
+      i1.$UnambiguousMacronizationsAnnotationComposer,
+      $UnambiguousMacronizationsCreateCompanionBuilder,
+      $UnambiguousMacronizationsUpdateCompanionBuilder,
       (
-        i1.Macronization,
+        i1.UnambiguousMacronization,
         i0.BaseReferences<
           i0.GeneratedDatabase,
-          i1.Macronizations,
-          i1.Macronization
+          i1.UnambiguousMacronizations,
+          i1.UnambiguousMacronization
         >,
       ),
-      i1.Macronization,
+      i1.UnambiguousMacronization,
       i0.PrefetchHooks Function()
     >;
 typedef $WorkMacronizationsCreateCompanionBuilder =
     i1.WorkMacronizationsCompanion Function({
       required String workId,
-      required String idx,
+      required int wordIdx,
       required String macronizedWord,
+      required int uncertaintyBitMask,
     });
 typedef $WorkMacronizationsUpdateCompanionBuilder =
     i1.WorkMacronizationsCompanion Function({
       i0.Value<String> workId,
-      i0.Value<String> idx,
+      i0.Value<int> wordIdx,
       i0.Value<String> macronizedWord,
+      i0.Value<int> uncertaintyBitMask,
     });
 
 class $WorkMacronizationsFilterComposer
@@ -1530,13 +1538,18 @@ class $WorkMacronizationsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<String> get idx => $composableBuilder(
-    column: $table.idx,
+  i0.ColumnFilters<int> get wordIdx => $composableBuilder(
+    column: $table.wordIdx,
     builder: (column) => i0.ColumnFilters(column),
   );
 
   i0.ColumnFilters<String> get macronizedWord => $composableBuilder(
     column: $table.macronizedWord,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -1555,13 +1568,18 @@ class $WorkMacronizationsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
-  i0.ColumnOrderings<String> get idx => $composableBuilder(
-    column: $table.idx,
+  i0.ColumnOrderings<int> get wordIdx => $composableBuilder(
+    column: $table.wordIdx,
     builder: (column) => i0.ColumnOrderings(column),
   );
 
   i0.ColumnOrderings<String> get macronizedWord => $composableBuilder(
     column: $table.macronizedWord,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
     builder: (column) => i0.ColumnOrderings(column),
   );
 }
@@ -1578,11 +1596,16 @@ class $WorkMacronizationsAnnotationComposer
   i0.GeneratedColumn<String> get workId =>
       $composableBuilder(column: $table.workId, builder: (column) => column);
 
-  i0.GeneratedColumn<String> get idx =>
-      $composableBuilder(column: $table.idx, builder: (column) => column);
+  i0.GeneratedColumn<int> get wordIdx =>
+      $composableBuilder(column: $table.wordIdx, builder: (column) => column);
 
   i0.GeneratedColumn<String> get macronizedWord => $composableBuilder(
     column: $table.macronizedWord,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
     builder: (column) => column,
   );
 }
@@ -1625,22 +1648,26 @@ class $WorkMacronizationsTableManager
           updateCompanionCallback:
               ({
                 i0.Value<String> workId = const i0.Value.absent(),
-                i0.Value<String> idx = const i0.Value.absent(),
+                i0.Value<int> wordIdx = const i0.Value.absent(),
                 i0.Value<String> macronizedWord = const i0.Value.absent(),
+                i0.Value<int> uncertaintyBitMask = const i0.Value.absent(),
               }) => i1.WorkMacronizationsCompanion(
                 workId: workId,
-                idx: idx,
+                wordIdx: wordIdx,
                 macronizedWord: macronizedWord,
+                uncertaintyBitMask: uncertaintyBitMask,
               ),
           createCompanionCallback:
               ({
                 required String workId,
-                required String idx,
+                required int wordIdx,
                 required String macronizedWord,
+                required int uncertaintyBitMask,
               }) => i1.WorkMacronizationsCompanion.insert(
                 workId: workId,
-                idx: idx,
+                wordIdx: wordIdx,
                 macronizedWord: macronizedWord,
+                uncertaintyBitMask: uncertaintyBitMask,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -1674,13 +1701,13 @@ typedef $WorkMacronizationsProcessedTableManager =
 typedef $UserProvidedMacronizationsCreateCompanionBuilder =
     i1.UserProvidedMacronizationsCompanion Function({
       required String workId,
-      required String idx,
+      required int idx,
       required String macronizedWord,
     });
 typedef $UserProvidedMacronizationsUpdateCompanionBuilder =
     i1.UserProvidedMacronizationsCompanion Function({
       i0.Value<String> workId,
-      i0.Value<String> idx,
+      i0.Value<int> idx,
       i0.Value<String> macronizedWord,
     });
 
@@ -1698,7 +1725,7 @@ class $UserProvidedMacronizationsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<String> get idx => $composableBuilder(
+  i0.ColumnFilters<int> get idx => $composableBuilder(
     column: $table.idx,
     builder: (column) => i0.ColumnFilters(column),
   );
@@ -1723,7 +1750,7 @@ class $UserProvidedMacronizationsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
-  i0.ColumnOrderings<String> get idx => $composableBuilder(
+  i0.ColumnOrderings<int> get idx => $composableBuilder(
     column: $table.idx,
     builder: (column) => i0.ColumnOrderings(column),
   );
@@ -1746,7 +1773,7 @@ class $UserProvidedMacronizationsAnnotationComposer
   i0.GeneratedColumn<String> get workId =>
       $composableBuilder(column: $table.workId, builder: (column) => column);
 
-  i0.GeneratedColumn<String> get idx =>
+  i0.GeneratedColumn<int> get idx =>
       $composableBuilder(column: $table.idx, builder: (column) => column);
 
   i0.GeneratedColumn<String> get macronizedWord => $composableBuilder(
@@ -1802,7 +1829,7 @@ class $UserProvidedMacronizationsTableManager
           updateCompanionCallback:
               ({
                 i0.Value<String> workId = const i0.Value.absent(),
-                i0.Value<String> idx = const i0.Value.absent(),
+                i0.Value<int> idx = const i0.Value.absent(),
                 i0.Value<String> macronizedWord = const i0.Value.absent(),
               }) => i1.UserProvidedMacronizationsCompanion(
                 workId: workId,
@@ -1812,7 +1839,7 @@ class $UserProvidedMacronizationsTableManager
           createCompanionCallback:
               ({
                 required String workId,
-                required String idx,
+                required int idx,
                 required String macronizedWord,
               }) => i1.UserProvidedMacronizationsCompanion.insert(
                 workId: workId,
@@ -3132,8 +3159,24 @@ class WorkContents extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _properNounStateMeta =
+      const i0.VerificationMeta('properNounState');
+  late final i0.GeneratedColumn<int> properNounState = i0.GeneratedColumn<int>(
+    'properNounState',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'CHECK (properNounState IN (0, 1, 2))',
+  );
   @override
-  List<i0.GeneratedColumn> get $columns => [workId, idx, word, sourceReference];
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    idx,
+    word,
+    sourceReference,
+    properNounState,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3181,6 +3224,15 @@ class WorkContents extends i0.Table
     } else if (isInserting) {
       context.missing(_sourceReferenceMeta);
     }
+    if (data.containsKey('properNounState')) {
+      context.handle(
+        _properNounStateMeta,
+        properNounState.isAcceptableOrUnknown(
+          data['properNounState']!,
+          _properNounStateMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3206,6 +3258,10 @@ class WorkContents extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}sourceReference'],
       )!,
+      properNounState: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}properNounState'],
+      ),
     );
   }
 
@@ -3233,11 +3289,13 @@ class WorkContent extends i0.DataClass
   final int idx;
   final String word;
   final String sourceReference;
+  final int? properNounState;
   const WorkContent({
     required this.workId,
     required this.idx,
     required this.word,
     required this.sourceReference,
+    this.properNounState,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -3246,6 +3304,9 @@ class WorkContent extends i0.DataClass
     map['idx'] = i0.Variable<int>(idx);
     map['word'] = i0.Variable<String>(word);
     map['sourceReference'] = i0.Variable<String>(sourceReference);
+    if (!nullToAbsent || properNounState != null) {
+      map['properNounState'] = i0.Variable<int>(properNounState);
+    }
     return map;
   }
 
@@ -3255,6 +3316,9 @@ class WorkContent extends i0.DataClass
       idx: i0.Value(idx),
       word: i0.Value(word),
       sourceReference: i0.Value(sourceReference),
+      properNounState: properNounState == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(properNounState),
     );
   }
 
@@ -3268,6 +3332,7 @@ class WorkContent extends i0.DataClass
       idx: serializer.fromJson<int>(json['idx']),
       word: serializer.fromJson<String>(json['word']),
       sourceReference: serializer.fromJson<String>(json['sourceReference']),
+      properNounState: serializer.fromJson<int?>(json['properNounState']),
     );
   }
   @override
@@ -3278,6 +3343,7 @@ class WorkContent extends i0.DataClass
       'idx': serializer.toJson<int>(idx),
       'word': serializer.toJson<String>(word),
       'sourceReference': serializer.toJson<String>(sourceReference),
+      'properNounState': serializer.toJson<int?>(properNounState),
     };
   }
 
@@ -3286,11 +3352,15 @@ class WorkContent extends i0.DataClass
     int? idx,
     String? word,
     String? sourceReference,
+    i0.Value<int?> properNounState = const i0.Value.absent(),
   }) => i1.WorkContent(
     workId: workId ?? this.workId,
     idx: idx ?? this.idx,
     word: word ?? this.word,
     sourceReference: sourceReference ?? this.sourceReference,
+    properNounState: properNounState.present
+        ? properNounState.value
+        : this.properNounState,
   );
   WorkContent copyWithCompanion(i1.WorkContentsCompanion data) {
     return WorkContent(
@@ -3300,6 +3370,9 @@ class WorkContent extends i0.DataClass
       sourceReference: data.sourceReference.present
           ? data.sourceReference.value
           : this.sourceReference,
+      properNounState: data.properNounState.present
+          ? data.properNounState.value
+          : this.properNounState,
     );
   }
 
@@ -3309,13 +3382,15 @@ class WorkContent extends i0.DataClass
           ..write('workId: $workId, ')
           ..write('idx: $idx, ')
           ..write('word: $word, ')
-          ..write('sourceReference: $sourceReference')
+          ..write('sourceReference: $sourceReference, ')
+          ..write('properNounState: $properNounState')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(workId, idx, word, sourceReference);
+  int get hashCode =>
+      Object.hash(workId, idx, word, sourceReference, properNounState);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3323,7 +3398,8 @@ class WorkContent extends i0.DataClass
           other.workId == this.workId &&
           other.idx == this.idx &&
           other.word == this.word &&
-          other.sourceReference == this.sourceReference);
+          other.sourceReference == this.sourceReference &&
+          other.properNounState == this.properNounState);
 }
 
 class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
@@ -3331,17 +3407,20 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
   final i0.Value<int> idx;
   final i0.Value<String> word;
   final i0.Value<String> sourceReference;
+  final i0.Value<int?> properNounState;
   const WorkContentsCompanion({
     this.workId = const i0.Value.absent(),
     this.idx = const i0.Value.absent(),
     this.word = const i0.Value.absent(),
     this.sourceReference = const i0.Value.absent(),
+    this.properNounState = const i0.Value.absent(),
   });
   WorkContentsCompanion.insert({
     required String workId,
     required int idx,
     required String word,
     required String sourceReference,
+    this.properNounState = const i0.Value.absent(),
   }) : workId = i0.Value(workId),
        idx = i0.Value(idx),
        word = i0.Value(word),
@@ -3351,12 +3430,14 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     i0.Expression<int>? idx,
     i0.Expression<String>? word,
     i0.Expression<String>? sourceReference,
+    i0.Expression<int>? properNounState,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
       if (idx != null) 'idx': idx,
       if (word != null) 'word': word,
       if (sourceReference != null) 'sourceReference': sourceReference,
+      if (properNounState != null) 'properNounState': properNounState,
     });
   }
 
@@ -3365,12 +3446,14 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     i0.Value<int>? idx,
     i0.Value<String>? word,
     i0.Value<String>? sourceReference,
+    i0.Value<int?>? properNounState,
   }) {
     return i1.WorkContentsCompanion(
       workId: workId ?? this.workId,
       idx: idx ?? this.idx,
       word: word ?? this.word,
       sourceReference: sourceReference ?? this.sourceReference,
+      properNounState: properNounState ?? this.properNounState,
     );
   }
 
@@ -3389,6 +3472,9 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     if (sourceReference.present) {
       map['sourceReference'] = i0.Variable<String>(sourceReference.value);
     }
+    if (properNounState.present) {
+      map['properNounState'] = i0.Variable<int>(properNounState.value);
+    }
     return map;
   }
 
@@ -3398,7 +3484,8 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
           ..write('workId: $workId, ')
           ..write('idx: $idx, ')
           ..write('word: $word, ')
-          ..write('sourceReference: $sourceReference')
+          ..write('sourceReference: $sourceReference, ')
+          ..write('properNounState: $properNounState')
           ..write(')'))
         .toString();
   }
@@ -4344,12 +4431,12 @@ class WorkContentSupplementaryCompanion
   }
 }
 
-class Macronizations extends i0.Table
-    with i0.TableInfo<Macronizations, i1.Macronization> {
+class UnambiguousMacronizations extends i0.Table
+    with i0.TableInfo<UnambiguousMacronizations, i1.UnambiguousMacronization> {
   @override
   final i0.GeneratedDatabase attachedDatabase;
   final String? _alias;
-  Macronizations(this.attachedDatabase, [this._alias]);
+  UnambiguousMacronizations(this.attachedDatabase, [this._alias]);
   static const i0.VerificationMeta _wordMeta = const i0.VerificationMeta(
     'word',
   );
@@ -4372,27 +4459,16 @@ class Macronizations extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
-  static const i0.VerificationMeta _isUncertainMeta = const i0.VerificationMeta(
-    'isUncertain',
-  );
-  late final i0.GeneratedColumn<int> isUncertain = i0.GeneratedColumn<int>(
-    'isUncertain',
-    aliasedName,
-    false,
-    type: i0.DriftSqlType.int,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL CHECK (isUncertain IN (0, 1))',
-  );
   @override
-  List<i0.GeneratedColumn> get $columns => [word, macronizedWord, isUncertain];
+  List<i0.GeneratedColumn> get $columns => [word, macronizedWord];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'Macronizations';
+  static const String $name = 'UnambiguousMacronizations';
   @override
   i0.VerificationContext validateIntegrity(
-    i0.Insertable<i1.Macronization> instance, {
+    i0.Insertable<i1.UnambiguousMacronization> instance, {
     bool isInserting = false,
   }) {
     final context = i0.VerificationContext();
@@ -4416,26 +4492,22 @@ class Macronizations extends i0.Table
     } else if (isInserting) {
       context.missing(_macronizedWordMeta);
     }
-    if (data.containsKey('isUncertain')) {
-      context.handle(
-        _isUncertainMeta,
-        isUncertain.isAcceptableOrUnknown(
-          data['isUncertain']!,
-          _isUncertainMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_isUncertainMeta);
-    }
     return context;
   }
 
   @override
-  Set<i0.GeneratedColumn> get $primaryKey => {word, macronizedWord};
+  Set<i0.GeneratedColumn> get $primaryKey => {word};
   @override
-  i1.Macronization map(Map<String, dynamic> data, {String? tablePrefix}) {
+  List<Set<i0.GeneratedColumn>> get uniqueKeys => [
+    {word, macronizedWord},
+  ];
+  @override
+  i1.UnambiguousMacronization map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return i1.Macronization(
+    return i1.UnambiguousMacronization(
       word: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}word'],
@@ -4444,16 +4516,12 @@ class Macronizations extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}macronizedWord'],
       )!,
-      isUncertain: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.int,
-        data['${effectivePrefix}isUncertain'],
-      )!,
     );
   }
 
   @override
-  Macronizations createAlias(String alias) {
-    return Macronizations(attachedDatabase, alias);
+  UnambiguousMacronizations createAlias(String alias) {
+    return UnambiguousMacronizations(attachedDatabase, alias);
   }
 
   @override
@@ -4462,48 +4530,44 @@ class Macronizations extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(word, macronizedWord)',
+    'PRIMARY KEY(word)',
+    'UNIQUE(word, macronizedWord)',
   ];
   @override
   bool get dontWriteConstraints => true;
 }
 
-class Macronization extends i0.DataClass
-    implements i0.Insertable<i1.Macronization> {
+class UnambiguousMacronization extends i0.DataClass
+    implements i0.Insertable<i1.UnambiguousMacronization> {
   final String word;
   final String macronizedWord;
-  final int isUncertain;
-  const Macronization({
+  const UnambiguousMacronization({
     required this.word,
     required this.macronizedWord,
-    required this.isUncertain,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
     map['word'] = i0.Variable<String>(word);
     map['macronizedWord'] = i0.Variable<String>(macronizedWord);
-    map['isUncertain'] = i0.Variable<int>(isUncertain);
     return map;
   }
 
-  i1.MacronizationsCompanion toCompanion(bool nullToAbsent) {
-    return i1.MacronizationsCompanion(
+  i1.UnambiguousMacronizationsCompanion toCompanion(bool nullToAbsent) {
+    return i1.UnambiguousMacronizationsCompanion(
       word: i0.Value(word),
       macronizedWord: i0.Value(macronizedWord),
-      isUncertain: i0.Value(isUncertain),
     );
   }
 
-  factory Macronization.fromJson(
+  factory UnambiguousMacronization.fromJson(
     Map<String, dynamic> json, {
     i0.ValueSerializer? serializer,
   }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return Macronization(
+    return UnambiguousMacronization(
       word: serializer.fromJson<String>(json['word']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
-      isUncertain: serializer.fromJson<int>(json['isUncertain']),
     );
   }
   @override
@@ -4512,89 +4576,76 @@ class Macronization extends i0.DataClass
     return <String, dynamic>{
       'word': serializer.toJson<String>(word),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
-      'isUncertain': serializer.toJson<int>(isUncertain),
     };
   }
 
-  i1.Macronization copyWith({
+  i1.UnambiguousMacronization copyWith({
     String? word,
     String? macronizedWord,
-    int? isUncertain,
-  }) => i1.Macronization(
+  }) => i1.UnambiguousMacronization(
     word: word ?? this.word,
     macronizedWord: macronizedWord ?? this.macronizedWord,
-    isUncertain: isUncertain ?? this.isUncertain,
   );
-  Macronization copyWithCompanion(i1.MacronizationsCompanion data) {
-    return Macronization(
+  UnambiguousMacronization copyWithCompanion(
+    i1.UnambiguousMacronizationsCompanion data,
+  ) {
+    return UnambiguousMacronization(
       word: data.word.present ? data.word.value : this.word,
       macronizedWord: data.macronizedWord.present
           ? data.macronizedWord.value
           : this.macronizedWord,
-      isUncertain: data.isUncertain.present
-          ? data.isUncertain.value
-          : this.isUncertain,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('Macronization(')
+    return (StringBuffer('UnambiguousMacronization(')
           ..write('word: $word, ')
-          ..write('macronizedWord: $macronizedWord, ')
-          ..write('isUncertain: $isUncertain')
+          ..write('macronizedWord: $macronizedWord')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(word, macronizedWord, isUncertain);
+  int get hashCode => Object.hash(word, macronizedWord);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is i1.Macronization &&
+      (other is i1.UnambiguousMacronization &&
           other.word == this.word &&
-          other.macronizedWord == this.macronizedWord &&
-          other.isUncertain == this.isUncertain);
+          other.macronizedWord == this.macronizedWord);
 }
 
-class MacronizationsCompanion extends i0.UpdateCompanion<i1.Macronization> {
+class UnambiguousMacronizationsCompanion
+    extends i0.UpdateCompanion<i1.UnambiguousMacronization> {
   final i0.Value<String> word;
   final i0.Value<String> macronizedWord;
-  final i0.Value<int> isUncertain;
-  const MacronizationsCompanion({
+  const UnambiguousMacronizationsCompanion({
     this.word = const i0.Value.absent(),
     this.macronizedWord = const i0.Value.absent(),
-    this.isUncertain = const i0.Value.absent(),
   });
-  MacronizationsCompanion.insert({
+  UnambiguousMacronizationsCompanion.insert({
     required String word,
     required String macronizedWord,
-    required int isUncertain,
   }) : word = i0.Value(word),
-       macronizedWord = i0.Value(macronizedWord),
-       isUncertain = i0.Value(isUncertain);
-  static i0.Insertable<i1.Macronization> custom({
+       macronizedWord = i0.Value(macronizedWord);
+  static i0.Insertable<i1.UnambiguousMacronization> custom({
     i0.Expression<String>? word,
     i0.Expression<String>? macronizedWord,
-    i0.Expression<int>? isUncertain,
   }) {
     return i0.RawValuesInsertable({
       if (word != null) 'word': word,
       if (macronizedWord != null) 'macronizedWord': macronizedWord,
-      if (isUncertain != null) 'isUncertain': isUncertain,
     });
   }
 
-  i1.MacronizationsCompanion copyWith({
+  i1.UnambiguousMacronizationsCompanion copyWith({
     i0.Value<String>? word,
     i0.Value<String>? macronizedWord,
-    i0.Value<int>? isUncertain,
   }) {
-    return i1.MacronizationsCompanion(
+    return i1.UnambiguousMacronizationsCompanion(
       word: word ?? this.word,
       macronizedWord: macronizedWord ?? this.macronizedWord,
-      isUncertain: isUncertain ?? this.isUncertain,
     );
   }
 
@@ -4607,18 +4658,14 @@ class MacronizationsCompanion extends i0.UpdateCompanion<i1.Macronization> {
     if (macronizedWord.present) {
       map['macronizedWord'] = i0.Variable<String>(macronizedWord.value);
     }
-    if (isUncertain.present) {
-      map['isUncertain'] = i0.Variable<int>(isUncertain.value);
-    }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('MacronizationsCompanion(')
+    return (StringBuffer('UnambiguousMacronizationsCompanion(')
           ..write('word: $word, ')
-          ..write('macronizedWord: $macronizedWord, ')
-          ..write('isUncertain: $isUncertain')
+          ..write('macronizedWord: $macronizedWord')
           ..write(')'))
         .toString();
   }
@@ -4641,12 +4688,14 @@ class WorkMacronizations extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
-  static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
-  late final i0.GeneratedColumn<String> idx = i0.GeneratedColumn<String>(
-    'idx',
+  static const i0.VerificationMeta _wordIdxMeta = const i0.VerificationMeta(
+    'wordIdx',
+  );
+  late final i0.GeneratedColumn<int> wordIdx = i0.GeneratedColumn<int>(
+    'wordIdx',
     aliasedName,
     false,
-    type: i0.DriftSqlType.string,
+    type: i0.DriftSqlType.int,
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
@@ -4661,8 +4710,24 @@ class WorkMacronizations extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _uncertaintyBitMaskMeta =
+      const i0.VerificationMeta('uncertaintyBitMask');
+  late final i0.GeneratedColumn<int> uncertaintyBitMask =
+      i0.GeneratedColumn<int>(
+        'uncertaintyBitMask',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.int,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
   @override
-  List<i0.GeneratedColumn> get $columns => [workId, idx, macronizedWord];
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    wordIdx,
+    macronizedWord,
+    uncertaintyBitMask,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4683,13 +4748,13 @@ class WorkMacronizations extends i0.Table
     } else if (isInserting) {
       context.missing(_workIdMeta);
     }
-    if (data.containsKey('idx')) {
+    if (data.containsKey('wordIdx')) {
       context.handle(
-        _idxMeta,
-        idx.isAcceptableOrUnknown(data['idx']!, _idxMeta),
+        _wordIdxMeta,
+        wordIdx.isAcceptableOrUnknown(data['wordIdx']!, _wordIdxMeta),
       );
     } else if (isInserting) {
-      context.missing(_idxMeta);
+      context.missing(_wordIdxMeta);
     }
     if (data.containsKey('macronizedWord')) {
       context.handle(
@@ -4702,11 +4767,22 @@ class WorkMacronizations extends i0.Table
     } else if (isInserting) {
       context.missing(_macronizedWordMeta);
     }
+    if (data.containsKey('uncertaintyBitMask')) {
+      context.handle(
+        _uncertaintyBitMaskMeta,
+        uncertaintyBitMask.isAcceptableOrUnknown(
+          data['uncertaintyBitMask']!,
+          _uncertaintyBitMaskMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_uncertaintyBitMaskMeta);
+    }
     return context;
   }
 
   @override
-  Set<i0.GeneratedColumn> get $primaryKey => {workId, idx};
+  Set<i0.GeneratedColumn> get $primaryKey => {workId, wordIdx};
   @override
   i1.WorkMacronization map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -4715,13 +4791,17 @@ class WorkMacronizations extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}workId'],
       )!,
-      idx: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}idx'],
+      wordIdx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}wordIdx'],
       )!,
       macronizedWord: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}macronizedWord'],
+      )!,
+      uncertaintyBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}uncertaintyBitMask'],
       )!,
     );
   }
@@ -4737,8 +4817,8 @@ class WorkMacronizations extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(workId, idx)',
-    'FOREIGN KEY(workId, idx)REFERENCES WorkContents(workId, idx)',
+    'PRIMARY KEY(workId, wordIdx)',
+    'FOREIGN KEY(workId, wordIdx)REFERENCES WorkContents(workId, idx)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -4747,27 +4827,31 @@ class WorkMacronizations extends i0.Table
 class WorkMacronization extends i0.DataClass
     implements i0.Insertable<i1.WorkMacronization> {
   final String workId;
-  final String idx;
+  final int wordIdx;
   final String macronizedWord;
+  final int uncertaintyBitMask;
   const WorkMacronization({
     required this.workId,
-    required this.idx,
+    required this.wordIdx,
     required this.macronizedWord,
+    required this.uncertaintyBitMask,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
     map['workId'] = i0.Variable<String>(workId);
-    map['idx'] = i0.Variable<String>(idx);
+    map['wordIdx'] = i0.Variable<int>(wordIdx);
     map['macronizedWord'] = i0.Variable<String>(macronizedWord);
+    map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
     return map;
   }
 
   i1.WorkMacronizationsCompanion toCompanion(bool nullToAbsent) {
     return i1.WorkMacronizationsCompanion(
       workId: i0.Value(workId),
-      idx: i0.Value(idx),
+      wordIdx: i0.Value(wordIdx),
       macronizedWord: i0.Value(macronizedWord),
+      uncertaintyBitMask: i0.Value(uncertaintyBitMask),
     );
   }
 
@@ -4778,8 +4862,9 @@ class WorkMacronization extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return WorkMacronization(
       workId: serializer.fromJson<String>(json['workId']),
-      idx: serializer.fromJson<String>(json['idx']),
+      wordIdx: serializer.fromJson<int>(json['wordIdx']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
+      uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
     );
   }
   @override
@@ -4787,27 +4872,33 @@ class WorkMacronization extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'workId': serializer.toJson<String>(workId),
-      'idx': serializer.toJson<String>(idx),
+      'wordIdx': serializer.toJson<int>(wordIdx),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
+      'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
     };
   }
 
   i1.WorkMacronization copyWith({
     String? workId,
-    String? idx,
+    int? wordIdx,
     String? macronizedWord,
+    int? uncertaintyBitMask,
   }) => i1.WorkMacronization(
     workId: workId ?? this.workId,
-    idx: idx ?? this.idx,
+    wordIdx: wordIdx ?? this.wordIdx,
     macronizedWord: macronizedWord ?? this.macronizedWord,
+    uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
   );
   WorkMacronization copyWithCompanion(i1.WorkMacronizationsCompanion data) {
     return WorkMacronization(
       workId: data.workId.present ? data.workId.value : this.workId,
-      idx: data.idx.present ? data.idx.value : this.idx,
+      wordIdx: data.wordIdx.present ? data.wordIdx.value : this.wordIdx,
       macronizedWord: data.macronizedWord.present
           ? data.macronizedWord.value
           : this.macronizedWord,
+      uncertaintyBitMask: data.uncertaintyBitMask.present
+          ? data.uncertaintyBitMask.value
+          : this.uncertaintyBitMask,
     );
   }
 
@@ -4815,61 +4906,72 @@ class WorkMacronization extends i0.DataClass
   String toString() {
     return (StringBuffer('WorkMacronization(')
           ..write('workId: $workId, ')
-          ..write('idx: $idx, ')
-          ..write('macronizedWord: $macronizedWord')
+          ..write('wordIdx: $wordIdx, ')
+          ..write('macronizedWord: $macronizedWord, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(workId, idx, macronizedWord);
+  int get hashCode =>
+      Object.hash(workId, wordIdx, macronizedWord, uncertaintyBitMask);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.WorkMacronization &&
           other.workId == this.workId &&
-          other.idx == this.idx &&
-          other.macronizedWord == this.macronizedWord);
+          other.wordIdx == this.wordIdx &&
+          other.macronizedWord == this.macronizedWord &&
+          other.uncertaintyBitMask == this.uncertaintyBitMask);
 }
 
 class WorkMacronizationsCompanion
     extends i0.UpdateCompanion<i1.WorkMacronization> {
   final i0.Value<String> workId;
-  final i0.Value<String> idx;
+  final i0.Value<int> wordIdx;
   final i0.Value<String> macronizedWord;
+  final i0.Value<int> uncertaintyBitMask;
   const WorkMacronizationsCompanion({
     this.workId = const i0.Value.absent(),
-    this.idx = const i0.Value.absent(),
+    this.wordIdx = const i0.Value.absent(),
     this.macronizedWord = const i0.Value.absent(),
+    this.uncertaintyBitMask = const i0.Value.absent(),
   });
   WorkMacronizationsCompanion.insert({
     required String workId,
-    required String idx,
+    required int wordIdx,
     required String macronizedWord,
+    required int uncertaintyBitMask,
   }) : workId = i0.Value(workId),
-       idx = i0.Value(idx),
-       macronizedWord = i0.Value(macronizedWord);
+       wordIdx = i0.Value(wordIdx),
+       macronizedWord = i0.Value(macronizedWord),
+       uncertaintyBitMask = i0.Value(uncertaintyBitMask);
   static i0.Insertable<i1.WorkMacronization> custom({
     i0.Expression<String>? workId,
-    i0.Expression<String>? idx,
+    i0.Expression<int>? wordIdx,
     i0.Expression<String>? macronizedWord,
+    i0.Expression<int>? uncertaintyBitMask,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
-      if (idx != null) 'idx': idx,
+      if (wordIdx != null) 'wordIdx': wordIdx,
       if (macronizedWord != null) 'macronizedWord': macronizedWord,
+      if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
     });
   }
 
   i1.WorkMacronizationsCompanion copyWith({
     i0.Value<String>? workId,
-    i0.Value<String>? idx,
+    i0.Value<int>? wordIdx,
     i0.Value<String>? macronizedWord,
+    i0.Value<int>? uncertaintyBitMask,
   }) {
     return i1.WorkMacronizationsCompanion(
       workId: workId ?? this.workId,
-      idx: idx ?? this.idx,
+      wordIdx: wordIdx ?? this.wordIdx,
       macronizedWord: macronizedWord ?? this.macronizedWord,
+      uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     );
   }
 
@@ -4879,11 +4981,14 @@ class WorkMacronizationsCompanion
     if (workId.present) {
       map['workId'] = i0.Variable<String>(workId.value);
     }
-    if (idx.present) {
-      map['idx'] = i0.Variable<String>(idx.value);
+    if (wordIdx.present) {
+      map['wordIdx'] = i0.Variable<int>(wordIdx.value);
     }
     if (macronizedWord.present) {
       map['macronizedWord'] = i0.Variable<String>(macronizedWord.value);
+    }
+    if (uncertaintyBitMask.present) {
+      map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask.value);
     }
     return map;
   }
@@ -4892,8 +4997,9 @@ class WorkMacronizationsCompanion
   String toString() {
     return (StringBuffer('WorkMacronizationsCompanion(')
           ..write('workId: $workId, ')
-          ..write('idx: $idx, ')
-          ..write('macronizedWord: $macronizedWord')
+          ..write('wordIdx: $wordIdx, ')
+          ..write('macronizedWord: $macronizedWord, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask')
           ..write(')'))
         .toString();
   }
@@ -4918,11 +5024,11 @@ class UserProvidedMacronizations extends i0.Table
     $customConstraints: 'NOT NULL',
   );
   static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
-  late final i0.GeneratedColumn<String> idx = i0.GeneratedColumn<String>(
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
     'idx',
     aliasedName,
     false,
-    type: i0.DriftSqlType.string,
+    type: i0.DriftSqlType.int,
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
@@ -4995,7 +5101,7 @@ class UserProvidedMacronizations extends i0.Table
         data['${effectivePrefix}workId'],
       )!,
       idx: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
+        i0.DriftSqlType.int,
         data['${effectivePrefix}idx'],
       )!,
       macronizedWord: attachedDatabase.typeMapping.read(
@@ -5026,7 +5132,7 @@ class UserProvidedMacronizations extends i0.Table
 class UserProvidedMacronization extends i0.DataClass
     implements i0.Insertable<i1.UserProvidedMacronization> {
   final String workId;
-  final String idx;
+  final int idx;
   final String macronizedWord;
   const UserProvidedMacronization({
     required this.workId,
@@ -5037,7 +5143,7 @@ class UserProvidedMacronization extends i0.DataClass
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
     map['workId'] = i0.Variable<String>(workId);
-    map['idx'] = i0.Variable<String>(idx);
+    map['idx'] = i0.Variable<int>(idx);
     map['macronizedWord'] = i0.Variable<String>(macronizedWord);
     return map;
   }
@@ -5057,7 +5163,7 @@ class UserProvidedMacronization extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return UserProvidedMacronization(
       workId: serializer.fromJson<String>(json['workId']),
-      idx: serializer.fromJson<String>(json['idx']),
+      idx: serializer.fromJson<int>(json['idx']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
     );
   }
@@ -5066,14 +5172,14 @@ class UserProvidedMacronization extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'workId': serializer.toJson<String>(workId),
-      'idx': serializer.toJson<String>(idx),
+      'idx': serializer.toJson<int>(idx),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
     };
   }
 
   i1.UserProvidedMacronization copyWith({
     String? workId,
-    String? idx,
+    int? idx,
     String? macronizedWord,
   }) => i1.UserProvidedMacronization(
     workId: workId ?? this.workId,
@@ -5116,7 +5222,7 @@ class UserProvidedMacronization extends i0.DataClass
 class UserProvidedMacronizationsCompanion
     extends i0.UpdateCompanion<i1.UserProvidedMacronization> {
   final i0.Value<String> workId;
-  final i0.Value<String> idx;
+  final i0.Value<int> idx;
   final i0.Value<String> macronizedWord;
   const UserProvidedMacronizationsCompanion({
     this.workId = const i0.Value.absent(),
@@ -5125,14 +5231,14 @@ class UserProvidedMacronizationsCompanion
   });
   UserProvidedMacronizationsCompanion.insert({
     required String workId,
-    required String idx,
+    required int idx,
     required String macronizedWord,
   }) : workId = i0.Value(workId),
        idx = i0.Value(idx),
        macronizedWord = i0.Value(macronizedWord);
   static i0.Insertable<i1.UserProvidedMacronization> custom({
     i0.Expression<String>? workId,
-    i0.Expression<String>? idx,
+    i0.Expression<int>? idx,
     i0.Expression<String>? macronizedWord,
   }) {
     return i0.RawValuesInsertable({
@@ -5144,7 +5250,7 @@ class UserProvidedMacronizationsCompanion
 
   i1.UserProvidedMacronizationsCompanion copyWith({
     i0.Value<String>? workId,
-    i0.Value<String>? idx,
+    i0.Value<int>? idx,
     i0.Value<String>? macronizedWord,
   }) {
     return i1.UserProvidedMacronizationsCompanion(
@@ -5161,7 +5267,7 @@ class UserProvidedMacronizationsCompanion
       map['workId'] = i0.Variable<String>(workId.value);
     }
     if (idx.present) {
-      map['idx'] = i0.Variable<String>(idx.value);
+      map['idx'] = i0.Variable<int>(idx.value);
     }
     if (macronizedWord.present) {
       map['macronizedWord'] = i0.Variable<String>(macronizedWord.value);
@@ -6715,6 +6821,241 @@ class LibraryWorkIndexes
   i0.Query? get query => null;
   @override
   Set<String> get readTables => const {'WorkContentSubdivisions'};
+}
+
+class LibraryMacronizedWorkContent extends i0.DataClass {
+  final String workId;
+  final int idx;
+  final String word;
+  final String macronizedWord;
+  final int? uncertaintyBitMask;
+  final String sourceReference;
+  final int? properNounState;
+  const LibraryMacronizedWorkContent({
+    required this.workId,
+    required this.idx,
+    required this.word,
+    required this.macronizedWord,
+    this.uncertaintyBitMask,
+    required this.sourceReference,
+    this.properNounState,
+  });
+  factory LibraryMacronizedWorkContent.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return LibraryMacronizedWorkContent(
+      workId: serializer.fromJson<String>(json['workId']),
+      idx: serializer.fromJson<int>(json['idx']),
+      word: serializer.fromJson<String>(json['word']),
+      macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
+      uncertaintyBitMask: serializer.fromJson<int?>(json['uncertaintyBitMask']),
+      sourceReference: serializer.fromJson<String>(json['sourceReference']),
+      properNounState: serializer.fromJson<int?>(json['properNounState']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'idx': serializer.toJson<int>(idx),
+      'word': serializer.toJson<String>(word),
+      'macronizedWord': serializer.toJson<String>(macronizedWord),
+      'uncertaintyBitMask': serializer.toJson<int?>(uncertaintyBitMask),
+      'sourceReference': serializer.toJson<String>(sourceReference),
+      'properNounState': serializer.toJson<int?>(properNounState),
+    };
+  }
+
+  i1.LibraryMacronizedWorkContent copyWith({
+    String? workId,
+    int? idx,
+    String? word,
+    String? macronizedWord,
+    i0.Value<int?> uncertaintyBitMask = const i0.Value.absent(),
+    String? sourceReference,
+    i0.Value<int?> properNounState = const i0.Value.absent(),
+  }) => i1.LibraryMacronizedWorkContent(
+    workId: workId ?? this.workId,
+    idx: idx ?? this.idx,
+    word: word ?? this.word,
+    macronizedWord: macronizedWord ?? this.macronizedWord,
+    uncertaintyBitMask: uncertaintyBitMask.present
+        ? uncertaintyBitMask.value
+        : this.uncertaintyBitMask,
+    sourceReference: sourceReference ?? this.sourceReference,
+    properNounState: properNounState.present
+        ? properNounState.value
+        : this.properNounState,
+  );
+  @override
+  String toString() {
+    return (StringBuffer('LibraryMacronizedWorkContent(')
+          ..write('workId: $workId, ')
+          ..write('idx: $idx, ')
+          ..write('word: $word, ')
+          ..write('macronizedWord: $macronizedWord, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
+          ..write('sourceReference: $sourceReference, ')
+          ..write('properNounState: $properNounState')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    workId,
+    idx,
+    word,
+    macronizedWord,
+    uncertaintyBitMask,
+    sourceReference,
+    properNounState,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.LibraryMacronizedWorkContent &&
+          other.workId == this.workId &&
+          other.idx == this.idx &&
+          other.word == this.word &&
+          other.macronizedWord == this.macronizedWord &&
+          other.uncertaintyBitMask == this.uncertaintyBitMask &&
+          other.sourceReference == this.sourceReference &&
+          other.properNounState == this.properNounState);
+}
+
+class LibraryMacronizedWorkContents
+    extends
+        i0.ViewInfo<
+          i1.LibraryMacronizedWorkContents,
+          i1.LibraryMacronizedWorkContent
+        >
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  LibraryMacronizedWorkContents(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    idx,
+    word,
+    macronizedWord,
+    uncertaintyBitMask,
+    sourceReference,
+    properNounState,
+  ];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'library.MacronizedWorkContents';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.MacronizedWorkContents" AS SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, COALESCE(UserProvidedMacronizations.macronizedWord, WorkMacronizations.macronizedWord, ExactUnambiguous.macronizedWord, CASE WHEN LowerUnambiguous.macronizedWord IS NOT NULL AND SUBSTR(WorkContents.word, 1, 1) = UPPER(SUBSTR(WorkContents.word, 1, 1)) THEN UPPER(SUBSTR(LowerUnambiguous.macronizedWord, 1, 1)) || SUBSTR(LowerUnambiguous.macronizedWord, 2) ELSE LowerUnambiguous.macronizedWord END, WorkContents.word) AS macronizedWord, CASE WHEN UserProvidedMacronizations.macronizedWord IS NOT NULL THEN 0 WHEN WorkMacronizations.macronizedWord IS NOT NULL THEN WorkMacronizations.uncertaintyBitMask WHEN ExactUnambiguous.macronizedWord IS NOT NULL THEN 0 WHEN LowerUnambiguous.macronizedWord IS NOT NULL THEN 0 ELSE 1 END AS uncertaintyBitMask, WorkContents.sourceReference, WorkContents.properNounState FROM WorkContents LEFT JOIN UserProvidedMacronizations ON WorkContents.workId = UserProvidedMacronizations.workId AND WorkContents.idx = UserProvidedMacronizations.idx LEFT JOIN WorkMacronizations ON WorkContents.workId = WorkMacronizations.workId AND WorkContents.idx = WorkMacronizations.wordIdx LEFT JOIN UnambiguousMacronizations AS ExactUnambiguous ON((WorkContents.properNounState = TRUE OR WorkContents.properNounState = 2)AND WorkContents.word = ExactUnambiguous.word)LEFT JOIN UnambiguousMacronizations AS LowerUnambiguous ON((WorkContents.properNounState = FALSE OR WorkContents.properNounState = 2)AND LOWER(WorkContents.word) = LowerUnambiguous.word)',
+  };
+  @override
+  LibraryMacronizedWorkContents get asDslTable => this;
+  @override
+  i1.LibraryMacronizedWorkContent map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.LibraryMacronizedWorkContent(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      word: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}word'],
+      )!,
+      macronizedWord: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronizedWord'],
+      )!,
+      uncertaintyBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}uncertaintyBitMask'],
+      ),
+      sourceReference: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sourceReference'],
+      )!,
+      properNounState: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}properNounState'],
+      ),
+    );
+  }
+
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  late final i0.GeneratedColumn<String> word = i0.GeneratedColumn<String>(
+    'word',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> macronizedWord =
+      i0.GeneratedColumn<String>(
+        'macronizedWord',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
+  late final i0.GeneratedColumn<int> uncertaintyBitMask =
+      i0.GeneratedColumn<int>(
+        'uncertaintyBitMask',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.int,
+      );
+  late final i0.GeneratedColumn<String> sourceReference =
+      i0.GeneratedColumn<String>(
+        'sourceReference',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
+  late final i0.GeneratedColumn<int> properNounState = i0.GeneratedColumn<int>(
+    'properNounState',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.int,
+  );
+  @override
+  LibraryMacronizedWorkContents createAlias(String alias) {
+    return LibraryMacronizedWorkContents(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {
+    'WorkContents',
+    'UserProvidedMacronizations',
+    'WorkMacronizations',
+    'UnambiguousMacronizations',
+  };
 }
 
 class LibraryDrift extends i3.ModularAccessor {
