@@ -31,13 +31,15 @@ class DictionaryRefResolver {
 
   final IDictionaryRepository repo;
   static const Map<String, String> _assimilations = {
+    'b-m': 'mm',
     'd-p': 'pp',
     'd-t': 'tt',
     'd-s': 'ss',
     'n-c': 'nc',
+    'n-m': 'mm',
     'n-r': 'rr',
     'x-f': 'ff',
-    'x-s': 's',
+    'x-su': 'su',
     'x-l': 'l',
   };
 
