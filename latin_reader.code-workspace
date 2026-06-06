@@ -17,6 +17,7 @@
 		],
 		"editor.inlayHints.maximumLength": 0,
 		"editor.inlayHints.padding": true,
+		"files.eol": "\n",
 	},
 	"launch": {
 		"version": "0.2.0",
