@@ -1,7 +1,11 @@
+import 'dart:async';
+import 'dart:collection';
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -9,51 +13,197 @@ import 'app_config.dart';
 
 final Logger log = Logger('');
 
-void configureLogging() {
-  var writeSuccessful = true;
-  Logger.root.onRecord.listen((r) async {
-    final trace = r.stackTrace ?? StackTrace.current;
-    if (kDebugMode) {
-      if (AppConfig.instance.logUsesPrint) {
-        print(r.formattedMessage(trace));
-      }
-      if (AppConfig.instance.logUsesApi) {
-        developer.log(
-          '${r.message}\n ${Logger.root._caller(trace).location}',
-          time: r.time,
-          sequenceNumber: r.sequenceNumber,
-          level: r.level.value,
-          name: r.loggerName,
-          error: r.error,
-          stackTrace: r.stackTrace,
-        );
-      }
+typedef CallerInfo = ({String classAndMethod, String location});
+
+IOSink? _fileSink;
+
+/// True if file logging has been permanently disabled due to an init or write failure.
+bool _fileLoggingDisabled = false;
+
+/// Shutdown flag
+bool _isClosing = false;
+
+/// Bounded queue limit to prevent OOM
+const int _maxQueueSize = 500;
+
+final _fileWriteQueue = Queue<({LogRecord record, CallerInfo caller})>();
+
+final _wakeChannel = StreamController<void>();
+
+Future<void>? _loopFuture;
+
+/// Tracks logs dropped due to backpressure to prevent silent data loss
+int _droppedLogsCount = 0;
+
+Future<void> _initFileLogging() async {
+  try {
+    final d = await getApplicationSupportDirectory();
+    final basePath = '${d.path}${Platform.pathSeparator}app';
+    final currentFile = File('$basePath.log');
+    final previousFile = File('$basePath.1.log');
+    final oldestFile = File('$basePath.2.log');
+    // ignore: avoid_slow_async_io because this is a one-time startup operation
+    if (await oldestFile.exists()) {
+      await oldestFile.delete();
     }
-    if (writeSuccessful) {
-      try {
-        final d = await getApplicationDocumentsDirectory();
-        final file = File('${d.path}${Platform.pathSeparator}latin_reader.log');
-        final optError = r.error != null ? '\n${r.error}' : '';
-        final optStackTrace = r.stackTrace != null ? '\n${r.stackTrace}' : '';
-        await file.writeAsString('${r.formattedMessage}$optError$optStackTrace\n');
-      } on Exception catch (e) {
+    // ignore: avoid_slow_async_io because this is a one-time startup operation
+    if (await previousFile.exists()) {
+      await previousFile.rename(oldestFile.path);
+    }
+    // ignore: avoid_slow_async_io because this is a one-time startup operation
+    if (await currentFile.exists()) {
+      await currentFile.rename(previousFile.path);
+    }
+    // Open a fresh file for the current session with FileMode.append just in case
+    _fileSink = currentFile.openWrite(mode: FileMode.append);
+    unawaited(
+      _fileSink?.done.catchError((Object e) {
         if (kDebugMode) {
-          print('Failed to write file log: $e');
+          print('Async Disk write error: $e');
         }
-        writeSuccessful = false;
+        _fileLoggingDisabled = true;
+        _fileWriteQueue.clear();
+      }),
+    );
+  } on Exception catch (e) {
+    if (kDebugMode) {
+      print('Failed to open or rotate file logs: $e');
+    }
+    _fileLoggingDisabled = true;
+  }
+}
+
+/// Single-writer loop. Guarantees chronological FIFO ordering
+/// and prevents interleaving by ensuring only one write operation happens at a time.
+Future<void> _runWriteLoop() async {
+  await _initFileLogging();
+  if (_fileLoggingDisabled) {
+    if (kDebugMode) {
+      print('File logging disabled, write loop exiting.');
+    }
+    _fileWriteQueue.clear();
+  } else {
+    await for (final _ in _wakeChannel.stream) {
+      while (_fileWriteQueue.isNotEmpty) {
+        // Alert if we had to drop logs to save memory
+        if (_droppedLogsCount > 0) {
+          final dropped = _droppedLogsCount;
+          _droppedLogsCount = 0;
+          _fileSink?.writeln(
+            '\n--- WARNING: $dropped log records dropped due to backpressure ---\n',
+          );
+        }
+        final item = _fileWriteQueue.removeFirst();
+        try {
+          _writeItem(item);
+        } on Exception catch (e) {
+          if (kDebugMode) {
+            print('Error writing log to disk: $e');
+          }
+          // Stop trying to write if the disk is full/failing
+          _fileWriteQueue.clear();
+          _fileLoggingDisabled = true;
+          // Clean up resources on disk failure
+          await _fileSink?.close();
+          _fileSink = null;
+          return;
+        }
+      }
+      if (_isClosing) {
+        return;
       }
     }
-  });
+  }
+}
+
+void _writeItem(({LogRecord record, CallerInfo caller}) item) {
+  final optError = item.record.error != null ? '\n${item.record.error}' : '';
+  final optTrace = item.record.stackTrace != null ? '\n${item.record.stackTrace}' : '';
+  _fileSink?.writeln('${item.record.formattedMessage(item.caller)}$optError$optTrace');
+}
+
+void configureLogging() {
+  // 1. Set the level
   Logger.root.level = kDebugMode
       ? AppConfig.instance.consoleLogLevel
       : AppConfig.instance.fileLogLevel;
+  // 2. Initialize before attaching listeners
+  _loopFuture = _runWriteLoop();
+  // 3. Attach the listener
+  Logger.root.onRecord.listen((r) {
+    // Don't accept logs if shutting down
+    if (!_isClosing) {
+      final trace = r.stackTrace ?? StackTrace.current;
+      final callerInfo = _logCaller(trace);
+      if (kDebugMode) {
+        if (AppConfig.instance.logUsesPrint) {
+          print(r.formattedMessage(callerInfo, useColor: true));
+        }
+        if (AppConfig.instance.logUsesApi) {
+          developer.log(
+            '${r.message}\n ${callerInfo.location}',
+            time: r.time,
+            sequenceNumber: r.sequenceNumber,
+            level: r.level.value,
+            name: r.loggerName,
+            error: r.error,
+            stackTrace: r.stackTrace,
+          );
+        }
+      }
+      // Handle File Logging safely
+      if (!_fileLoggingDisabled) {
+        // Backpressure / Memory safeguard
+        if (_fileWriteQueue.length >= _maxQueueSize) {
+          _fileWriteQueue.removeFirst(); // Drop the oldest to make room for the next
+          _droppedLogsCount++;
+        }
+        _fileWriteQueue.add((record: r, caller: callerInfo));
+        _wakeChannel.add(null);
+      }
+    }
+  });
+  // 4. Ensure we flush file on app exit
+  AppLifecycleListener(
+    onExitRequested: () async {
+      await closeLogging();
+      return AppExitResponse.exit;
+    },
+  );
 }
 
-/// An extension on the [Logger] class that adds methods similar to those
-/// in `org.slf4j.ext.XLogger` for logging method entry/exit and exceptions
+/// Safe, deterministic shutdown sequence
+Future<void> closeLogging() async {
+  if (!_isClosing) {
+    _isClosing = true;
+    _wakeChannel.add(null); // One last wake to let the loop drain the queue, then exit
+    await _loopFuture;
+    await _fileSink?.flush();
+    await _fileSink?.close();
+    _fileSink = null;
+    await _wakeChannel.close();
+  }
+}
+
+final _callerRegex = RegExp(r'^#\d+\s+(.+?)\s(\(.+\))$');
+
+CallerInfo _logCaller(StackTrace stack) {
+  // WARN: caller info (class and location) will be unavailable in obfuscated release builds
+  final callerLine = stack
+      .toString()
+      .split('\n')
+      .skip(1)
+      .firstWhere((e) => e.contains('package:latin_reader'), orElse: () => '');
+  final match = callerLine.isNotEmpty ? _callerRegex.firstMatch(callerLine) : null;
+  return (
+    classAndMethod: match != null
+        ? '${match.group(1)}()'.replaceFirst('.<anonymous closure>', '').trim()
+        : '',
+    location: match?.group(2)?.trim() ?? '',
+  );
+}
+
 extension XLogger on Logger {
-  /// For stack lines of form *#n      Class.method (package:relative_file_path:Ln:Col)*
-  static final _callerRegex = RegExp(r'^#\d+\s+(.+?)\s(\(.+\))$');
   static const _entry = 'entry';
   static const _exit = 'exit';
   static const _throwing = 'throwing';
@@ -115,23 +265,6 @@ extension XLogger on Logger {
     );
   }
 
-  /// Gets caller information from the stack
-  ({String? classAndMethod, String? location}) _caller(StackTrace stack) {
-    final stackLines = stack.toString().split('\n');
-    final callerLine = stackLines
-        .skip(1)
-        .firstWhere(
-          (e) => e.contains('package:latin_reader'),
-          orElse: () => '',
-        );
-    final match = _callerRegex.firstMatch(callerLine);
-    final unnamed = ('${match?.group(1)}()', match?.group(2));
-    return (
-      classAndMethod: unnamed.$1.replaceFirst('.<anonymous closure>', '').trim(),
-      location: unnamed.$2?.trim(), // If printed in the console, provides navigation
-    );
-  }
-
   //
 }
 
@@ -163,17 +296,24 @@ extension FormattedLogRecord on LogRecord {
     Level.SHOUT: '$white$bgRed',
   };
 
-  /// Returns the message formatted according to the provided trace
-  String formattedMessage(StackTrace trace) {
-    final logIdentifier = '${loggerName.isNotEmpty ? '($loggerName)' : ''}${level.name}';
-    final caller = Logger.root._caller(trace);
-    return (StringBuffer()..writeAll([
-          '\n$dim${caller.location}',
-          '\n${_colors[level]}$logIdentifier$reset $time',
-          '\n${caller.classAndMethod}',
-          '\n$bright$message',
-        ]))
-        .toString();
+  /// Returns the message formatted according to the provided trace, optionally with ANSI colors
+  String formattedMessage(CallerInfo caller, {bool useColor = false}) {
+    final logId = '${loggerName.isNotEmpty ? '($loggerName)' : ''}${level.name}';
+    return useColor
+        ? (StringBuffer()..writeAll([
+                if (caller.location.isNotEmpty) '\n$dim${caller.location}',
+                '\n${_colors[level]}$logId$reset $time',
+                if (caller.classAndMethod.isNotEmpty) '\n${caller.classAndMethod}',
+                '\n$bright$message',
+              ]))
+              .toString()
+        : [
+            '',
+            if (caller.location.isNotEmpty) caller.location,
+            '$logId $time',
+            if (caller.classAndMethod.isNotEmpty) caller.classAndMethod,
+            message,
+          ].join('\n');
   }
 
   //
