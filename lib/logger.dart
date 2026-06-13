@@ -197,7 +197,7 @@ CallerInfo _logCaller(StackTrace stack) {
   final match = callerLine.isNotEmpty ? _callerRegex.firstMatch(callerLine) : null;
   return (
     classAndMethod: match != null
-        ? '${match.group(1)}()'.replaceFirst('.<anonymous closure>', '').trim()
+        ? '${match.group(1)}()'.replaceAll('.<anonymous closure>', '').trim()
         : '',
     location: match?.group(2)?.trim() ?? '',
   );
