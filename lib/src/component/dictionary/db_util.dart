@@ -73,7 +73,10 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await rootBundle.loadString('${path}dict_entry_senses.csv');
-      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(
+        csvData,
+        shouldParseNumbers: false,
+      );
       await db.batch(
         (b) => b.insertAll(
           db.dictEntrySenses,

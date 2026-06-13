@@ -37,15 +37,23 @@ class AppDb extends $AppDb {
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {
       log.fine(() => 'DB events - creation migration started');
-      await customStatement('PRAGMA journal_mode = MEMORY;');
-      await customStatement('PRAGMA synchronous = OFF;');
-      await customStatement('PRAGMA foreign_keys = ON;');
       await m.createAll();
-      await util.populateDatabaseFromCsv(this);
-      await util.updateDatabaseVersion(this);
     },
     beforeOpen: (d) async {
       log.fine(() => 'DB events - database ready');
+      await customStatement('PRAGMA foreign_keys = ON;');
+      if (await util.shouldPopulate(this)) {
+        log.fine(() => 'Setting pragmas for DB population');
+        await customStatement('PRAGMA journal_mode = MEMORY;');
+        await customStatement('PRAGMA synchronous = OFF;');
+        log.info(() => 'Populating or updating database from CSVs');
+        await util.populateDatabaseFromCsv(this);
+        await util.updateDatabaseVersion(this);
+        log.info(() => 'Database population complete.');
+      } else {
+        log.info(() => 'Skipping DB population');
+      }
+      log.fine(() => 'Setting pragmas for normal DB operation');
       await customStatement('PRAGMA journal_mode = OFF;');
       await customStatement('PRAGMA temp_store = MEMORY;');
     },
