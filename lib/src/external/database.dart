@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -16,10 +17,17 @@ import 'db_util.dart' as util;
 
 part 'database.g.dart';
 
-@riverpod
+/// Provides one db connection for the lifetime of the app
+@Riverpod(keepAlive: true)
 Future<AppDb> db(Ref ref) async {
   log.info(() => '@riverpod');
-  return AppDb();
+  final database = AppDb();
+  // Ensure the connection closes if the provider is ever destroyed
+  ref.onDispose(() {
+    log.info(() => 'Closing DB connection');
+    unawaited(database.close());
+  });
+  return database;
 }
 
 @DriftDatabase(
