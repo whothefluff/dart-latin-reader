@@ -283,10 +283,10 @@ extension type const AnalysisKeys._(ValueList<AnalysisKey> unm) implements Value
 
 extension type const AnalysisKey._(({String form, int item, int cnt}) _record) {
   AnalysisKey({
-    required String? form,
-    required int? item,
-    required int? cnt,
-  }) : this._((form: form!, item: item!, cnt: cnt!));
+    required String form,
+    required int item,
+    required int cnt,
+  }) : this._((form: form, item: item, cnt: cnt));
 
   String get form => _record.form;
   int get item => _record.item;
