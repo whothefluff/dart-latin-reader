@@ -1,4 +1,5 @@
-database.log_statements: false
+database:
+  log_statements: false
 log:
   console:
     level: ALL
