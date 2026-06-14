@@ -5873,7 +5873,7 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.Authors" AS SELECT Authors.id, Authors.name, Authors.about, Authors.image, COUNT(*)OVER (PARTITION BY AuthorsAndWorks.workId RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS numberOfWorks FROM Authors LEFT JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId',
+        'CREATE VIEW "library.Authors" AS WITH AuthorWorks AS (SELECT authorId, COUNT(workId) AS numberOfWorks FROM AuthorsAndWorks GROUP BY authorId) SELECT Authors.id, Authors.name, Authors.about, Authors.image, COALESCE(AuthorWorks.numberOfWorks, 0) AS numberOfWorks FROM Authors LEFT JOIN AuthorWorks ON Authors.id = AuthorWorks.authorId',
   };
   @override
   LibraryAuthors get asDslTable => this;
@@ -5943,7 +5943,7 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
   @override
   i0.Query? get query => null;
   @override
-  Set<String> get readTables => const {'Authors', 'AuthorsAndWorks'};
+  Set<String> get readTables => const {'AuthorsAndWorks', 'Authors'};
 }
 
 class LibraryAuthorDetail extends i0.DataClass {
@@ -7064,7 +7064,7 @@ class LibraryDrift extends i3.ModularAccessor {
     return customSelect(
       'SELECT * FROM "library.Authors"',
       variables: [],
-      readsFrom: {authors, authorsAndWorks},
+      readsFrom: {authorsAndWorks, authors},
     ).map(
       (i0.QueryRow row) => i4.Author(
         id: row.read<String>('id'),
@@ -7131,12 +7131,12 @@ class LibraryDrift extends i3.ModularAccessor {
   i1.LibraryAuthors get libraryAuthors => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthors>('library.Authors');
-  i1.Authors get authors => i3.ReadDatabaseContainer(
-    attachedDatabase,
-  ).resultSet<i1.Authors>('Authors');
   i1.AuthorsAndWorks get authorsAndWorks => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.AuthorsAndWorks>('AuthorsAndWorks');
+  i1.Authors get authors => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.Authors>('Authors');
   i1.LibraryAuthorDetails get libraryAuthorDetails => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthorDetails>('library.AuthorDetails');
