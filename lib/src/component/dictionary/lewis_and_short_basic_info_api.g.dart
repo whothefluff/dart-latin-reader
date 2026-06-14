@@ -6,7 +6,7 @@ part of 'lewis_and_short_basic_info_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lnsBasicInfoHash() => r'ed3033cb1a1f904b29de9102dd17adb60790aac4';
+String _$lnsBasicInfoHash() => r'521d852a2a61cc49f3b94167175ad44967c3a864';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -39,7 +39,7 @@ class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfo>> {
   const LnsBasicInfoFamily();
 
   /// See also [lnsBasicInfo].
-  LnsBasicInfoProvider call(Iterable<String> lemmas) {
+  LnsBasicInfoProvider call(Lemmas lemmas) {
     return LnsBasicInfoProvider(lemmas);
   }
 
@@ -68,7 +68,7 @@ class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfo>> {
 /// See also [lnsBasicInfo].
 class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
   /// See also [lnsBasicInfo].
-  LnsBasicInfoProvider(Iterable<String> lemmas)
+  LnsBasicInfoProvider(Lemmas lemmas)
     : this._internal(
         (ref) => lnsBasicInfo(ref as LnsBasicInfoRef, lemmas),
         from: lnsBasicInfoProvider,
@@ -92,7 +92,7 @@ class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
     required this.lemmas,
   }) : super.internal();
 
-  final Iterable<String> lemmas;
+  final Lemmas lemmas;
 
   @override
   Override overrideWith(
@@ -135,7 +135,7 @@ class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
 // ignore: unused_element
 mixin LnsBasicInfoRef on AutoDisposeFutureProviderRef<LnsBasicInfo> {
   /// The parameter `lemmas` of this provider.
-  Iterable<String> get lemmas;
+  Lemmas get lemmas;
 }
 
 class _LnsBasicInfoProviderElement
@@ -144,7 +144,7 @@ class _LnsBasicInfoProviderElement
   _LnsBasicInfoProviderElement(super.provider);
 
   @override
-  Iterable<String> get lemmas => (origin as LnsBasicInfoProvider).lemmas;
+  Lemmas get lemmas => (origin as LnsBasicInfoProvider).lemmas;
 }
 
 // ignore_for_file: type=lint

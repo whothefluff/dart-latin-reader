@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
+import '../../core/value_list.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import 'morph_analysis.drift.dart';
@@ -171,7 +172,9 @@ abstract interface class IGetMorphologicalAnalysisKeysUseCase {
 @immutable
 extension type const Analyses._(UnmodifiableListView<Analysis> unm)
     implements UnmodifiableListView<Analysis> {
-  Analyses(Iterable<Analysis> iter) : this._(UnmodifiableListView(iter));
+  Analyses(
+    Iterable<Analysis> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
@@ -230,9 +233,10 @@ class Analysis {
 }
 
 @immutable
-extension type const AnalysisKeys._(UnmodifiableListView<AnalysisKey> unm)
-    implements UnmodifiableListView<AnalysisKey> {
-  AnalysisKeys(Iterable<AnalysisKey> iter) : this._(UnmodifiableListView(iter));
+extension type const AnalysisKeys._(ValueList<AnalysisKey> unm) implements ValueList<AnalysisKey> {
+  AnalysisKeys(
+    Iterable<AnalysisKey> iter,
+  ) : this._(ValueList(iter));
 
   AnalysisKeys.fromJson(String source)
     : this(

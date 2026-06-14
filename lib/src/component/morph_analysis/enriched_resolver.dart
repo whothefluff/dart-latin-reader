@@ -17,7 +17,7 @@ class RiverpodDictionaryRepository implements IDictionaryRepository {
 
   @override
   Future<LnsBasicInfo> getLnsInfoFor(Iterable<String> lemmas) =>
-      _ref.read(lnsBasicInfoProvider(lemmas).future);
+      _ref.read(lnsBasicInfoProvider(Lemmas(lemmas)).future);
 }
 
 //domain
