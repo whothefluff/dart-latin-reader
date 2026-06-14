@@ -387,7 +387,7 @@ class _WordDetailsButton extends ContextMenuButtonItem {
     log.entry(args: [word]);
     ContextMenuController.removeAny();
     // Using double quotes will force an exact match, avoiding a text search
-    final results = await ref.watch(enrichedMorphologicalSearchProvider('"$word"').future);
+    final results = await ref.read(enrichedMorphologicalSearchProvider('"$word"').future);
     if (results.isNotEmpty) {
       final selectedKeys = AnalysisKeys(
         results.map((r) => AnalysisKey(form: r.form, item: r.item, cnt: r.cnt)),
@@ -471,7 +471,7 @@ class _WiktionaryButton extends ContextMenuButtonItem {
     var isProperName = false;
     if (word == _capitalize(word)) {
       // The assumption is that the provider will not find proper names
-      final results = await ref.watch(enrichedMorphologicalSearchProvider('"$word"').future);
+      final results = await ref.read(enrichedMorphologicalSearchProvider('"$word"').future);
       isProperName = results.isEmpty;
     }
     return log.exit(r: isProperName)!;

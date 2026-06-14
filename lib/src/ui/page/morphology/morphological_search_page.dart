@@ -9,7 +9,6 @@ import '../../router/config.dart';
 import '../../widget/show_error.dart';
 import 'common.dart';
 
-/// This page has a weird state, so much so that hot reload doesn't even work
 class MorphologicalSearchPage extends ConsumerStatefulWidget {
   const MorphologicalSearchPage({
     super.key,
@@ -24,7 +23,6 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
   //
   AnalysisKeys _selectedKeys = AnalysisKeys(const []);
   final SearchController _searchController = SearchController();
-  bool _isSearching = false;
 
   @override
   void dispose() {
@@ -62,20 +60,10 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                 isFullScreen: true,
                 suggestionsBuilder: (context, controller) async {
                   final searchTerm = controller.text.trim();
-                  // Set searching state and trigger rebuild
-                  if (!_isSearching) {
-                    setState(() => _isSearching = true);
-                  }
-                  log.info(() => 'searching for: $searchTerm');
                   try {
-                    final results = await ref.watch(
+                    final results = await ref.read(
                       enrichedMorphologicalSearchProvider(searchTerm).future,
                     );
-                    // Reset searching state
-                    if (_isSearching) {
-                      setState(() => _isSearching = false);
-                    }
-                    // Appealing sort not easy since the results are primarily ordered by match and key
                     final groupedRes = results.groupListsBy(consolidatedForm());
                     return [
                       ListView.builder(
