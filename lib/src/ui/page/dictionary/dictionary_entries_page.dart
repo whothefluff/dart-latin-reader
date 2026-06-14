@@ -25,6 +25,8 @@ class DictionaryEntriesPage extends ConsumerStatefulWidget {
 class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
   //
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _prototypeKey = GlobalKey();
+  double _listTileHeight = 48.0; // Fallback height
 
   @override
   Widget build(context) => Scaffold(
@@ -47,10 +49,13 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
               dictId: widget.dictionary,
               data: entries,
               scrollController: _scrollController,
+              prototypeKey: _prototypeKey,
+              onHeightCalculated: (height) => _listTileHeight = height,
             ),
             AlphabetNavigation(
               dictId: widget.dictionary,
               scrollController: _scrollController,
+              getListTileHeight: () => _listTileHeight,
             ),
           ],
         ),
@@ -75,11 +80,15 @@ class ScrollableEntries extends ConsumerStatefulWidget {
     required this.dictId,
     required this.data,
     required this.scrollController,
+    required this.prototypeKey,
+    required this.onHeightCalculated,
   });
 
   final String dictId;
   final DictionaryEntries data;
   final ScrollController scrollController;
+  final GlobalKey prototypeKey;
+  final ValueChanged<double> onHeightCalculated;
 
   @override
   ConsumerState<ScrollableEntries> createState() => _ScrollableEntriesState();
@@ -88,43 +97,69 @@ class ScrollableEntries extends ConsumerStatefulWidget {
 
 class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
   //
+  double? _lastMeasuredHeight;
+
   @override
-  Widget build(context) => Expanded(
-    child: ListView.builder(
-      controller: widget.scrollController,
-      itemCount: widget.data.length,
-      prototypeItem: ListTile(
-        title: Text(widget.data.first.lemma),
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final context = widget.prototypeKey.currentContext;
+        if (context != null) {
+          final newHeight = context.size!.height;
+          // Trigger the callback if the height changed
+          if (newHeight != _lastMeasuredHeight) {
+            _lastMeasuredHeight = newHeight;
+            widget.onHeightCalculated(newHeight);
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(context) {
+    final titleStyle = Theme.of(context).listTileTheme.titleTextStyle;
+    final subtitleStyle = subtitleTextStyle(context);
+    return Expanded(
+      child: ListView.builder(
+        controller: widget.scrollController,
+        itemCount: widget.data.length,
+        prototypeItem: ListTile(
+          key: widget.prototypeKey,
+          title: tileTitle(widget.data.first, titleStyle, subtitleStyle),
+        ),
+        addAutomaticKeepAlives: false,
+        itemBuilder: (context, index) => tile(context, index, titleStyle, subtitleStyle),
       ),
-      addAutomaticKeepAlives: false,
-      itemBuilder: tile(),
+    );
+  }
+
+  Text tileTitle(Entry entry, TextStyle? titleStyle, TextStyle subtitleStyle) => Text.rich(
+    TextSpan(
+      children: [
+        TextSpan(
+          text: removeDigits(entry.lemma),
+          style: titleStyle,
+        ),
+        const TextSpan(text: ' '),
+        TextSpan(
+          text: entry.inflection,
+          style: subtitleStyle,
+        ),
+      ],
     ),
   );
 
-  Widget Function(BuildContext, int) tile() => (context, index) {
-    final subtitleStyleBecauseFuckFlutter = subtitleTextStyle(context);
+  ListTile tile(BuildContext context, int index, TextStyle? titleStyle, TextStyle subtitleStyle) {
     final entry = widget.data[index];
     return ListTile(
-      title: Text.rich(
-        TextSpan(
-          children: [
-            TextSpan(
-              text: removeDigits(entry.lemma),
-              style: Theme.of(context).listTileTheme.titleTextStyle,
-            ),
-            const TextSpan(text: ' '),
-            TextSpan(
-              text: entry.inflection,
-              style: subtitleStyleBecauseFuckFlutter,
-            ),
-          ],
-        ),
-      ),
+      title: tileTitle(entry, titleStyle, subtitleStyle),
       onTap: () async {
         await DictionaryEntryRoute(widget.dictId, entry.lemma).push<void>(context);
       },
     );
-  };
+  }
 
   String removeDigits(String original) => original.replaceAll(RegExp(r'\d'), '');
   //
@@ -135,10 +170,12 @@ class AlphabetNavigation extends ConsumerStatefulWidget {
     super.key,
     required this.dictId,
     required this.scrollController,
+    required this.getListTileHeight,
   });
 
   final String dictId;
   final ScrollController scrollController;
+  final double Function() getListTileHeight;
 
   @override
   ConsumerState<AlphabetNavigation> createState() => _AlphabetNavigationState();
@@ -170,16 +207,17 @@ class _AlphabetNavigationState extends ConsumerState<AlphabetNavigation> {
   }
 
   Future<void> scrollToLetter(String letter) async {
-    const listTileHeight = 48.0;
+    final listTileDynHeight = widget.getListTileHeight();
     final index = await ref.read(
       dictionaryAlphabetLetterPositionProvider(widget.dictId, letter).future,
     );
+    final target = index.calculateHeight(listTileDynHeight);
+    final clamped = target.clamp(0.0, widget.scrollController.position.maxScrollExtent);
     await widget.scrollController.animateTo(
-      index.calculateHeight(listTileHeight),
-      duration: const Duration(milliseconds: 100),
-      curve: Easing.linear,
+      clamped,
+      duration: Durations.medium2,
+      curve: Easing.standard,
     );
-    // _scrollController.jumpTo((index * listTileHeight).toDouble());
   }
 
   //
