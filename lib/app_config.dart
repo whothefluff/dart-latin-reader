@@ -9,7 +9,7 @@ class AppConfig {
   AppConfig._();
 
   static final AppConfig _instance = AppConfig._();
-  static late final YamlMap _config;
+  static YamlMap? _config;
   static final Map<String, Level> _logLevels = {
     'ALL': Level.ALL,
     'FINEST': Level.FINEST,
@@ -26,18 +26,22 @@ class AppConfig {
   static AppConfig get instance => _instance;
 
   Future<void> load() async {
-    final configString = await rootBundle.loadString('config.yaml');
-    _config = loadYaml(configString) as YamlMap;
+    if (_config == null) {
+      final configString = await rootBundle.loadString('config.yaml');
+      _config = loadYaml(configString) as YamlMap;
+    }
   }
 
-  bool get logDbStatements => _config['database.log_statements'] as bool? ?? false;
+  static YamlMap get _cfg => _config ?? (throw StateError('AppConfig.load() not called'));
 
-  Level get consoleLogLevel => _logLevels[_config['log']['console']['level']] ?? Level.ALL;
+  bool get logDbStatements => _cfg['database']?['log_statements'] as bool? ?? false;
 
-  Level get fileLogLevel => _logLevels[_config['log']['file']['level']] ?? Level.OFF;
+  Level get consoleLogLevel => _logLevels[_cfg['log']?['console']?['level']] ?? Level.ALL;
 
-  bool get logUsesApi => _config['log']?['console']?['using']?['api'] as bool? ?? false;
+  Level get fileLogLevel => _logLevels[_cfg['log']?['file']?['level']] ?? Level.OFF;
 
-  bool get logUsesPrint => _config['log']?['console']?['using']?['print'] as bool? ?? true;
+  bool get logUsesApi => _cfg['log']?['console']?['using']?['api'] as bool? ?? false;
+
+  bool get logUsesPrint => _cfg['log']?['console']?['using']?['print'] as bool? ?? true;
   //
 }
