@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
+import '../../core/value_list.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import 'dictionary.drift.dart';
@@ -18,7 +19,7 @@ part 'lewis_and_short_basic_info_api.g.dart';
 //infrastructure
 
 @riverpod
-Future<LnsBasicInfo> lnsBasicInfo(Ref ref, Iterable<String> lemmas) async {
+Future<LnsBasicInfo> lnsBasicInfo(Ref ref, Lemmas lemmas) async {
   log.info(() => '@riverpod - using $lemmas');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
@@ -100,7 +101,9 @@ abstract interface class IGetLnsBasicInfoUseCase {
 @immutable
 extension type const LnsBasicInfo._(UnmodifiableListView<LnsBasicInfoEntry> unm)
     implements UnmodifiableListView<LnsBasicInfoEntry> {
-  LnsBasicInfo(Iterable<LnsBasicInfoEntry> iter) : this._(UnmodifiableListView(iter));
+  LnsBasicInfo(
+    Iterable<LnsBasicInfoEntry> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable
@@ -125,4 +128,11 @@ class LnsBasicInfoEntry {
   @override
   int get hashCode => lemma.hashCode;
   //
+}
+
+@immutable
+extension type const Lemmas._(ValueList<String> unm) implements ValueList<String> {
+  Lemmas(
+    Iterable<String> iter,
+  ) : this._(ValueList(iter));
 }
