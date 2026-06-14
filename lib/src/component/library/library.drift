@@ -142,14 +142,18 @@ CREATE VIEW "WorkContentSubdivisionsHierarchy" AS
             ORDER BY fromindex, depth, toindex;
 
 CREATE VIEW "library.Authors" AS
-    SELECT Authors.id,
-           Authors.name,
-           Authors.about,
-           Authors.image,
-           COUNT(*) OVER( PARTITION BY AuthorsAndWorks.workId ) AS numberOfWorks
-        FROM Authors
-        LEFT JOIN AuthorsAndWorks
-            ON Authors.id = AuthorsAndWorks.authorId;
+    WITH AuthorWorks AS ( SELECT authorId, 
+                                 COUNT( workId ) AS numberOfWorks
+                               FROM AuthorsAndWorks
+                               GROUP BY authorId )
+        SELECT Authors.id,
+               Authors.name,
+               Authors.about,
+               Authors.image,
+               COALESCE( AuthorWorks.numberOfWorks, 0 ) AS numberOfWorks
+            FROM Authors
+            LEFT JOIN AuthorWorks
+                ON Authors.id = AuthorWorks.authorId;
 
 getLibraryAuthors WITH Author: SELECT * FROM "library.Authors";
 
