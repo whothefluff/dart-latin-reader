@@ -19,7 +19,7 @@ class AuthorsPage extends ConsumerWidget {
       onFilterPressed: () {},
       onSortPressed: () {},
       onSettingsPressed: () async {
-        await const SettingsRoute().push<void>(context);
+        await const AppSettingsRoute().push<void>(context);
       },
       searchSuggestionsBuilder: (context, controller) async => [],
     ),

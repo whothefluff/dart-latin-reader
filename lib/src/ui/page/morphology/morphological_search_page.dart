@@ -106,7 +106,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
           const VerticalDivider(),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () async => const SettingsRoute().push<void>(context),
+            onPressed: () async => const AppSettingsRoute().push<void>(context),
           ),
         ],
       ),

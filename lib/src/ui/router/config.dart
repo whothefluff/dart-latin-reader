@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../component/morph_analysis/morphological_details_api.dart';
+import '../page/app_settings_page.dart';
 import '../page/dictionary/dictionaries_page.dart';
 import '../page/dictionary/dictionary_entries_page.dart';
 import '../page/dictionary/dictionary_entry_page.dart';
@@ -14,8 +14,6 @@ import '../page/morphology/morphological_data_page.dart';
 import '../page/morphology/morphological_search_page.dart';
 import '../page/word_frequency_page.dart';
 import '../page/word_lookup_page.dart';
-import '../settings/settings_controller.dart';
-import '../settings/settings_view.dart';
 
 part 'config.g.dart';
 
@@ -64,17 +62,12 @@ const pagesWithoutNavBar = ['/library/reader/:workId'];
 
 const List<String> pagesWithoutNavRail = [...pagesWithoutNavBar];
 
-@TypedGoRoute<SettingsRoute>(path: '/settings')
-class SettingsRoute extends GoRouteData with _$SettingsRoute {
-  const SettingsRoute();
+@TypedGoRoute<AppSettingsRoute>(path: '/settings')
+class AppSettingsRoute extends GoRouteData with _$AppSettingsRoute {
+  const AppSettingsRoute();
 
   @override
-  Widget build(context, state) => Consumer(
-    builder: (_, ref, _) {
-      final controller = ref.watch(settingsControllerProvider);
-      return SettingsView(controller: controller);
-    },
-  );
+  Widget build(context, state) => const AppSettingsPage();
 }
 
 @TypedStatefulShellRoute<MainRoute>(

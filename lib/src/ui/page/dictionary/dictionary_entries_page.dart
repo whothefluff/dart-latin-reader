@@ -33,7 +33,7 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
     appBar: SearchableAppBar(
       onSortPressed: () {},
       onSettingsPressed: () async {
-        await const SettingsRoute().push<void>(context);
+        await const AppSettingsRoute().push<void>(context);
       },
       searchSuggestionsBuilder: (context, controller) async => [],
     ),
