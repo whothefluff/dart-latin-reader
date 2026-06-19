@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../component/settings/app_settings_api.dart';
 import 'router/config.dart';
-import 'settings/settings_controller.dart';
 import 'widget/custom_adaptive_scaffold.dart';
 import 'widget/show_loading.dart';
 
@@ -29,54 +29,48 @@ class AppState extends ConsumerState<App> {
       : throw AssertionError('Not a StatefulShellRoute');
 
   @override
-  Widget build(context) => ref
-      .watch(settingsInitializerProvider)
-      .when(
-        loading: showLoading,
-        data: (_) {
-          final settingsController = ref.watch(settingsControllerProvider);
-          return ListenableBuilder(
-            listenable: settingsController,
-            builder: (_, _) => MaterialApp.router(
-              key: ValueKey(settingsController.themeMode),
-              routerConfig: _router,
-              restorationScopeId: 'app',
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: const [
-                Locale('en'),
-                Locale('es'),
-              ],
-              onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-              theme: ThemeData(),
-              darkTheme: ThemeData.dark(),
-              themeMode: settingsController.themeMode,
-            ),
-          );
-        },
-        error: (error, stack) => MaterialApp(
-          home: Scaffold(
-            body: Center(child: Text('Error: $error')),
-          ),
-        ),
-      );
-
-  @override
   void initState() {
     super.initState();
     _router = GoRouter(
       initialLocation: const LibraryRoute().location,
       routes: [
         mainRoute(),
-        $settingsRoute,
+        $appSettingsRoute,
       ],
       errorBuilder: backToHome,
     );
   }
+
+  @override
+  Widget build(context) => ref
+      .watch(appSettingsNotifierProvider)
+      .when(
+        loading: () => MaterialApp(home: Scaffold(body: showLoading())),
+        data: (settings) => MaterialApp.router(
+          key: ValueKey(settings.themeMode),
+          routerConfig: _router,
+          restorationScopeId: 'app',
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('es'),
+          ],
+          onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+          theme: ThemeData(),
+          darkTheme: ThemeData.dark(),
+          themeMode: settings.themeMode,
+        ),
+        error: (error, stack) => MaterialApp(
+          home: Scaffold(
+            body: Center(child: Text('Error: $error')),
+          ),
+        ),
+      );
 
   StatefulShellRoute mainRoute() => StatefulShellRoute.indexedStack(
     builder: (_, state, navShell) => ScaffoldWithNavBar(
