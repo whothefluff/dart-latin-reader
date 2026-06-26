@@ -334,6 +334,7 @@ class AdaptiveScaffold extends StatefulWidget {
     label: Text(destination.label),
     icon: destination.icon,
     selectedIcon: destination.selectedIcon,
+    disabled: !destination.enabled,
   );
 
   /// Creates a Material 3 Design Spec abiding [NavigationRail] from a
