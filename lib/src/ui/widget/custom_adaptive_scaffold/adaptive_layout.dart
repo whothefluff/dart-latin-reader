@@ -122,6 +122,7 @@ class AdaptiveLayout extends StatefulWidget {
     this.bodyRatio,
     this.transitionDuration = const Duration(seconds: 1),
     this.internalAnimations = true,
+    this.animateInitialLayout = true,
     this.bodyOrientation = Axis.horizontal,
   });
 
@@ -196,6 +197,10 @@ class AdaptiveLayout extends StatefulWidget {
   /// Defaults to true.
   final bool internalAnimations;
 
+  /// Whether the very first layout animates in, or appears already settled.
+  /// Subsequent breakpoint transitions always animate.
+  final bool animateInitialLayout;
+
   /// The orientation of the body and secondaryBody. Either horizontal (side by
   /// side) or vertical (top to bottom).
   ///
@@ -218,6 +223,7 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
   Map<String, Size?> slotSizes = <String, Size?>{};
   Map<String, ValueNotifier<Key?>> notifiers = <String, ValueNotifier<Key?>>{};
   Set<String> isAnimating = <String>{};
+  bool _firstBuildDone = false;
 
   @override
   void initState() {
@@ -225,13 +231,22 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
       _controller = AnimationController(
         duration: widget.transitionDuration,
         vsync: this,
-      )..forward();
+      );
+      if (widget.animateInitialLayout) {
+        _controller.forward();
+      } else {
+        _controller.value = 1.0;
+      }
     } else {
       _controller = AnimationController(duration: Duration.zero, vsync: this);
     }
     for (final item in _SlotIds.values) {
       notifiers[item.name] = ValueNotifier<Key?>(null)
         ..addListener(() {
+          // Skip the animation caused by the first null -> key assignment.
+          if (!_firstBuildDone && !widget.animateInitialLayout) {
+            return;
+          }
           isAnimating.add(item.name);
           _controller
             ..reset()
@@ -296,6 +311,7 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
     notifiers.forEach((key, notifier) {
       notifier.value = chosenWidgets[key]?.key;
     });
+    _firstBuildDone = true;
     Rect? hinge;
     for (final e in MediaQuery.displayFeaturesOf(context)) {
       if (e.type == DisplayFeatureType.hinge || e.type == DisplayFeatureType.fold) {
