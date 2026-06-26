@@ -51,6 +51,7 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     this.groupAlignment,
     this.bottomNavigationBarLabelBehavior = NavigationDestinationLabelBehavior.onlyShowSelected,
     this.createBottomNavigationBar = true,
+    this.bottomNavigationBarBuilder,
     this.createNavigationRail = true,
   }) : assert(
          destinations.length >= 2,
@@ -250,6 +251,15 @@ class CustomAdaptiveScaffold extends StatefulWidget {
   /// as long as the [drawerBreakpoint] is not active and [useDrawer] is false.
   final bool createBottomNavigationBar;
 
+  /// Widget to be displayed in the bottomNavigation slot at the small
+  /// breakpoint.
+  ///
+  /// If nothing is entered for this property, then the default
+  /// [BottomNavigationBar] is displayed in the slot.
+  ///
+  /// Relevant only when [createBottomNavigationBar] is `true`
+  final WidgetBuilder? bottomNavigationBarBuilder;
+
   /// Whether to create a [NavigationRail] or not
   /// as long as at least the [mediumBreakpoint] or [largeBreakpoint] are active.
   final bool createNavigationRail;
@@ -266,6 +276,7 @@ class CustomAdaptiveScaffold extends StatefulWidget {
       label: Text(destination.label),
       icon: destination.icon,
       selectedIcon: destination.selectedIcon,
+      disabled: !destination.enabled, // NavigationRail uses 'disabled' instead of 'enabled'
     );
   }
 
@@ -658,12 +669,14 @@ class CustomAdaptiveScaffoldState extends State<CustomAdaptiveScaffold> {
                 config: <Breakpoint, SlotLayoutConfig>{
                   widget.smallBreakpoint: SlotLayout.from(
                     key: const Key('bottomNavigation'),
-                    builder: (_) => CustomAdaptiveScaffold.standardBottomNavigationBar(
-                      currentIndex: widget.selectedIndex,
-                      destinations: widget.destinations,
-                      onDestinationSelected: widget.onSelectedIndexChange,
-                      labelBehavior: widget.bottomNavigationBarLabelBehavior,
-                    ),
+                    builder:
+                        widget.bottomNavigationBarBuilder ??
+                        (_) => CustomAdaptiveScaffold.standardBottomNavigationBar(
+                          currentIndex: widget.selectedIndex,
+                          destinations: widget.destinations,
+                          onDestinationSelected: widget.onSelectedIndexChange,
+                          labelBehavior: widget.bottomNavigationBarLabelBehavior,
+                        ),
                   ),
                 },
               )
