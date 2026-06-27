@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../component/settings/app_settings_api.dart';
+import '../component/settings/general_settings_api.dart';
 import 'router/config.dart';
 import 'widget/custom_adaptive_scaffold.dart';
 import 'widget/show_loading.dart';
@@ -35,7 +35,7 @@ class AppState extends ConsumerState<App> {
       initialLocation: const LibraryRoute().location,
       routes: [
         mainRoute(),
-        $appSettingsRoute,
+        $settingsRoute,
       ],
       errorBuilder: backToHome,
     );
@@ -43,7 +43,7 @@ class AppState extends ConsumerState<App> {
 
   @override
   Widget build(context) => ref
-      .watch(appSettingsNotifierProvider)
+      .watch(generalSettingsNotifierProvider)
       .when(
         loading: () => MaterialApp(home: Scaffold(body: showLoading())),
         data: (settings) => MaterialApp.router(

@@ -7,6 +7,7 @@ import '../../../component/morph_analysis/enriched_morph_search_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../router/config.dart';
 import '../../widget/show_error.dart';
+import '../settings/settings_shell_page.dart' show SettingsTab;
 import 'common.dart';
 
 class MorphologicalSearchPage extends ConsumerStatefulWidget {
@@ -106,7 +107,8 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
           const VerticalDivider(),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () async => const AppSettingsRoute().push<void>(context),
+            onPressed: () async =>
+                const SettingsRoute(tab: SettingsTab.morphAnalysis).push<void>(context),
           ),
         ],
       ),

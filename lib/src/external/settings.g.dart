@@ -7,7 +7,7 @@ part of 'settings.dart';
 // **************************************************************************
 
 String _$settingsRepositoryHash() =>
-    r'eea72d781f43f01df10d1b5f764e81a9894afdfe';
+    r'e157c2a8f962603662bd87ad8b95a9f4ae8b7d63';
 
 /// A pure, asynchronous abstraction over the platform's local storage.
 ///

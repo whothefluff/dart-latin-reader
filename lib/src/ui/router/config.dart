@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../component/morph_analysis/morphological_details_api.dart';
-import '../page/app_settings_page.dart';
 import '../page/dictionary/dictionaries_page.dart';
 import '../page/dictionary/dictionary_entries_page.dart';
 import '../page/dictionary/dictionary_entry_page.dart';
@@ -12,28 +11,39 @@ import '../page/library/text_page.dart';
 import '../page/library/work_details_page.dart';
 import '../page/morphology/morphological_data_page.dart';
 import '../page/morphology/morphological_search_page.dart';
+import '../page/settings/settings_shell_page.dart';
 import '../page/word_frequency_page.dart';
 import '../page/word_lookup_page.dart';
 
 part 'config.g.dart';
 
+const String libraryId = 'library';
+
+const String dictionariesId = 'dictionaries';
+
+const String wordFrequencyId = 'word-frequency';
+
+const String morphAnalysisId = 'morph-analysis';
+
+const String wordLookupId = 'word-lookup';
+
 const List<({String id, NavigationDestination navDest})> mainBranches = [
   (
-    id: '/library',
+    id: '/$libraryId',
     navDest: NavigationDestination(
       icon: Icon(Icons.auto_stories),
       label: 'Library',
     ),
   ),
   (
-    id: '/dictionaries',
+    id: '/$dictionariesId',
     navDest: NavigationDestination(
       icon: Icon(Icons.translate),
       label: 'Dictionaries',
     ),
   ),
   (
-    id: '/word-frequency',
+    id: '/$wordFrequencyId',
     navDest: NavigationDestination(
       icon: Icon(Icons.bar_chart),
       label: 'Frequency',
@@ -41,7 +51,7 @@ const List<({String id, NavigationDestination navDest})> mainBranches = [
     ),
   ),
   (
-    id: '/morph-analysis',
+    id: '/$morphAnalysisId',
     navDest: NavigationDestination(
       icon: Icon(Icons.edit_note),
       label: 'Morphology',
@@ -49,7 +59,7 @@ const List<({String id, NavigationDestination navDest})> mainBranches = [
     ),
   ),
   (
-    id: '/word-lookup',
+    id: '/$wordLookupId',
     navDest: NavigationDestination(
       icon: Icon(Icons.find_in_page),
       label: 'Usage',
@@ -62,12 +72,16 @@ const pagesWithoutNavBar = ['/library/reader/:workId'];
 
 const List<String> pagesWithoutNavRail = [...pagesWithoutNavBar];
 
-@TypedGoRoute<AppSettingsRoute>(path: '/settings')
-class AppSettingsRoute extends GoRouteData with _$AppSettingsRoute {
-  const AppSettingsRoute();
+@TypedGoRoute<SettingsRoute>(path: '/settings/:tab')
+class SettingsRoute extends GoRouteData with _$SettingsRoute {
+  const SettingsRoute({
+    this.tab = 'general',
+  });
+
+  final String tab;
 
   @override
-  Widget build(context, state) => const AppSettingsPage();
+  Widget build(context, state) => SettingsShellPage(tab: tab);
 }
 
 @TypedStatefulShellRoute<MainRoute>(
