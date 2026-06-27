@@ -8,6 +8,7 @@ import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
 import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
+import '../settings/settings_shell_page.dart' show SettingsTab;
 
 class DictionaryEntriesPage extends ConsumerStatefulWidget {
   const DictionaryEntriesPage(
@@ -33,7 +34,7 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
     appBar: SearchableAppBar(
       onSortPressed: () {},
       onSettingsPressed: () async {
-        await const AppSettingsRoute().push<void>(context);
+        await const SettingsRoute(tab: SettingsTab.dictionaries).push<void>(context);
       },
       searchSuggestionsBuilder: (context, controller) async => [],
     ),

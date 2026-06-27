@@ -7,6 +7,7 @@ import '../../router/config.dart';
 import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
+import '../settings/settings_shell_page.dart' show SettingsTab;
 
 class DictionariesPage extends ConsumerWidget {
   const DictionariesPage({
@@ -19,7 +20,7 @@ class DictionariesPage extends ConsumerWidget {
       onFilterPressed: () {},
       onSortPressed: () {},
       onSettingsPressed: () async {
-        await const AppSettingsRoute().push<void>(context);
+        await const SettingsRoute(tab: SettingsTab.dictionaries).push<void>(context);
       },
       searchSuggestionsBuilder: (context, controller) async => [],
     ),
