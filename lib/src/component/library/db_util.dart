@@ -109,6 +109,13 @@ final operations = [
                   word: Value(row[2].toString()),
                   sourceReference: Value(row[3].toString()),
                   properNounState: intValue(row[4].toString()),
+                  tokenType: Value(row[5] as int),
+                  sentenceIdx: Value(row[6] as int),
+                  wordIdx: intValue(row[7].toString()),
+                  enclitic: stringValue(row[8].toString()),
+                  expansion: stringValue(row[9].toString()),
+                  macronizedWord: const Value(''),
+                  uncertaintyBitMask: const Value(-1), // fully uncertain until staging
                 ),
               ),
           mode: InsertMode.insertOrRollback,
@@ -214,7 +221,7 @@ final operations = [
               .map(
                 (row) => WorkMacronizationsCompanion(
                   workId: Value(row[0].toString()),
-                  wordIdx: Value(row[1] as int),
+                  idx: Value(row[1] as int),
                   macronizedWord: Value(row[2].toString()),
                   uncertaintyBitMask: Value(row[3] as int),
                 ),
@@ -225,28 +232,18 @@ final operations = [
     },
   ),
   (
-    id: 'UserProvidedMacronizations',
-    delete: (AppDb db) async {
-      await db.delete(db.userProvidedMacronizations).go();
-    },
+    id: 'ResolveMacronizations',
+    delete: (_) async {},
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}user_provided_macronizations.csv');
-      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
-      await db.batch(
-        (b) => b.insertAll(
-          db.userProvidedMacronizations,
-          rows
-              .skip(1)
-              .map(
-                (row) => UserProvidedMacronizationsCompanion(
-                  workId: Value(row[0].toString()),
-                  idx: Value(row[1] as int),
-                  macronizedWord: Value(row[2].toString()),
-                ),
-              ),
-          mode: InsertMode.insertOrRollback,
-        ),
-      );
+      await db.customStatement('''
+      -- permanent regression tripwire: rows where table and oracle disagree
+      UPDATE WorkContents
+        SET macronizedWord = r_m.finalMacronizedWord,
+            uncertaintyBitMask = r_m.uncertaintyBitMask
+        FROM "library.staging.ResolvedMacronizations" r_m
+        WHERE WorkContents.workId = r_m.workId
+              AND WorkContents.idx = r_m.idx
+    ''');
     },
   ),
   (

@@ -229,6 +229,11 @@ class $MorphologicalDetailInflectionsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
+  i0.ColumnFilters<String> get macronizedForm => $composableBuilder(
+    column: $table.macronizedForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
   i0.ColumnFilters<int> get item => $composableBuilder(
     column: $table.item,
     builder: (column) => i0.ColumnFilters(column),
@@ -315,6 +320,11 @@ class $MorphologicalDetailInflectionsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<String> get macronizedForm => $composableBuilder(
+    column: $table.macronizedForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<int> get item => $composableBuilder(
     column: $table.item,
     builder: (column) => i0.ColumnOrderings(column),
@@ -398,6 +408,11 @@ class $MorphologicalDetailInflectionsAnnotationComposer
   });
   i0.GeneratedColumn<String> get form =>
       $composableBuilder(column: $table.form, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get macronizedForm => $composableBuilder(
+    column: $table.macronizedForm,
+    builder: (column) => column,
+  );
 
   i0.GeneratedColumn<int> get item =>
       $composableBuilder(column: $table.item, builder: (column) => column);
@@ -1090,6 +1105,22 @@ class MorphologicalDetailInflections extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
+  static const i0.VerificationMeta _macronizedFormMeta =
+      const i0.VerificationMeta('macronizedForm');
+  late final i0.GeneratedColumn<String>
+  macronizedForm = i0.GeneratedColumn<String>(
+    'macronizedForm',
+    aliasedName,
+    false,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression('CONCAT("REPLACE"(stem, \'-\', \'\'), suffix)'),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL GENERATED ALWAYS AS (CONCAT("REPLACE"(stem, \'-\', \'\'), suffix)) VIRTUAL',
+  );
   static const i0.VerificationMeta _itemMeta = const i0.VerificationMeta(
     'item',
   );
@@ -1245,6 +1276,7 @@ class MorphologicalDetailInflections extends i0.Table
   @override
   List<i0.GeneratedColumn> get $columns => [
     form,
+    macronizedForm,
     item,
     cnt,
     partOfSpeech,
@@ -1279,6 +1311,15 @@ class MorphologicalDetailInflections extends i0.Table
       );
     } else if (isInserting) {
       context.missing(_formMeta);
+    }
+    if (data.containsKey('macronizedForm')) {
+      context.handle(
+        _macronizedFormMeta,
+        macronizedForm.isAcceptableOrUnknown(
+          data['macronizedForm']!,
+          _macronizedFormMeta,
+        ),
+      );
     }
     if (data.containsKey('item')) {
       context.handle(
@@ -1394,6 +1435,10 @@ class MorphologicalDetailInflections extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}form'],
       )!,
+      macronizedForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronizedForm'],
+      )!,
       item: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}item'],
@@ -1474,6 +1519,7 @@ class MorphologicalDetailInflections extends i0.Table
 class MorphologicalDetailInflection extends i0.DataClass
     implements i0.Insertable<i1.MorphologicalDetailInflection> {
   final String form;
+  final String macronizedForm;
   final int item;
   final int cnt;
   final String partOfSpeech;
@@ -1490,6 +1536,7 @@ class MorphologicalDetailInflection extends i0.DataClass
   final String? person;
   const MorphologicalDetailInflection({
     required this.form,
+    required this.macronizedForm,
     required this.item,
     required this.cnt,
     required this.partOfSpeech,
@@ -1593,6 +1640,7 @@ class MorphologicalDetailInflection extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return MorphologicalDetailInflection(
       form: serializer.fromJson<String>(json['form']),
+      macronizedForm: serializer.fromJson<String>(json['macronizedForm']),
       item: serializer.fromJson<int>(json['item']),
       cnt: serializer.fromJson<int>(json['cnt']),
       partOfSpeech: serializer.fromJson<String>(json['partOfSpeech']),
@@ -1614,6 +1662,7 @@ class MorphologicalDetailInflection extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'form': serializer.toJson<String>(form),
+      'macronizedForm': serializer.toJson<String>(macronizedForm),
       'item': serializer.toJson<int>(item),
       'cnt': serializer.toJson<int>(cnt),
       'partOfSpeech': serializer.toJson<String>(partOfSpeech),
@@ -1633,6 +1682,7 @@ class MorphologicalDetailInflection extends i0.DataClass
 
   i1.MorphologicalDetailInflection copyWith({
     String? form,
+    String? macronizedForm,
     int? item,
     int? cnt,
     String? partOfSpeech,
@@ -1649,6 +1699,7 @@ class MorphologicalDetailInflection extends i0.DataClass
     i0.Value<String?> person = const i0.Value.absent(),
   }) => i1.MorphologicalDetailInflection(
     form: form ?? this.form,
+    macronizedForm: macronizedForm ?? this.macronizedForm,
     item: item ?? this.item,
     cnt: cnt ?? this.cnt,
     partOfSpeech: partOfSpeech ?? this.partOfSpeech,
@@ -1664,38 +1715,11 @@ class MorphologicalDetailInflection extends i0.DataClass
     voice: voice.present ? voice.value : this.voice,
     person: person.present ? person.value : this.person,
   );
-  MorphologicalDetailInflection copyWithCompanion(
-    i1.MorphologicalDetailInflectionsCompanion data,
-  ) {
-    return MorphologicalDetailInflection(
-      form: data.form.present ? data.form.value : this.form,
-      item: data.item.present ? data.item.value : this.item,
-      cnt: data.cnt.present ? data.cnt.value : this.cnt,
-      partOfSpeech: data.partOfSpeech.present
-          ? data.partOfSpeech.value
-          : this.partOfSpeech,
-      stem: data.stem.present ? data.stem.value : this.stem,
-      suffix: data.suffix.present ? data.suffix.value : this.suffix,
-      segmentsInfo: data.segmentsInfo.present
-          ? data.segmentsInfo.value
-          : this.segmentsInfo,
-      gender: data.gender.present ? data.gender.value : this.gender,
-      number: data.number.present ? data.number.value : this.number,
-      declension: data.declension.present
-          ? data.declension.value
-          : this.declension,
-      gramCase: data.gramCase.present ? data.gramCase.value : this.gramCase,
-      verbForm: data.verbForm.present ? data.verbForm.value : this.verbForm,
-      tense: data.tense.present ? data.tense.value : this.tense,
-      voice: data.voice.present ? data.voice.value : this.voice,
-      person: data.person.present ? data.person.value : this.person,
-    );
-  }
-
   @override
   String toString() {
     return (StringBuffer('MorphologicalDetailInflection(')
           ..write('form: $form, ')
+          ..write('macronizedForm: $macronizedForm, ')
           ..write('item: $item, ')
           ..write('cnt: $cnt, ')
           ..write('partOfSpeech: $partOfSpeech, ')
@@ -1717,6 +1741,7 @@ class MorphologicalDetailInflection extends i0.DataClass
   @override
   int get hashCode => Object.hash(
     form,
+    macronizedForm,
     item,
     cnt,
     partOfSpeech,
@@ -1737,6 +1762,7 @@ class MorphologicalDetailInflection extends i0.DataClass
       identical(this, other) ||
       (other is i1.MorphologicalDetailInflection &&
           other.form == this.form &&
+          other.macronizedForm == this.macronizedForm &&
           other.item == this.item &&
           other.cnt == this.cnt &&
           other.partOfSpeech == this.partOfSpeech &&
@@ -2722,7 +2748,7 @@ class MorphologyAnalyses
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "morphology.Analyses" AS SELECT Infl.form, Infl.item, Infl.cnt, CONCAT("REPLACE"(Infl.stem, \'-\', \'\'), Infl.suffix) AS macronizedForm, MorphologicalDetails.dictionaryRef, Infl.partOfSpeech, Infl.stem, Infl.suffix, Infl.segmentsInfo, Infl.gender, Infl.number, Infl.declension, Infl.gramCase, Infl.verbForm, Infl.tense, Infl.voice, Infl.person, Peek.additional FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item INNER JOIN "morphology.Peek" AS Peek ON Infl.form = Peek.form AND Infl.item = Peek.item AND Infl.cnt = Peek.cnt',
+        'CREATE VIEW "morphology.Analyses" AS SELECT Infl.form, Infl.item, Infl.cnt, Infl.macronizedForm, MorphologicalDetails.dictionaryRef, Infl.partOfSpeech, Infl.stem, Infl.suffix, Infl.segmentsInfo, Infl.gender, Infl.number, Infl.declension, Infl.gramCase, Infl.verbForm, Infl.tense, Infl.voice, Infl.person, Peek.additional FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item INNER JOIN "morphology.Peek" AS Peek ON Infl.form = Peek.form AND Infl.item = Peek.item AND Infl.cnt = Peek.cnt',
   };
   @override
   MorphologyAnalyses get asDslTable => this;

@@ -664,6 +664,13 @@ typedef $WorkContentsCreateCompanionBuilder =
       required String word,
       required String sourceReference,
       i0.Value<int?> properNounState,
+      required int tokenType,
+      required int sentenceIdx,
+      i0.Value<int?> wordIdx,
+      i0.Value<String?> enclitic,
+      i0.Value<String?> expansion,
+      required String macronizedWord,
+      required int uncertaintyBitMask,
     });
 typedef $WorkContentsUpdateCompanionBuilder =
     i1.WorkContentsCompanion Function({
@@ -672,6 +679,13 @@ typedef $WorkContentsUpdateCompanionBuilder =
       i0.Value<String> word,
       i0.Value<String> sourceReference,
       i0.Value<int?> properNounState,
+      i0.Value<int> tokenType,
+      i0.Value<int> sentenceIdx,
+      i0.Value<int?> wordIdx,
+      i0.Value<String?> enclitic,
+      i0.Value<String?> expansion,
+      i0.Value<String> macronizedWord,
+      i0.Value<int> uncertaintyBitMask,
     });
 
 class $WorkContentsFilterComposer
@@ -705,6 +719,81 @@ class $WorkContentsFilterComposer
 
   i0.ColumnFilters<int> get properNounState => $composableBuilder(
     column: $table.properNounState,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get tokenType => $composableBuilder(
+    column: $table.tokenType,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get sentenceIdx => $composableBuilder(
+    column: $table.sentenceIdx,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get wordIdx => $composableBuilder(
+    column: $table.wordIdx,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get enclitic => $composableBuilder(
+    column: $table.enclitic,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get expansion => $composableBuilder(
+    column: $table.expansion,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get macronizedWord => $composableBuilder(
+    column: $table.macronizedWord,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get auxExpansionNoMacrons => $composableBuilder(
+    column: $table.auxExpansionNoMacrons,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get auxMacronBase => $composableBuilder(
+    column: $table.auxMacronBase,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get auxMacronWordLower => $composableBuilder(
+    column: $table.auxMacronWordLower,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get auxMacronBaseLower => $composableBuilder(
+    column: $table.auxMacronBaseLower,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get normForm => $composableBuilder(
+    column: $table.normForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get macronNormForm => $composableBuilder(
+    column: $table.macronNormForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get baseNormForm => $composableBuilder(
+    column: $table.baseNormForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get macronBaseNormForm => $composableBuilder(
+    column: $table.macronBaseNormForm,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -742,6 +831,81 @@ class $WorkContentsOrderingComposer
     column: $table.properNounState,
     builder: (column) => i0.ColumnOrderings(column),
   );
+
+  i0.ColumnOrderings<int> get tokenType => $composableBuilder(
+    column: $table.tokenType,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get sentenceIdx => $composableBuilder(
+    column: $table.sentenceIdx,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get wordIdx => $composableBuilder(
+    column: $table.wordIdx,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get enclitic => $composableBuilder(
+    column: $table.enclitic,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get expansion => $composableBuilder(
+    column: $table.expansion,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get macronizedWord => $composableBuilder(
+    column: $table.macronizedWord,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get auxExpansionNoMacrons => $composableBuilder(
+    column: $table.auxExpansionNoMacrons,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get auxMacronBase => $composableBuilder(
+    column: $table.auxMacronBase,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get auxMacronWordLower => $composableBuilder(
+    column: $table.auxMacronWordLower,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get auxMacronBaseLower => $composableBuilder(
+    column: $table.auxMacronBaseLower,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get normForm => $composableBuilder(
+    column: $table.normForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get macronNormForm => $composableBuilder(
+    column: $table.macronNormForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get baseNormForm => $composableBuilder(
+    column: $table.baseNormForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get macronBaseNormForm => $composableBuilder(
+    column: $table.macronBaseNormForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorkContentsAnnotationComposer
@@ -769,6 +933,71 @@ class $WorkContentsAnnotationComposer
 
   i0.GeneratedColumn<int> get properNounState => $composableBuilder(
     column: $table.properNounState,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<int> get tokenType =>
+      $composableBuilder(column: $table.tokenType, builder: (column) => column);
+
+  i0.GeneratedColumn<int> get sentenceIdx => $composableBuilder(
+    column: $table.sentenceIdx,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<int> get wordIdx =>
+      $composableBuilder(column: $table.wordIdx, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get enclitic =>
+      $composableBuilder(column: $table.enclitic, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get expansion =>
+      $composableBuilder(column: $table.expansion, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get macronizedWord => $composableBuilder(
+    column: $table.macronizedWord,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get auxExpansionNoMacrons => $composableBuilder(
+    column: $table.auxExpansionNoMacrons,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get auxMacronBase => $composableBuilder(
+    column: $table.auxMacronBase,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get auxMacronWordLower => $composableBuilder(
+    column: $table.auxMacronWordLower,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get auxMacronBaseLower => $composableBuilder(
+    column: $table.auxMacronBaseLower,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get normForm =>
+      $composableBuilder(column: $table.normForm, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get macronNormForm => $composableBuilder(
+    column: $table.macronNormForm,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get baseNormForm => $composableBuilder(
+    column: $table.baseNormForm,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get macronBaseNormForm => $composableBuilder(
+    column: $table.macronBaseNormForm,
     builder: (column) => column,
   );
 }
@@ -813,12 +1042,26 @@ class $WorkContentsTableManager
                 i0.Value<String> word = const i0.Value.absent(),
                 i0.Value<String> sourceReference = const i0.Value.absent(),
                 i0.Value<int?> properNounState = const i0.Value.absent(),
+                i0.Value<int> tokenType = const i0.Value.absent(),
+                i0.Value<int> sentenceIdx = const i0.Value.absent(),
+                i0.Value<int?> wordIdx = const i0.Value.absent(),
+                i0.Value<String?> enclitic = const i0.Value.absent(),
+                i0.Value<String?> expansion = const i0.Value.absent(),
+                i0.Value<String> macronizedWord = const i0.Value.absent(),
+                i0.Value<int> uncertaintyBitMask = const i0.Value.absent(),
               }) => i1.WorkContentsCompanion(
                 workId: workId,
                 idx: idx,
                 word: word,
                 sourceReference: sourceReference,
                 properNounState: properNounState,
+                tokenType: tokenType,
+                sentenceIdx: sentenceIdx,
+                wordIdx: wordIdx,
+                enclitic: enclitic,
+                expansion: expansion,
+                macronizedWord: macronizedWord,
+                uncertaintyBitMask: uncertaintyBitMask,
               ),
           createCompanionCallback:
               ({
@@ -827,12 +1070,26 @@ class $WorkContentsTableManager
                 required String word,
                 required String sourceReference,
                 i0.Value<int?> properNounState = const i0.Value.absent(),
+                required int tokenType,
+                required int sentenceIdx,
+                i0.Value<int?> wordIdx = const i0.Value.absent(),
+                i0.Value<String?> enclitic = const i0.Value.absent(),
+                i0.Value<String?> expansion = const i0.Value.absent(),
+                required String macronizedWord,
+                required int uncertaintyBitMask,
               }) => i1.WorkContentsCompanion.insert(
                 workId: workId,
                 idx: idx,
                 word: word,
                 sourceReference: sourceReference,
                 properNounState: properNounState,
+                tokenType: tokenType,
+                sentenceIdx: sentenceIdx,
+                wordIdx: wordIdx,
+                enclitic: enclitic,
+                expansion: expansion,
+                macronizedWord: macronizedWord,
+                uncertaintyBitMask: uncertaintyBitMask,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -1512,14 +1769,14 @@ typedef $UnambiguousMacronizationsProcessedTableManager =
 typedef $WorkMacronizationsCreateCompanionBuilder =
     i1.WorkMacronizationsCompanion Function({
       required String workId,
-      required int wordIdx,
+      required int idx,
       required String macronizedWord,
       required int uncertaintyBitMask,
     });
 typedef $WorkMacronizationsUpdateCompanionBuilder =
     i1.WorkMacronizationsCompanion Function({
       i0.Value<String> workId,
-      i0.Value<int> wordIdx,
+      i0.Value<int> idx,
       i0.Value<String> macronizedWord,
       i0.Value<int> uncertaintyBitMask,
     });
@@ -1538,8 +1795,8 @@ class $WorkMacronizationsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<int> get wordIdx => $composableBuilder(
-    column: $table.wordIdx,
+  i0.ColumnFilters<int> get idx => $composableBuilder(
+    column: $table.idx,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -1568,8 +1825,8 @@ class $WorkMacronizationsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
-  i0.ColumnOrderings<int> get wordIdx => $composableBuilder(
-    column: $table.wordIdx,
+  i0.ColumnOrderings<int> get idx => $composableBuilder(
+    column: $table.idx,
     builder: (column) => i0.ColumnOrderings(column),
   );
 
@@ -1596,8 +1853,8 @@ class $WorkMacronizationsAnnotationComposer
   i0.GeneratedColumn<String> get workId =>
       $composableBuilder(column: $table.workId, builder: (column) => column);
 
-  i0.GeneratedColumn<int> get wordIdx =>
-      $composableBuilder(column: $table.wordIdx, builder: (column) => column);
+  i0.GeneratedColumn<int> get idx =>
+      $composableBuilder(column: $table.idx, builder: (column) => column);
 
   i0.GeneratedColumn<String> get macronizedWord => $composableBuilder(
     column: $table.macronizedWord,
@@ -1648,24 +1905,24 @@ class $WorkMacronizationsTableManager
           updateCompanionCallback:
               ({
                 i0.Value<String> workId = const i0.Value.absent(),
-                i0.Value<int> wordIdx = const i0.Value.absent(),
+                i0.Value<int> idx = const i0.Value.absent(),
                 i0.Value<String> macronizedWord = const i0.Value.absent(),
                 i0.Value<int> uncertaintyBitMask = const i0.Value.absent(),
               }) => i1.WorkMacronizationsCompanion(
                 workId: workId,
-                wordIdx: wordIdx,
+                idx: idx,
                 macronizedWord: macronizedWord,
                 uncertaintyBitMask: uncertaintyBitMask,
               ),
           createCompanionCallback:
               ({
                 required String workId,
-                required int wordIdx,
+                required int idx,
                 required String macronizedWord,
                 required int uncertaintyBitMask,
               }) => i1.WorkMacronizationsCompanion.insert(
                 workId: workId,
-                wordIdx: wordIdx,
+                idx: idx,
                 macronizedWord: macronizedWord,
                 uncertaintyBitMask: uncertaintyBitMask,
               ),
@@ -1696,183 +1953,6 @@ typedef $WorkMacronizationsProcessedTableManager =
         >,
       ),
       i1.WorkMacronization,
-      i0.PrefetchHooks Function()
-    >;
-typedef $UserProvidedMacronizationsCreateCompanionBuilder =
-    i1.UserProvidedMacronizationsCompanion Function({
-      required String workId,
-      required int idx,
-      required String macronizedWord,
-    });
-typedef $UserProvidedMacronizationsUpdateCompanionBuilder =
-    i1.UserProvidedMacronizationsCompanion Function({
-      i0.Value<String> workId,
-      i0.Value<int> idx,
-      i0.Value<String> macronizedWord,
-    });
-
-class $UserProvidedMacronizationsFilterComposer
-    extends i0.Composer<i0.GeneratedDatabase, i1.UserProvidedMacronizations> {
-  $UserProvidedMacronizationsFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  i0.ColumnFilters<String> get workId => $composableBuilder(
-    column: $table.workId,
-    builder: (column) => i0.ColumnFilters(column),
-  );
-
-  i0.ColumnFilters<int> get idx => $composableBuilder(
-    column: $table.idx,
-    builder: (column) => i0.ColumnFilters(column),
-  );
-
-  i0.ColumnFilters<String> get macronizedWord => $composableBuilder(
-    column: $table.macronizedWord,
-    builder: (column) => i0.ColumnFilters(column),
-  );
-}
-
-class $UserProvidedMacronizationsOrderingComposer
-    extends i0.Composer<i0.GeneratedDatabase, i1.UserProvidedMacronizations> {
-  $UserProvidedMacronizationsOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  i0.ColumnOrderings<String> get workId => $composableBuilder(
-    column: $table.workId,
-    builder: (column) => i0.ColumnOrderings(column),
-  );
-
-  i0.ColumnOrderings<int> get idx => $composableBuilder(
-    column: $table.idx,
-    builder: (column) => i0.ColumnOrderings(column),
-  );
-
-  i0.ColumnOrderings<String> get macronizedWord => $composableBuilder(
-    column: $table.macronizedWord,
-    builder: (column) => i0.ColumnOrderings(column),
-  );
-}
-
-class $UserProvidedMacronizationsAnnotationComposer
-    extends i0.Composer<i0.GeneratedDatabase, i1.UserProvidedMacronizations> {
-  $UserProvidedMacronizationsAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  i0.GeneratedColumn<String> get workId =>
-      $composableBuilder(column: $table.workId, builder: (column) => column);
-
-  i0.GeneratedColumn<int> get idx =>
-      $composableBuilder(column: $table.idx, builder: (column) => column);
-
-  i0.GeneratedColumn<String> get macronizedWord => $composableBuilder(
-    column: $table.macronizedWord,
-    builder: (column) => column,
-  );
-}
-
-class $UserProvidedMacronizationsTableManager
-    extends
-        i0.RootTableManager<
-          i0.GeneratedDatabase,
-          i1.UserProvidedMacronizations,
-          i1.UserProvidedMacronization,
-          i1.$UserProvidedMacronizationsFilterComposer,
-          i1.$UserProvidedMacronizationsOrderingComposer,
-          i1.$UserProvidedMacronizationsAnnotationComposer,
-          $UserProvidedMacronizationsCreateCompanionBuilder,
-          $UserProvidedMacronizationsUpdateCompanionBuilder,
-          (
-            i1.UserProvidedMacronization,
-            i0.BaseReferences<
-              i0.GeneratedDatabase,
-              i1.UserProvidedMacronizations,
-              i1.UserProvidedMacronization
-            >,
-          ),
-          i1.UserProvidedMacronization,
-          i0.PrefetchHooks Function()
-        > {
-  $UserProvidedMacronizationsTableManager(
-    i0.GeneratedDatabase db,
-    i1.UserProvidedMacronizations table,
-  ) : super(
-        i0.TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              i1.$UserProvidedMacronizationsFilterComposer(
-                $db: db,
-                $table: table,
-              ),
-          createOrderingComposer: () =>
-              i1.$UserProvidedMacronizationsOrderingComposer(
-                $db: db,
-                $table: table,
-              ),
-          createComputedFieldComposer: () =>
-              i1.$UserProvidedMacronizationsAnnotationComposer(
-                $db: db,
-                $table: table,
-              ),
-          updateCompanionCallback:
-              ({
-                i0.Value<String> workId = const i0.Value.absent(),
-                i0.Value<int> idx = const i0.Value.absent(),
-                i0.Value<String> macronizedWord = const i0.Value.absent(),
-              }) => i1.UserProvidedMacronizationsCompanion(
-                workId: workId,
-                idx: idx,
-                macronizedWord: macronizedWord,
-              ),
-          createCompanionCallback:
-              ({
-                required String workId,
-                required int idx,
-                required String macronizedWord,
-              }) => i1.UserProvidedMacronizationsCompanion.insert(
-                workId: workId,
-                idx: idx,
-                macronizedWord: macronizedWord,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ),
-      );
-}
-
-typedef $UserProvidedMacronizationsProcessedTableManager =
-    i0.ProcessedTableManager<
-      i0.GeneratedDatabase,
-      i1.UserProvidedMacronizations,
-      i1.UserProvidedMacronization,
-      i1.$UserProvidedMacronizationsFilterComposer,
-      i1.$UserProvidedMacronizationsOrderingComposer,
-      i1.$UserProvidedMacronizationsAnnotationComposer,
-      $UserProvidedMacronizationsCreateCompanionBuilder,
-      $UserProvidedMacronizationsUpdateCompanionBuilder,
-      (
-        i1.UserProvidedMacronization,
-        i0.BaseReferences<
-          i0.GeneratedDatabase,
-          i1.UserProvidedMacronizations,
-          i1.UserProvidedMacronization
-        >,
-      ),
-      i1.UserProvidedMacronization,
       i0.PrefetchHooks Function()
     >;
 typedef $AuthorsAndWorksCreateCompanionBuilder =
@@ -3169,6 +3249,227 @@ class WorkContents extends i0.Table
     requiredDuringInsert: false,
     $customConstraints: 'CHECK (properNounState IN (0, 1, 2))',
   );
+  static const i0.VerificationMeta _tokenTypeMeta = const i0.VerificationMeta(
+    'tokenType',
+  );
+  late final i0.GeneratedColumn<int> tokenType = i0.GeneratedColumn<int>(
+    'tokenType',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (tokenType BETWEEN 1 AND 6)',
+  );
+  static const i0.VerificationMeta _sentenceIdxMeta = const i0.VerificationMeta(
+    'sentenceIdx',
+  );
+  late final i0.GeneratedColumn<int> sentenceIdx = i0.GeneratedColumn<int>(
+    'sentenceIdx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _wordIdxMeta = const i0.VerificationMeta(
+    'wordIdx',
+  );
+  late final i0.GeneratedColumn<int> wordIdx = i0.GeneratedColumn<int>(
+    'wordIdx',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const i0.VerificationMeta _encliticMeta = const i0.VerificationMeta(
+    'enclitic',
+  );
+  late final i0.GeneratedColumn<String> enclitic = i0.GeneratedColumn<String>(
+    'enclitic',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const i0.VerificationMeta _expansionMeta = const i0.VerificationMeta(
+    'expansion',
+  );
+  late final i0.GeneratedColumn<String> expansion = i0.GeneratedColumn<String>(
+    'expansion',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const i0.VerificationMeta _macronizedWordMeta =
+      const i0.VerificationMeta('macronizedWord');
+  late final i0.GeneratedColumn<String> macronizedWord =
+      i0.GeneratedColumn<String>(
+        'macronizedWord',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
+  static const i0.VerificationMeta _uncertaintyBitMaskMeta =
+      const i0.VerificationMeta('uncertaintyBitMask');
+  late final i0.GeneratedColumn<int> uncertaintyBitMask =
+      i0.GeneratedColumn<int>(
+        'uncertaintyBitMask',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.int,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
+  static const i0.VerificationMeta _auxExpansionNoMacronsMeta =
+      const i0.VerificationMeta('auxExpansionNoMacrons');
+  late final i0.GeneratedColumn<String>
+  auxExpansionNoMacrons = i0.GeneratedColumn<String>(
+    'aux_expansionNoMacrons',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        '"REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(expansion, \'ā\', \'a\'), \'ē\', \'e\'), \'ī\', \'i\'), \'ō\', \'o\'), \'ū\', \'u\'), \'ȳ\', \'y\'), \'Ā\', \'A\'), \'Ē\', \'E\'), \'Ī\', \'I\'), \'Ō\', \'O\'), \'Ū\', \'U\'), \'Ȳ\', \'Y\')',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS ("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(expansion, \'ā\', \'a\'), \'ē\', \'e\'), \'ī\', \'i\'), \'ō\', \'o\'), \'ū\', \'u\'), \'ȳ\', \'y\'), \'Ā\', \'A\'), \'Ē\', \'E\'), \'Ī\', \'I\'), \'Ō\', \'O\'), \'Ū\', \'U\'), \'Ȳ\', \'Y\')) VIRTUAL',
+  );
+  static const i0.VerificationMeta _auxMacronBaseMeta =
+      const i0.VerificationMeta('auxMacronBase');
+  late final i0.GeneratedColumn<String>
+  auxMacronBase = i0.GeneratedColumn<String>(
+    'aux_macronBase',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        'COALESCE(expansion, CASE WHEN enclitic IS NOT NULL THEN SUBSTR(macronizedWord, 1, LENGTH(macronizedWord) - LENGTH(enclitic)) ELSE macronizedWord END)',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS (COALESCE(expansion, CASE WHEN enclitic IS NOT NULL THEN SUBSTR(macronizedWord, 1, LENGTH(macronizedWord) - LENGTH(enclitic)) ELSE macronizedWord END)) VIRTUAL',
+  );
+  static const i0.VerificationMeta _auxMacronWordLowerMeta =
+      const i0.VerificationMeta('auxMacronWordLower');
+  late final i0.GeneratedColumn<String>
+  auxMacronWordLower = i0.GeneratedColumn<String>(
+    'aux_macronWordLower',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        '"REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(LOWER(macronizedWord), \'Ā\', \'ā\'), \'Ē\', \'ē\'), \'Ī\', \'ī\'), \'Ō\', \'ō\'), \'Ū\', \'ū\'), \'Ȳ\', \'ȳ\')',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS ("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(LOWER(macronizedWord), \'Ā\', \'ā\'), \'Ē\', \'ē\'), \'Ī\', \'ī\'), \'Ō\', \'ō\'), \'Ū\', \'ū\'), \'Ȳ\', \'ȳ\')) VIRTUAL',
+  );
+  static const i0.VerificationMeta _auxMacronBaseLowerMeta =
+      const i0.VerificationMeta('auxMacronBaseLower');
+  late final i0.GeneratedColumn<String>
+  auxMacronBaseLower = i0.GeneratedColumn<String>(
+    'aux_macronBaseLower',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        '"REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(LOWER(aux_macronBase), \'Ā\', \'ā\'), \'Ē\', \'ē\'), \'Ī\', \'ī\'), \'Ō\', \'ō\'), \'Ū\', \'ū\'), \'Ȳ\', \'ȳ\')',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS ("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(LOWER(aux_macronBase), \'Ā\', \'ā\'), \'Ē\', \'ē\'), \'Ī\', \'ī\'), \'Ō\', \'ō\'), \'Ū\', \'ū\'), \'Ȳ\', \'ȳ\')) VIRTUAL',
+  );
+  static const i0.VerificationMeta _normFormMeta = const i0.VerificationMeta(
+    'normForm',
+  );
+  late final i0.GeneratedColumn<String> normForm = i0.GeneratedColumn<String>(
+    'normForm',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        'CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2)) ELSE LOWER(word) END',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS (CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2)) ELSE LOWER(word) END) VIRTUAL',
+  );
+  static const i0.VerificationMeta _macronNormFormMeta =
+      const i0.VerificationMeta('macronNormForm');
+  late final i0.GeneratedColumn<String>
+  macronNormForm = i0.GeneratedColumn<String>(
+    'macronNormForm',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        'CASE WHEN properNounState IN (1, 2) THEN CASE SUBSTR(macronizedWord, 1, 1) WHEN \'ā\' THEN \'Ā\' WHEN \'ē\' THEN \'Ē\' WHEN \'ī\' THEN \'Ī\' WHEN \'ō\' THEN \'Ō\' WHEN \'ū\' THEN \'Ū\' WHEN \'ȳ\' THEN \'Ȳ\' ELSE UPPER(SUBSTR(macronizedWord, 1, 1)) END || SUBSTR(aux_macronWordLower, 2) ELSE aux_macronWordLower END',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS (CASE WHEN properNounState IN (1, 2) THEN CASE SUBSTR(macronizedWord, 1, 1) WHEN \'ā\' THEN \'Ā\' WHEN \'ē\' THEN \'Ē\' WHEN \'ī\' THEN \'Ī\' WHEN \'ō\' THEN \'Ō\' WHEN \'ū\' THEN \'Ū\' WHEN \'ȳ\' THEN \'Ȳ\' ELSE UPPER(SUBSTR(macronizedWord, 1, 1)) END || SUBSTR(aux_macronWordLower, 2) ELSE aux_macronWordLower END) VIRTUAL',
+  );
+  static const i0.VerificationMeta _baseNormFormMeta =
+      const i0.VerificationMeta('baseNormForm');
+  late final i0.GeneratedColumn<String>
+  baseNormForm = i0.GeneratedColumn<String>(
+    'baseNormForm',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        'CASE WHEN aux_expansionNoMacrons IS NOT NULL THEN CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(aux_expansionNoMacrons, 1, 1)) || LOWER(SUBSTR(aux_expansionNoMacrons, 2)) ELSE LOWER(aux_expansionNoMacrons) END WHEN enclitic IS NOT NULL THEN CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2, LENGTH(word) - LENGTH(enclitic) - 1)) ELSE LOWER(SUBSTR(word, 1, LENGTH(word) - LENGTH(enclitic))) END ELSE CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2)) ELSE LOWER(word) END END',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS (CASE WHEN aux_expansionNoMacrons IS NOT NULL THEN CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(aux_expansionNoMacrons, 1, 1)) || LOWER(SUBSTR(aux_expansionNoMacrons, 2)) ELSE LOWER(aux_expansionNoMacrons) END WHEN enclitic IS NOT NULL THEN CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2, LENGTH(word) - LENGTH(enclitic) - 1)) ELSE LOWER(SUBSTR(word, 1, LENGTH(word) - LENGTH(enclitic))) END ELSE CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2)) ELSE LOWER(word) END END) VIRTUAL',
+  );
+  static const i0.VerificationMeta _macronBaseNormFormMeta =
+      const i0.VerificationMeta('macronBaseNormForm');
+  late final i0.GeneratedColumn<String>
+  macronBaseNormForm = i0.GeneratedColumn<String>(
+    'macronBaseNormForm',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        'CASE WHEN properNounState IN (1, 2) THEN CASE SUBSTR(aux_macronBase, 1, 1) WHEN \'ā\' THEN \'Ā\' WHEN \'ē\' THEN \'Ē\' WHEN \'ī\' THEN \'Ī\' WHEN \'ō\' THEN \'Ō\' WHEN \'ū\' THEN \'Ū\' WHEN \'ȳ\' THEN \'Ȳ\' ELSE UPPER(SUBSTR(aux_macronBase, 1, 1)) END || SUBSTR(aux_macronBaseLower, 2) ELSE aux_macronBaseLower END',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS (CASE WHEN properNounState IN (1, 2) THEN CASE SUBSTR(aux_macronBase, 1, 1) WHEN \'ā\' THEN \'Ā\' WHEN \'ē\' THEN \'Ē\' WHEN \'ī\' THEN \'Ī\' WHEN \'ō\' THEN \'Ō\' WHEN \'ū\' THEN \'Ū\' WHEN \'ȳ\' THEN \'Ȳ\' ELSE UPPER(SUBSTR(aux_macronBase, 1, 1)) END || SUBSTR(aux_macronBaseLower, 2) ELSE aux_macronBaseLower END) VIRTUAL',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [
     workId,
@@ -3176,6 +3477,21 @@ class WorkContents extends i0.Table
     word,
     sourceReference,
     properNounState,
+    tokenType,
+    sentenceIdx,
+    wordIdx,
+    enclitic,
+    expansion,
+    macronizedWord,
+    uncertaintyBitMask,
+    auxExpansionNoMacrons,
+    auxMacronBase,
+    auxMacronWordLower,
+    auxMacronBaseLower,
+    normForm,
+    macronNormForm,
+    baseNormForm,
+    macronBaseNormForm,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3233,6 +3549,134 @@ class WorkContents extends i0.Table
         ),
       );
     }
+    if (data.containsKey('tokenType')) {
+      context.handle(
+        _tokenTypeMeta,
+        tokenType.isAcceptableOrUnknown(data['tokenType']!, _tokenTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tokenTypeMeta);
+    }
+    if (data.containsKey('sentenceIdx')) {
+      context.handle(
+        _sentenceIdxMeta,
+        sentenceIdx.isAcceptableOrUnknown(
+          data['sentenceIdx']!,
+          _sentenceIdxMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sentenceIdxMeta);
+    }
+    if (data.containsKey('wordIdx')) {
+      context.handle(
+        _wordIdxMeta,
+        wordIdx.isAcceptableOrUnknown(data['wordIdx']!, _wordIdxMeta),
+      );
+    }
+    if (data.containsKey('enclitic')) {
+      context.handle(
+        _encliticMeta,
+        enclitic.isAcceptableOrUnknown(data['enclitic']!, _encliticMeta),
+      );
+    }
+    if (data.containsKey('expansion')) {
+      context.handle(
+        _expansionMeta,
+        expansion.isAcceptableOrUnknown(data['expansion']!, _expansionMeta),
+      );
+    }
+    if (data.containsKey('macronizedWord')) {
+      context.handle(
+        _macronizedWordMeta,
+        macronizedWord.isAcceptableOrUnknown(
+          data['macronizedWord']!,
+          _macronizedWordMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_macronizedWordMeta);
+    }
+    if (data.containsKey('uncertaintyBitMask')) {
+      context.handle(
+        _uncertaintyBitMaskMeta,
+        uncertaintyBitMask.isAcceptableOrUnknown(
+          data['uncertaintyBitMask']!,
+          _uncertaintyBitMaskMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_uncertaintyBitMaskMeta);
+    }
+    if (data.containsKey('aux_expansionNoMacrons')) {
+      context.handle(
+        _auxExpansionNoMacronsMeta,
+        auxExpansionNoMacrons.isAcceptableOrUnknown(
+          data['aux_expansionNoMacrons']!,
+          _auxExpansionNoMacronsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('aux_macronBase')) {
+      context.handle(
+        _auxMacronBaseMeta,
+        auxMacronBase.isAcceptableOrUnknown(
+          data['aux_macronBase']!,
+          _auxMacronBaseMeta,
+        ),
+      );
+    }
+    if (data.containsKey('aux_macronWordLower')) {
+      context.handle(
+        _auxMacronWordLowerMeta,
+        auxMacronWordLower.isAcceptableOrUnknown(
+          data['aux_macronWordLower']!,
+          _auxMacronWordLowerMeta,
+        ),
+      );
+    }
+    if (data.containsKey('aux_macronBaseLower')) {
+      context.handle(
+        _auxMacronBaseLowerMeta,
+        auxMacronBaseLower.isAcceptableOrUnknown(
+          data['aux_macronBaseLower']!,
+          _auxMacronBaseLowerMeta,
+        ),
+      );
+    }
+    if (data.containsKey('normForm')) {
+      context.handle(
+        _normFormMeta,
+        normForm.isAcceptableOrUnknown(data['normForm']!, _normFormMeta),
+      );
+    }
+    if (data.containsKey('macronNormForm')) {
+      context.handle(
+        _macronNormFormMeta,
+        macronNormForm.isAcceptableOrUnknown(
+          data['macronNormForm']!,
+          _macronNormFormMeta,
+        ),
+      );
+    }
+    if (data.containsKey('baseNormForm')) {
+      context.handle(
+        _baseNormFormMeta,
+        baseNormForm.isAcceptableOrUnknown(
+          data['baseNormForm']!,
+          _baseNormFormMeta,
+        ),
+      );
+    }
+    if (data.containsKey('macronBaseNormForm')) {
+      context.handle(
+        _macronBaseNormFormMeta,
+        macronBaseNormForm.isAcceptableOrUnknown(
+          data['macronBaseNormForm']!,
+          _macronBaseNormFormMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3262,6 +3706,66 @@ class WorkContents extends i0.Table
         i0.DriftSqlType.int,
         data['${effectivePrefix}properNounState'],
       ),
+      tokenType: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}tokenType'],
+      )!,
+      sentenceIdx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}sentenceIdx'],
+      )!,
+      wordIdx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}wordIdx'],
+      ),
+      enclitic: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}enclitic'],
+      ),
+      expansion: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}expansion'],
+      ),
+      macronizedWord: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronizedWord'],
+      )!,
+      uncertaintyBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}uncertaintyBitMask'],
+      )!,
+      auxExpansionNoMacrons: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}aux_expansionNoMacrons'],
+      ),
+      auxMacronBase: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}aux_macronBase'],
+      ),
+      auxMacronWordLower: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}aux_macronWordLower'],
+      ),
+      auxMacronBaseLower: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}aux_macronBaseLower'],
+      ),
+      normForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}normForm'],
+      ),
+      macronNormForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronNormForm'],
+      ),
+      baseNormForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}baseNormForm'],
+      ),
+      macronBaseNormForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronBaseNormForm'],
+      ),
     );
   }
 
@@ -3278,6 +3782,8 @@ class WorkContents extends i0.Table
   List<String> get customConstraints => const [
     'PRIMARY KEY(workId, idx)',
     'FOREIGN KEY(workId)REFERENCES Works(id)',
+    'CHECK((wordIdx IS NULL)=(tokenType >= 4))',
+    'CHECK(expansion IS NULL OR enclitic IS NULL)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -3290,12 +3796,52 @@ class WorkContent extends i0.DataClass
   final String word;
   final String sourceReference;
   final int? properNounState;
+
+  ///NULL = unknown, 0 = no, 1 = yes, 2 = either/both
+  final int tokenType;
+
+  /// 1 word, 2 abbrev, 3 roman numeral, 4 punct, 5 editorial, 6 other
+  final int sentenceIdx;
+  final int? wordIdx;
+
+  /// Increments only for tokenType <= 3
+  final String? enclitic;
+  final String? expansion;
+  final String macronizedWord;
+  final int uncertaintyBitMask;
+
+  /// aux (internal use only)
+  final String? auxExpansionNoMacrons;
+  final String? auxMacronBase;
+  final String? auxMacronWordLower;
+  final String? auxMacronBaseLower;
+
+  /// 2×2 grid
+  final String? normForm;
+  final String? macronNormForm;
+  final String? baseNormForm;
+  final String? macronBaseNormForm;
   const WorkContent({
     required this.workId,
     required this.idx,
     required this.word,
     required this.sourceReference,
     this.properNounState,
+    required this.tokenType,
+    required this.sentenceIdx,
+    this.wordIdx,
+    this.enclitic,
+    this.expansion,
+    required this.macronizedWord,
+    required this.uncertaintyBitMask,
+    this.auxExpansionNoMacrons,
+    this.auxMacronBase,
+    this.auxMacronWordLower,
+    this.auxMacronBaseLower,
+    this.normForm,
+    this.macronNormForm,
+    this.baseNormForm,
+    this.macronBaseNormForm,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -3307,6 +3853,19 @@ class WorkContent extends i0.DataClass
     if (!nullToAbsent || properNounState != null) {
       map['properNounState'] = i0.Variable<int>(properNounState);
     }
+    map['tokenType'] = i0.Variable<int>(tokenType);
+    map['sentenceIdx'] = i0.Variable<int>(sentenceIdx);
+    if (!nullToAbsent || wordIdx != null) {
+      map['wordIdx'] = i0.Variable<int>(wordIdx);
+    }
+    if (!nullToAbsent || enclitic != null) {
+      map['enclitic'] = i0.Variable<String>(enclitic);
+    }
+    if (!nullToAbsent || expansion != null) {
+      map['expansion'] = i0.Variable<String>(expansion);
+    }
+    map['macronizedWord'] = i0.Variable<String>(macronizedWord);
+    map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
     return map;
   }
 
@@ -3319,6 +3878,19 @@ class WorkContent extends i0.DataClass
       properNounState: properNounState == null && nullToAbsent
           ? const i0.Value.absent()
           : i0.Value(properNounState),
+      tokenType: i0.Value(tokenType),
+      sentenceIdx: i0.Value(sentenceIdx),
+      wordIdx: wordIdx == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(wordIdx),
+      enclitic: enclitic == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(enclitic),
+      expansion: expansion == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(expansion),
+      macronizedWord: i0.Value(macronizedWord),
+      uncertaintyBitMask: i0.Value(uncertaintyBitMask),
     );
   }
 
@@ -3333,6 +3905,29 @@ class WorkContent extends i0.DataClass
       word: serializer.fromJson<String>(json['word']),
       sourceReference: serializer.fromJson<String>(json['sourceReference']),
       properNounState: serializer.fromJson<int?>(json['properNounState']),
+      tokenType: serializer.fromJson<int>(json['tokenType']),
+      sentenceIdx: serializer.fromJson<int>(json['sentenceIdx']),
+      wordIdx: serializer.fromJson<int?>(json['wordIdx']),
+      enclitic: serializer.fromJson<String?>(json['enclitic']),
+      expansion: serializer.fromJson<String?>(json['expansion']),
+      macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
+      uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
+      auxExpansionNoMacrons: serializer.fromJson<String?>(
+        json['aux_expansionNoMacrons'],
+      ),
+      auxMacronBase: serializer.fromJson<String?>(json['aux_macronBase']),
+      auxMacronWordLower: serializer.fromJson<String?>(
+        json['aux_macronWordLower'],
+      ),
+      auxMacronBaseLower: serializer.fromJson<String?>(
+        json['aux_macronBaseLower'],
+      ),
+      normForm: serializer.fromJson<String?>(json['normForm']),
+      macronNormForm: serializer.fromJson<String?>(json['macronNormForm']),
+      baseNormForm: serializer.fromJson<String?>(json['baseNormForm']),
+      macronBaseNormForm: serializer.fromJson<String?>(
+        json['macronBaseNormForm'],
+      ),
     );
   }
   @override
@@ -3344,6 +3939,23 @@ class WorkContent extends i0.DataClass
       'word': serializer.toJson<String>(word),
       'sourceReference': serializer.toJson<String>(sourceReference),
       'properNounState': serializer.toJson<int?>(properNounState),
+      'tokenType': serializer.toJson<int>(tokenType),
+      'sentenceIdx': serializer.toJson<int>(sentenceIdx),
+      'wordIdx': serializer.toJson<int?>(wordIdx),
+      'enclitic': serializer.toJson<String?>(enclitic),
+      'expansion': serializer.toJson<String?>(expansion),
+      'macronizedWord': serializer.toJson<String>(macronizedWord),
+      'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
+      'aux_expansionNoMacrons': serializer.toJson<String?>(
+        auxExpansionNoMacrons,
+      ),
+      'aux_macronBase': serializer.toJson<String?>(auxMacronBase),
+      'aux_macronWordLower': serializer.toJson<String?>(auxMacronWordLower),
+      'aux_macronBaseLower': serializer.toJson<String?>(auxMacronBaseLower),
+      'normForm': serializer.toJson<String?>(normForm),
+      'macronNormForm': serializer.toJson<String?>(macronNormForm),
+      'baseNormForm': serializer.toJson<String?>(baseNormForm),
+      'macronBaseNormForm': serializer.toJson<String?>(macronBaseNormForm),
     };
   }
 
@@ -3353,6 +3965,21 @@ class WorkContent extends i0.DataClass
     String? word,
     String? sourceReference,
     i0.Value<int?> properNounState = const i0.Value.absent(),
+    int? tokenType,
+    int? sentenceIdx,
+    i0.Value<int?> wordIdx = const i0.Value.absent(),
+    i0.Value<String?> enclitic = const i0.Value.absent(),
+    i0.Value<String?> expansion = const i0.Value.absent(),
+    String? macronizedWord,
+    int? uncertaintyBitMask,
+    i0.Value<String?> auxExpansionNoMacrons = const i0.Value.absent(),
+    i0.Value<String?> auxMacronBase = const i0.Value.absent(),
+    i0.Value<String?> auxMacronWordLower = const i0.Value.absent(),
+    i0.Value<String?> auxMacronBaseLower = const i0.Value.absent(),
+    i0.Value<String?> normForm = const i0.Value.absent(),
+    i0.Value<String?> macronNormForm = const i0.Value.absent(),
+    i0.Value<String?> baseNormForm = const i0.Value.absent(),
+    i0.Value<String?> macronBaseNormForm = const i0.Value.absent(),
   }) => i1.WorkContent(
     workId: workId ?? this.workId,
     idx: idx ?? this.idx,
@@ -3361,21 +3988,34 @@ class WorkContent extends i0.DataClass
     properNounState: properNounState.present
         ? properNounState.value
         : this.properNounState,
+    tokenType: tokenType ?? this.tokenType,
+    sentenceIdx: sentenceIdx ?? this.sentenceIdx,
+    wordIdx: wordIdx.present ? wordIdx.value : this.wordIdx,
+    enclitic: enclitic.present ? enclitic.value : this.enclitic,
+    expansion: expansion.present ? expansion.value : this.expansion,
+    macronizedWord: macronizedWord ?? this.macronizedWord,
+    uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
+    auxExpansionNoMacrons: auxExpansionNoMacrons.present
+        ? auxExpansionNoMacrons.value
+        : this.auxExpansionNoMacrons,
+    auxMacronBase: auxMacronBase.present
+        ? auxMacronBase.value
+        : this.auxMacronBase,
+    auxMacronWordLower: auxMacronWordLower.present
+        ? auxMacronWordLower.value
+        : this.auxMacronWordLower,
+    auxMacronBaseLower: auxMacronBaseLower.present
+        ? auxMacronBaseLower.value
+        : this.auxMacronBaseLower,
+    normForm: normForm.present ? normForm.value : this.normForm,
+    macronNormForm: macronNormForm.present
+        ? macronNormForm.value
+        : this.macronNormForm,
+    baseNormForm: baseNormForm.present ? baseNormForm.value : this.baseNormForm,
+    macronBaseNormForm: macronBaseNormForm.present
+        ? macronBaseNormForm.value
+        : this.macronBaseNormForm,
   );
-  WorkContent copyWithCompanion(i1.WorkContentsCompanion data) {
-    return WorkContent(
-      workId: data.workId.present ? data.workId.value : this.workId,
-      idx: data.idx.present ? data.idx.value : this.idx,
-      word: data.word.present ? data.word.value : this.word,
-      sourceReference: data.sourceReference.present
-          ? data.sourceReference.value
-          : this.sourceReference,
-      properNounState: data.properNounState.present
-          ? data.properNounState.value
-          : this.properNounState,
-    );
-  }
-
   @override
   String toString() {
     return (StringBuffer('WorkContent(')
@@ -3383,14 +4023,49 @@ class WorkContent extends i0.DataClass
           ..write('idx: $idx, ')
           ..write('word: $word, ')
           ..write('sourceReference: $sourceReference, ')
-          ..write('properNounState: $properNounState')
+          ..write('properNounState: $properNounState, ')
+          ..write('tokenType: $tokenType, ')
+          ..write('sentenceIdx: $sentenceIdx, ')
+          ..write('wordIdx: $wordIdx, ')
+          ..write('enclitic: $enclitic, ')
+          ..write('expansion: $expansion, ')
+          ..write('macronizedWord: $macronizedWord, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
+          ..write('auxExpansionNoMacrons: $auxExpansionNoMacrons, ')
+          ..write('auxMacronBase: $auxMacronBase, ')
+          ..write('auxMacronWordLower: $auxMacronWordLower, ')
+          ..write('auxMacronBaseLower: $auxMacronBaseLower, ')
+          ..write('normForm: $normForm, ')
+          ..write('macronNormForm: $macronNormForm, ')
+          ..write('baseNormForm: $baseNormForm, ')
+          ..write('macronBaseNormForm: $macronBaseNormForm')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(workId, idx, word, sourceReference, properNounState);
+  int get hashCode => Object.hash(
+    workId,
+    idx,
+    word,
+    sourceReference,
+    properNounState,
+    tokenType,
+    sentenceIdx,
+    wordIdx,
+    enclitic,
+    expansion,
+    macronizedWord,
+    uncertaintyBitMask,
+    auxExpansionNoMacrons,
+    auxMacronBase,
+    auxMacronWordLower,
+    auxMacronBaseLower,
+    normForm,
+    macronNormForm,
+    baseNormForm,
+    macronBaseNormForm,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3399,7 +4074,22 @@ class WorkContent extends i0.DataClass
           other.idx == this.idx &&
           other.word == this.word &&
           other.sourceReference == this.sourceReference &&
-          other.properNounState == this.properNounState);
+          other.properNounState == this.properNounState &&
+          other.tokenType == this.tokenType &&
+          other.sentenceIdx == this.sentenceIdx &&
+          other.wordIdx == this.wordIdx &&
+          other.enclitic == this.enclitic &&
+          other.expansion == this.expansion &&
+          other.macronizedWord == this.macronizedWord &&
+          other.uncertaintyBitMask == this.uncertaintyBitMask &&
+          other.auxExpansionNoMacrons == this.auxExpansionNoMacrons &&
+          other.auxMacronBase == this.auxMacronBase &&
+          other.auxMacronWordLower == this.auxMacronWordLower &&
+          other.auxMacronBaseLower == this.auxMacronBaseLower &&
+          other.normForm == this.normForm &&
+          other.macronNormForm == this.macronNormForm &&
+          other.baseNormForm == this.baseNormForm &&
+          other.macronBaseNormForm == this.macronBaseNormForm);
 }
 
 class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
@@ -3408,12 +4098,26 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
   final i0.Value<String> word;
   final i0.Value<String> sourceReference;
   final i0.Value<int?> properNounState;
+  final i0.Value<int> tokenType;
+  final i0.Value<int> sentenceIdx;
+  final i0.Value<int?> wordIdx;
+  final i0.Value<String?> enclitic;
+  final i0.Value<String?> expansion;
+  final i0.Value<String> macronizedWord;
+  final i0.Value<int> uncertaintyBitMask;
   const WorkContentsCompanion({
     this.workId = const i0.Value.absent(),
     this.idx = const i0.Value.absent(),
     this.word = const i0.Value.absent(),
     this.sourceReference = const i0.Value.absent(),
     this.properNounState = const i0.Value.absent(),
+    this.tokenType = const i0.Value.absent(),
+    this.sentenceIdx = const i0.Value.absent(),
+    this.wordIdx = const i0.Value.absent(),
+    this.enclitic = const i0.Value.absent(),
+    this.expansion = const i0.Value.absent(),
+    this.macronizedWord = const i0.Value.absent(),
+    this.uncertaintyBitMask = const i0.Value.absent(),
   });
   WorkContentsCompanion.insert({
     required String workId,
@@ -3421,16 +4125,34 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     required String word,
     required String sourceReference,
     this.properNounState = const i0.Value.absent(),
+    required int tokenType,
+    required int sentenceIdx,
+    this.wordIdx = const i0.Value.absent(),
+    this.enclitic = const i0.Value.absent(),
+    this.expansion = const i0.Value.absent(),
+    required String macronizedWord,
+    required int uncertaintyBitMask,
   }) : workId = i0.Value(workId),
        idx = i0.Value(idx),
        word = i0.Value(word),
-       sourceReference = i0.Value(sourceReference);
+       sourceReference = i0.Value(sourceReference),
+       tokenType = i0.Value(tokenType),
+       sentenceIdx = i0.Value(sentenceIdx),
+       macronizedWord = i0.Value(macronizedWord),
+       uncertaintyBitMask = i0.Value(uncertaintyBitMask);
   static i0.Insertable<i1.WorkContent> custom({
     i0.Expression<String>? workId,
     i0.Expression<int>? idx,
     i0.Expression<String>? word,
     i0.Expression<String>? sourceReference,
     i0.Expression<int>? properNounState,
+    i0.Expression<int>? tokenType,
+    i0.Expression<int>? sentenceIdx,
+    i0.Expression<int>? wordIdx,
+    i0.Expression<String>? enclitic,
+    i0.Expression<String>? expansion,
+    i0.Expression<String>? macronizedWord,
+    i0.Expression<int>? uncertaintyBitMask,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
@@ -3438,6 +4160,13 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
       if (word != null) 'word': word,
       if (sourceReference != null) 'sourceReference': sourceReference,
       if (properNounState != null) 'properNounState': properNounState,
+      if (tokenType != null) 'tokenType': tokenType,
+      if (sentenceIdx != null) 'sentenceIdx': sentenceIdx,
+      if (wordIdx != null) 'wordIdx': wordIdx,
+      if (enclitic != null) 'enclitic': enclitic,
+      if (expansion != null) 'expansion': expansion,
+      if (macronizedWord != null) 'macronizedWord': macronizedWord,
+      if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
     });
   }
 
@@ -3447,6 +4176,13 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     i0.Value<String>? word,
     i0.Value<String>? sourceReference,
     i0.Value<int?>? properNounState,
+    i0.Value<int>? tokenType,
+    i0.Value<int>? sentenceIdx,
+    i0.Value<int?>? wordIdx,
+    i0.Value<String?>? enclitic,
+    i0.Value<String?>? expansion,
+    i0.Value<String>? macronizedWord,
+    i0.Value<int>? uncertaintyBitMask,
   }) {
     return i1.WorkContentsCompanion(
       workId: workId ?? this.workId,
@@ -3454,6 +4190,13 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
       word: word ?? this.word,
       sourceReference: sourceReference ?? this.sourceReference,
       properNounState: properNounState ?? this.properNounState,
+      tokenType: tokenType ?? this.tokenType,
+      sentenceIdx: sentenceIdx ?? this.sentenceIdx,
+      wordIdx: wordIdx ?? this.wordIdx,
+      enclitic: enclitic ?? this.enclitic,
+      expansion: expansion ?? this.expansion,
+      macronizedWord: macronizedWord ?? this.macronizedWord,
+      uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     );
   }
 
@@ -3475,6 +4218,27 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     if (properNounState.present) {
       map['properNounState'] = i0.Variable<int>(properNounState.value);
     }
+    if (tokenType.present) {
+      map['tokenType'] = i0.Variable<int>(tokenType.value);
+    }
+    if (sentenceIdx.present) {
+      map['sentenceIdx'] = i0.Variable<int>(sentenceIdx.value);
+    }
+    if (wordIdx.present) {
+      map['wordIdx'] = i0.Variable<int>(wordIdx.value);
+    }
+    if (enclitic.present) {
+      map['enclitic'] = i0.Variable<String>(enclitic.value);
+    }
+    if (expansion.present) {
+      map['expansion'] = i0.Variable<String>(expansion.value);
+    }
+    if (macronizedWord.present) {
+      map['macronizedWord'] = i0.Variable<String>(macronizedWord.value);
+    }
+    if (uncertaintyBitMask.present) {
+      map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask.value);
+    }
     return map;
   }
 
@@ -3485,11 +4249,27 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
           ..write('idx: $idx, ')
           ..write('word: $word, ')
           ..write('sourceReference: $sourceReference, ')
-          ..write('properNounState: $properNounState')
+          ..write('properNounState: $properNounState, ')
+          ..write('tokenType: $tokenType, ')
+          ..write('sentenceIdx: $sentenceIdx, ')
+          ..write('wordIdx: $wordIdx, ')
+          ..write('enclitic: $enclitic, ')
+          ..write('expansion: $expansion, ')
+          ..write('macronizedWord: $macronizedWord, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask')
           ..write(')'))
         .toString();
   }
 }
+
+i0.Index get workContentsBaseNormForm => i0.Index(
+  'WorkContents_BaseNormForm',
+  'CREATE INDEX WorkContents_BaseNormForm ON WorkContents (baseNormForm)',
+);
+i0.Index get workContentsWordPosition => i0.Index(
+  'WorkContents_WordPosition',
+  'CREATE INDEX WorkContents_WordPosition ON WorkContents (workId, sentenceIdx, wordIdx)',
+);
 
 class WorkContentSubdivisions extends i0.Table
     with i0.TableInfo<WorkContentSubdivisions, i1.WorkContentSubdivision> {
@@ -3740,8 +4520,6 @@ class WorkContentSubdivision extends i0.DataClass
   final String workId;
   final String node;
   final String typ;
-
-  ///add more as needed
   final int cnt;
   final String name;
   final String? parent;
@@ -4688,11 +5466,9 @@ class WorkMacronizations extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
-  static const i0.VerificationMeta _wordIdxMeta = const i0.VerificationMeta(
-    'wordIdx',
-  );
-  late final i0.GeneratedColumn<int> wordIdx = i0.GeneratedColumn<int>(
-    'wordIdx',
+  static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
+    'idx',
     aliasedName,
     false,
     type: i0.DriftSqlType.int,
@@ -4724,7 +5500,7 @@ class WorkMacronizations extends i0.Table
   @override
   List<i0.GeneratedColumn> get $columns => [
     workId,
-    wordIdx,
+    idx,
     macronizedWord,
     uncertaintyBitMask,
   ];
@@ -4736,323 +5512,6 @@ class WorkMacronizations extends i0.Table
   @override
   i0.VerificationContext validateIntegrity(
     i0.Insertable<i1.WorkMacronization> instance, {
-    bool isInserting = false,
-  }) {
-    final context = i0.VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('workId')) {
-      context.handle(
-        _workIdMeta,
-        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_workIdMeta);
-    }
-    if (data.containsKey('wordIdx')) {
-      context.handle(
-        _wordIdxMeta,
-        wordIdx.isAcceptableOrUnknown(data['wordIdx']!, _wordIdxMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_wordIdxMeta);
-    }
-    if (data.containsKey('macronizedWord')) {
-      context.handle(
-        _macronizedWordMeta,
-        macronizedWord.isAcceptableOrUnknown(
-          data['macronizedWord']!,
-          _macronizedWordMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_macronizedWordMeta);
-    }
-    if (data.containsKey('uncertaintyBitMask')) {
-      context.handle(
-        _uncertaintyBitMaskMeta,
-        uncertaintyBitMask.isAcceptableOrUnknown(
-          data['uncertaintyBitMask']!,
-          _uncertaintyBitMaskMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_uncertaintyBitMaskMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<i0.GeneratedColumn> get $primaryKey => {workId, wordIdx};
-  @override
-  i1.WorkMacronization map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return i1.WorkMacronization(
-      workId: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}workId'],
-      )!,
-      wordIdx: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.int,
-        data['${effectivePrefix}wordIdx'],
-      )!,
-      macronizedWord: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}macronizedWord'],
-      )!,
-      uncertaintyBitMask: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.int,
-        data['${effectivePrefix}uncertaintyBitMask'],
-      )!,
-    );
-  }
-
-  @override
-  WorkMacronizations createAlias(String alias) {
-    return WorkMacronizations(attachedDatabase, alias);
-  }
-
-  @override
-  bool get withoutRowId => true;
-  @override
-  bool get isStrict => true;
-  @override
-  List<String> get customConstraints => const [
-    'PRIMARY KEY(workId, wordIdx)',
-    'FOREIGN KEY(workId, wordIdx)REFERENCES WorkContents(workId, idx)',
-  ];
-  @override
-  bool get dontWriteConstraints => true;
-}
-
-class WorkMacronization extends i0.DataClass
-    implements i0.Insertable<i1.WorkMacronization> {
-  final String workId;
-  final int wordIdx;
-  final String macronizedWord;
-  final int uncertaintyBitMask;
-  const WorkMacronization({
-    required this.workId,
-    required this.wordIdx,
-    required this.macronizedWord,
-    required this.uncertaintyBitMask,
-  });
-  @override
-  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
-    final map = <String, i0.Expression>{};
-    map['workId'] = i0.Variable<String>(workId);
-    map['wordIdx'] = i0.Variable<int>(wordIdx);
-    map['macronizedWord'] = i0.Variable<String>(macronizedWord);
-    map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
-    return map;
-  }
-
-  i1.WorkMacronizationsCompanion toCompanion(bool nullToAbsent) {
-    return i1.WorkMacronizationsCompanion(
-      workId: i0.Value(workId),
-      wordIdx: i0.Value(wordIdx),
-      macronizedWord: i0.Value(macronizedWord),
-      uncertaintyBitMask: i0.Value(uncertaintyBitMask),
-    );
-  }
-
-  factory WorkMacronization.fromJson(
-    Map<String, dynamic> json, {
-    i0.ValueSerializer? serializer,
-  }) {
-    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return WorkMacronization(
-      workId: serializer.fromJson<String>(json['workId']),
-      wordIdx: serializer.fromJson<int>(json['wordIdx']),
-      macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
-      uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
-    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'workId': serializer.toJson<String>(workId),
-      'wordIdx': serializer.toJson<int>(wordIdx),
-      'macronizedWord': serializer.toJson<String>(macronizedWord),
-      'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
-    };
-  }
-
-  i1.WorkMacronization copyWith({
-    String? workId,
-    int? wordIdx,
-    String? macronizedWord,
-    int? uncertaintyBitMask,
-  }) => i1.WorkMacronization(
-    workId: workId ?? this.workId,
-    wordIdx: wordIdx ?? this.wordIdx,
-    macronizedWord: macronizedWord ?? this.macronizedWord,
-    uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
-  );
-  WorkMacronization copyWithCompanion(i1.WorkMacronizationsCompanion data) {
-    return WorkMacronization(
-      workId: data.workId.present ? data.workId.value : this.workId,
-      wordIdx: data.wordIdx.present ? data.wordIdx.value : this.wordIdx,
-      macronizedWord: data.macronizedWord.present
-          ? data.macronizedWord.value
-          : this.macronizedWord,
-      uncertaintyBitMask: data.uncertaintyBitMask.present
-          ? data.uncertaintyBitMask.value
-          : this.uncertaintyBitMask,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('WorkMacronization(')
-          ..write('workId: $workId, ')
-          ..write('wordIdx: $wordIdx, ')
-          ..write('macronizedWord: $macronizedWord, ')
-          ..write('uncertaintyBitMask: $uncertaintyBitMask')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(workId, wordIdx, macronizedWord, uncertaintyBitMask);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is i1.WorkMacronization &&
-          other.workId == this.workId &&
-          other.wordIdx == this.wordIdx &&
-          other.macronizedWord == this.macronizedWord &&
-          other.uncertaintyBitMask == this.uncertaintyBitMask);
-}
-
-class WorkMacronizationsCompanion
-    extends i0.UpdateCompanion<i1.WorkMacronization> {
-  final i0.Value<String> workId;
-  final i0.Value<int> wordIdx;
-  final i0.Value<String> macronizedWord;
-  final i0.Value<int> uncertaintyBitMask;
-  const WorkMacronizationsCompanion({
-    this.workId = const i0.Value.absent(),
-    this.wordIdx = const i0.Value.absent(),
-    this.macronizedWord = const i0.Value.absent(),
-    this.uncertaintyBitMask = const i0.Value.absent(),
-  });
-  WorkMacronizationsCompanion.insert({
-    required String workId,
-    required int wordIdx,
-    required String macronizedWord,
-    required int uncertaintyBitMask,
-  }) : workId = i0.Value(workId),
-       wordIdx = i0.Value(wordIdx),
-       macronizedWord = i0.Value(macronizedWord),
-       uncertaintyBitMask = i0.Value(uncertaintyBitMask);
-  static i0.Insertable<i1.WorkMacronization> custom({
-    i0.Expression<String>? workId,
-    i0.Expression<int>? wordIdx,
-    i0.Expression<String>? macronizedWord,
-    i0.Expression<int>? uncertaintyBitMask,
-  }) {
-    return i0.RawValuesInsertable({
-      if (workId != null) 'workId': workId,
-      if (wordIdx != null) 'wordIdx': wordIdx,
-      if (macronizedWord != null) 'macronizedWord': macronizedWord,
-      if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
-    });
-  }
-
-  i1.WorkMacronizationsCompanion copyWith({
-    i0.Value<String>? workId,
-    i0.Value<int>? wordIdx,
-    i0.Value<String>? macronizedWord,
-    i0.Value<int>? uncertaintyBitMask,
-  }) {
-    return i1.WorkMacronizationsCompanion(
-      workId: workId ?? this.workId,
-      wordIdx: wordIdx ?? this.wordIdx,
-      macronizedWord: macronizedWord ?? this.macronizedWord,
-      uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
-    );
-  }
-
-  @override
-  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
-    final map = <String, i0.Expression>{};
-    if (workId.present) {
-      map['workId'] = i0.Variable<String>(workId.value);
-    }
-    if (wordIdx.present) {
-      map['wordIdx'] = i0.Variable<int>(wordIdx.value);
-    }
-    if (macronizedWord.present) {
-      map['macronizedWord'] = i0.Variable<String>(macronizedWord.value);
-    }
-    if (uncertaintyBitMask.present) {
-      map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('WorkMacronizationsCompanion(')
-          ..write('workId: $workId, ')
-          ..write('wordIdx: $wordIdx, ')
-          ..write('macronizedWord: $macronizedWord, ')
-          ..write('uncertaintyBitMask: $uncertaintyBitMask')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class UserProvidedMacronizations extends i0.Table
-    with
-        i0.TableInfo<UserProvidedMacronizations, i1.UserProvidedMacronization> {
-  @override
-  final i0.GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  UserProvidedMacronizations(this.attachedDatabase, [this._alias]);
-  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
-    'workId',
-  );
-  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-    'workId',
-    aliasedName,
-    false,
-    type: i0.DriftSqlType.string,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
-  );
-  static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
-  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
-    'idx',
-    aliasedName,
-    false,
-    type: i0.DriftSqlType.int,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
-  );
-  static const i0.VerificationMeta _macronizedWordMeta =
-      const i0.VerificationMeta('macronizedWord');
-  late final i0.GeneratedColumn<String> macronizedWord =
-      i0.GeneratedColumn<String>(
-        'macronizedWord',
-        aliasedName,
-        false,
-        type: i0.DriftSqlType.string,
-        requiredDuringInsert: true,
-        $customConstraints: 'NOT NULL',
-      );
-  @override
-  List<i0.GeneratedColumn> get $columns => [workId, idx, macronizedWord];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'UserProvidedMacronizations';
-  @override
-  i0.VerificationContext validateIntegrity(
-    i0.Insertable<i1.UserProvidedMacronization> instance, {
     bool isInserting = false,
   }) {
     final context = i0.VerificationContext();
@@ -5084,18 +5543,26 @@ class UserProvidedMacronizations extends i0.Table
     } else if (isInserting) {
       context.missing(_macronizedWordMeta);
     }
+    if (data.containsKey('uncertaintyBitMask')) {
+      context.handle(
+        _uncertaintyBitMaskMeta,
+        uncertaintyBitMask.isAcceptableOrUnknown(
+          data['uncertaintyBitMask']!,
+          _uncertaintyBitMaskMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_uncertaintyBitMaskMeta);
+    }
     return context;
   }
 
   @override
   Set<i0.GeneratedColumn> get $primaryKey => {workId, idx};
   @override
-  i1.UserProvidedMacronization map(
-    Map<String, dynamic> data, {
-    String? tablePrefix,
-  }) {
+  i1.WorkMacronization map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return i1.UserProvidedMacronization(
+    return i1.WorkMacronization(
       workId: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}workId'],
@@ -5108,12 +5575,16 @@ class UserProvidedMacronizations extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}macronizedWord'],
       )!,
+      uncertaintyBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}uncertaintyBitMask'],
+      )!,
     );
   }
 
   @override
-  UserProvidedMacronizations createAlias(String alias) {
-    return UserProvidedMacronizations(attachedDatabase, alias);
+  WorkMacronizations createAlias(String alias) {
+    return WorkMacronizations(attachedDatabase, alias);
   }
 
   @override
@@ -5129,15 +5600,17 @@ class UserProvidedMacronizations extends i0.Table
   bool get dontWriteConstraints => true;
 }
 
-class UserProvidedMacronization extends i0.DataClass
-    implements i0.Insertable<i1.UserProvidedMacronization> {
+class WorkMacronization extends i0.DataClass
+    implements i0.Insertable<i1.WorkMacronization> {
   final String workId;
   final int idx;
   final String macronizedWord;
-  const UserProvidedMacronization({
+  final int uncertaintyBitMask;
+  const WorkMacronization({
     required this.workId,
     required this.idx,
     required this.macronizedWord,
+    required this.uncertaintyBitMask,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -5145,26 +5618,29 @@ class UserProvidedMacronization extends i0.DataClass
     map['workId'] = i0.Variable<String>(workId);
     map['idx'] = i0.Variable<int>(idx);
     map['macronizedWord'] = i0.Variable<String>(macronizedWord);
+    map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
     return map;
   }
 
-  i1.UserProvidedMacronizationsCompanion toCompanion(bool nullToAbsent) {
-    return i1.UserProvidedMacronizationsCompanion(
+  i1.WorkMacronizationsCompanion toCompanion(bool nullToAbsent) {
+    return i1.WorkMacronizationsCompanion(
       workId: i0.Value(workId),
       idx: i0.Value(idx),
       macronizedWord: i0.Value(macronizedWord),
+      uncertaintyBitMask: i0.Value(uncertaintyBitMask),
     );
   }
 
-  factory UserProvidedMacronization.fromJson(
+  factory WorkMacronization.fromJson(
     Map<String, dynamic> json, {
     i0.ValueSerializer? serializer,
   }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return UserProvidedMacronization(
+    return WorkMacronization(
       workId: serializer.fromJson<String>(json['workId']),
       idx: serializer.fromJson<int>(json['idx']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
+      uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
     );
   }
   @override
@@ -5174,89 +5650,104 @@ class UserProvidedMacronization extends i0.DataClass
       'workId': serializer.toJson<String>(workId),
       'idx': serializer.toJson<int>(idx),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
+      'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
     };
   }
 
-  i1.UserProvidedMacronization copyWith({
+  i1.WorkMacronization copyWith({
     String? workId,
     int? idx,
     String? macronizedWord,
-  }) => i1.UserProvidedMacronization(
+    int? uncertaintyBitMask,
+  }) => i1.WorkMacronization(
     workId: workId ?? this.workId,
     idx: idx ?? this.idx,
     macronizedWord: macronizedWord ?? this.macronizedWord,
+    uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
   );
-  UserProvidedMacronization copyWithCompanion(
-    i1.UserProvidedMacronizationsCompanion data,
-  ) {
-    return UserProvidedMacronization(
+  WorkMacronization copyWithCompanion(i1.WorkMacronizationsCompanion data) {
+    return WorkMacronization(
       workId: data.workId.present ? data.workId.value : this.workId,
       idx: data.idx.present ? data.idx.value : this.idx,
       macronizedWord: data.macronizedWord.present
           ? data.macronizedWord.value
           : this.macronizedWord,
+      uncertaintyBitMask: data.uncertaintyBitMask.present
+          ? data.uncertaintyBitMask.value
+          : this.uncertaintyBitMask,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('UserProvidedMacronization(')
+    return (StringBuffer('WorkMacronization(')
           ..write('workId: $workId, ')
           ..write('idx: $idx, ')
-          ..write('macronizedWord: $macronizedWord')
+          ..write('macronizedWord: $macronizedWord, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(workId, idx, macronizedWord);
+  int get hashCode =>
+      Object.hash(workId, idx, macronizedWord, uncertaintyBitMask);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is i1.UserProvidedMacronization &&
+      (other is i1.WorkMacronization &&
           other.workId == this.workId &&
           other.idx == this.idx &&
-          other.macronizedWord == this.macronizedWord);
+          other.macronizedWord == this.macronizedWord &&
+          other.uncertaintyBitMask == this.uncertaintyBitMask);
 }
 
-class UserProvidedMacronizationsCompanion
-    extends i0.UpdateCompanion<i1.UserProvidedMacronization> {
+class WorkMacronizationsCompanion
+    extends i0.UpdateCompanion<i1.WorkMacronization> {
   final i0.Value<String> workId;
   final i0.Value<int> idx;
   final i0.Value<String> macronizedWord;
-  const UserProvidedMacronizationsCompanion({
+  final i0.Value<int> uncertaintyBitMask;
+  const WorkMacronizationsCompanion({
     this.workId = const i0.Value.absent(),
     this.idx = const i0.Value.absent(),
     this.macronizedWord = const i0.Value.absent(),
+    this.uncertaintyBitMask = const i0.Value.absent(),
   });
-  UserProvidedMacronizationsCompanion.insert({
+  WorkMacronizationsCompanion.insert({
     required String workId,
     required int idx,
     required String macronizedWord,
+    required int uncertaintyBitMask,
   }) : workId = i0.Value(workId),
        idx = i0.Value(idx),
-       macronizedWord = i0.Value(macronizedWord);
-  static i0.Insertable<i1.UserProvidedMacronization> custom({
+       macronizedWord = i0.Value(macronizedWord),
+       uncertaintyBitMask = i0.Value(uncertaintyBitMask);
+  static i0.Insertable<i1.WorkMacronization> custom({
     i0.Expression<String>? workId,
     i0.Expression<int>? idx,
     i0.Expression<String>? macronizedWord,
+    i0.Expression<int>? uncertaintyBitMask,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
       if (idx != null) 'idx': idx,
       if (macronizedWord != null) 'macronizedWord': macronizedWord,
+      if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
     });
   }
 
-  i1.UserProvidedMacronizationsCompanion copyWith({
+  i1.WorkMacronizationsCompanion copyWith({
     i0.Value<String>? workId,
     i0.Value<int>? idx,
     i0.Value<String>? macronizedWord,
+    i0.Value<int>? uncertaintyBitMask,
   }) {
-    return i1.UserProvidedMacronizationsCompanion(
+    return i1.WorkMacronizationsCompanion(
       workId: workId ?? this.workId,
       idx: idx ?? this.idx,
       macronizedWord: macronizedWord ?? this.macronizedWord,
+      uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     );
   }
 
@@ -5272,15 +5763,19 @@ class UserProvidedMacronizationsCompanion
     if (macronizedWord.present) {
       map['macronizedWord'] = i0.Variable<String>(macronizedWord.value);
     }
+    if (uncertaintyBitMask.present) {
+      map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask.value);
+    }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('UserProvidedMacronizationsCompanion(')
+    return (StringBuffer('WorkMacronizationsCompanion(')
           ..write('workId: $workId, ')
           ..write('idx: $idx, ')
-          ..write('macronizedWord: $macronizedWord')
+          ..write('macronizedWord: $macronizedWord, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask')
           ..write(')'))
         .toString();
   }
@@ -5507,7 +6002,176 @@ class AuthorsAndWorksCompanion extends i0.UpdateCompanion<i1.AuthorsAndWork> {
   }
 }
 
-class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
+class LibraryStagingResolvedMacronization extends i0.DataClass {
+  final String workId;
+  final int idx;
+  final int? uncertaintyBitMask;
+  final String finalMacronizedWord;
+  const LibraryStagingResolvedMacronization({
+    required this.workId,
+    required this.idx,
+    this.uncertaintyBitMask,
+    required this.finalMacronizedWord,
+  });
+  factory LibraryStagingResolvedMacronization.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return LibraryStagingResolvedMacronization(
+      workId: serializer.fromJson<String>(json['workId']),
+      idx: serializer.fromJson<int>(json['idx']),
+      uncertaintyBitMask: serializer.fromJson<int?>(json['uncertaintyBitMask']),
+      finalMacronizedWord: serializer.fromJson<String>(
+        json['finalMacronizedWord'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'idx': serializer.toJson<int>(idx),
+      'uncertaintyBitMask': serializer.toJson<int?>(uncertaintyBitMask),
+      'finalMacronizedWord': serializer.toJson<String>(finalMacronizedWord),
+    };
+  }
+
+  i1.LibraryStagingResolvedMacronization copyWith({
+    String? workId,
+    int? idx,
+    i0.Value<int?> uncertaintyBitMask = const i0.Value.absent(),
+    String? finalMacronizedWord,
+  }) => i1.LibraryStagingResolvedMacronization(
+    workId: workId ?? this.workId,
+    idx: idx ?? this.idx,
+    uncertaintyBitMask: uncertaintyBitMask.present
+        ? uncertaintyBitMask.value
+        : this.uncertaintyBitMask,
+    finalMacronizedWord: finalMacronizedWord ?? this.finalMacronizedWord,
+  );
+  @override
+  String toString() {
+    return (StringBuffer('LibraryStagingResolvedMacronization(')
+          ..write('workId: $workId, ')
+          ..write('idx: $idx, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
+          ..write('finalMacronizedWord: $finalMacronizedWord')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(workId, idx, uncertaintyBitMask, finalMacronizedWord);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.LibraryStagingResolvedMacronization &&
+          other.workId == this.workId &&
+          other.idx == this.idx &&
+          other.uncertaintyBitMask == this.uncertaintyBitMask &&
+          other.finalMacronizedWord == this.finalMacronizedWord);
+}
+
+class LibraryStagingResolvedMacronizations
+    extends
+        i0.ViewInfo<
+          i1.LibraryStagingResolvedMacronizations,
+          i1.LibraryStagingResolvedMacronization
+        >
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  LibraryStagingResolvedMacronizations(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    idx,
+    uncertaintyBitMask,
+    finalMacronizedWord,
+  ];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'library.staging.ResolvedMacronizations';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.staging.ResolvedMacronizations" AS WITH RawResolution AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.tokenType, COALESCE(WorkMacronizations.macronizedWord, ExactMatches.macronizedWord, LowerCaseMatches.macronizedWord, WorkContents.word) AS rawMacron, CASE WHEN WorkMacronizations.macronizedWord IS NOT NULL THEN WorkMacronizations.uncertaintyBitMask WHEN ExactMatches.macronizedWord IS NOT NULL OR LowerCaseMatches.macronizedWord IS NOT NULL THEN 0 ELSE -1 END AS finalMask FROM WorkContents LEFT JOIN WorkMacronizations ON WorkContents.workId = WorkMacronizations.workId AND WorkContents.idx = WorkMacronizations.idx LEFT JOIN UnambiguousMacronizations AS ExactMatches ON(WorkContents.properNounState IN (1, 2) OR WorkContents.properNounState IS NULL)AND WorkContents.word = ExactMatches.word LEFT JOIN UnambiguousMacronizations AS LowerCaseMatches ON(WorkContents.properNounState IN (0, 2) OR WorkContents.properNounState IS NULL)AND LOWER(WorkContents.word) = LowerCaseMatches.word), Lowered AS (SELECT *, "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(LOWER(rawMacron), \'Ā\', \'ā\'), \'Ē\', \'ē\'), \'Ī\', \'ī\'), \'Ō\', \'ō\'), \'Ū\', \'ū\'), \'Ȳ\', \'ȳ\') AS lowerCaseMacron FROM RawResolution) SELECT workId, idx, finalMask AS uncertaintyBitMask, CASE WHEN word = UPPER(word) AND LENGTH(word) > 1 THEN "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(UPPER(lowerCaseMacron), \'ā\', \'Ā\'), \'ē\', \'Ē\'), \'ī\', \'Ī\'), \'ō\', \'Ō\'), \'ū\', \'Ū\'), \'ȳ\', \'Ȳ\') WHEN SUBSTR(word, 1, 1) = UPPER(SUBSTR(word, 1, 1)) AND SUBSTR(word, 1, 1) <> LOWER(SUBSTR(word, 1, 1)) THEN(CASE SUBSTR(lowerCaseMacron, 1, 1) WHEN \'ā\' THEN \'Ā\' WHEN \'ē\' THEN \'Ē\' WHEN \'ī\' THEN \'Ī\' WHEN \'ō\' THEN \'Ō\' WHEN \'ū\' THEN \'Ū\' WHEN \'ȳ\' THEN \'Ȳ\' ELSE UPPER(SUBSTR(lowerCaseMacron, 1, 1)) END)|| SUBSTR(lowerCaseMacron, 2) WHEN word = LOWER(word) THEN lowerCaseMacron ELSE rawMacron END AS finalMacronizedWord FROM Lowered',
+  };
+  @override
+  LibraryStagingResolvedMacronizations get asDslTable => this;
+  @override
+  i1.LibraryStagingResolvedMacronization map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.LibraryStagingResolvedMacronization(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      uncertaintyBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}uncertaintyBitMask'],
+      ),
+      finalMacronizedWord: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}finalMacronizedWord'],
+      )!,
+    );
+  }
+
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  late final i0.GeneratedColumn<int> uncertaintyBitMask =
+      i0.GeneratedColumn<int>(
+        'uncertaintyBitMask',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.int,
+      );
+  late final i0.GeneratedColumn<String> finalMacronizedWord =
+      i0.GeneratedColumn<String>(
+        'finalMacronizedWord',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
+  @override
+  LibraryStagingResolvedMacronizations createAlias(String alias) {
+    return LibraryStagingResolvedMacronizations(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {
+    'WorkContents',
+    'WorkMacronizations',
+    'UnambiguousMacronizations',
+  };
+}
+
+class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
   final String workId;
   final String node;
   final String typ;
@@ -5517,7 +6181,7 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
   final int fromIndex;
   final int toIndex;
   final int depth;
-  const WorkContentSubdivisionsHierarchyData({
+  const LibraryWorkContentSubdivisionsHierarchyData({
     required this.workId,
     required this.node,
     required this.typ,
@@ -5528,12 +6192,12 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
     required this.toIndex,
     required this.depth,
   });
-  factory WorkContentSubdivisionsHierarchyData.fromJson(
+  factory LibraryWorkContentSubdivisionsHierarchyData.fromJson(
     Map<String, dynamic> json, {
     i0.ValueSerializer? serializer,
   }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return WorkContentSubdivisionsHierarchyData(
+    return LibraryWorkContentSubdivisionsHierarchyData(
       workId: serializer.fromJson<String>(json['workId']),
       node: serializer.fromJson<String>(json['node']),
       typ: serializer.fromJson<String>(json['typ']),
@@ -5561,7 +6225,7 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
     };
   }
 
-  i1.WorkContentSubdivisionsHierarchyData copyWith({
+  i1.LibraryWorkContentSubdivisionsHierarchyData copyWith({
     String? workId,
     String? node,
     String? typ,
@@ -5571,7 +6235,7 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
     int? fromIndex,
     int? toIndex,
     int? depth,
-  }) => i1.WorkContentSubdivisionsHierarchyData(
+  }) => i1.LibraryWorkContentSubdivisionsHierarchyData(
     workId: workId ?? this.workId,
     node: node ?? this.node,
     typ: typ ?? this.typ,
@@ -5584,7 +6248,7 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
   );
   @override
   String toString() {
-    return (StringBuffer('WorkContentSubdivisionsHierarchyData(')
+    return (StringBuffer('LibraryWorkContentSubdivisionsHierarchyData(')
           ..write('workId: $workId, ')
           ..write('node: $node, ')
           ..write('typ: $typ, ')
@@ -5613,7 +6277,7 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is i1.WorkContentSubdivisionsHierarchyData &&
+      (other is i1.LibraryWorkContentSubdivisionsHierarchyData &&
           other.workId == this.workId &&
           other.node == this.node &&
           other.typ == this.typ &&
@@ -5625,17 +6289,17 @@ class WorkContentSubdivisionsHierarchyData extends i0.DataClass {
           other.depth == this.depth);
 }
 
-class WorkContentSubdivisionsHierarchy
+class LibraryWorkContentSubdivisionsHierarchy
     extends
         i0.ViewInfo<
-          i1.WorkContentSubdivisionsHierarchy,
-          i1.WorkContentSubdivisionsHierarchyData
+          i1.LibraryWorkContentSubdivisionsHierarchy,
+          i1.LibraryWorkContentSubdivisionsHierarchyData
         >
     implements i0.HasResultSet {
   final String? _alias;
   @override
   final i0.GeneratedDatabase attachedDatabase;
-  WorkContentSubdivisionsHierarchy(this.attachedDatabase, [this._alias]);
+  LibraryWorkContentSubdivisionsHierarchy(this.attachedDatabase, [this._alias]);
   @override
   List<i0.GeneratedColumn> get $columns => [
     workId,
@@ -5651,21 +6315,21 @@ class WorkContentSubdivisionsHierarchy
   @override
   String get aliasedName => _alias ?? entityName;
   @override
-  String get entityName => 'WorkContentSubdivisionsHierarchy';
+  String get entityName => 'library.WorkContentSubdivisionsHierarchy';
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW WorkContentSubdivisionsHierarchy AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1 FROM WorkContentSubdivisions AS s INNER JOIN Subsets ON s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
+        'CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1 FROM WorkContentSubdivisions AS s INNER JOIN Subsets ON s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
   };
   @override
-  WorkContentSubdivisionsHierarchy get asDslTable => this;
+  LibraryWorkContentSubdivisionsHierarchy get asDslTable => this;
   @override
-  i1.WorkContentSubdivisionsHierarchyData map(
+  i1.LibraryWorkContentSubdivisionsHierarchyData map(
     Map<String, dynamic> data, {
     String? tablePrefix,
   }) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return i1.WorkContentSubdivisionsHierarchyData(
+    return i1.LibraryWorkContentSubdivisionsHierarchyData(
       workId: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}workId'],
@@ -5760,8 +6424,8 @@ class WorkContentSubdivisionsHierarchy
     type: i0.DriftSqlType.int,
   );
   @override
-  WorkContentSubdivisionsHierarchy createAlias(String alias) {
-    return WorkContentSubdivisionsHierarchy(attachedDatabase, alias);
+  LibraryWorkContentSubdivisionsHierarchy createAlias(String alias) {
+    return LibraryWorkContentSubdivisionsHierarchy(attachedDatabase, alias);
   }
 
   @override
@@ -6070,7 +6734,7 @@ class LibraryAuthorDetails
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.AuthorDetails" AS WITH Aux AS (SELECT Authors.id, Authors.name, Authors.about, Authors.image, AuthorsAndWorks.workId, Works.name AS workName FROM Authors INNER JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId INNER JOIN Works ON AuthorsAndWorks.workId = Works.id), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.workId = WorkContents.workId WHERE WorkContents.word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords FROM Aux INNER JOIN WorksContents ON Aux.workId = WorksContents.workId',
+        'CREATE VIEW "library.AuthorDetails" AS WITH Aux AS (SELECT Authors.id, Authors.name, Authors.about, Authors.image, AuthorsAndWorks.workId, Works.name AS workName FROM Authors INNER JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId INNER JOIN Works ON AuthorsAndWorks.workId = Works.id), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.workId = WorkContents.workId WHERE WorkContents.tokenType <= 3 GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords FROM Aux INNER JOIN WorksContents ON Aux.workId = WorksContents.workId',
   };
   @override
   LibraryAuthorDetails get asDslTable => this;
@@ -6276,7 +6940,7 @@ class LibraryWorkDetails
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkDetails" AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.id = WorkContents.workId WHERE word NOT IN (\'!\', \'"\', \'(\', \')\', \',\', \'.\', \':\', \'?\', \'-\') GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords, AuthorsAndWorks.authorId, Authors.name AS authorName FROM Aux INNER JOIN WorksContents ON Aux.id = WorksContents.workId LEFT OUTER JOIN AuthorsAndWorks ON Aux.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id',
+        'CREATE VIEW "library.WorkDetails" AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.id = WorkContents.workId WHERE WorkContents.tokenType <= 3 GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords, AuthorsAndWorks.authorId, Authors.name AS authorName FROM Aux INNER JOIN WorksContents ON Aux.id = WorksContents.workId LEFT OUTER JOIN AuthorsAndWorks ON Aux.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id',
   };
   @override
   LibraryWorkDetails get asDslTable => this;
@@ -6369,6 +7033,8 @@ class LibraryWorkContent extends i0.DataClass {
   final String node;
   final int idx;
   final String word;
+  final String macronizedWord;
+  final int uncertaintyBitMask;
   final String typ;
   final int depth;
   final String sourceReference;
@@ -6378,6 +7044,8 @@ class LibraryWorkContent extends i0.DataClass {
     required this.node,
     required this.idx,
     required this.word,
+    required this.macronizedWord,
+    required this.uncertaintyBitMask,
     required this.typ,
     required this.depth,
     required this.sourceReference,
@@ -6393,6 +7061,8 @@ class LibraryWorkContent extends i0.DataClass {
       node: serializer.fromJson<String>(json['node']),
       idx: serializer.fromJson<int>(json['idx']),
       word: serializer.fromJson<String>(json['word']),
+      macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
+      uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
       typ: serializer.fromJson<String>(json['typ']),
       depth: serializer.fromJson<int>(json['depth']),
       sourceReference: serializer.fromJson<String>(json['sourceReference']),
@@ -6407,6 +7077,8 @@ class LibraryWorkContent extends i0.DataClass {
       'node': serializer.toJson<String>(node),
       'idx': serializer.toJson<int>(idx),
       'word': serializer.toJson<String>(word),
+      'macronizedWord': serializer.toJson<String>(macronizedWord),
+      'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
       'typ': serializer.toJson<String>(typ),
       'depth': serializer.toJson<int>(depth),
       'sourceReference': serializer.toJson<String>(sourceReference),
@@ -6419,6 +7091,8 @@ class LibraryWorkContent extends i0.DataClass {
     String? node,
     int? idx,
     String? word,
+    String? macronizedWord,
+    int? uncertaintyBitMask,
     String? typ,
     int? depth,
     String? sourceReference,
@@ -6428,6 +7102,8 @@ class LibraryWorkContent extends i0.DataClass {
     node: node ?? this.node,
     idx: idx ?? this.idx,
     word: word ?? this.word,
+    macronizedWord: macronizedWord ?? this.macronizedWord,
+    uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     typ: typ ?? this.typ,
     depth: depth ?? this.depth,
     sourceReference: sourceReference ?? this.sourceReference,
@@ -6440,6 +7116,8 @@ class LibraryWorkContent extends i0.DataClass {
           ..write('node: $node, ')
           ..write('idx: $idx, ')
           ..write('word: $word, ')
+          ..write('macronizedWord: $macronizedWord, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
           ..write('typ: $typ, ')
           ..write('depth: $depth, ')
           ..write('sourceReference: $sourceReference')
@@ -6448,8 +7126,18 @@ class LibraryWorkContent extends i0.DataClass {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(workId, parent, node, idx, word, typ, depth, sourceReference);
+  int get hashCode => Object.hash(
+    workId,
+    parent,
+    node,
+    idx,
+    word,
+    macronizedWord,
+    uncertaintyBitMask,
+    typ,
+    depth,
+    sourceReference,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -6459,6 +7147,8 @@ class LibraryWorkContent extends i0.DataClass {
           other.node == this.node &&
           other.idx == this.idx &&
           other.word == this.word &&
+          other.macronizedWord == this.macronizedWord &&
+          other.uncertaintyBitMask == this.uncertaintyBitMask &&
           other.typ == this.typ &&
           other.depth == this.depth &&
           other.sourceReference == this.sourceReference);
@@ -6478,6 +7168,8 @@ class LibraryWorkContents
     node,
     idx,
     word,
+    macronizedWord,
+    uncertaintyBitMask,
     typ,
     depth,
     sourceReference,
@@ -6489,7 +7181,7 @@ class LibraryWorkContents
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN WorkContentSubdivisionsHierarchy AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
   };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -6516,6 +7208,14 @@ class LibraryWorkContents
       word: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}word'],
+      )!,
+      macronizedWord: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronizedWord'],
+      )!,
+      uncertaintyBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}uncertaintyBitMask'],
       )!,
       typ: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -6562,6 +7262,20 @@ class LibraryWorkContents
     false,
     type: i0.DriftSqlType.string,
   );
+  late final i0.GeneratedColumn<String> macronizedWord =
+      i0.GeneratedColumn<String>(
+        'macronizedWord',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
+  late final i0.GeneratedColumn<int> uncertaintyBitMask =
+      i0.GeneratedColumn<int>(
+        'uncertaintyBitMask',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.int,
+      );
   late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
@@ -6596,6 +7310,7 @@ class LibraryWorkContents
 }
 
 class LibraryWorkIndexe extends i0.DataClass {
+  final String workId;
   final String? parent;
   final String node;
   final int depth;
@@ -6605,6 +7320,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   final int toIndex;
   final String name;
   const LibraryWorkIndexe({
+    required this.workId,
     this.parent,
     required this.node,
     required this.depth,
@@ -6620,6 +7336,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   }) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LibraryWorkIndexe(
+      workId: serializer.fromJson<String>(json['workId']),
       parent: serializer.fromJson<String?>(json['parent']),
       node: serializer.fromJson<String>(json['node']),
       depth: serializer.fromJson<int>(json['depth']),
@@ -6634,6 +7351,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
       'parent': serializer.toJson<String?>(parent),
       'node': serializer.toJson<String>(node),
       'depth': serializer.toJson<int>(depth),
@@ -6646,6 +7364,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   }
 
   i1.LibraryWorkIndexe copyWith({
+    String? workId,
     i0.Value<String?> parent = const i0.Value.absent(),
     String? node,
     int? depth,
@@ -6655,6 +7374,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     int? toIndex,
     String? name,
   }) => i1.LibraryWorkIndexe(
+    workId: workId ?? this.workId,
     parent: parent.present ? parent.value : this.parent,
     node: node ?? this.node,
     depth: depth ?? this.depth,
@@ -6667,6 +7387,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   @override
   String toString() {
     return (StringBuffer('LibraryWorkIndexe(')
+          ..write('workId: $workId, ')
           ..write('parent: $parent, ')
           ..write('node: $node, ')
           ..write('depth: $depth, ')
@@ -6680,12 +7401,22 @@ class LibraryWorkIndexe extends i0.DataClass {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(parent, node, depth, typ, cnt, fromIndex, toIndex, name);
+  int get hashCode => Object.hash(
+    workId,
+    parent,
+    node,
+    depth,
+    typ,
+    cnt,
+    fromIndex,
+    toIndex,
+    name,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.LibraryWorkIndexe &&
+          other.workId == this.workId &&
           other.parent == this.parent &&
           other.node == this.node &&
           other.depth == this.depth &&
@@ -6705,6 +7436,7 @@ class LibraryWorkIndexes
   LibraryWorkIndexes(this.attachedDatabase, [this._alias]);
   @override
   List<i0.GeneratedColumn> get $columns => [
+    workId,
     parent,
     node,
     depth,
@@ -6721,7 +7453,7 @@ class LibraryWorkIndexes
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name FROM WorkContentSubdivisionsHierarchy AS SubdivsHierarchy INNER JOIN WorkContentSubdivisionsHierarchy AS Titles ON SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ ORDER BY SubdivsHierarchy.fromindex',
+        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS Titles ON SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ ORDER BY SubdivsHierarchy.fromindex',
   };
   @override
   LibraryWorkIndexes get asDslTable => this;
@@ -6729,6 +7461,10 @@ class LibraryWorkIndexes
   i1.LibraryWorkIndexe map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return i1.LibraryWorkIndexe(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
       parent: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}parent'],
@@ -6764,6 +7500,12 @@ class LibraryWorkIndexes
     );
   }
 
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> parent = i0.GeneratedColumn<String>(
     'parent',
     aliasedName,
@@ -6821,241 +7563,6 @@ class LibraryWorkIndexes
   i0.Query? get query => null;
   @override
   Set<String> get readTables => const {'WorkContentSubdivisions'};
-}
-
-class LibraryMacronizedWorkContent extends i0.DataClass {
-  final String workId;
-  final int idx;
-  final String word;
-  final String macronizedWord;
-  final int? uncertaintyBitMask;
-  final String sourceReference;
-  final int? properNounState;
-  const LibraryMacronizedWorkContent({
-    required this.workId,
-    required this.idx,
-    required this.word,
-    required this.macronizedWord,
-    this.uncertaintyBitMask,
-    required this.sourceReference,
-    this.properNounState,
-  });
-  factory LibraryMacronizedWorkContent.fromJson(
-    Map<String, dynamic> json, {
-    i0.ValueSerializer? serializer,
-  }) {
-    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return LibraryMacronizedWorkContent(
-      workId: serializer.fromJson<String>(json['workId']),
-      idx: serializer.fromJson<int>(json['idx']),
-      word: serializer.fromJson<String>(json['word']),
-      macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
-      uncertaintyBitMask: serializer.fromJson<int?>(json['uncertaintyBitMask']),
-      sourceReference: serializer.fromJson<String>(json['sourceReference']),
-      properNounState: serializer.fromJson<int?>(json['properNounState']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
-    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'workId': serializer.toJson<String>(workId),
-      'idx': serializer.toJson<int>(idx),
-      'word': serializer.toJson<String>(word),
-      'macronizedWord': serializer.toJson<String>(macronizedWord),
-      'uncertaintyBitMask': serializer.toJson<int?>(uncertaintyBitMask),
-      'sourceReference': serializer.toJson<String>(sourceReference),
-      'properNounState': serializer.toJson<int?>(properNounState),
-    };
-  }
-
-  i1.LibraryMacronizedWorkContent copyWith({
-    String? workId,
-    int? idx,
-    String? word,
-    String? macronizedWord,
-    i0.Value<int?> uncertaintyBitMask = const i0.Value.absent(),
-    String? sourceReference,
-    i0.Value<int?> properNounState = const i0.Value.absent(),
-  }) => i1.LibraryMacronizedWorkContent(
-    workId: workId ?? this.workId,
-    idx: idx ?? this.idx,
-    word: word ?? this.word,
-    macronizedWord: macronizedWord ?? this.macronizedWord,
-    uncertaintyBitMask: uncertaintyBitMask.present
-        ? uncertaintyBitMask.value
-        : this.uncertaintyBitMask,
-    sourceReference: sourceReference ?? this.sourceReference,
-    properNounState: properNounState.present
-        ? properNounState.value
-        : this.properNounState,
-  );
-  @override
-  String toString() {
-    return (StringBuffer('LibraryMacronizedWorkContent(')
-          ..write('workId: $workId, ')
-          ..write('idx: $idx, ')
-          ..write('word: $word, ')
-          ..write('macronizedWord: $macronizedWord, ')
-          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
-          ..write('sourceReference: $sourceReference, ')
-          ..write('properNounState: $properNounState')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    workId,
-    idx,
-    word,
-    macronizedWord,
-    uncertaintyBitMask,
-    sourceReference,
-    properNounState,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is i1.LibraryMacronizedWorkContent &&
-          other.workId == this.workId &&
-          other.idx == this.idx &&
-          other.word == this.word &&
-          other.macronizedWord == this.macronizedWord &&
-          other.uncertaintyBitMask == this.uncertaintyBitMask &&
-          other.sourceReference == this.sourceReference &&
-          other.properNounState == this.properNounState);
-}
-
-class LibraryMacronizedWorkContents
-    extends
-        i0.ViewInfo<
-          i1.LibraryMacronizedWorkContents,
-          i1.LibraryMacronizedWorkContent
-        >
-    implements i0.HasResultSet {
-  final String? _alias;
-  @override
-  final i0.GeneratedDatabase attachedDatabase;
-  LibraryMacronizedWorkContents(this.attachedDatabase, [this._alias]);
-  @override
-  List<i0.GeneratedColumn> get $columns => [
-    workId,
-    idx,
-    word,
-    macronizedWord,
-    uncertaintyBitMask,
-    sourceReference,
-    properNounState,
-  ];
-  @override
-  String get aliasedName => _alias ?? entityName;
-  @override
-  String get entityName => 'library.MacronizedWorkContents';
-  @override
-  Map<i0.SqlDialect, String> get createViewStatements => {
-    i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.MacronizedWorkContents" AS SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, COALESCE(UserProvidedMacronizations.macronizedWord, WorkMacronizations.macronizedWord, ExactUnambiguous.macronizedWord, CASE WHEN LowerUnambiguous.macronizedWord IS NOT NULL AND SUBSTR(WorkContents.word, 1, 1) = UPPER(SUBSTR(WorkContents.word, 1, 1)) THEN UPPER(SUBSTR(LowerUnambiguous.macronizedWord, 1, 1)) || SUBSTR(LowerUnambiguous.macronizedWord, 2) ELSE LowerUnambiguous.macronizedWord END, WorkContents.word) AS macronizedWord, CASE WHEN UserProvidedMacronizations.macronizedWord IS NOT NULL THEN 0 WHEN WorkMacronizations.macronizedWord IS NOT NULL THEN WorkMacronizations.uncertaintyBitMask WHEN ExactUnambiguous.macronizedWord IS NOT NULL THEN 0 WHEN LowerUnambiguous.macronizedWord IS NOT NULL THEN 0 ELSE 1 END AS uncertaintyBitMask, WorkContents.sourceReference, WorkContents.properNounState FROM WorkContents LEFT JOIN UserProvidedMacronizations ON WorkContents.workId = UserProvidedMacronizations.workId AND WorkContents.idx = UserProvidedMacronizations.idx LEFT JOIN WorkMacronizations ON WorkContents.workId = WorkMacronizations.workId AND WorkContents.idx = WorkMacronizations.wordIdx LEFT JOIN UnambiguousMacronizations AS ExactUnambiguous ON((WorkContents.properNounState = TRUE OR WorkContents.properNounState = 2)AND WorkContents.word = ExactUnambiguous.word)LEFT JOIN UnambiguousMacronizations AS LowerUnambiguous ON((WorkContents.properNounState = FALSE OR WorkContents.properNounState = 2)AND LOWER(WorkContents.word) = LowerUnambiguous.word)',
-  };
-  @override
-  LibraryMacronizedWorkContents get asDslTable => this;
-  @override
-  i1.LibraryMacronizedWorkContent map(
-    Map<String, dynamic> data, {
-    String? tablePrefix,
-  }) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return i1.LibraryMacronizedWorkContent(
-      workId: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}workId'],
-      )!,
-      idx: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.int,
-        data['${effectivePrefix}idx'],
-      )!,
-      word: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}word'],
-      )!,
-      macronizedWord: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}macronizedWord'],
-      )!,
-      uncertaintyBitMask: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.int,
-        data['${effectivePrefix}uncertaintyBitMask'],
-      ),
-      sourceReference: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}sourceReference'],
-      )!,
-      properNounState: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.int,
-        data['${effectivePrefix}properNounState'],
-      ),
-    );
-  }
-
-  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
-    'workId',
-    aliasedName,
-    false,
-    type: i0.DriftSqlType.string,
-  );
-  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
-    'idx',
-    aliasedName,
-    false,
-    type: i0.DriftSqlType.int,
-  );
-  late final i0.GeneratedColumn<String> word = i0.GeneratedColumn<String>(
-    'word',
-    aliasedName,
-    false,
-    type: i0.DriftSqlType.string,
-  );
-  late final i0.GeneratedColumn<String> macronizedWord =
-      i0.GeneratedColumn<String>(
-        'macronizedWord',
-        aliasedName,
-        false,
-        type: i0.DriftSqlType.string,
-      );
-  late final i0.GeneratedColumn<int> uncertaintyBitMask =
-      i0.GeneratedColumn<int>(
-        'uncertaintyBitMask',
-        aliasedName,
-        true,
-        type: i0.DriftSqlType.int,
-      );
-  late final i0.GeneratedColumn<String> sourceReference =
-      i0.GeneratedColumn<String>(
-        'sourceReference',
-        aliasedName,
-        false,
-        type: i0.DriftSqlType.string,
-      );
-  late final i0.GeneratedColumn<int> properNounState = i0.GeneratedColumn<int>(
-    'properNounState',
-    aliasedName,
-    true,
-    type: i0.DriftSqlType.int,
-  );
-  @override
-  LibraryMacronizedWorkContents createAlias(String alias) {
-    return LibraryMacronizedWorkContents(attachedDatabase, alias);
-  }
-
-  @override
-  i0.Query? get query => null;
-  @override
-  Set<String> get readTables => const {
-    'WorkContents',
-    'UserProvidedMacronizations',
-    'WorkMacronizations',
-    'UnambiguousMacronizations',
-  };
 }
 
 class LibraryDrift extends i3.ModularAccessor {
@@ -7128,6 +7635,14 @@ class LibraryDrift extends i3.ModularAccessor {
     );
   }
 
+  i0.Selectable<i1.LibraryWorkIndexe> getLibraryWorkIndexes(String var1) {
+    return customSelect(
+      'SELECT * FROM "library.WorkIndexes" WHERE workId = ?1',
+      variables: [i0.Variable<String>(var1)],
+      readsFrom: {workContentSubdivisions},
+    ).asyncMap(libraryWorkIndexes.mapFromRow);
+  }
+
   i1.LibraryAuthors get libraryAuthors => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthors>('library.Authors');
@@ -7155,4 +7670,7 @@ class LibraryDrift extends i3.ModularAccessor {
       i3.ReadDatabaseContainer(
         attachedDatabase,
       ).resultSet<i1.WorkContentSubdivisions>('WorkContentSubdivisions');
+  i1.LibraryWorkIndexes get libraryWorkIndexes => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.LibraryWorkIndexes>('library.WorkIndexes');
 }

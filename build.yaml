@@ -7,6 +7,7 @@ targets:
       drift_dev:analyzer:
         enabled: true
         options: &options
+          named_parameters: true
           store_date_time_values_as_text: true
           fatal_warnings: true
           sql:

@@ -1,0 +1,62 @@
+CREATE TABLE "WorkFormCounts"(
+    "workId" TEXT NOT NULL,
+    "form" TEXT NOT NULL,
+    "macronForm" TEXT NOT NULL,
+    "cnt" INTEGER NOT NULL CHECK( cnt > 0 ),
+    PRIMARY KEY( workId, form, macronForm )
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE TABLE "WorkLemmaCounts"(
+    "workId" TEXT NOT NULL,
+    "dictionaryRef" TEXT NOT NULL,
+    "cnt" INTEGER NOT NULL CHECK( cnt > 0 ),
+    PRIMARY KEY( workId, dictionaryRef )
+)
+STRICT,
+WITHOUT ROWID;
+
+-- Form frequency - macrons OFF -> group by plain form
+getFormFrequencies:
+    SELECT form,
+           MIN( macronForm ) AS macronForm,
+           SUM( cnt ) AS occurrences,
+           COUNT(*) OVER() AS totalForms,
+           SUM( SUM( cnt ) ) OVER() AS totalTokens
+        FROM WorkFormCounts
+        WHERE workId IN ?
+        GROUP BY form
+        ORDER BY occurrences DESC
+        LIMIT :limit OFFSET :offset;
+
+-- Form frequency - macrons ON -> group by macron form
+getMacronFormFrequencies:
+    SELECT macronForm,
+           MIN( form ) AS form,
+           SUM( cnt ) AS occurrences,
+           COUNT(*) OVER() AS totalForms,
+           SUM( SUM( cnt ) ) OVER() AS totalTokens
+        FROM WorkFormCounts
+        WHERE workId IN ?
+        GROUP BY macronForm
+        ORDER BY occurrences DESC
+        LIMIT :limit OFFSET :offset;
+
+-- Lemma frequency (macron toggle is a no-op since counts can't differ)
+getLemmaFrequencies:
+    SELECT dictionaryRef,
+           SUM( cnt ) AS occurrences,
+           COUNT(*) OVER() AS totalLemmas,
+           SUM( SUM( cnt ) ) OVER() AS totalTokens
+        FROM WorkLemmaCounts
+        WHERE workId IN ?
+        GROUP BY dictionaryRef
+        ORDER BY occurrences DESC
+        LIMIT :limit OFFSET :offset;
+
+-- Total distinct lemmas in scope
+getTotalLemmasInScope:
+    SELECT COUNT( DISTINCT dictionaryRef ) AS cnt
+        FROM WorkLemmaCounts
+        WHERE workId IN ?;

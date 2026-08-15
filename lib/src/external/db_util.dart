@@ -6,6 +6,7 @@ import '../../logger.dart';
 import '../component/dictionary/db_util.dart' as dict_util;
 import '../component/library/db_util.dart' as libr_util;
 import '../component/morph_analysis/db_util.dart' as morp_util;
+import '../component/word_frequency/db_util.dart' as freq_util;
 import 'data_version.drift.dart';
 import 'database.dart';
 
@@ -47,6 +48,7 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
     ...libr_util.operations,
     ...dict_util.operations,
     ...morp_util.operations,
+    ...freq_util.operations,
   ];
   await db.transaction(() async {
     await operations.fold(
