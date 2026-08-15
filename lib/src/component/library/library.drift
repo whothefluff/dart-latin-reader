@@ -49,17 +49,108 @@ CREATE TABLE "WorkContents"(
     "word" TEXT NOT NULL,
     "sourceReference" TEXT NOT NULL,
     "properNounState" INTEGER CHECK( properNounState IN (0, 1, 2) ), --NULL = unknown, 0 = no, 1 = yes, 2 = either/both
+    "tokenType" INTEGER NOT NULL CHECK( tokenType BETWEEN 1 AND 6 ), -- 1 word, 2 abbrev, 3 roman numeral, 4 punct, 5 editorial, 6 other
+    "sentenceIdx" INTEGER NOT NULL,
+    "wordIdx" INTEGER, -- Increments only for tokenType <= 3
+    "enclitic" TEXT,
+    "expansion" TEXT,
+    "macronizedWord" TEXT NOT NULL,
+    "uncertaintyBitMask" INTEGER NOT NULL,
+    -- aux (internal use only)
+    "aux_expansionNoMacrons" TEXT GENERATED ALWAYS AS (
+        "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"(
+          expansion,
+          'ā','a'),'ē','e'),'ī','i'),'ō','o'),'ū','u'),'ȳ','y'),
+          'Ā','A'),'Ē','E'),'Ī','I'),'Ō','O'),'Ū','U'),'Ȳ','Y')
+    ) VIRTUAL,
+    "aux_macronBase" TEXT GENERATED ALWAYS AS (
+        COALESCE( expansion,
+                  CASE WHEN enclitic IS NOT NULL
+                       THEN SUBSTR( macronizedWord, 1,
+                                   LENGTH( macronizedWord ) - LENGTH( enclitic ) )
+                       ELSE macronizedWord
+                  END )
+    ) VIRTUAL,
+    "aux_macronWordLower" TEXT GENERATED ALWAYS AS (
+        "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"(
+            LOWER( macronizedWord ),
+            'Ā','ā'),'Ē','ē'),'Ī','ī'),'Ō','ō'),'Ū','ū'),'Ȳ','ȳ')
+    ) VIRTUAL,
+    "aux_macronBaseLower" TEXT GENERATED ALWAYS AS (
+        "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"(
+            LOWER( aux_macronBase ),
+            'Ā','ā'),'Ē','ē'),'Ī','ī'),'Ō','ō'),'Ū','ū'),'Ȳ','ȳ')
+    ) VIRTUAL,
+    -- 2×2 grid
+    "normForm" TEXT GENERATED ALWAYS AS (
+        CASE WHEN properNounState IN (1, 2)
+             THEN UPPER( SUBSTR( word, 1, 1 ) ) || LOWER( SUBSTR( word, 2 ) )
+             ELSE LOWER( word )
+        END
+    ) VIRTUAL,
+    "macronNormForm" TEXT GENERATED ALWAYS AS (
+        CASE WHEN properNounState IN (1, 2)
+             THEN CASE SUBSTR( macronizedWord, 1, 1 )
+                       WHEN 'ā' THEN 'Ā' 
+                       WHEN 'ē' THEN 'Ē'
+                       WHEN 'ī' THEN 'Ī' 
+                       WHEN 'ō' THEN 'Ō'
+                       WHEN 'ū' THEN 'Ū'  
+                       WHEN 'ȳ' THEN 'Ȳ'
+                       ELSE UPPER( SUBSTR( macronizedWord, 1, 1 ) )
+                  END || SUBSTR( aux_macronWordLower, 2 )
+             ELSE aux_macronWordLower
+        END
+    ) VIRTUAL,
+    "baseNormForm" TEXT GENERATED ALWAYS AS (
+        CASE WHEN aux_expansionNoMacrons IS NOT NULL
+             THEN CASE WHEN properNounState IN (1, 2)
+                       THEN UPPER( SUBSTR( aux_expansionNoMacrons, 1, 1 ) ) || LOWER( SUBSTR( aux_expansionNoMacrons, 2 ) )
+                       ELSE LOWER( aux_expansionNoMacrons )
+                  END
+             WHEN enclitic IS NOT NULL
+             THEN CASE WHEN properNounState IN (1, 2)
+                       THEN UPPER( SUBSTR( word, 1, 1 ) ) || LOWER( SUBSTR( word, 2, LENGTH( word ) - LENGTH( enclitic ) - 1 ) )
+                       ELSE LOWER( SUBSTR( word, 1, LENGTH( word ) - LENGTH( enclitic ) ) )
+                  END
+             ELSE CASE WHEN properNounState IN (1, 2)
+                       THEN UPPER( SUBSTR( word, 1, 1 ) ) || LOWER( SUBSTR( word, 2 ) )
+                       ELSE LOWER( word )
+                  END
+        END
+    ) VIRTUAL,
+    "macronBaseNormForm" TEXT GENERATED ALWAYS AS (
+        CASE WHEN properNounState IN (1, 2)
+             THEN CASE SUBSTR( aux_macronBase, 1, 1 )
+                       WHEN 'ā' THEN 'Ā'  
+                       WHEN 'ē' THEN 'Ē'
+                       WHEN 'ī' THEN 'Ī'  
+                       WHEN 'ō' THEN 'Ō'
+                       WHEN 'ū' THEN 'Ū'  
+                       WHEN 'ȳ' THEN 'Ȳ'
+                       ELSE UPPER( SUBSTR( aux_macronBase, 1, 1 ) )
+                  END || SUBSTR( aux_macronBaseLower, 2 )
+             ELSE aux_macronBaseLower
+        END
+    ) VIRTUAL,
     PRIMARY KEY( workId, idx ),
-    FOREIGN KEY( workId ) REFERENCES Works( id )
-) 
-STRICT, 
+    FOREIGN KEY( workId ) REFERENCES Works( id ),
+    CHECK( (wordIdx IS NULL) = (tokenType >= 4) ), --fancy XNOR expression (both must be true or both must be false)
+    CHECK( expansion IS NULL OR enclitic IS NULL )
+)
+STRICT,
 WITHOUT ROWID;
+
+CREATE INDEX "WorkContents_BaseNormForm"
+    ON WorkContents( baseNormForm );
+
+CREATE INDEX "WorkContents_WordPosition"
+    ON WorkContents( workId, sentenceIdx, wordIdx );
 
 CREATE TABLE "WorkContentSubdivisions"(
     "workId" TEXT NOT NULL,
     "node" TEXT NOT NULL CHECK( node LIKE '________-____-____-____-____________' ),
     "typ" TEXT NOT NULL CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','TITL','PARA') ),
-    --add more as needed
     "cnt" INTEGER NOT NULL CHECK( cnt >= 0 ),
     "name" TEXT NOT NULL,
     "parent" TEXT CHECK( parent IS NULL OR parent LIKE '________-____-____-____-____________' ),
@@ -96,19 +187,9 @@ WITHOUT ROWID;
 
 CREATE TABLE "WorkMacronizations"(
     "workId" TEXT NOT NULL,
-    "wordIdx" INTEGER NOT NULL,
-    "macronizedWord" TEXT NOT NULL,
-    "uncertaintyBitMask" INTEGER NOT NULL, --1 for uncertain
-    PRIMARY KEY( workId, wordIdx ),
-    FOREIGN KEY( workId, wordIdx ) REFERENCES WorkContents( workId, idx )
-)
-STRICT,
-WITHOUT ROWID;
-
-CREATE TABLE "UserProvidedMacronizations"(
-    "workId" TEXT NOT NULL,
     "idx" INTEGER NOT NULL,
     "macronizedWord" TEXT NOT NULL,
+    "uncertaintyBitMask" INTEGER NOT NULL, -- Bit N is 1 if the Nth character is uncertain (unknown words have all bits set to 1)
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId, idx ) REFERENCES WorkContents( workId, idx )
 )
@@ -125,7 +206,67 @@ CREATE TABLE "AuthorsAndWorks"(
 STRICT, 
 WITHOUT ROWID;
 
-CREATE VIEW "WorkContentSubdivisionsHierarchy" AS 
+CREATE VIEW "library.staging.ResolvedMacronizations" AS
+    WITH RawResolution AS ( SELECT WorkContents.workId,
+                                   WorkContents.idx,
+                                   WorkContents.word,
+                                   WorkContents.tokenType,
+                                   COALESCE( WorkMacronizations.macronizedWord,
+                                             ExactMatches.macronizedWord,
+                                             LowerCaseMatches.macronizedWord,
+                                             WorkContents.word ) AS rawMacron,
+                                   CASE WHEN WorkMacronizations.macronizedWord IS NOT NULL
+                                        THEN WorkMacronizations.uncertaintyBitMask -- can also be 0
+                                        WHEN ExactMatches.macronizedWord IS NOT NULL
+                                             OR LowerCaseMatches.macronizedWord IS NOT NULL
+                                        THEN 0
+                                        ELSE -1
+                                    END AS finalMask
+                                FROM WorkContents
+                                LEFT JOIN WorkMacronizations
+                                    ON WorkContents.workId = WorkMacronizations.workId
+                                       AND WorkContents.idx = WorkMacronizations.idx
+                                LEFT JOIN UnambiguousMacronizations AS ExactMatches
+                                    ON ( WorkContents.properNounState IN (1, 2) OR WorkContents.properNounState IS NULL )
+                                       AND WorkContents.word = ExactMatches.word
+                                LEFT JOIN UnambiguousMacronizations AS LowerCaseMatches
+                                    ON ( WorkContents.properNounState IN (0, 2) OR WorkContents.properNounState IS NULL )
+                                       AND LOWER( WorkContents.word ) = LowerCaseMatches.word ),
+    Lowered AS ( SELECT *,
+                        "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"(
+                            LOWER( rawMacron ),
+                            'Ā','ā'),'Ē','ē'),'Ī','ī'),'Ō','ō'),'Ū','ū'),'Ȳ','ȳ' ) AS lowerCaseMacron
+                     FROM RawResolution
+    )
+    SELECT workId,
+           idx,
+           finalMask AS uncertaintyBitMask,
+           CASE -- 1. ALL CAPS (e.g. PROLOGUS -> PRŌLOGUS)
+                WHEN word = UPPER( word ) AND LENGTH( word ) > 1 
+                THEN "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( 
+                          UPPER( lowerCaseMacron ),
+                         'ā','Ā'),'ē','Ē'),'ī','Ī'),'ō','Ō'), 'ū','Ū'),'ȳ','Ȳ')
+                -- 2. Title Case (e.g. Fabula -> Fābula)
+                WHEN SUBSTR( word, 1, 1 ) = UPPER( SUBSTR( word, 1, 1 ) )
+                     AND SUBSTR( word, 1, 1 ) <> LOWER( SUBSTR( word, 1, 1 ) ) 
+                THEN ( CASE SUBSTR( lowerCaseMacron, 1, 1 )
+                            WHEN 'ā' THEN 'Ā'  
+                            WHEN 'ē' THEN 'Ē'
+                            WHEN 'ī' THEN 'Ī'  
+                            WHEN 'ō' THEN 'Ō'
+                            WHEN 'ū' THEN 'Ū'  
+                            WHEN 'ȳ' THEN 'Ȳ'
+                            ELSE UPPER( SUBSTR( lowerCaseMacron, 1, 1 ) )
+                       END ) || SUBSTR( lowerCaseMacron, 2 )
+                -- 3. Lowercase (e.g. fabula > fābula)
+                WHEN word = LOWER( word ) 
+                THEN lowerCaseMacron
+                -- 4. Unrecognized casing shape: pass through unchanged
+                ELSE rawMacron
+           END AS finalMacronizedWord
+        FROM Lowered;
+
+CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS 
     WITH RECURSIVE Subsets AS ( SELECT *,
                                        0 AS depth
                                     FROM WorkContentSubdivisions
@@ -174,7 +315,7 @@ CREATE VIEW "library.AuthorDetails" AS
                                 FROM Aux
                                 INNER JOIN WorkContents
                                     ON Aux.workId = WorkContents.workId
-                                WHERE WorkContents.word NOT IN ('!','"','(', ')',',','.',':','?','-')
+                                WHERE WorkContents.tokenType <= 3
                                 GROUP BY WorkContents.workId )
         SELECT Aux.*,
                WorksContents.numberOfWords
@@ -194,7 +335,7 @@ CREATE VIEW "library.WorkDetails" AS
                                 FROM Aux
                                 INNER JOIN WorkContents 
                                     ON Aux.id = WorkContents.workId
-                                WHERE word NOT IN ('!','"','(',')',',','.',':','?','-')
+                                WHERE WorkContents.tokenType <= 3
                                 GROUP BY WorkContents.workId )
         SELECT Aux.*,
                WorksContents.numberOfWords,
@@ -214,6 +355,8 @@ CREATE VIEW "library.WorkContents" AS
     WITH ClosestSubdivision AS ( SELECT WorkContents.workId,
                                         WorkContents.idx,
                                         WorkContents.word,
+                                        WorkContents.macronizedWord,
+                                        WorkContents.uncertaintyBitMask,
                                         WorkContents.sourceReference,
                                         SubdivsHierarchy.node,
                                         SubdivsHierarchy.typ,
@@ -221,7 +364,7 @@ CREATE VIEW "library.WorkContents" AS
                                         SubdivsHierarchy.depth,
                                         ROW_NUMBER( ) OVER( PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC ) AS rn
                                      FROM WorkContents
-                                     INNER JOIN WorkContentSubdivisionsHierarchy AS SubdivsHierarchy 
+                                     INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy 
                                          ON WorkContents.workId = SubdivsHierarchy.workId
                                             AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex
                                             AND SubdivsHierarchy.typ <> 'TITL' )
@@ -230,6 +373,8 @@ CREATE VIEW "library.WorkContents" AS
                node,
                idx,
                word,
+               macronizedWord,
+               uncertaintyBitMask,
                typ,
                depth,
                sourceReference --( SELECT name FROM WorkContentSubdivisions AS aux WHERE aux.parent = ClosestSubdivision.parent AND aux.typ = 'TITL' LIMIT 1 ) AS title
@@ -240,7 +385,8 @@ CREATE VIEW "library.WorkContents" AS
 getLibraryWorkContentsPartial WITH WorkContentsSegment: SELECT * FROM "library.WorkContents" WHERE workId = ? AND idx BETWEEN ? AND ?;
 
 CREATE VIEW "library.WorkIndexes" AS
-    SELECT SubdivsHierarchy.parent,
+    SELECT SubdivsHierarchy.workId,
+           SubdivsHierarchy.parent,
            SubdivsHierarchy.node,
            SubdivsHierarchy.depth,
            SubdivsHierarchy.typ,
@@ -248,44 +394,10 @@ CREATE VIEW "library.WorkIndexes" AS
            SubdivsHierarchy.fromIndex,
            SubdivsHierarchy.toIndex,
            Titles.name
-        FROM WorkContentSubdivisionsHierarchy AS SubdivsHierarchy
-        INNER JOIN WorkContentSubdivisionsHierarchy AS Titles
+        FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy
+        INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS Titles
             ON SubdivsHierarchy.node = Titles.parent
                AND 'TITL' = Titles.typ
         ORDER BY SubdivsHierarchy.fromindex;
 
-CREATE VIEW "library.MacronizedWorkContents" AS
-    SELECT WorkContents.workId,
-           WorkContents.idx,
-           WorkContents.word,
-           COALESCE( UserProvidedMacronizations.macronizedWord,
-                     WorkMacronizations.macronizedWord,
-                     ExactUnambiguous.macronizedWord,
-                     -- If the exact match fails but the lowercase fallback succeeds (e.g., for common nouns at the start of a sentence), 
-                     -- we preserve the original capitalization:
-                     CASE WHEN LowerUnambiguous.macronizedWord IS NOT NULL AND SUBSTR( WorkContents.word, 1, 1 ) = UPPER( SUBSTR( WorkContents.word, 1, 1 ) )
-                          THEN UPPER( SUBSTR( LowerUnambiguous.macronizedWord, 1, 1 ) ) || SUBSTR( LowerUnambiguous.macronizedWord, 2 )
-                          ELSE LowerUnambiguous.macronizedWord 
-                     END,
-                     WorkContents.word ) AS macronizedWord,
-           CASE WHEN UserProvidedMacronizations.macronizedWord IS NOT NULL THEN 0
-                WHEN WorkMacronizations.macronizedWord IS NOT NULL THEN WorkMacronizations.uncertaintyBitMask
-                WHEN ExactUnambiguous.macronizedWord IS NOT NULL THEN 0
-                WHEN LowerUnambiguous.macronizedWord IS NOT NULL THEN 0
-                ELSE 1
-           END AS uncertaintyBitMask,
-           WorkContents.sourceReference,
-           WorkContents.properNounState
-        FROM WorkContents
-        LEFT JOIN UserProvidedMacronizations
-            ON WorkContents.workId = UserProvidedMacronizations.workId
-               AND WorkContents.idx = UserProvidedMacronizations.idx
-        LEFT JOIN WorkMacronizations
-            ON WorkContents.workId = WorkMacronizations.workId
-               AND WorkContents.idx = WorkMacronizations.wordIdx
-        LEFT JOIN UnambiguousMacronizations AS ExactUnambiguous -- one-to-one
-            ON ( ( WorkContents.properNounState = TRUE OR WorkContents.properNounState = 2 )
-                 AND WorkContents.word = ExactUnambiguous.word )
-        LEFT JOIN UnambiguousMacronizations AS LowerUnambiguous -- one-to-one
-            ON ( ( WorkContents.properNounState = FALSE OR WorkContents.properNounState = 2 )
-                 AND LOWER( WorkContents.word ) = LowerUnambiguous.word );
+getLibraryWorkIndexes: SELECT * FROM "library.WorkIndexes" WHERE workId = ?;

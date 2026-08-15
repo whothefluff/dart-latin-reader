@@ -89,7 +89,7 @@ final operations = [
           inflTab.form,
           inflTab.item,
           inflTab.cnt,
-          concat([_removeAllHyphens(inflTab.stem), inflTab.suffix]),
+          inflTab.macronizedForm,
         ]);
       final searchTab = db.searchableMorphDetInflections;
       await db
@@ -100,8 +100,7 @@ final operations = [
               searchTab.form: inflTab.form,
               searchTab.item: inflTab.item,
               searchTab.cnt: inflTab.cnt,
-              // TODO(whothefluff): consider adding nullable field "macronizedForm" to source tab to avoid calculation duplication for search tab and views
-              searchTab.macronizedForm: concat([_removeAllHyphens(inflTab.stem), inflTab.suffix]),
+              searchTab.macronizedForm: inflTab.macronizedForm,
             },
             mode: InsertMode.insertOrRollback,
           );
@@ -112,9 +111,6 @@ final operations = [
     },
   ),
 ];
-
-Expression<String> _removeAllHyphens(Expression<String> columnExpression) =>
-    replace<String>(columnExpression, const Constant('-'), const Constant(''));
 
 Expression<T> replace<T extends Object>(Expression<T> val, Expression<T> sub, Expression<T> wit) =>
     FunctionCallExpression<T>('REPLACE', [val, sub, wit]);

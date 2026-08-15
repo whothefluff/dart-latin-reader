@@ -36,6 +36,7 @@ Future<AppDb> db(Ref ref) async {
     '../component/library/library.drift',
     '../component/dictionary/dictionary.drift',
     '../component/morph_analysis/morph_analysis.drift',
+    '../component/word_frequency/word_frequency.drift',
   },
 )
 class AppDb extends $AppDb {

@@ -32,9 +32,11 @@ CREATE TABLE "MorphologicalDetailDicts"(
 
  */
 
---TODO(whothefluff): consider adding nullable field "macronizedForm" to avoid calculation duplication for search tab and views
 CREATE TABLE "MorphologicalDetailInflections"(
     "form" TEXT NOT NULL,
+    "macronizedForm" TEXT NOT NULL GENERATED ALWAYS AS ( 
+        CONCAT( "REPLACE"( stem, '-', '' ), suffix ) 
+    ) VIRTUAL,
     "item" INTEGER NOT NULL,
     "cnt" INTEGER NOT NULL CHECK( cnt >= 0 ),
     "partOfSpeech" TEXT NOT NULL,
@@ -217,7 +219,7 @@ CREATE VIEW "morphology.Analyses" AS MorphologyAnalysis AS
     SELECT Infl.form,
            Infl.item,
            Infl.cnt,
-           CONCAT( "REPLACE"( Infl.stem, '-', '' ), Infl.suffix ) AS macronizedForm,
+           Infl.macronizedForm,
            MorphologicalDetails.dictionaryRef,
            Infl.partOfSpeech,
            Infl.stem,
