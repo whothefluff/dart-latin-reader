@@ -104,7 +104,9 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   ///
   /// In any other case return the original string
   String _sanitizeQuotes(String form) =>
-      ((form.startsWith('"') && form.endsWith('"')) || (form.startsWith("'") && form.endsWith("'")))
+      form.length >= 2 &&
+          ((form.startsWith('"') && form.endsWith('"')) ||
+              (form.startsWith("'") && form.endsWith("'")))
       ? form.substring(1, form.length - 1)
       : form;
 
