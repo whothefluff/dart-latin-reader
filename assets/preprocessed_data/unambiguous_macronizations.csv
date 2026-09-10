@@ -1,6 +1,5 @@
 word,macronizedWord
 primus,prīmus
-Primus,Prīmus
 prologus,prologus
 Aesopus,Aesōpus
 auctor,auctor
@@ -406,7 +405,6 @@ desiderat,dēsīderat
 bis,bis
 peccat,peccat
 primum,prīmum
-Primum,Prīmum
 indignos,indignōs
 adiuvat,adiuvat
 impune,impūne
@@ -533,6 +531,7 @@ ipse,ipse
 exciperet,exciperet
 auritulus,aurītulus
 tollit,tollit
+novoque,novōque
 turbat,turbat
 bestias,bēstiās
 Bestias,Bēstiās
@@ -687,6 +686,7 @@ addidit,addidit
 quantae,quantae
 dementiae,dēmentiae
 cui,cui
+calceandos,calceandōs
 nemo,nēmō
 commisit,commīsit
 pertinere,pertinēre
@@ -963,6 +963,7 @@ inflare,īnflāre
 sese,sēsē
 rupto,ruptō
 iacuit,iacuit
+corcodili,corcodīlī
 hominibus,hominibus
 perdunt,perdunt
 operam,operam
@@ -972,9 +973,11 @@ currentes,currentēs
 nilo,nīlō
 Nilo,Nīlō
 flumine,flūmine
+corcodilis,corcodīlīs
 rapiantur,rapiantur
 traditum,trāditum
 currens,currēns
+corcodilus,corcodīlus
 quamlibet,quamlibet
 lambe,lambe
 otio,ōtiō
@@ -1057,6 +1060,7 @@ docili,docilī
 patet,patet
 sollertiae,sollertiae
 vulpinos,vulpīnōs
+nidoque,nīdōque
 pullis,pullīs
 escam,ēscam
 carperent,carperent
@@ -1262,6 +1266,7 @@ modestiae,modestiae
 audacter,audācter
 tolle,tolle
 diviso,dīvīsō
+tergore,tergore
 silvas,silvās
 petivit,petīvit
 accessum,accessum
@@ -1460,6 +1465,7 @@ multo,multō
 maioris,maiōris
 alapae,alapae
 mecum,mēcum
+veneunt,vēneunt
 cornix,cornīx
 munitus,mūnītus
 accessit,accessit
@@ -1475,6 +1481,7 @@ auras,aurās
 volans,volāns
 opimam,opīmam
 rapuisti,rapuistī
+monstraro,mōnstrārō
 faciendum,faciendum
 lassabit,lassābit
 pondere,pondere
@@ -1670,7 +1677,6 @@ libellos,libellōs
 desideras,dēsīderās
 vaces,vacēs
 oportet,oportet
-Eutyche,Eutyche
 negotiis,negōtiīs
 sentiat,sentiat
 vim,vim
@@ -1718,12 +1724,14 @@ Pierio,Pīeriō
 iugo,iugō
 tonanti,tonantī
 Iovi,Iovī
+novies,novies
 artium,artium
 peperit,peperit
 chorum,chorum
 Chorum,Chorum
 paene,paene
 sim,sim
+curamque,cūramque
 habendi,habendī
 eraserim,ērāserim
 laude,laude
@@ -1793,7 +1801,6 @@ animi,animī
 excusatum,excūsātum
 nihilo,nihilō
 neque,neque
-Neque,Neque
 enim,enim
 notare,notāre
 mens,mēns
@@ -1817,6 +1824,7 @@ numeret,numeret
 auctores,auctōrēs
 Apollo,Apollō
 saxa,saxa
+Saxa,Saxa
 cantu,cantū
 movit,mōvit
 domuit,domuit
@@ -2197,7 +2205,6 @@ sanctamque,sānctamque
 dormientem,dormientem
 cubiculo,cubiculō
 primo,prīmō
-Primo,Prīmō
 senserat,sēnserat
 repraesentavit,repraesentāvit
 poenam,poenam
@@ -2232,7 +2239,6 @@ tenebras,tenebrās
 dispulit,dispulit
 calumniae,calumniae
 certumque,certumque
-Certumque,Certumque
 luat,luat
 libertus,lībertus
 orbam,orbam
@@ -2452,9 +2458,11 @@ negarat,negārat
 vellent,vellent
 divi,dīvī
 legerunt,lēgērunt
+myrtus,myrtus
 Veneri,Venerī
 placuit,placuit
 Phoebo,Phoebō
+Cybebae,Cybēbae
 Herculi,Herculī
 admirans,admīrāns
 steriles,sterilēs
@@ -2646,6 +2654,7 @@ Galli,Gallī
 obitum,obitum
 persequitur,persequitur
 fati,fātī
+Cybebes,Cybēbēs
 circum,circum
 solebant,solēbant
 baiulantem,baiulantem
@@ -2940,6 +2949,7 @@ vetustior,vetustior
 Minos,Mīnōs
 classe,classe
 perdomuit,perdomuit
+iustoque,iūstōque
 exemplo,exemplō
 cato,catō
 Cato,Catō
@@ -2980,6 +2990,7 @@ effugium,effugium
 puteum,puteum
 altiore,altiōre
 margine,margine
+hircus,hircus
 sitiens,sitiēns
 rogavit,rogāvit
 copiosus,cōpiōsus
@@ -2993,6 +3004,7 @@ barbatus,barbātus
 evasit,ēvāsit
 celsis,celsīs
 Celsis,Celsīs
+hircumque,hircumque
 clauso,clausō
 Clauso,Clausō
 liquit,līquit
@@ -3011,7 +3023,6 @@ sumus,sumus
 accendit,accendit
 Iovis,Iovis
 ipsumque,ipsumque
-Ipsumque,Ipsumque
 compilavit,compīlāvit
 onustus,onustus
 sacrilegio,sacrilegiō
@@ -3125,6 +3136,7 @@ Barbam,Barbam
 capellae,capellae
 Capellae,Capellae
 impetrassent,impetrāssent
+hirci,hircī
 maerentes,maerentēs
 indignari,indignārī
 coeperunt,coepērunt
@@ -3234,6 +3246,7 @@ exspectant,exspectant
 novum,novum
 venire,venīre
 culum,cūlum
+olfacit,olfacit
 fert,fert
 dolet,dolet
 gelu,gelū
@@ -3286,7 +3299,6 @@ torques,torquēs
 heredis,hērēdis
 ture,tūre
 superos,superōs
-Superos,Superōs
 audis,audīs
 musicum,mūsicum
 citharae,citharae
@@ -3655,7 +3667,6 @@ verrem,verrem
 Verrem,Verrem
 sancto,sānctō
 salute,salūte
-Salute,Salūte
 votum,vōtum
 reliquias,reliquiās
 poni,pōnī
@@ -3696,6 +3707,7 @@ Sale,Sale
 spectaculi,spectāculī
 theatro,theātrō
 prolatum,prōlātum
+dispersus,dispersus
 concitat,concitat
 paulo,paulō
 Paulo,Paulō
@@ -3752,7 +3764,6 @@ quales,quālēs
 pectinem,pectinem
 heia,hēia
 superum,superum
-Superum,Superum
 voluntas,voluntās
 favit,fāvit
 fato,fātō
@@ -3881,7 +3892,6 @@ latrans,lātrāns
 destituit,dēstituit
 fuimus,fuimus
 damnas,damnās
-Philete,Philete
 scripserim,scrīpserim
 appendix,appendix
 novae,novae
@@ -4115,6 +4125,7 @@ ais,ais
 tune,tūne
 commilito,commīlitō
 spoliare,spoliāre
+exscreat,exscreat
 sputum,spūtum
 digitis,digitīs
 Digitis,Digitīs
@@ -4133,7 +4144,6 @@ provocabat,prōvocābat
 barbarus,barbarus
 metuit,metuit
 primi,prīmī
-Primi,Prīmī
 mussitant,mussitant
 Mars,Mārs
 adit,adit
@@ -4509,8 +4519,10 @@ crura,crūra
 demittit,dēmittit
 villos,villōs
 haeserunt,haesērunt
+canceres,cancerēs
 abripiens,abripiēns
 excutit,excutit
+vafer,vafer
 acuit,acuit
 fames,famēs
 saepenumero,saepenumerō
@@ -4589,6 +4601,7 @@ venatorem,vēnātōrem
 fugeret,fugeret
 bubulco,bubulcō
 Bubulco,Bubulcō
+veprem,veprem
 irreperet,irrēperet
 perque,perque
 bubulce,bubulce
@@ -4681,6 +4694,7 @@ fugisti,fūgistī
 grilli,grillī
 scarabaei,scarabaeī
 locustarum,locustārum
+Locustarum,Locustārum
 metuas,metuās
 diligo,dīligō
 quietos,quiētōs
@@ -4688,7 +4702,6 @@ probam,probam
 bene,bene
 campo,campō
 salutem,salūtem
-Salutem,Salūtem
 committo,committō
 epilogus,epilogus
 qualecumque,quālecumque
