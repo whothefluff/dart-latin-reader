@@ -114,7 +114,7 @@ final operations = [
                   wordIdx: intValue(row[7].toString()),
                   enclitic: stringValue(row[8].toString()),
                   expansion: stringValue(row[9].toString()),
-                  macronizedWord: const Value(''),
+                  macronizedWord: const Value(''), // worth leaving like this for easier error tracking
                   uncertaintyBitMask: const Value(-1), // fully uncertain until staging
                 ),
               ),
