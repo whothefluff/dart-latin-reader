@@ -46,16 +46,24 @@ Future<int> getDbDataVersion(AppDb db) async {
 Future<void> populateDatabaseFromCsv(AppDb db) async {
   final operations = [
     ...libr_util.operations,
-    ...dict_util.operations,
     ...morp_util.operations,
+    ...dict_util.operations,
     ...freq_util.operations,
   ];
   await db.transaction(() async {
-    await operations.fold(
+    // Two passes, one transaction.
+    // Foreign keys are enforced immediately so every dependent table has to be
+    // emptied before the table it points at
+    await operations.reversed.fold(
       Future<void>.value(),
       (previousFuture, op) => previousFuture.then((_) async {
         log.fine(() => 'deleting ${op.id}');
         await op.delete(db);
+      }),
+    );
+    await operations.fold(
+      Future<void>.value(),
+      (previousFuture, op) => previousFuture.then((_) async {
         log.fine(() => 'inserting ${op.id}');
         await op.insert(db);
       }),
