@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../../external/database.dart';
+import '../../external/db_oracle.dart';
 import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'dictionary.drift.dart';
@@ -202,3 +203,5 @@ final operations = [
     },
   ),
 ];
+
+const List<DbOracle> oracles = [];

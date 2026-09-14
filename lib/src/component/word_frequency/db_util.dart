@@ -1,4 +1,5 @@
 import '../../external/database.dart';
+import '../../external/db_oracle.dart';
 
 /// CTE for every frequency population statement.
 /// Here as raw SQL (and not as a declared view) to keep behavior and DDL
@@ -204,3 +205,5 @@ final operations = [
     },
   ),
 ];
+
+const List<DbOracle> oracles = [];
