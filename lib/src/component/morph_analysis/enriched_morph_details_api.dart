@@ -1,6 +1,3 @@
-// Exception for APIs
-// ignore_for_file: one_member_abstracts
-
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -9,8 +6,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../../external/provider_ext.dart';
-import '../dictionary/lewis_and_short_basic_info_api.dart' hide IDictionaryRepository;
-import 'enriched_resolver.dart';
+import '../dictionary/lewis_and_short_basic_info_api.dart';
+import '../dictionary/lns_enricher.dart';
 import 'morphological_details_api.dart';
 
 part 'enriched_morph_details_api.g.dart';
@@ -22,47 +19,23 @@ Future<EnrichedAnalyses> enrichedMorphologicalAnalyses(Ref ref, AnalysisKeys key
   log.info(() => '@riverpod - using $keys');
   ref.cacheFor(const Duration(minutes: 5));
   final analyses = await ref.watch(morphologicalAnalysesProvider(keys).future);
-  return GetEnrichedMorphologicalAnalysesUseCase(
-    analyses: analyses,
-    repo: RiverpodDictionaryRepository(ref),
-  ).invoke();
-}
-
-// interactors
-
-class GetEnrichedMorphologicalAnalysesUseCase implements IGetEnrichedMorphologicalAnalysesUseCase {
-  GetEnrichedMorphologicalAnalysesUseCase({
-    required this.analyses,
-    required this.repo,
-  });
-
-  final Analyses analyses;
-  final IDictionaryRepository repo;
-
-  @override
-  Future<EnrichedAnalyses> invoke() async {
-    final resolver = DictionaryRefResolver(repo);
-    final enrichedItems = await resolver.resolveAndEnrich(
-      items: analyses,
-      getDictRef: (analysis) => analysis.dictionaryRef,
-      createEnriched: (analysis, lnsInfo) => EnrichedAnalysis(base: analysis, lns: lnsInfo),
-    );
-    return EnrichedAnalyses(enrichedItems);
-  }
-
-  //
+  final enriched = await enrichWithLns(
+    ref: ref,
+    items: analyses,
+    getDictRef: (analysis) => analysis.dictionaryRef,
+    createEnriched: (analysis, lnsInfo) => EnrichedAnalysis(base: analysis, lns: lnsInfo),
+  );
+  return EnrichedAnalyses(enriched);
 }
 
 //domain
 
-abstract interface class IGetEnrichedMorphologicalAnalysesUseCase {
-  Future<EnrichedAnalyses> invoke();
-}
-
 @immutable
 extension type const EnrichedAnalyses._(UnmodifiableListView<EnrichedAnalysis> unm)
     implements UnmodifiableListView<EnrichedAnalysis> {
-  EnrichedAnalyses(Iterable<EnrichedAnalysis> iter) : this._(UnmodifiableListView(iter));
+  EnrichedAnalyses(
+    Iterable<EnrichedAnalysis> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable

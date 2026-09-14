@@ -18,8 +18,8 @@ class DictionaryEntryPage extends ConsumerWidget {
   final String dictionary;
   final String lemma;
   // dart format off
-  static final Map<bool, 
-                   ({int? maxLines, TextOverflow textOverflow})> 
+  static final Map<bool,
+                   ({int? maxLines, TextOverflow textOverflow})>
       _toggle = {
     true: (textOverflow: TextOverflow.visible, maxLines: null),
     false: (textOverflow: TextOverflow.ellipsis, maxLines: 1),
@@ -41,7 +41,7 @@ class DictionaryEntryPage extends ConsumerWidget {
           ),
         ),
         loading: showLoading,
-        error: error(ref),
+        error: showError(ref, dictionaryEntrySensesProvider(dictionary, lemma)),
       );
 
   LinkedHashMap<String, List<EntrySense>> groupSenses(List<EntrySense> senses) =>
@@ -109,18 +109,16 @@ class DictionaryEntryPage extends ConsumerWidget {
     );
   }
 
-  Widget Function(Object error, StackTrace _) error(WidgetRef ref) =>
-      showError(ref, dictionaryEntrySensesProvider(dictionary, lemma));
   //
 }
 
 class TabulatedText extends StatelessWidget {
   const TabulatedText({
+    super.key,
     required this.prettyLevel,
     required this.content,
     this.textOverflow = TextOverflow.visible,
     this.maxLines,
-    super.key,
   });
 
   final String prettyLevel;
@@ -152,4 +150,5 @@ class TabulatedText extends StatelessWidget {
       style: TextStyle(color: ColorScheme.of(context).secondary),
     ),
   ];
+  //
 }

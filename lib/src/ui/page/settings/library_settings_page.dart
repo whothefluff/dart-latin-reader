@@ -20,7 +20,7 @@ class LibrarySettingsPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(context, WidgetRef ref) => Scaffold(
+  Widget build(context, ref) => Scaffold(
     appBar: AppBar(title: const Text('Library Settings')),
     body: ref
         .watch(readerSettingsNotifierProvider)
@@ -46,6 +46,7 @@ class LibrarySettingsPage extends ConsumerWidget {
           },
         ),
   );
+  //
 }
 
 class _ReaderSettingsSection extends StatelessWidget {

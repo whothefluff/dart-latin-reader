@@ -68,6 +68,8 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
         await op.insert(db);
       }),
     );
+    // Better plans:
+    await db.customStatement('ANALYZE;');
   });
 }
 

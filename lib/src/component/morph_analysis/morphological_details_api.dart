@@ -24,7 +24,7 @@ Future<Analyses> morphologicalAnalyses(Ref ref, AnalysisKeys keys) async {
   log.info(() => '@riverpod - using $keys');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
-  final repo = MorphologicalDataRepository(db);
+  final repo = MorphologicalDataRepository(db.morphAnalysisDrift);
   return GetMorphologicalAnalysesUseCase(repo, keys).invoke();
 }
 
@@ -33,7 +33,7 @@ Future<AnalysisKeys> morphologicalAnalysisKeys(Ref ref, String form) async {
   log.info(() => '@riverpod - using $form');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
-  final repo = MorphologicalDataRepository(db);
+  final repo = MorphologicalDataRepository(db.morphAnalysisDrift);
   return GetMorphologicalAnalysisKeysUseCase(repo, form).invoke();
 }
 
@@ -44,18 +44,18 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
     _analysisKeysQueries = {
       (hasMacrons: true): (String form) {
         log.fine(() => 'retrieve AnalysisKeys WHERE macronizedForm LIKE "$form"');
-        return _db.morphAnalysisDrift.getAnalysisKeysOfMacronized(form);
+        return _db.getAnalysisKeysOfMacronized(form);
       },
       (hasMacrons: false): (String form) {
         log.fine(() => 'retrieve AnalysisKeys WHERE form LIKE "$form"');
-        return _db.morphAnalysisDrift.getAnalysisKeysOf(form);
+        return _db.getAnalysisKeysOf(form);
       },
     };
   }
 
-  final AppDb _db;
+  final MorphAnalysisDrift _db;
   // dart format off
-  late final Map<({bool hasMacrons}), 
+  late final Map<({bool hasMacrons}),
                  MultiSelectable<AnalysisKey> Function(String form)>
       _analysisKeysQueries;
   // dart format on
@@ -63,12 +63,11 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   @override
   Future<Analyses> getMorphAnalyses(AnalysisKeys keys) async {
     log.fine('retrieving analyses of $keys from db');
-    // dart format off
-    final dbData = await 
-        (_db.select(_db.morphAnalysisDrift.morphologyAnalyses)
-        ..where(_keysMatch(keys))).get();
-    // dart format on
-    return Analyses(dbData.map(_toDomain));
+    // TODO(whothefluff): replace by final dbData = await _db.morphAnalysisDrift.getMorphAnalyses(predicate: _keysMatch(keys)).get();
+    // Keep reading order and numbering stable for the selected keys.
+    final query = _db.select(_db.morphologyAnalyses)..where(_keysMatch(keys));
+    final dbData = await query.get();
+    return Analyses(dbData);
   }
 
   /// If the input contains macrons, the query will look for them explicitely
@@ -93,27 +92,6 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
           ]),
         ),
       );
-
-  Analysis _toDomain(MorphologyAnalysis e) => Analysis(
-    form: e.form,
-    item: e.item,
-    cnt: e.cnt,
-    macronizedForm: e.macronizedForm,
-    dictionaryRef: e.dictionaryRef,
-    partOfSpeech: e.partOfSpeech,
-    stem: e.stem,
-    suffix: e.suffix,
-    segmentsInfo: e.segmentsInfo,
-    gender: e.gender,
-    number: e.number,
-    declension: e.declension,
-    gramCase: e.gramCase,
-    verbForm: e.verbForm,
-    tense: e.tense,
-    voice: e.voice,
-    person: e.person,
-    additional: e.additional,
-  );
   //
 }
 
@@ -238,8 +216,9 @@ extension type const AnalysisKeys._(ValueList<AnalysisKey> unm) implements Value
     Iterable<AnalysisKey> iter,
   ) : this._(ValueList(iter));
 
-  AnalysisKeys.fromJson(String source)
-    : this(
+  AnalysisKeys.fromJson(
+    String source,
+  ) : this(
         (jsonDecode(source) as List).expand((formEntry) {
           final formData = formEntry as List;
           final items = formData[1] as List;
@@ -259,8 +238,8 @@ extension type const AnalysisKeys._(ValueList<AnalysisKey> unm) implements Value
 
   String toJson() {
     // dart format off
-    final forms = <String, 
-                   Map<int, 
+    final forms = <String,
+                   Map<int,
                        List<int>>>{};
     // dart format on
     forEach((k) {
@@ -281,12 +260,23 @@ extension type const AnalysisKeys._(ValueList<AnalysisKey> unm) implements Value
   //
 }
 
+@immutable
 extension type const AnalysisKey._(({String form, int item, int cnt}) _record) {
-  AnalysisKey({
+  const AnalysisKey({
     required String form,
     required int item,
     required int cnt,
   }) : this._((form: form, item: item, cnt: cnt));
+
+  AnalysisKey.fromSql({
+    required String? form,
+    required int? item,
+    required int? cnt,
+  }) : this(
+         form: form!,
+         item: item!,
+         cnt: cnt!,
+       );
 
   String get form => _record.form;
   int get item => _record.item;

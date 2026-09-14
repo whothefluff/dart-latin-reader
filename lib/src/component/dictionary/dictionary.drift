@@ -62,6 +62,14 @@ CREATE TABLE "DictEntrySenseQuotes" (
 STRICT,
 WITHOUT ROWID;
 
+CREATE TABLE "LnsRefResolutions"(
+    "dictionaryRef" TEXT NOT NULL,
+    "lnsLemma" TEXT,
+    PRIMARY KEY( dictionaryRef )
+)
+STRICT, 
+WITHOUT ROWID;
+
 fillDictionaryAlphabets: INSERT INTO "DictionaryAlphabets" SELECT dictionary, UPPER( SUBSTR( lemma, 1, 1 ) ), MIN( idx ) FROM DictionaryEntries GROUP BY dictionary, UPPER( SUBSTR( lemma, 1, 1 ) );
 
 CREATE VIEW "dictionary.Dictionaries" AS
@@ -75,6 +83,19 @@ CREATE VIEW "dictionary.Dictionaries" AS
             ON Dictionaries.id = DictionaryCounts.dictionary;
 
 getDictionaries WITH Dictionary: SELECT id, name, language, publisher, CAST( publicationDate AS DATETIME ) AS publicationDate, numberOfEntries FROM "dictionary.Dictionaries";
+
+CREATE VIEW "dictionary.LewisAndShortDictionary" AS 
+    SELECT id, 
+           name, 
+           language, 
+           publisher, 
+           CAST( publicationDate AS DATETIME ) AS publicationDate, 
+           numberOfEntries 
+        FROM "dictionary.Dictionaries" 
+        WHERE name = 'Lewis & Short' -- literal 1 of 3
+        LIMIT 1;
+
+getLewisAndShortDictionary WITH Dictionary: SELECT * FROM "dictionary.LewisAndShortDictionary";
 
 CREATE VIEW "dictionary.DictionaryEntries" AS
     SELECT DictionaryEntries.*,
@@ -131,3 +152,18 @@ getDictionaryEntrySenses WITH EntrySense: SELECT prettyLevel,
 --             ON SearchableDictionaryEntries.lemma = DictionaryEntries.lemma 
 --                AND SearchableDictionaryEntries.dictionary = DictionaryEntries.dictionary
 --                AND DictionaryEntries.dictionary = ?;
+
+CREATE VIEW "dictionary.ResolvedLnsRefs" AS
+    SELECT LnsRefResolutions.dictionaryRef,
+           DictionaryEntries.lemma,
+           DictionaryEntries.inflection,
+           DictionaryEntries.partOfSpeech
+        FROM LnsRefResolutions
+        INNER JOIN DictionaryEntries
+            ON DictionaryEntries.lemma = LnsRefResolutions.lnsLemma
+               AND DictionaryEntries.dictionary = ( SELECT id 
+                                                        FROM Dictionaries 
+                                                        WHERE name = 'Lewis & Short' -- literal 2 of 3
+                                                        LIMIT 1 );
+
+getBasicLnsInfo: SELECT * FROM "dictionary.ResolvedLnsRefs" WHERE dictionaryRef IN ?;

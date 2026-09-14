@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../component/morph_analysis/enriched_morph_details_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import 'common.dart';
 
-///While in theory any number of keys would work, the assumption is that all
-///share the same form. This is relevant for example when showing the title of
-///the page
-class MorphologicalDataPage extends StatelessWidget {
+class MorphologicalDataPage extends ConsumerWidget {
   const MorphologicalDataPage(
     this.keys, {
     super.key,
@@ -15,9 +14,23 @@ class MorphologicalDataPage extends StatelessWidget {
   final AnalysisKeys keys;
 
   @override
-  Widget build(context) => Scaffold(
-    appBar: AppBar(title: Text(keys.first.form)),
+  Widget build(context, ref) => Scaffold(
+    appBar: AppBar(title: _title(ref)),
     body: MorphologicalDataView(keys: keys),
   );
+
+  /// A key can read "magnoque" when the word is "magnō", so the title comes
+  /// from the analyses (no analyses, no title)
+  Text? _title(WidgetRef ref) => ref
+      .watch(enrichedMorphologicalAnalysesProvider(keys))
+      .whenOrNull(data: (analyses) => Text(_titleOf(analyses.map((a) => a.macronizedForm))));
+
+  /// Covers navigating from something like "Venere" at sentence start,
+  /// which would show both "Venere" (Venus) and "venere" (venio).
+  static String _titleOf(Iterable<String> forms) {
+    final distinct = {...forms};
+    return distinct.length <= 3 ? distinct.join(', ') : '${distinct.length} forms';
+  }
+
   //
 }

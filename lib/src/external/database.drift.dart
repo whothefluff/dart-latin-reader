@@ -15,8 +15,13 @@ import 'package:sqlite3/common.dart' as i7;
 abstract class $AppDb extends i0.GeneratedDatabase {
   $AppDb(i0.QueryExecutor e) : super(e);
   $AppDbManager get managers => $AppDbManager(this);
-  late final i1.WorkFormCounts workFormCounts = i1.WorkFormCounts(this);
-  late final i1.WorkLemmaCounts workLemmaCounts = i1.WorkLemmaCounts(this);
+  late final i1.ScopedFormFreq scopedFormFreq = i1.ScopedFormFreq(this);
+  late final i1.ResolvedFreqMorphForms resolvedFreqMorphForms =
+      i1.ResolvedFreqMorphForms(this);
+  late final i1.ScopedFormLemmaFreq scopedFormLemmaFreq =
+      i1.ScopedFormLemmaFreq(this);
+  late final i1.ScopedLemmaFreq scopedLemmaFreq = i1.ScopedLemmaFreq(this);
+  late final i1.ScopedFreqTotals scopedFreqTotals = i1.ScopedFreqTotals(this);
   late final i2.MorphologicalDetails morphologicalDetails =
       i2.MorphologicalDetails(this);
   late final i2.MorphologicalDetailInflections morphologicalDetailInflections =
@@ -36,10 +41,19 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i3.DictEntrySenses dictEntrySenses = i3.DictEntrySenses(this);
   late final i3.DictEntrySenseQuotes dictEntrySenseQuotes =
       i3.DictEntrySenseQuotes(this);
+  late final i3.LnsRefResolutions lnsRefResolutions = i3.LnsRefResolutions(
+    this,
+  );
   late final i3.DictionaryDictionaries dictionaryDictionaries =
       i3.DictionaryDictionaries(this);
+  late final i3.DictionaryLewisAndShortDictionary
+  dictionaryLewisAndShortDictionary = i3.DictionaryLewisAndShortDictionary(
+    this,
+  );
   late final i3.DictionaryDictionaryEntries dictionaryDictionaryEntries =
       i3.DictionaryDictionaryEntries(this);
+  late final i3.DictionaryResolvedLnsRefs dictionaryResolvedLnsRefs =
+      i3.DictionaryResolvedLnsRefs(this);
   late final i4.Authors authors = i4.Authors(this);
   late final i4.AuthorAbbreviations authorAbbreviations =
       i4.AuthorAbbreviations(this);
@@ -75,6 +89,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i4.LibraryWorkIndexes libraryWorkIndexes = i4.LibraryWorkIndexes(
     this,
   );
+  late final i4.LibraryCatalog libraryCatalog = i4.LibraryCatalog(this);
   late final i5.DataVersion dataVersion = i5.DataVersion(this);
   late final i5.LatestDataVersion latestDataVersion = i5.LatestDataVersion(
     this,
@@ -96,8 +111,13 @@ abstract class $AppDb extends i0.GeneratedDatabase {
       allSchemaEntities.whereType<i0.TableInfo<i0.Table, Object?>>();
   @override
   List<i0.DatabaseSchemaEntity> get allSchemaEntities => [
-    workFormCounts,
-    workLemmaCounts,
+    scopedFormFreq,
+    resolvedFreqMorphForms,
+    i1.resolvedFreqMorphFormsLemma,
+    scopedFormLemmaFreq,
+    i1.scopedFormLemmaFreqMacronForm,
+    scopedLemmaFreq,
+    scopedFreqTotals,
     morphologicalDetails,
     morphologicalDetailInflections,
     searchableMorphDetInflections,
@@ -108,16 +128,18 @@ abstract class $AppDb extends i0.GeneratedDatabase {
     dictionaryAlphabets,
     dictEntrySenses,
     dictEntrySenseQuotes,
+    lnsRefResolutions,
     dictionaryDictionaries,
+    dictionaryLewisAndShortDictionary,
     dictionaryDictionaryEntries,
+    dictionaryResolvedLnsRefs,
     authors,
     authorAbbreviations,
     works,
     workAbbreviations,
     workContents,
-    i4.workContentsBaseNormForm,
-    i4.workContentsWordPosition,
     workContentSubdivisions,
+    i4.workContentSubdivisionsParent,
     workContentSupplementary,
     unambiguousMacronizations,
     workMacronizations,
@@ -129,6 +151,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
     libraryWorkDetails,
     libraryWorkContents,
     libraryWorkIndexes,
+    libraryCatalog,
     dataVersion,
     latestDataVersion,
   ];
@@ -140,10 +163,16 @@ abstract class $AppDb extends i0.GeneratedDatabase {
 class $AppDbManager {
   final $AppDb _db;
   $AppDbManager(this._db);
-  i1.$WorkFormCountsTableManager get workFormCounts =>
-      i1.$WorkFormCountsTableManager(_db, _db.workFormCounts);
-  i1.$WorkLemmaCountsTableManager get workLemmaCounts =>
-      i1.$WorkLemmaCountsTableManager(_db, _db.workLemmaCounts);
+  i1.$ScopedFormFreqTableManager get scopedFormFreq =>
+      i1.$ScopedFormFreqTableManager(_db, _db.scopedFormFreq);
+  i1.$ResolvedFreqMorphFormsTableManager get resolvedFreqMorphForms =>
+      i1.$ResolvedFreqMorphFormsTableManager(_db, _db.resolvedFreqMorphForms);
+  i1.$ScopedFormLemmaFreqTableManager get scopedFormLemmaFreq =>
+      i1.$ScopedFormLemmaFreqTableManager(_db, _db.scopedFormLemmaFreq);
+  i1.$ScopedLemmaFreqTableManager get scopedLemmaFreq =>
+      i1.$ScopedLemmaFreqTableManager(_db, _db.scopedLemmaFreq);
+  i1.$ScopedFreqTotalsTableManager get scopedFreqTotals =>
+      i1.$ScopedFreqTotalsTableManager(_db, _db.scopedFreqTotals);
   i2.$MorphologicalDetailsTableManager get morphologicalDetails =>
       i2.$MorphologicalDetailsTableManager(_db, _db.morphologicalDetails);
   i2.$MorphologicalDetailInflectionsTableManager
@@ -168,6 +197,8 @@ class $AppDbManager {
       i3.$DictEntrySensesTableManager(_db, _db.dictEntrySenses);
   i3.$DictEntrySenseQuotesTableManager get dictEntrySenseQuotes =>
       i3.$DictEntrySenseQuotesTableManager(_db, _db.dictEntrySenseQuotes);
+  i3.$LnsRefResolutionsTableManager get lnsRefResolutions =>
+      i3.$LnsRefResolutionsTableManager(_db, _db.lnsRefResolutions);
   i4.$AuthorsTableManager get authors =>
       i4.$AuthorsTableManager(_db, _db.authors);
   i4.$AuthorAbbreviationsTableManager get authorAbbreviations =>

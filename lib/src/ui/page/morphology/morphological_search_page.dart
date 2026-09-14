@@ -61,12 +61,12 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                 isFullScreen: true,
                 suggestionsBuilder: (context, controller) async {
                   final searchTerm = controller.text.trim();
+                  final provider = enrichedMorphologicalSearchProvider(searchTerm);
+                  late final List<Widget> suggestions;
                   try {
-                    final results = await ref.read(
-                      enrichedMorphologicalSearchProvider(searchTerm).future,
-                    );
+                    final results = await ref.read(provider.future);
                     final groupedRes = results.groupListsBy(consolidatedForm());
-                    return [
+                    suggestions = [
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const ClampingScrollPhysics(),
@@ -94,10 +94,9 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                     ];
                   } on Exception catch (e, stack) {
                     log.catching(e);
-                    return [
-                      showError(ref, enrichedMorphologicalSearchProvider(searchTerm))(e, stack),
-                    ];
+                    suggestions = [showError(ref, provider)(e, stack)];
                   }
+                  return suggestions;
                 },
               ),
             ),

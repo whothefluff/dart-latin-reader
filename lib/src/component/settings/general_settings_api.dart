@@ -7,6 +7,8 @@ import '../../external/settings.dart';
 
 part 'general_settings_api.g.dart';
 
+//infrastructure
+
 /// A Notifier that many Widgets can interact with to read global user settings,
 /// update user settings, or listen to user settings changes.
 ///
@@ -28,30 +30,34 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
     return log.exit(r: settings)!;
   }
 
-  /// Updates the state and persists the user's preferred ThemeMode
-  Future<void> updateThemeMode(ThemeMode mode) async {
-    log.entry(args: [mode]);
+  /// Updates and saves the app settings.
+  Future<void> updateSettings(GeneralSettings newSettings) async {
+    log.entry(args: [newSettings]);
     final previous = state.valueOrNull;
-    if (previous != null && previous.themeMode != mode) {
+    if (previous != null && previous != newSettings) {
       // Optimistic update: state reflects the change before persistence completes
-      state = AsyncData(previous.copyWith(themeMode: mode));
+      state = AsyncData(newSettings);
       // Persist (with rollback on failure)
       try {
-        await ref.read(settingsRepositoryProvider).set(_theme, PrefString(mode.name));
+        await ref
+            .read(settingsRepositoryProvider)
+            .set(_theme, PrefString(newSettings.themeMode.name));
       } on Exception catch (e, st) {
         log
           ..catching(e, stackTrace: st)
-          ..warning(() => 'Rolling back theme to ${previous.themeMode}');
+          ..warning(() => 'Rolling back settings to $previous');
         state = AsyncData(previous);
       }
     } else {
-      log.fine(() => 'no-op: theme unchanged');
+      log.fine(() => 'no-op: settings unchanged');
     }
     log.exit<void>();
   }
 
   //
 }
+
+//domain
 
 /// Holds the global app settings that dictate the app's overall behavior and appearance.
 @immutable
@@ -65,5 +71,14 @@ class GeneralSettings {
   GeneralSettings copyWith({ThemeMode? themeMode}) => GeneralSettings(
     themeMode: themeMode ?? this.themeMode,
   );
+  @override
+  String toString() => 'GeneralSettings{themeMode: $themeMode}';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is GeneralSettings && other.themeMode == themeMode);
+
+  @override
+  int get hashCode => themeMode.hashCode;
   //
 }

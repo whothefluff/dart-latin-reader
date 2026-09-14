@@ -72,7 +72,9 @@ abstract interface class IGetDictionariesUseCase {
 @immutable
 extension type const Dictionaries._(UnmodifiableListView<Dictionary> unm)
     implements UnmodifiableListView<Dictionary> {
-  Dictionaries(Iterable<Dictionary> iter) : this._(UnmodifiableListView(iter));
+  Dictionaries(
+    Iterable<Dictionary> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable

@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../component/dictionary/dictionaries_api.dart';
+import '../../../component/dictionary/lewis_and_short_api.dart';
 import '../../../component/morph_analysis/enriched_morph_details_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../router/config.dart';
@@ -30,8 +31,7 @@ import '../../widget/show_loading.dart';
       add: r.additional,
     );
 
-/// A reusable widget that fetches and displays morphological analysis details
-/// taking AnalysisKeys [keys]
+/// Loads and displays the morphological analyses identified by [keys]
 class MorphologicalDataView extends ConsumerWidget {
   const MorphologicalDataView({
     super.key,
@@ -44,10 +44,13 @@ class MorphologicalDataView extends ConsumerWidget {
   Widget build(context, ref) => ref
       .watch(enrichedMorphologicalAnalysesProvider(keys))
       .when(
-        data: (data) => _MorphDataSlides(analyses: data),
+        data: (data) => data.isEmpty
+            ? const Center(child: Text('No morphological analysis is available'))
+            : _MorphDataSlides(key: ObjectKey(data), analyses: data),
         error: showError(ref, enrichedMorphologicalAnalysesProvider(keys)),
         loading: showLoading,
       );
+  //
 }
 
 /// There will be one "slide" for each entry in the grouping logic, which is
@@ -61,6 +64,7 @@ class MorphologicalDataView extends ConsumerWidget {
 /// platforms the user will use the buttons
 class _MorphDataSlides extends StatefulWidget {
   const _MorphDataSlides({
+    super.key,
     required this.analyses,
   });
 
@@ -75,7 +79,7 @@ class _MorphDataSlidesState extends State<_MorphDataSlides> with TickerProviderS
   //
   /// Each entry will correspond to a slide
   // dart format off
-  late final Map<({String? add, String dictRef, String? pos, String title}), 
+  late final Map<({String? add, String dictRef, String? pos, String title}),
                   List<EnrichedAnalysis>>
       _groupedAnalyses;
   // dart format on
@@ -244,10 +248,7 @@ class _MorphEntryCard extends ConsumerWidget {
     avatar: Icon(Icons.translate, color: themeColor.secondary),
     label: const Text('View in Dictionary'),
     onPressed: () async {
-      // We could create a provider specifically for this but this call
-      // should remain extremely fast forever
-      final dictionaries = await ref.read(dictionariesProvider.future);
-      final lns = dictionaries.singleWhere((d) => d.name == 'Lewis & Short');
+      final lns = await ref.read(lewisAndShortDictionaryProvider.future);
       if (context.mounted) {
         await DictionaryEntryRoute(lns.id, firstAnalysis.lnsLemma).push<void>(context);
       }
@@ -316,6 +317,8 @@ class _MorphEntryCard extends ConsumerWidget {
 /// Helper class to encapsulate the grouping logic *within* a PageView Card
 ///
 /// Meant to be used inside independent PageView elements
+///
+/// Separates the properties shared by all readings from their differences
 class _GroupedAnalysisData {
   _GroupedAnalysisData(
     this.analyses,
@@ -326,8 +329,6 @@ class _GroupedAnalysisData {
   final EnrichedAnalyses analyses;
   late final Map<String, String> commonProperties;
   late final List<Map<String, String>> differences;
-
-  bool get hasDifferences => differences.any((d) => d.isNotEmpty);
 
   // Versatility preferred over clarity
   // ignore: specify_nonobvious_property_types
@@ -346,32 +347,46 @@ class _GroupedAnalysisData {
   ];
 
   void _computeGroupedProperties() {
-    final common = <String, String>{};
-    final differencesList = List<Map<String, String>>.generate(analyses.length, (_) => {});
-    // Iterate over each property label once only
-    for (final e in _propertyExtractors) {
-      final label = e.label;
-      final extractor = e.value;
-      final nonNullValues = analyses.map(extractor).whereType<String>().toSet();
-      if (nonNullValues.length == 1) {
-        common[label] = nonNullValues.first;
-      } else if (nonNullValues.length > 1) {
-        // Fill the differences for this property
-        for (var i = 0; i < analyses.length; i++) {
-          final val = extractor(analyses[i]);
-          if (val != null && val.isNotEmpty) {
-            differencesList[i][label] = val;
-          }
-        }
-      }
-    }
+    // The card already groups analyses by displayed form, dictionary reference,
+    // part of speech, and additional information. Compare the remaining displayed
+    // properties to show identical readings only once.
+    const equality = MapEquality<String, String>();
+    final readings = LinkedHashSet<Map<String, String>>(
+      equals: equality.equals,
+      hashCode: equality.hash,
+    )..addAll(analyses.map(_readingOf));
+    // A common property must be present with the same value in every reading.
+    final common = Map.fromEntries(
+      readings
+          .take(1)
+          .expand((first) => first.entries)
+          .where((entry) => readings.every((reading) => reading[entry.key] == entry.value)),
+    );
     commonProperties = common;
-    differences = differencesList;
+    differences = readings
+        .map(
+          (reading) => Map.fromEntries(
+            reading.entries.where(
+              (entry) => !common.containsKey(entry.key),
+            ),
+          ),
+        )
+        .toList();
   }
+
+  /// Builds the displayed properties for [analysis], omitting null and empty values.
+  /// Properties follow the order in [_propertyExtractors].
+  static Map<String, String> _readingOf(EnrichedAnalysis analysis) => Map.fromEntries(
+    _propertyExtractors
+        .map((extractor) => MapEntry(extractor.label, extractor.value(analysis) ?? ''))
+        .where((entry) => entry.value.isNotEmpty),
+  );
 
   //
 }
 
+/// Shows page dots when there is more than one page.
+/// Desktop and web also show previous and next buttons.
 class _PageIndicator extends StatelessWidget {
   const _PageIndicator({
     required this.tabController,
@@ -389,43 +404,35 @@ class _PageIndicator extends StatelessWidget {
   final bool isOnDesktopOrWeb;
 
   @override
-  Widget build(context) {
-    // Hide if only one page or not on desktop/web
-    if (totalPages <= 1) {
-      return const SizedBox.shrink();
-    }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ?goLeftButtonForDesktop(),
-        // Use Flexible to allow TabPageSelector to take necessary space but not more
-        Flexible(
-          child: TabPageSelector(
-            controller: tabController,
-            selectedColor: ColorScheme.of(context).primary,
-          ),
-        ),
-        ?_goRightButtonForDesktop(),
-      ],
-    );
-  }
+  Widget build(context) => totalPages <= 1
+      ? const SizedBox.shrink()
+      : Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ?goLeftButtonForDesktop(),
+            // Use Flexible to allow TabPageSelector to take necessary space but not more
+            Flexible(
+              child: TabPageSelector(
+                controller: tabController,
+                selectedColor: ColorScheme.of(context).primary,
+              ),
+            ),
+            ?_goRightButtonForDesktop(),
+          ],
+        );
 
-  IconButton? _goRightButtonForDesktop() {
-    if (isOnDesktopOrWeb) {
-      return IconButton(
-        tooltip: 'Next',
-        onPressed: () {
-          // Use totalPages for the upper bound check
-          if (currentPageIndex != totalPages - 1) {
-            onPageChangeRequestedByButton(currentPageIndex + 1);
-          }
-        },
-        icon: const Icon(Icons.arrow_right_rounded),
-      );
-    } else {
-      return null;
-    }
-  }
+  IconButton? _goRightButtonForDesktop() => isOnDesktopOrWeb
+      ? IconButton(
+          tooltip: 'Next',
+          onPressed: () {
+            // Use totalPages for the upper bound check
+            if (currentPageIndex != totalPages - 1) {
+              onPageChangeRequestedByButton(currentPageIndex + 1);
+            }
+          },
+          icon: const Icon(Icons.arrow_right_rounded),
+        )
+      : null;
 
   IconButton? goLeftButtonForDesktop() => isOnDesktopOrWeb
       ? IconButton(

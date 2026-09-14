@@ -762,6 +762,11 @@ class $WorkContentsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
+  i0.ColumnFilters<String> get auxPlainBase => $composableBuilder(
+    column: $table.auxPlainBase,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
   i0.ColumnFilters<String> get auxMacronBase => $composableBuilder(
     column: $table.auxMacronBase,
     builder: (column) => i0.ColumnFilters(column),
@@ -872,6 +877,11 @@ class $WorkContentsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<String> get auxPlainBase => $composableBuilder(
+    column: $table.auxPlainBase,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<String> get auxMacronBase => $composableBuilder(
     column: $table.auxMacronBase,
     builder: (column) => i0.ColumnOrderings(column),
@@ -965,6 +975,11 @@ class $WorkContentsAnnotationComposer
 
   i0.GeneratedColumn<String> get auxExpansionNoMacrons => $composableBuilder(
     column: $table.auxExpansionNoMacrons,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get auxPlainBase => $composableBuilder(
+    column: $table.auxPlainBase,
     builder: (column) => column,
   );
 
@@ -3344,6 +3359,24 @@ class WorkContents extends i0.Table
     $customConstraints:
         'GENERATED ALWAYS AS ("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(expansion, \'ā\', \'a\'), \'ē\', \'e\'), \'ī\', \'i\'), \'ō\', \'o\'), \'ū\', \'u\'), \'ȳ\', \'y\'), \'Ā\', \'A\'), \'Ē\', \'E\'), \'Ī\', \'I\'), \'Ō\', \'O\'), \'Ū\', \'U\'), \'Ȳ\', \'Y\')) VIRTUAL',
   );
+  static const i0.VerificationMeta _auxPlainBaseMeta =
+      const i0.VerificationMeta('auxPlainBase');
+  late final i0.GeneratedColumn<String>
+  auxPlainBase = i0.GeneratedColumn<String>(
+    'aux_plainBase',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        'COALESCE(aux_expansionNoMacrons, CASE WHEN enclitic IS NOT NULL THEN SUBSTR(word, 1, LENGTH(word) - LENGTH(enclitic)) ELSE word END)',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS (COALESCE(aux_expansionNoMacrons, CASE WHEN enclitic IS NOT NULL THEN SUBSTR(word, 1, LENGTH(word) - LENGTH(enclitic)) ELSE word END)) VIRTUAL',
+  );
   static const i0.VerificationMeta _auxMacronBaseMeta =
       const i0.VerificationMeta('auxMacronBase');
   late final i0.GeneratedColumn<String>
@@ -3443,14 +3476,14 @@ class WorkContents extends i0.Table
     true,
     generatedAs: i0.GeneratedAs(
       const i0.CustomExpression(
-        'CASE WHEN aux_expansionNoMacrons IS NOT NULL THEN CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(aux_expansionNoMacrons, 1, 1)) || LOWER(SUBSTR(aux_expansionNoMacrons, 2)) ELSE LOWER(aux_expansionNoMacrons) END WHEN enclitic IS NOT NULL THEN CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2, LENGTH(word) - LENGTH(enclitic) - 1)) ELSE LOWER(SUBSTR(word, 1, LENGTH(word) - LENGTH(enclitic))) END ELSE CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2)) ELSE LOWER(word) END END',
+        'CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(aux_plainBase, 1, 1)) || LOWER(SUBSTR(aux_plainBase, 2)) ELSE LOWER(aux_plainBase) END',
       ),
       false,
     ),
     type: i0.DriftSqlType.string,
     requiredDuringInsert: false,
     $customConstraints:
-        'GENERATED ALWAYS AS (CASE WHEN aux_expansionNoMacrons IS NOT NULL THEN CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(aux_expansionNoMacrons, 1, 1)) || LOWER(SUBSTR(aux_expansionNoMacrons, 2)) ELSE LOWER(aux_expansionNoMacrons) END WHEN enclitic IS NOT NULL THEN CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2, LENGTH(word) - LENGTH(enclitic) - 1)) ELSE LOWER(SUBSTR(word, 1, LENGTH(word) - LENGTH(enclitic))) END ELSE CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(word, 1, 1)) || LOWER(SUBSTR(word, 2)) ELSE LOWER(word) END END) VIRTUAL',
+        'GENERATED ALWAYS AS (CASE WHEN properNounState IN (1, 2) THEN UPPER(SUBSTR(aux_plainBase, 1, 1)) || LOWER(SUBSTR(aux_plainBase, 2)) ELSE LOWER(aux_plainBase) END) VIRTUAL',
   );
   static const i0.VerificationMeta _macronBaseNormFormMeta =
       const i0.VerificationMeta('macronBaseNormForm');
@@ -3485,6 +3518,7 @@ class WorkContents extends i0.Table
     macronizedWord,
     uncertaintyBitMask,
     auxExpansionNoMacrons,
+    auxPlainBase,
     auxMacronBase,
     auxMacronWordLower,
     auxMacronBaseLower,
@@ -3617,6 +3651,15 @@ class WorkContents extends i0.Table
         ),
       );
     }
+    if (data.containsKey('aux_plainBase')) {
+      context.handle(
+        _auxPlainBaseMeta,
+        auxPlainBase.isAcceptableOrUnknown(
+          data['aux_plainBase']!,
+          _auxPlainBaseMeta,
+        ),
+      );
+    }
     if (data.containsKey('aux_macronBase')) {
       context.handle(
         _auxMacronBaseMeta,
@@ -3738,6 +3781,10 @@ class WorkContents extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}aux_expansionNoMacrons'],
       ),
+      auxPlainBase: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}aux_plainBase'],
+      ),
       auxMacronBase: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}aux_macronBase'],
@@ -3784,6 +3831,8 @@ class WorkContents extends i0.Table
     'FOREIGN KEY(workId)REFERENCES Works(id)',
     'CHECK((wordIdx IS NULL)=(tokenType >= 4))',
     'CHECK(expansion IS NULL OR enclitic IS NULL)',
+    'CHECK(enclitic IS NULL OR(LENGTH(enclitic) > 0 AND LENGTH(enclitic) < LENGTH(word) AND LOWER(SUBSTR(word, LENGTH(word) - LENGTH(enclitic) + 1)) = LOWER(enclitic)))',
+    'CHECK(enclitic IS NULL OR tokenType = 1)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -3812,6 +3861,7 @@ class WorkContent extends i0.DataClass
 
   /// aux (internal use only)
   final String? auxExpansionNoMacrons;
+  final String? auxPlainBase;
   final String? auxMacronBase;
   final String? auxMacronWordLower;
   final String? auxMacronBaseLower;
@@ -3835,6 +3885,7 @@ class WorkContent extends i0.DataClass
     required this.macronizedWord,
     required this.uncertaintyBitMask,
     this.auxExpansionNoMacrons,
+    this.auxPlainBase,
     this.auxMacronBase,
     this.auxMacronWordLower,
     this.auxMacronBaseLower,
@@ -3915,6 +3966,7 @@ class WorkContent extends i0.DataClass
       auxExpansionNoMacrons: serializer.fromJson<String?>(
         json['aux_expansionNoMacrons'],
       ),
+      auxPlainBase: serializer.fromJson<String?>(json['aux_plainBase']),
       auxMacronBase: serializer.fromJson<String?>(json['aux_macronBase']),
       auxMacronWordLower: serializer.fromJson<String?>(
         json['aux_macronWordLower'],
@@ -3949,6 +4001,7 @@ class WorkContent extends i0.DataClass
       'aux_expansionNoMacrons': serializer.toJson<String?>(
         auxExpansionNoMacrons,
       ),
+      'aux_plainBase': serializer.toJson<String?>(auxPlainBase),
       'aux_macronBase': serializer.toJson<String?>(auxMacronBase),
       'aux_macronWordLower': serializer.toJson<String?>(auxMacronWordLower),
       'aux_macronBaseLower': serializer.toJson<String?>(auxMacronBaseLower),
@@ -3973,6 +4026,7 @@ class WorkContent extends i0.DataClass
     String? macronizedWord,
     int? uncertaintyBitMask,
     i0.Value<String?> auxExpansionNoMacrons = const i0.Value.absent(),
+    i0.Value<String?> auxPlainBase = const i0.Value.absent(),
     i0.Value<String?> auxMacronBase = const i0.Value.absent(),
     i0.Value<String?> auxMacronWordLower = const i0.Value.absent(),
     i0.Value<String?> auxMacronBaseLower = const i0.Value.absent(),
@@ -3998,6 +4052,7 @@ class WorkContent extends i0.DataClass
     auxExpansionNoMacrons: auxExpansionNoMacrons.present
         ? auxExpansionNoMacrons.value
         : this.auxExpansionNoMacrons,
+    auxPlainBase: auxPlainBase.present ? auxPlainBase.value : this.auxPlainBase,
     auxMacronBase: auxMacronBase.present
         ? auxMacronBase.value
         : this.auxMacronBase,
@@ -4032,6 +4087,7 @@ class WorkContent extends i0.DataClass
           ..write('macronizedWord: $macronizedWord, ')
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
           ..write('auxExpansionNoMacrons: $auxExpansionNoMacrons, ')
+          ..write('auxPlainBase: $auxPlainBase, ')
           ..write('auxMacronBase: $auxMacronBase, ')
           ..write('auxMacronWordLower: $auxMacronWordLower, ')
           ..write('auxMacronBaseLower: $auxMacronBaseLower, ')
@@ -4044,7 +4100,7 @@ class WorkContent extends i0.DataClass
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     workId,
     idx,
     word,
@@ -4058,6 +4114,7 @@ class WorkContent extends i0.DataClass
     macronizedWord,
     uncertaintyBitMask,
     auxExpansionNoMacrons,
+    auxPlainBase,
     auxMacronBase,
     auxMacronWordLower,
     auxMacronBaseLower,
@@ -4065,7 +4122,7 @@ class WorkContent extends i0.DataClass
     macronNormForm,
     baseNormForm,
     macronBaseNormForm,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4083,6 +4140,7 @@ class WorkContent extends i0.DataClass
           other.macronizedWord == this.macronizedWord &&
           other.uncertaintyBitMask == this.uncertaintyBitMask &&
           other.auxExpansionNoMacrons == this.auxExpansionNoMacrons &&
+          other.auxPlainBase == this.auxPlainBase &&
           other.auxMacronBase == this.auxMacronBase &&
           other.auxMacronWordLower == this.auxMacronWordLower &&
           other.auxMacronBaseLower == this.auxMacronBaseLower &&
@@ -4261,15 +4319,6 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
         .toString();
   }
 }
-
-i0.Index get workContentsBaseNormForm => i0.Index(
-  'WorkContents_BaseNormForm',
-  'CREATE INDEX WorkContents_BaseNormForm ON WorkContents (baseNormForm)',
-);
-i0.Index get workContentsWordPosition => i0.Index(
-  'WorkContents_WordPosition',
-  'CREATE INDEX WorkContents_WordPosition ON WorkContents (workId, sentenceIdx, wordIdx)',
-);
 
 class WorkContentSubdivisions extends i0.Table
     with i0.TableInfo<WorkContentSubdivisions, i1.WorkContentSubdivision> {
@@ -4789,6 +4838,11 @@ class WorkContentSubdivisionsCompanion
   }
 }
 
+i0.Index get workContentSubdivisionsParent => i0.Index(
+  'WorkContentSubdivisions_Parent',
+  'CREATE INDEX WorkContentSubdivisions_Parent ON WorkContentSubdivisions (parent)',
+);
+
 class WorkContentSupplementary extends i0.Table
     with
         i0.TableInfo<
@@ -5276,10 +5330,6 @@ class UnambiguousMacronizations extends i0.Table
   @override
   Set<i0.GeneratedColumn> get $primaryKey => {word};
   @override
-  List<Set<i0.GeneratedColumn>> get uniqueKeys => [
-    {word, macronizedWord},
-  ];
-  @override
   i1.UnambiguousMacronization map(
     Map<String, dynamic> data, {
     String? tablePrefix,
@@ -5307,10 +5357,7 @@ class UnambiguousMacronizations extends i0.Table
   @override
   bool get isStrict => true;
   @override
-  List<String> get customConstraints => const [
-    'PRIMARY KEY(word)',
-    'UNIQUE(word, macronizedWord)',
-  ];
+  List<String> get customConstraints => const ['PRIMARY KEY(word)'];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -6100,7 +6147,7 @@ class LibraryStagingResolvedMacronizations
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.staging.ResolvedMacronizations" AS WITH RawResolution AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.tokenType, COALESCE(WorkMacronizations.macronizedWord, ExactMatches.macronizedWord, LowerCaseMatches.macronizedWord, WorkContents.word) AS rawMacron, CASE WHEN WorkMacronizations.macronizedWord IS NOT NULL THEN WorkMacronizations.uncertaintyBitMask WHEN ExactMatches.macronizedWord IS NOT NULL OR LowerCaseMatches.macronizedWord IS NOT NULL THEN 0 ELSE -1 END AS finalMask FROM WorkContents LEFT JOIN WorkMacronizations ON WorkContents.workId = WorkMacronizations.workId AND WorkContents.idx = WorkMacronizations.idx LEFT JOIN UnambiguousMacronizations AS ExactMatches ON(WorkContents.properNounState IN (1, 2) OR WorkContents.properNounState IS NULL)AND WorkContents.word = ExactMatches.word LEFT JOIN UnambiguousMacronizations AS LowerCaseMatches ON(WorkContents.properNounState IN (0, 2) OR WorkContents.properNounState IS NULL)AND LOWER(WorkContents.word) = LowerCaseMatches.word), Lowered AS (SELECT *, "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(LOWER(rawMacron), \'Ā\', \'ā\'), \'Ē\', \'ē\'), \'Ī\', \'ī\'), \'Ō\', \'ō\'), \'Ū\', \'ū\'), \'Ȳ\', \'ȳ\') AS lowerCaseMacron FROM RawResolution) SELECT workId, idx, finalMask AS uncertaintyBitMask, CASE WHEN word = UPPER(word) AND LENGTH(word) > 1 THEN "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(UPPER(lowerCaseMacron), \'ā\', \'Ā\'), \'ē\', \'Ē\'), \'ī\', \'Ī\'), \'ō\', \'Ō\'), \'ū\', \'Ū\'), \'ȳ\', \'Ȳ\') WHEN SUBSTR(word, 1, 1) = UPPER(SUBSTR(word, 1, 1)) AND SUBSTR(word, 1, 1) <> LOWER(SUBSTR(word, 1, 1)) THEN(CASE SUBSTR(lowerCaseMacron, 1, 1) WHEN \'ā\' THEN \'Ā\' WHEN \'ē\' THEN \'Ē\' WHEN \'ī\' THEN \'Ī\' WHEN \'ō\' THEN \'Ō\' WHEN \'ū\' THEN \'Ū\' WHEN \'ȳ\' THEN \'Ȳ\' ELSE UPPER(SUBSTR(lowerCaseMacron, 1, 1)) END)|| SUBSTR(lowerCaseMacron, 2) WHEN word = LOWER(word) THEN lowerCaseMacron ELSE rawMacron END AS finalMacronizedWord FROM Lowered',
+        'CREATE VIEW "library.staging.ResolvedMacronizations" AS WITH RawResolution AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.tokenType, COALESCE(WorkMacronizations.macronizedWord, RawMatches.macronizedWord, ProperNounMatches.macronizedWord, CommonWordMatches.macronizedWord, WorkContents.word) AS rawMacron, CASE WHEN WorkContents.tokenType > 1 THEN 0 WHEN WorkMacronizations.macronizedWord IS NOT NULL THEN WorkMacronizations.uncertaintyBitMask WHEN ProperNounMatches.macronizedWord IS NOT NULL OR CommonWordMatches.macronizedWord IS NOT NULL THEN 0 ELSE -1 END AS finalMask FROM WorkContents LEFT JOIN WorkMacronizations ON WorkContents.workId = WorkMacronizations.workId AND WorkContents.idx = WorkMacronizations.idx LEFT JOIN UnambiguousMacronizations AS RawMatches ON WorkContents.tokenType > 1 AND WorkContents.word = RawMatches.word LEFT JOIN UnambiguousMacronizations AS ProperNounMatches ON WorkContents.tokenType = 1 AND(WorkContents.properNounState IN (1, 2) OR WorkContents.properNounState IS NULL)AND UPPER(SUBSTR(WorkContents.word, 1, 1)) || LOWER(SUBSTR(WorkContents.word, 2)) = ProperNounMatches.word LEFT JOIN UnambiguousMacronizations AS CommonWordMatches ON WorkContents.tokenType = 1 AND(WorkContents.properNounState IN (0, 2) OR WorkContents.properNounState IS NULL)AND LOWER(WorkContents.word) = CommonWordMatches.word), Lowered AS (SELECT *, "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(LOWER(rawMacron), \'Ā\', \'ā\'), \'Ē\', \'ē\'), \'Ī\', \'ī\'), \'Ō\', \'ō\'), \'Ū\', \'ū\'), \'Ȳ\', \'ȳ\') AS lowerCaseMacron FROM RawResolution) SELECT workId, idx, finalMask AS uncertaintyBitMask, CASE WHEN word = UPPER(word) AND LENGTH(word) > 1 THEN "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(UPPER(lowerCaseMacron), \'ā\', \'Ā\'), \'ē\', \'Ē\'), \'ī\', \'Ī\'), \'ō\', \'Ō\'), \'ū\', \'Ū\'), \'ȳ\', \'Ȳ\') WHEN SUBSTR(word, 1, 1) = UPPER(SUBSTR(word, 1, 1)) AND SUBSTR(word, 1, 1) <> LOWER(SUBSTR(word, 1, 1)) AND SUBSTR(word, 2) = LOWER(SUBSTR(word, 2)) THEN(CASE SUBSTR(lowerCaseMacron, 1, 1) WHEN \'ā\' THEN \'Ā\' WHEN \'ē\' THEN \'Ē\' WHEN \'ī\' THEN \'Ī\' WHEN \'ō\' THEN \'Ō\' WHEN \'ū\' THEN \'Ū\' WHEN \'ȳ\' THEN \'Ȳ\' ELSE UPPER(SUBSTR(lowerCaseMacron, 1, 1)) END)|| SUBSTR(lowerCaseMacron, 2) WHEN word = LOWER(word) THEN lowerCaseMacron ELSE rawMacron END AS finalMacronizedWord FROM Lowered',
   };
   @override
   LibraryStagingResolvedMacronizations get asDslTable => this;
@@ -6734,7 +6781,7 @@ class LibraryAuthorDetails
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.AuthorDetails" AS WITH Aux AS (SELECT Authors.id, Authors.name, Authors.about, Authors.image, AuthorsAndWorks.workId, Works.name AS workName FROM Authors INNER JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId INNER JOIN Works ON AuthorsAndWorks.workId = Works.id), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.workId = WorkContents.workId WHERE WorkContents.tokenType <= 3 GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords FROM Aux INNER JOIN WorksContents ON Aux.workId = WorksContents.workId',
+        'CREATE VIEW "library.AuthorDetails" AS WITH Aux AS (SELECT Authors.id, Authors.name, Authors.about, Authors.image, AuthorsAndWorks.workId, Works.name AS workName FROM Authors INNER JOIN AuthorsAndWorks ON Authors.id = AuthorsAndWorks.authorId INNER JOIN Works ON AuthorsAndWorks.workId = Works.id), WorksContents AS (SELECT workId, COUNT(*) AS numberOfWords FROM WorkContents WHERE tokenType <= 3 GROUP BY workId) SELECT Aux.*, WorksContents.numberOfWords FROM Aux INNER JOIN WorksContents ON Aux.workId = WorksContents.workId',
   };
   @override
   LibraryAuthorDetails get asDslTable => this;
@@ -6837,6 +6884,7 @@ class LibraryWorkDetail extends i0.DataClass {
   final String name;
   final String about;
   final int numberOfWords;
+  final int lastIndex;
   final String? authorId;
   final String? authorName;
   const LibraryWorkDetail({
@@ -6844,6 +6892,7 @@ class LibraryWorkDetail extends i0.DataClass {
     required this.name,
     required this.about,
     required this.numberOfWords,
+    required this.lastIndex,
     this.authorId,
     this.authorName,
   });
@@ -6857,6 +6906,7 @@ class LibraryWorkDetail extends i0.DataClass {
       name: serializer.fromJson<String>(json['name']),
       about: serializer.fromJson<String>(json['about']),
       numberOfWords: serializer.fromJson<int>(json['numberOfWords']),
+      lastIndex: serializer.fromJson<int>(json['lastIndex']),
       authorId: serializer.fromJson<String?>(json['authorId']),
       authorName: serializer.fromJson<String?>(json['authorName']),
     );
@@ -6869,6 +6919,7 @@ class LibraryWorkDetail extends i0.DataClass {
       'name': serializer.toJson<String>(name),
       'about': serializer.toJson<String>(about),
       'numberOfWords': serializer.toJson<int>(numberOfWords),
+      'lastIndex': serializer.toJson<int>(lastIndex),
       'authorId': serializer.toJson<String?>(authorId),
       'authorName': serializer.toJson<String?>(authorName),
     };
@@ -6879,6 +6930,7 @@ class LibraryWorkDetail extends i0.DataClass {
     String? name,
     String? about,
     int? numberOfWords,
+    int? lastIndex,
     i0.Value<String?> authorId = const i0.Value.absent(),
     i0.Value<String?> authorName = const i0.Value.absent(),
   }) => i1.LibraryWorkDetail(
@@ -6886,6 +6938,7 @@ class LibraryWorkDetail extends i0.DataClass {
     name: name ?? this.name,
     about: about ?? this.about,
     numberOfWords: numberOfWords ?? this.numberOfWords,
+    lastIndex: lastIndex ?? this.lastIndex,
     authorId: authorId.present ? authorId.value : this.authorId,
     authorName: authorName.present ? authorName.value : this.authorName,
   );
@@ -6896,6 +6949,7 @@ class LibraryWorkDetail extends i0.DataClass {
           ..write('name: $name, ')
           ..write('about: $about, ')
           ..write('numberOfWords: $numberOfWords, ')
+          ..write('lastIndex: $lastIndex, ')
           ..write('authorId: $authorId, ')
           ..write('authorName: $authorName')
           ..write(')'))
@@ -6903,8 +6957,15 @@ class LibraryWorkDetail extends i0.DataClass {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, about, numberOfWords, authorId, authorName);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    about,
+    numberOfWords,
+    lastIndex,
+    authorId,
+    authorName,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -6913,6 +6974,7 @@ class LibraryWorkDetail extends i0.DataClass {
           other.name == this.name &&
           other.about == this.about &&
           other.numberOfWords == this.numberOfWords &&
+          other.lastIndex == this.lastIndex &&
           other.authorId == this.authorId &&
           other.authorName == this.authorName);
 }
@@ -6930,6 +6992,7 @@ class LibraryWorkDetails
     name,
     about,
     numberOfWords,
+    lastIndex,
     authorId,
     authorName,
   ];
@@ -6940,7 +7003,7 @@ class LibraryWorkDetails
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkDetails" AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT WorkContents.workId, COUNT(*) AS numberOfWords FROM Aux INNER JOIN WorkContents ON Aux.id = WorkContents.workId WHERE WorkContents.tokenType <= 3 GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords, AuthorsAndWorks.authorId, Authors.name AS authorName FROM Aux INNER JOIN WorksContents ON Aux.id = WorksContents.workId LEFT OUTER JOIN AuthorsAndWorks ON Aux.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id',
+        'CREATE VIEW "library.WorkDetails" AS WITH Aux AS (SELECT id, name, about FROM Works), WorksContents AS (SELECT WorkContents.workId, COUNT(*)FILTER (WHERE WorkContents.tokenType <= 3) AS numberOfWords, COALESCE(MAX(WorkContents.idx), -1) AS lastIndex FROM Aux INNER JOIN WorkContents ON Aux.id = WorkContents.workId GROUP BY WorkContents.workId) SELECT Aux.*, WorksContents.numberOfWords, WorksContents.lastIndex, AuthorsAndWorks.authorId, Authors.name AS authorName FROM Aux INNER JOIN WorksContents ON Aux.id = WorksContents.workId LEFT OUTER JOIN AuthorsAndWorks ON Aux.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id',
   };
   @override
   LibraryWorkDetails get asDslTable => this;
@@ -6963,6 +7026,10 @@ class LibraryWorkDetails
       numberOfWords: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}numberOfWords'],
+      )!,
+      lastIndex: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}lastIndex'],
       )!,
       authorId: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -6995,6 +7062,12 @@ class LibraryWorkDetails
   );
   late final i0.GeneratedColumn<int> numberOfWords = i0.GeneratedColumn<int>(
     'numberOfWords',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  late final i0.GeneratedColumn<int> lastIndex = i0.GeneratedColumn<int>(
+    'lastIndex',
     aliasedName,
     false,
     type: i0.DriftSqlType.int,
@@ -7181,7 +7254,7 @@ class LibraryWorkContents
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
   };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -7565,6 +7638,157 @@ class LibraryWorkIndexes
   Set<String> get readTables => const {'WorkContentSubdivisions'};
 }
 
+class LibraryCatalogData extends i0.DataClass {
+  final String workId;
+  final String workName;
+  final String? authorId;
+  final String? authorName;
+  const LibraryCatalogData({
+    required this.workId,
+    required this.workName,
+    this.authorId,
+    this.authorName,
+  });
+  factory LibraryCatalogData.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return LibraryCatalogData(
+      workId: serializer.fromJson<String>(json['workId']),
+      workName: serializer.fromJson<String>(json['workName']),
+      authorId: serializer.fromJson<String?>(json['authorId']),
+      authorName: serializer.fromJson<String?>(json['authorName']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'workName': serializer.toJson<String>(workName),
+      'authorId': serializer.toJson<String?>(authorId),
+      'authorName': serializer.toJson<String?>(authorName),
+    };
+  }
+
+  i1.LibraryCatalogData copyWith({
+    String? workId,
+    String? workName,
+    i0.Value<String?> authorId = const i0.Value.absent(),
+    i0.Value<String?> authorName = const i0.Value.absent(),
+  }) => i1.LibraryCatalogData(
+    workId: workId ?? this.workId,
+    workName: workName ?? this.workName,
+    authorId: authorId.present ? authorId.value : this.authorId,
+    authorName: authorName.present ? authorName.value : this.authorName,
+  );
+  @override
+  String toString() {
+    return (StringBuffer('LibraryCatalogData(')
+          ..write('workId: $workId, ')
+          ..write('workName: $workName, ')
+          ..write('authorId: $authorId, ')
+          ..write('authorName: $authorName')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(workId, workName, authorId, authorName);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.LibraryCatalogData &&
+          other.workId == this.workId &&
+          other.workName == this.workName &&
+          other.authorId == this.authorId &&
+          other.authorName == this.authorName);
+}
+
+class LibraryCatalog
+    extends i0.ViewInfo<i1.LibraryCatalog, i1.LibraryCatalogData>
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  LibraryCatalog(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    workName,
+    authorId,
+    authorName,
+  ];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'library.Catalog';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.Catalog" AS SELECT Works.id AS workId, Works.name AS workName, Authors.id AS authorId, Authors.name AS authorName FROM Works LEFT OUTER JOIN AuthorsAndWorks ON Works.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id ORDER BY Authors.name, Works.name',
+  };
+  @override
+  LibraryCatalog get asDslTable => this;
+  @override
+  i1.LibraryCatalogData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.LibraryCatalogData(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      workName: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workName'],
+      )!,
+      authorId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}authorId'],
+      ),
+      authorName: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}authorName'],
+      ),
+    );
+  }
+
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> workName = i0.GeneratedColumn<String>(
+    'workName',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> authorId = i0.GeneratedColumn<String>(
+    'authorId',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> authorName = i0.GeneratedColumn<String>(
+    'authorName',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
+  @override
+  LibraryCatalog createAlias(String alias) {
+    return LibraryCatalog(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {'Works', 'AuthorsAndWorks', 'Authors'};
+}
+
 class LibraryDrift extends i3.ModularAccessor {
   LibraryDrift(i0.GeneratedDatabase db) : super(db);
   i0.Selectable<i4.Author> getLibraryAuthors() {
@@ -7601,6 +7825,7 @@ class LibraryDrift extends i3.ModularAccessor {
         id: row.read<String>('id'),
         name: row.read<String>('name'),
         about: row.read<String>('about'),
+        lastIndex: row.read<int>('lastIndex'),
         numberOfWords: row.read<int>('numberOfWords'),
         authorId: row.readNullable<String>('authorId'),
         authorName: row.readNullable<String>('authorName'),
@@ -7643,6 +7868,14 @@ class LibraryDrift extends i3.ModularAccessor {
     ).asyncMap(libraryWorkIndexes.mapFromRow);
   }
 
+  i0.Selectable<i1.LibraryCatalogData> getLibraryCatalog() {
+    return customSelect(
+      'SELECT * FROM "library.Catalog"',
+      variables: [],
+      readsFrom: {works, authorsAndWorks, authors},
+    ).asyncMap(libraryCatalog.mapFromRow);
+  }
+
   i1.LibraryAuthors get libraryAuthors => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthors>('library.Authors');
@@ -7673,4 +7906,7 @@ class LibraryDrift extends i3.ModularAccessor {
   i1.LibraryWorkIndexes get libraryWorkIndexes => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryWorkIndexes>('library.WorkIndexes');
+  i1.LibraryCatalog get libraryCatalog => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.LibraryCatalog>('library.Catalog');
 }

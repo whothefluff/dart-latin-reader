@@ -142,8 +142,6 @@ linter:
     - specify_nonobvious_property_types
     - unsafe_variance
 
-
-
 analyzer:
   # Additional information about this file can be found at
   # https://dart.dev/guides/language/analysis-options
