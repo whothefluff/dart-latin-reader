@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter/services.dart';
 
 import '../../external/database.dart';
+import '../../external/db_oracle.dart';
 import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'morph_analysis.drift.dart';
@@ -117,3 +118,5 @@ Expression<T> replace<T extends Object>(Expression<T> val, Expression<T> sub, Ex
 
 Expression<T> concat<T extends Object>(List<Expression<Object>> args) =>
     FunctionCallExpression<T>('CONCAT', args);
+
+const List<DbOracle> oracles = [];

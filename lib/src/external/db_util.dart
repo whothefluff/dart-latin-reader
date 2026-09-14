@@ -9,6 +9,7 @@ import '../component/morph_analysis/db_util.dart' as morp_util;
 import '../component/word_frequency/db_util.dart' as freq_util;
 import 'data_version.drift.dart';
 import 'database.dart';
+import 'db_oracle.dart';
 
 const path = 'assets/preprocessed_data/';
 
@@ -70,8 +71,60 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
     );
     // Better plans:
     await db.customStatement('ANALYZE;');
+    // Rollback on invariant violation
+    log.info(() => 'Running integrity checks');
+    await _runOracles(db);
+    log.info(() => 'Integrity checks passed');
   });
 }
+
+typedef _Result = ({DbOracle oracle, int violations, String sample});
+
+Future<void> _runOracles(AppDb db) async {
+  const oracles = <DbOracle>[
+    ...libr_util.oracles,
+    ...dict_util.oracles,
+    ...morp_util.oracles,
+    ...freq_util.oracles,
+  ];
+  final checks = await oracles.fold(
+    Future<List<_Result>>.value(const []),
+    (previous, oracle) async => [...await previous, await _check(db, oracle)],
+  );
+  final violated = checks.where((check) => check.violations > 0).toList()..forEach(_report);
+  final errors = violated
+      .where((check) => check.oracle.severity == DbOracleSeverity.error)
+      .map(_message)
+      .toList();
+  if (errors.isNotEmpty) {
+    throw DbIntegrityError(errors);
+  }
+}
+
+Future<_Result> _check(AppDb db, DbOracle oracle) async {
+  const sampleSize = 5;
+  assert(
+    !oracle.sql.trimRight().endsWith(';') && !oracle.sql.contains(oracleViolationsColumn),
+    '${oracle.id}: trailing ; or reserved column name',
+  );
+  final rows = await db
+      .customSelect(
+        'SELECT COUNT( * ) OVER ( ) AS $oracleViolationsColumn, * '
+        'FROM ( ${oracle.sql} ) '
+        'LIMIT $sampleSize',
+      )
+      .get();
+  final sample = rows.map((row) => Map.of(row.data)..remove(oracleViolationsColumn)).join('\n');
+  final violations = rows.isEmpty ? 0 : rows.first.read<int>(oracleViolationsColumn);
+  return (oracle: oracle, violations: violations, sample: sample);
+}
+
+String _message(_Result check) => '${check.oracle.id}: ${check.violations} rows\n${check.sample}';
+
+void _report(_Result check) => log.log(
+  check.oracle.severity.level,
+  () => _message(check),
+);
 
 Future<void> updateDatabaseVersion(AppDb db) async {
   log.fine(() => 'updating data version');
