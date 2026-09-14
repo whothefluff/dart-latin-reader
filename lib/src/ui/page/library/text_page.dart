@@ -1,8 +1,10 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../logger.dart';
@@ -10,13 +12,17 @@ import '../../../component/library/work_contents_api.dart';
 import '../../../component/library/work_details_api.dart';
 import '../../../component/morph_analysis/enriched_morph_search_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
+import '../../../component/settings/reader_settings_api.dart';
 import '../../app.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold.dart';
+import '../../widget/custom_adaptive_scaffold/adaptive_layout.dart';
+import '../../widget/custom_adaptive_scaffold/adaptive_scaffold.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
-import '../../widget/navigation_rail.dart';
+import '../../widget/custom_adaptive_scaffold/slot_layout.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
+import '../settings/settings_shell_page.dart' show SettingsTab;
 
 /// Line terminator that will be stable across all platforms even after rendering
 const _lineTerminator = '\n';
@@ -45,7 +51,7 @@ class TextPage extends ConsumerStatefulWidget {
 class TextPageState extends ConsumerState<TextPage> {
   //
   static const _pageSize = 250;
-  late int _workSize;
+  late int _lastIndex; // Highest token index, punctuation included
   var _currentFirstVisibleIndex = 0;
   var _currentLastVisibleIndex = 0;
   var _fromIndex = 0;
@@ -54,29 +60,29 @@ class TextPageState extends ConsumerState<TextPage> {
 
   @override
   Widget build(context) {
-    final workSizeProvider = ref.watch(
+    final lastIndexProvider = ref.watch(
       workDetailsProvider(
         widget.workId,
-      ).select((model) => model.whenData((work) => work.numberOfWords)),
+      ).select((model) => model.whenData((work) => work.lastIndex)),
     );
-    return workSizeProvider.when(
-      data: (workSize) {
-        _workSize = workSize;
+    return lastIndexProvider.when(
+      data: (lastIndex) {
+        _lastIndex = lastIndex;
         return _scaffold();
       },
       loading: showLoading,
-      error: (error, _) => Center(child: Text('Error: $error')),
+      error: showError(ref, workDetailsProvider(widget.workId)),
     );
   }
 
   Widget _scaffold() {
     final segmentsProvider = ref.watch(workContentsProvider(widget.workId, _fromIndex, _toIndex));
     return Scaffold(
-      appBar: AppBar(),
+      extendBodyBehindAppBar: true,
       body: segmentsProvider.when(
         data: _buildResponsiveContent,
         loading: showLoading,
-        error: error(ref),
+        error: showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex)),
       ),
     );
   }
@@ -111,13 +117,13 @@ class TextPageState extends ConsumerState<TextPage> {
 
   void _loadNextPage() {
     log.info(() => 'attempting to navigate to next page');
-    setState(() {
-      if (_currentLastVisibleIndex != _workSize) {
+    if (_currentLastVisibleIndex < _lastIndex) {
+      setState(() {
         _pageFlow = _PageFlow.next;
         _fromIndex = _currentLastVisibleIndex + 1;
-        _toIndex = min(_currentLastVisibleIndex + _pageSize, _workSize);
-      }
-    });
+        _toIndex = min(_currentLastVisibleIndex + _pageSize, _lastIndex);
+      });
+    }
   }
 
   void _loadPreviousPage() {
@@ -132,8 +138,6 @@ class TextPageState extends ConsumerState<TextPage> {
     });
   }
 
-  Widget Function(Object error, StackTrace _) error(WidgetRef ref) =>
-      showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex));
   //
 }
 
@@ -141,6 +145,7 @@ class _TextRenderer {
   _TextRenderer(
     this.textTheme,
     this.workSegments,
+    this.readerSettings,
   );
 
   final TextTheme textTheme;
@@ -160,6 +165,7 @@ class _TextRenderer {
   };
   final WorkContentsSegments workSegments;
   static const _empty = '';
+  final ReaderSettings readerSettings;
 
   String _getSpace(int index, WorkContentsSegment segment) {
     final nextIsPunctuation =
@@ -187,27 +193,35 @@ class _TextRenderer {
   }
 
   List<InlineSpan> createSpans() {
-    final spans = <InlineSpan>[];
-    String? prevStyle;
-    String? prevNode;
-    for (var index = 0; index < workSegments.length; index++) {
-      final segment = workSegments[index];
-      final currentStyle = segment.typ;
-      final currentNode = segment.node;
+    final baseTextStyle = TextStyle(
+      fontFamily: readerSettings.fontFamily,
+      fontSize: readerSettings.fontSize,
+      height: readerSettings.lineHeight,
+      letterSpacing: readerSettings.letterSpacing,
+      wordSpacing: readerSettings.wordSpacing,
+    );
+    return workSegments.mapIndexed<InlineSpan>((i, segment) {
+      final previousSegment = i > 0 ? workSegments[i - 1] : null;
+      final prevStyle = previousSegment?.typ;
+      final prevNode = previousSegment?.node;
+      final currStyle = segment.typ;
+      final currNode = segment.node;
       final buffer = StringBuffer()
-        ..write(_getLineBreak(prevStyle, currentStyle, prevNode, currentNode))
+        ..write(_getLineBreak(prevStyle, currStyle, prevNode, currNode))
         ..write(segment.word)
-        ..write(_getSpace(index, segment));
-      spans.add(
-        TextSpan(
-          text: buffer.toString(),
-          style: styles[currentStyle] ?? styles['default'],
-        ),
+        ..write(_getSpace(i, segment));
+      // Merge the theme style for this block (e.g. TITLE vs VERS) with the user settings
+      final currentStyle = segment.typ;
+      final blockThemeStyle = styles[currentStyle] ?? styles['default']!;
+      final mergedStyle = blockThemeStyle.merge(baseTextStyle);
+      final finalStyle = readerSettings.fontFamily != null
+          ? GoogleFonts.getFont(readerSettings.fontFamily!, textStyle: mergedStyle)
+          : mergedStyle;
+      return TextSpan(
+        text: buffer.toString(),
+        style: finalStyle,
       );
-      prevStyle = currentStyle;
-      prevNode = currentNode;
-    }
-    return spans;
+    }).toList();
   }
 
   //
@@ -218,14 +232,11 @@ class _GestureHandler {
     required this.onNavigateNext,
     required this.onNavigatePrevious,
     required this.onNavMenuToggle,
-    required this.customAdaptiveScaffoldKey,
   });
 
   final void Function() onNavigateNext;
   final void Function() onNavigatePrevious;
   final void Function(BuildContext context) onNavMenuToggle;
-  final GlobalKey<CustomAdaptiveScaffoldState> customAdaptiveScaffoldKey;
-  final List<String> _mainBranchesNames = mainBranches.map((e) => e.id).toList();
 
   void handleTap(_PageFlow pageFlow) {
     if (pageFlow == _PageFlow.next) {
@@ -249,59 +260,12 @@ class _GestureHandler {
     }
   }
 
-  void _dismissModalAndNavigate(BuildContext context, int index) {
-    context
-      ..pop()
-      ..go(_mainBranchesNames[index]);
-  }
-
-  Future<void> _showBottomNavBar(BuildContext context) async {
-    final customAdaptiveScaffoldState =
-        customAdaptiveScaffoldKey.currentState ??
-        Exception('CustomAdaptiveScaffold state is null') as CustomAdaptiveScaffoldState;
-    final stateWidget = customAdaptiveScaffoldState.widget;
-    await showModalBottomSheet<Builder>(
-      context: context,
-      builder: (_) => CustomAdaptiveScaffold.standardBottomNavigationBar(
-        destinations: stateWidget.destinations,
-        currentIndex: stateWidget.selectedIndex,
-        onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
-        labelBehavior: stateWidget.bottomNavigationBarLabelBehavior,
-      ),
-    );
-  }
-
-  Future<void> _showNavigationOverlay(BuildContext context) async {
-    final customAdaptiveScaffoldState =
-        customAdaptiveScaffoldKey.currentState ??
-        Exception('CustomAdaptiveScaffold state is null') as CustomAdaptiveScaffoldState;
-    final stateWidget = customAdaptiveScaffoldState.widget;
-    final navRailTheme = Theme.of(context).navigationRailTheme;
-    await showModalNavigationRail<Builder>(
-      context: context,
-      builder: (_) => CustomAdaptiveScaffold.standardNavigationRail(
-        width: stateWidget.navigationRailWidth,
-        leading: stateWidget.leadingUnextendedNavRail,
-        trailing: stateWidget.trailingNavRail,
-        selectedIndex: stateWidget.selectedIndex,
-        extended: stateWidget.largeBreakpoint.isActive(context),
-        destinations: stateWidget.destinations
-            .map(CustomAdaptiveScaffold.toRailDestination)
-            .toList(),
-        onDestinationSelected: (i) => _dismissModalAndNavigate(context, i),
-        backgroundColor: navRailTheme.backgroundColor,
-        selectedIconTheme: navRailTheme.selectedIconTheme,
-        unselectedIconTheme: navRailTheme.unselectedIconTheme,
-        selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
-        unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
-      ),
-    );
-  }
-
   //
 }
 
 class _TextSelector {
+  //
+
   /// If the user selected exactly just a full word (with no other words or
   /// symbols), this word will be returned stripped of whitespace
   ///
@@ -309,14 +273,11 @@ class _TextSelector {
   String? singleWord(TextSelection selection, String visibleText) {
     // Ignore selected spaces at word boundary
     final trimmedSelectedText = selection.textInside(visibleText).trim();
-    if (trimmedSelectedText.isNotEmpty &&
-        _isFullWordSelected(trimmedSelectedText, visibleText, selection)) {
-      log.info(() => 'word "$trimmedSelectedText" selected');
-      return trimmedSelectedText;
-    } else {
-      log.info(() => 'no word selected');
-      return null;
-    }
+    final isWordSelected =
+        trimmedSelectedText.isNotEmpty &&
+        _isFullWordSelected(trimmedSelectedText, visibleText, selection);
+    log.info(() => isWordSelected ? 'word "$trimmedSelectedText" selected' : 'no word selected');
+    return isWordSelected ? trimmedSelectedText : null;
   }
 
   bool _isFullWordSelected(
@@ -394,7 +355,7 @@ class _WordDetailsButton extends ContextMenuButtonItem {
       );
       if (context.mounted) {
         log.exit<void>();
-        return MorphologicalDataRoute(selectedKeys.toJson()).push(context);
+        await MorphologicalDataRoute(selectedKeys.toJson()).push<void>(context);
       }
     } else {
       log.warning(() => 'Nothing found when using morph data button with "$word"');
@@ -525,18 +486,17 @@ class _VisibleSegmentRange {
       if (firstElement.typ == 'VERS') {
         final currentNode = firstElement.node;
         final previousNode = firstFittingIndex > 0 ? segments[firstFittingIndex - 1].node : null;
-        if (currentNode != previousNode) {
-          return firstFittingIndex;
-        }
         // If we're in the middle of a verse, move forward to the start of the next verse
-        while (firstFittingIndex < segments.length - 1 &&
-            segments[firstFittingIndex + 1].node == currentNode) {
-          firstFittingIndex++;
-        }
-        // Now firstFittingIndex is at the end of the current verse
-        // Move it forward one more to get to the start of the next verse
-        if (firstFittingIndex < segments.length - 1) {
-          firstFittingIndex++;
+        if (currentNode == previousNode) {
+          while (firstFittingIndex < segments.length - 1 &&
+              segments[firstFittingIndex + 1].node == currentNode) {
+            firstFittingIndex++;
+          }
+          // Now firstFittingIndex is at the end of the current verse
+          // Move it forward one more to get to the start of the next verse
+          if (firstFittingIndex < segments.length - 1) {
+            firstFittingIndex++;
+          }
         }
       }
     }
@@ -572,24 +532,20 @@ class _VisibleSegmentRange {
         final nextNode = lastFittingIndex + 1 < segments.length
             ? segments[lastFittingIndex + 1].node
             : null;
-        // If the next word is from a different verse (node), we're good
-        if (currentNode != nextNode) {
-          return lastFittingIndex;
-        }
         // If we're in the middle of a verse, move back to the end of the previous verse
-        while (lastFittingIndex > 0 && segments[lastFittingIndex - 1].node == currentNode) {
-          lastFittingIndex--;
+        if (currentNode == nextNode) {
+          while (lastFittingIndex > 0 && segments[lastFittingIndex - 1].node == currentNode) {
+            lastFittingIndex--;
+          }
+          // Now lastFittingIndex is at the start of the current verse
+          // Move it back one more to get to the end of the previous verse
+          if (lastFittingIndex > 0) {
+            lastFittingIndex--;
+          }
         }
-        // Now lastFittingIndex is at the start of the current verse
-        // Move it back one more to get to the end of the previous verse
-        if (lastFittingIndex > 0) {
-          lastFittingIndex--;
-        }
-      } else {
-        if (lastFittingIndex < segments.length &&
-            _isPunctuation(segments[lastFittingIndex + 1].word)) {
-          lastFittingIndex--;
-        }
+      } else if (lastFittingIndex < segments.length &&
+          _isPunctuation(segments[lastFittingIndex + 1].word)) {
+        lastFittingIndex--;
       }
     }
     return lastFittingIndex;
@@ -639,25 +595,47 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
       onNavigateNext: widget.onNavigateNext,
       onNavigatePrevious: widget.onNavigatePrevious,
       onNavMenuToggle: _handleNavMenuToggle,
-      customAdaptiveScaffoldKey: customAdaptiveScaffoldKey,
+    );
+  }
+
+  Future<void> _handleNavMenuToggle(BuildContext context) async {
+    final mainBranchesNames = mainBranches.map((e) => e.id).toList();
+    await showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss',
+      barrierColor: Theme.of(context).bottomSheetTheme.modalBarrierColor ?? Colors.black54,
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (ctx, animation, secondaryAnimation) => _NavMenuModal(
+        scaffoldKey: customAdaptiveScaffoldKey,
+        //animation: animation,
+        onNavigate: (index) {
+          Navigator.of(ctx).pop();
+          context.go(mainBranchesNames[index]);
+        },
+        onSettings: () async {
+          Navigator.of(ctx).pop();
+          await const SettingsRoute(tab: SettingsTab.library).push<void>(context);
+        },
+        onBack: () {
+          Navigator.of(ctx).pop();
+          context.pop();
+        },
+      ),
     );
   }
 
   @override
   Widget build(context) {
     _rebuildOnScreenSizeChange(context);
+    final readerSettings =
+        ref.watch(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings();
     return widget.isLargeScreen
-        ? _buildLargeScreenLayout(context)
-        : _buildSmallScreenLayout(context);
+        ? _buildLargeScreenLayout(context, readerSettings)
+        : _buildSmallScreenLayout(context, readerSettings);
   }
 
-  Future<void> _handleNavMenuToggle(BuildContext context) async {
-    Breakpoints.smallDesktop.isActive(context)
-        ? await _gestureHandler._showBottomNavBar(context)
-        : await _gestureHandler._showNavigationOverlay(context);
-  }
-
-  Widget _buildSmallScreenLayout(BuildContext context) => Row(
+  Widget _buildSmallScreenLayout(BuildContext context, ReaderSettings settings) => Row(
     children: [
       Expanded(
         child: SizedBox.expand(
@@ -667,7 +645,9 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
             child: Container(
               padding: const EdgeInsets.only(left: 20, right: 20),
               // Use a LayoutBuilder to get the correct constraints
-              child: LayoutBuilder(builder: _buildSelectionArea),
+              child: LayoutBuilder(
+                builder: (ctx, constr) => _buildSelectionArea(ctx, constr, settings),
+              ),
             ),
           ),
         ),
@@ -675,7 +655,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     ],
   );
 
-  Widget _buildLargeScreenLayout(BuildContext context) {
+  Widget _buildLargeScreenLayout(BuildContext context, ReaderSettings settings) {
     final availableWidth = widget.pageConstraints.maxWidth;
     final textWidth = widget.textAreaConstraints!.maxWidth;
     final marginWidth = (availableWidth - textWidth) / 2;
@@ -689,7 +669,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
               onSecondaryTap: () => _gestureHandler.onNavMenuToggle(context),
             ),
           ),
-        SizedBox(width: textWidth, child: _buildStylizedTextArea()),
+        SizedBox(width: textWidth, child: _buildStylizedTextArea(settings)),
         if (marginWidth > 0)
           SizedBox(
             width: marginWidth,
@@ -702,20 +682,24 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     );
   }
 
-  Widget _buildStylizedTextArea() {
+  Widget _buildStylizedTextArea(ReaderSettings settings) {
     const padding = EdgeInsets.only(left: 24, bottom: 14);
     return Card(
       child: Padding(
         padding: padding,
         // Use a LayoutBuilder to get the correct constraints
-        child: LayoutBuilder(builder: _buildSelectionArea),
+        child: LayoutBuilder(builder: (ctx, constr) => _buildSelectionArea(ctx, constr, settings)),
       ),
     );
   }
 
-  Widget _buildSelectionArea(BuildContext context, BoxConstraints constraints) {
+  Widget _buildSelectionArea(
+    BuildContext context,
+    BoxConstraints constraints,
+    ReaderSettings settings,
+  ) {
     // Built using the constraints given by SizedBox
-    final visibleTextSpan = _buildTextWithOverflowDetection(context, constraints);
+    final visibleTextSpan = _buildTextWithOverflowDetection(context, constraints, settings);
     return SelectableText.rich(
       visibleTextSpan,
       onSelectionChanged: (selection, cause) =>
@@ -735,8 +719,6 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     final selectedWord = _textSelector.singleWord(selection, visibleText);
     setState(() {
       if (selectedWord != null) {
-        // TODO(whothefluff): add button for "using macrons" (exact match) when macrons are added
-        // although this will not be possible for the wiktionary
         _wordSelectionButtons = [
           _WordDetailsButton(word: selectedWord, ref: ref, context: context),
           _WiktionaryButton(word: selectedWord, ref: ref, context: context),
@@ -760,12 +742,13 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     MediaQuery.of(context);
   }
 
-  TextSpan _buildTextWithOverflowDetection(BuildContext context, BoxConstraints constraints) {
+  TextSpan _buildTextWithOverflowDetection(
+    BuildContext context,
+    BoxConstraints constraints,
+    ReaderSettings settings,
+  ) {
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
-    final allSpans = _TextRenderer(
-      TextTheme.of(context),
-      widget.segments,
-    ).createSpans();
+    final allSpans = _TextRenderer(TextTheme.of(context), widget.segments, settings).createSpans();
     textPainter
       ..text = TextSpan(children: allSpans)
       ..layout(maxWidth: constraints.maxWidth);
@@ -786,6 +769,155 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
       ),
     );
     return TextSpan(children: allSpans.sublist(visible.first, visible.last + 1));
+  }
+
+  //
+}
+
+class _NavMenuModal extends StatelessWidget {
+  const _NavMenuModal({
+    required this.scaffoldKey,
+    required this.onNavigate,
+    required this.onSettings,
+    required this.onBack,
+  });
+
+  final GlobalKey<CustomAdaptiveScaffoldState> scaffoldKey;
+  final ValueChanged<int> onNavigate;
+  final VoidCallback onSettings;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(context) {
+    final state = scaffoldKey.currentState;
+    return state == null ? const SizedBox.shrink() : _overlay(context, state.widget);
+  }
+
+  Widget _overlay(BuildContext context, CustomAdaptiveScaffold w) {
+    // Where the AppBar's left edge should sit, per active form.
+    final isBottom = w.smallBreakpoint.isActive(context);
+    final isUnextended = w.mediumBreakpoint.isActive(context); // medium range only
+    final appBarLeft = isBottom
+        ? 0.0
+        : (isUnextended ? w.navigationRailWidth : w.extendedNavigationRailWidth);
+    return Stack(
+      children: [
+        AdaptiveLayout(
+          transitionDuration: w.transitionDuration,
+          internalAnimations: w.internalAnimations,
+          animateInitialLayout: false,
+          // Mirror the scaffold's primaryNavigation EXACTLY (all breakpoints!).
+          primaryNavigation: SlotLayout(
+            config: <Breakpoint, SlotLayoutConfig?>{
+              w.mediumBreakpoint: _railSlot(
+                context,
+                w,
+                key: const Key('navModal.primaryNavigation'),
+                extended: false,
+              ),
+              w.mediumLargeBreakpoint: _railSlot(
+                context,
+                w,
+                key: const Key('navModal.primaryNavigation1'),
+                extended: true,
+              ),
+              w.largeBreakpoint: _railSlot(
+                context,
+                w,
+                key: const Key('navModal.primaryNavigation2'),
+                extended: true,
+              ),
+              w.extraLargeBreakpoint: _railSlot(
+                context,
+                w,
+                key: const Key('navModal.primaryNavigation3'),
+                extended: true,
+              ),
+            },
+          ),
+          bottomNavigation: SlotLayout(
+            config: <Breakpoint, SlotLayoutConfig?>{
+              w.smallBreakpoint: SlotLayout.from(
+                key: const Key('navModal.bottomNavigation'),
+                inAnimation: AdaptiveScaffold.bottomToTop,
+                //outAnimation: AdaptiveScaffold.topToBottom,
+                builder: (_) => CustomAdaptiveScaffold.standardBottomNavigationBar(
+                  currentIndex: w.selectedIndex,
+                  destinations: w.destinations,
+                  onDestinationSelected: onNavigate,
+                  labelBehavior: w.bottomNavigationBarLabelBehavior,
+                ),
+              ),
+            },
+          ),
+          // Body is now just a transparent, tap-through area.
+          body: SlotLayout(
+            config: <Breakpoint, SlotLayoutConfig?>{
+              Breakpoints.standard: SlotLayout.from(
+                key: const Key('navModal.body'),
+                builder: (_) => const IgnorePointer(child: SizedBox.expand()),
+              ),
+            },
+          ),
+        ),
+        // AppBar on top, tracking the rail edge but NOT animating on open.
+        AnimatedPositioned(
+          duration: w.transitionDuration,
+          //curve: Easing.emphasizedDecelerate,
+          top: 0,
+          left: appBarLeft,
+          right: 0,
+          child: Material(color: Colors.transparent, child: _appBar(context)),
+        ),
+      ],
+    );
+  }
+
+  Widget _appBar(BuildContext context) => AppBar(
+    backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
+    elevation: 4,
+    leading: BackButton(onPressed: onBack),
+    actions: [
+      IconButton(icon: const Icon(Icons.settings), onPressed: onSettings),
+    ],
+  );
+
+  SlotLayoutConfig _railSlot(
+    BuildContext context,
+    CustomAdaptiveScaffold w, {
+    required Key key,
+    required bool extended,
+  }) {
+    final navRailTheme = Theme.of(context).navigationRailTheme;
+    final destinations = w.destinations.map(CustomAdaptiveScaffold.toRailDestination).toList();
+    return SlotLayout.from(
+      key: key,
+      inAnimation: AdaptiveScaffold.leftOutIn, // or CustomAdaptiveScaffold.leftOutIn
+      //outAnimation: AdaptiveScaffold.leftInOut,
+      builder: (_) => Material(
+        // Restores the opaque, edge-to-edge surface + divider/shadow you had
+        // before via Material(elevation: 1.0, ...).
+        color: navRailTheme.backgroundColor ?? Theme.of(context).colorScheme.surface,
+        elevation: 1.0,
+        child: CustomAdaptiveScaffold.standardNavigationRail(
+          padding: EdgeInsets.zero, // <-- removes the 8px gap on all sides
+          width: extended ? w.extendedNavigationRailWidth : w.navigationRailWidth,
+          extended: extended,
+          leading: extended ? w.leadingExtendedNavRail : w.leadingUnextendedNavRail,
+          trailing: w.trailingNavRail,
+          selectedIndex: w.selectedIndex,
+          destinations: destinations,
+          onDestinationSelected: onNavigate,
+          backgroundColor: navRailTheme.backgroundColor,
+          selectedIconTheme: navRailTheme.selectedIconTheme,
+          unselectedIconTheme: navRailTheme.unselectedIconTheme,
+          selectedLabelTextStyle: navRailTheme.selectedLabelTextStyle,
+          unSelectedLabelTextStyle: navRailTheme.unselectedLabelTextStyle,
+          labelType: navRailTheme.labelType,
+          groupAlignment: w.groupAlignment,
+        ),
+      ),
+    );
   }
 
   //
