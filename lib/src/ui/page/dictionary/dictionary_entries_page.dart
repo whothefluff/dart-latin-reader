@@ -61,7 +61,7 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
           ],
         ),
         loading: showLoading,
-        error: error(ref),
+        error: showError(ref, dictionaryEntriesProvider(widget.dictionary)),
       );
 
   @override
@@ -70,8 +70,6 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
     super.dispose();
   }
 
-  Widget Function(Object error, StackTrace _) error(WidgetRef ref) =>
-      showError(ref, dictionaryEntriesProvider(widget.dictionary));
   //
 }
 
@@ -379,6 +377,7 @@ class AlphabetDropdown extends StatelessWidget {
   //
 }
 
+@immutable
 extension type const Alphabet(List<String> letters) {
   String operator [](int index) => letters[index];
   Iterable<T> map<T>(T Function(String e) toElement) => letters.map(toElement);
@@ -416,8 +415,9 @@ const alphabet = Alphabet([
 
 /// stupid ass class copied from list_tile.dart because hiding implementation details is so dope
 class _LisTileDefaultsM3 extends ListTileThemeData {
-  _LisTileDefaultsM3(this.context)
-    : super(
+  _LisTileDefaultsM3(
+    this.context,
+  ) : super(
         contentPadding: const EdgeInsetsDirectional.only(start: 16.0, end: 24.0),
         minLeadingWidth: 24,
         minVerticalPadding: 8,
@@ -448,6 +448,7 @@ class _LisTileDefaultsM3 extends ListTileThemeData {
 
   @override
   Color? get iconColor => _colors.onSurfaceVariant;
+  //
 }
 
 TextStyle subtitleTextStyle(BuildContext context) =>

@@ -133,4 +133,72 @@ final operations = [
       await db.dictionaryDrift.fillDictionaryAlphabets();
     },
   ),
+  (
+    id: 'LnsRefResolutions',
+    delete: (AppDb db) async {
+      await db.delete(db.lnsRefResolutions).go();
+    },
+    insert: (AppDb db) async {
+      await db.customStatement('''
+        INSERT INTO LnsRefResolutions( dictionaryRef, lnsLemma )
+            WITH LnsDictId AS ( SELECT id 
+                                    FROM Dictionaries
+                                    WHERE name = 'Lewis & Short' -- literal 3 of 3
+                                    LIMIT 1 ),
+                 Refs AS ( SELECT DISTINCT dictionaryRef,
+                                           --Many forms use a variety of spellings ('ad-tingo' -> 'attingo', 'con-mitto' -> 'committo')
+                                           REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( REPLACE(
+                                           dictionaryRef,
+                                           'b-m','mm'), 'd-p','pp'), 'd-t','tt'), 'd-s','ss'), 'n-c','nc'), 'n-m','mm'), 'n-r','rr'), 'x-f','ff'), 'x-su','su'), 'x-l','l'),
+                                           '-',''), '_','') AS assimilated
+                               FROM MorphologicalDetails ),
+                 -- Step 0: Match before assimilations (protects pre-existing L&S from being mangled)
+                 Step0_Verbatim AS ( SELECT dictionaryRef,
+                                            assimilated,
+                                            CASE WHEN dictionaryRef <> assimilated
+                                                 THEN ( SELECT LnsEntries.lemma
+                                                            FROM DictionaryEntries LnsEntries
+                                                            WHERE LnsEntries.dictionary = ( SELECT id FROM LnsDictId )
+                                                                  AND LnsEntries.lemma = Refs.dictionaryRef )
+                                            END AS verbatimMatch
+                                         FROM Refs ),
+                 -- Step 1: Exact match of the assimilated form against L&S
+                 Step1_Exact AS ( SELECT *,
+                                         CASE WHEN verbatimMatch IS NULL
+                                              THEN ( SELECT LnsEntries.lemma
+                                                         FROM DictionaryEntries LnsEntries
+                                                         WHERE LnsEntries.dictionary = ( SELECT id FROM LnsDictId )
+                                                               AND LnsEntries.lemma = Verbatim.assimilated )
+                                         END AS exactMatch
+                                      FROM Step0_Verbatim Verbatim ),
+                 -- Step 2: A few entries are only found by appending '1' ('princeps' not in L&S, but 'princeps1' is)
+                 Step2_Suffix AS ( SELECT *,
+                                          CASE WHEN verbatimMatch IS NULL
+                                                    AND exactMatch IS NULL
+                                                    AND assimilated NOT LIKE '%1'
+                                               THEN ( SELECT LnsEntries.lemma
+                                                          FROM DictionaryEntries LnsEntries
+                                                          WHERE LnsEntries.dictionary = ( SELECT id FROM LnsDictId )
+                                                                AND LnsEntries.lemma = Exact.assimilated || '1' )
+                                          END AS suffixMatch
+                                       FROM Step1_Exact Exact ),
+                 -- Step 3: A small handful are only found by removing a trailing '1' ('equus1' not in L&S, but 'equus' is)
+                 Step3_Normalize AS ( SELECT *,
+                                             CASE WHEN verbatimMatch IS NULL
+                                                       AND exactMatch IS NULL
+                                                       AND suffixMatch IS NULL
+                                                      AND assimilated LIKE '%1'
+                                                  THEN ( SELECT LnsEntries.lemma
+                                                             FROM DictionaryEntries LnsEntries
+                                                             WHERE LnsEntries.dictionary = ( SELECT id FROM LnsDictId )
+                                                                   AND LnsEntries.lemma = SUBSTR( Suffixed.assimilated, 1, LENGTH( Suffixed.assimilated ) - 1 ) )
+                                             END AS normalizedMatch
+                                          FROM Step2_Suffix Suffixed )
+                -- Some forms must be handled in Morpheus directly (e.g. 'adultera' when L&S only has 'adulter'); these get lnsLemma = NULL
+                SELECT dictionaryRef,
+                       COALESCE( verbatimMatch, exactMatch, suffixMatch, normalizedMatch )
+                    FROM Step3_Normalize;
+      ''');
+    },
+  ),
 ];

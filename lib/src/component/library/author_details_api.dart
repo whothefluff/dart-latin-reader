@@ -10,6 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'library.drift.dart';
 
 part 'author_details_api.g.dart';
 
@@ -20,19 +21,21 @@ Future<AuthorDetails> authorDetails(Ref ref, String author) async {
   log.info(() => '@riverpod - using $author');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
-  final repo = LibraryRepository(db);
+  final repo = LibraryRepository(db.libraryDrift);
   return GetAuthorDetailsUseCase(repo, author).invoke();
 }
 
 class LibraryRepository implements ILibraryRepository {
-  LibraryRepository(this._db);
+  LibraryRepository(
+    this._db,
+  );
 
-  final AppDb _db;
+  final LibraryDrift _db;
 
   @override
   Future<AuthorDetails> getAuthorDetailsOf(String author) async {
     log.fine(() => 'reading details of author "$author" from db');
-    final dbData = await _db.libraryDrift.getLibraryAuthorDetails(author).get();
+    final dbData = await _db.getLibraryAuthorDetails(author).get();
     final firstLine = dbData.first;
     return AuthorDetails(
       id: firstLine.id,

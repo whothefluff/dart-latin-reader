@@ -105,7 +105,7 @@ final operations = [
             mode: InsertMode.insertOrRollback,
           );
       await db.customInsert('''
-        INSERT INTO SearchableMorphDetInflections( SearchableMorphDetInflections ) 
+        INSERT INTO SearchableMorphDetInflections( SearchableMorphDetInflections )
           VALUES('optimize')
         ''');
     },

@@ -211,11 +211,11 @@ searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*, Search.mac
                                                            WHERE Search.macronizedForm LIKE ?
                                                            ORDER BY Peek.form, Peek.item, Peek.cnt;
 
-getAnalysisKeysOf WITH AnalysisKey: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM SearchableMorphDetInflections WHERE form LIKE ? ORDER BY form, item, cnt;
+getAnalysisKeysOf WITH AnalysisKey.fromSql: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM SearchableMorphDetInflections WHERE form LIKE ? ORDER BY form, item, cnt;
 
-getAnalysisKeysOfMacronized WITH AnalysisKey: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM SearchableMorphDetInflections WHERE macronizedForm LIKE ? ORDER BY form, item, cnt;
+getAnalysisKeysOfMacronized WITH AnalysisKey.fromSql: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM SearchableMorphDetInflections WHERE macronizedForm LIKE ? ORDER BY form, item, cnt;
 
-CREATE VIEW "morphology.Analyses" AS MorphologyAnalysis AS 
+CREATE VIEW "morphology.Analyses" WITH Analysis AS 
     SELECT Infl.form,
            Infl.item,
            Infl.cnt,
@@ -243,4 +243,5 @@ CREATE VIEW "morphology.Analyses" AS MorphologyAnalysis AS
                AND Infl.item = Peek.item
                AND Infl.cnt = Peek.cnt;
 
+--TODO(whothefluff): replace by getMorphAnalyses: SELECT * FROM "morphology.Analyses" WHERE $predicate ORDER BY form, item, cnt;
 dummy: SELECT * FROM "morphology.Analyses"; --for some reason, this is necessary to force Drift to generate a getter

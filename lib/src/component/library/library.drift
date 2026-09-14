@@ -63,6 +63,13 @@ CREATE TABLE "WorkContents"(
           'ā','a'),'ē','e'),'ī','i'),'ō','o'),'ū','u'),'ȳ','y'),
           'Ā','A'),'Ē','E'),'Ī','I'),'Ō','O'),'Ū','U'),'Ȳ','Y')
     ) VIRTUAL,
+    "aux_plainBase" TEXT GENERATED ALWAYS AS (
+        COALESCE( aux_expansionNoMacrons,
+                  CASE WHEN enclitic IS NOT NULL
+                       THEN SUBSTR( word, 1, LENGTH( word ) - LENGTH( enclitic ) )
+                       ELSE word
+                  END )
+    ) VIRTUAL,
     "aux_macronBase" TEXT GENERATED ALWAYS AS (
         COALESCE( expansion,
                   CASE WHEN enclitic IS NOT NULL
@@ -103,20 +110,9 @@ CREATE TABLE "WorkContents"(
         END
     ) VIRTUAL,
     "baseNormForm" TEXT GENERATED ALWAYS AS (
-        CASE WHEN aux_expansionNoMacrons IS NOT NULL
-             THEN CASE WHEN properNounState IN (1, 2)
-                       THEN UPPER( SUBSTR( aux_expansionNoMacrons, 1, 1 ) ) || LOWER( SUBSTR( aux_expansionNoMacrons, 2 ) )
-                       ELSE LOWER( aux_expansionNoMacrons )
-                  END
-             WHEN enclitic IS NOT NULL
-             THEN CASE WHEN properNounState IN (1, 2)
-                       THEN UPPER( SUBSTR( word, 1, 1 ) ) || LOWER( SUBSTR( word, 2, LENGTH( word ) - LENGTH( enclitic ) - 1 ) )
-                       ELSE LOWER( SUBSTR( word, 1, LENGTH( word ) - LENGTH( enclitic ) ) )
-                  END
-             ELSE CASE WHEN properNounState IN (1, 2)
-                       THEN UPPER( SUBSTR( word, 1, 1 ) ) || LOWER( SUBSTR( word, 2 ) )
-                       ELSE LOWER( word )
-                  END
+        CASE WHEN properNounState IN (1, 2)
+             THEN UPPER( SUBSTR( aux_plainBase, 1, 1 ) ) || LOWER( SUBSTR( aux_plainBase, 2 ) )
+             ELSE LOWER( aux_plainBase )
         END
     ) VIRTUAL,
     "macronBaseNormForm" TEXT GENERATED ALWAYS AS (
@@ -136,16 +132,15 @@ CREATE TABLE "WorkContents"(
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId ) REFERENCES Works( id ),
     CHECK( (wordIdx IS NULL) = (tokenType >= 4) ), --fancy XNOR expression (both must be true or both must be false)
-    CHECK( expansion IS NULL OR enclitic IS NULL )
+    CHECK( expansion IS NULL OR enclitic IS NULL ),
+    CHECK( enclitic IS NULL
+           OR ( LENGTH( enclitic ) > 0
+                AND LENGTH( enclitic ) < LENGTH( word )
+                AND LOWER( SUBSTR( word, LENGTH( word ) - LENGTH( enclitic ) + 1 ) ) = LOWER( enclitic ) ) ),
+    CHECK( enclitic IS NULL OR tokenType = 1 )
 )
 STRICT,
 WITHOUT ROWID;
-
-CREATE INDEX "WorkContents_BaseNormForm"
-    ON WorkContents( baseNormForm );
-
-CREATE INDEX "WorkContents_WordPosition"
-    ON WorkContents( workId, sentenceIdx, wordIdx );
 
 CREATE TABLE "WorkContentSubdivisions"(
     "workId" TEXT NOT NULL,
@@ -163,6 +158,10 @@ CREATE TABLE "WorkContentSubdivisions"(
 STRICT, 
 WITHOUT ROWID;
 
+-- Mostly for the hierarchy view's recursive step 
+CREATE INDEX "WorkContentSubdivisions_Parent"
+    ON WorkContentSubdivisions( parent );
+
 CREATE TABLE "WorkContentSupplementary"(
     "workId" TEXT NOT NULL,
     "typ" TEXT NOT NULL CHECK( typ IN ('NOTE','GAP','ABBR') ),
@@ -179,8 +178,7 @@ WITHOUT ROWID;
 CREATE TABLE "UnambiguousMacronizations"(
     "word" TEXT NOT NULL,
     "macronizedWord" TEXT NOT NULL,
-    PRIMARY KEY( word ),
-    UNIQUE( word, macronizedWord )
+    PRIMARY KEY( word )
 ) 
 STRICT, 
 WITHOUT ROWID;
@@ -212,26 +210,39 @@ CREATE VIEW "library.staging.ResolvedMacronizations" AS
                                    WorkContents.word,
                                    WorkContents.tokenType,
                                    COALESCE( WorkMacronizations.macronizedWord,
-                                             ExactMatches.macronizedWord,
-                                             LowerCaseMatches.macronizedWord,
+                                             RawMatches.macronizedWord,
+                                             ProperNounMatches.macronizedWord,
+                                             CommonWordMatches.macronizedWord,
                                              WorkContents.word ) AS rawMacron,
-                                   CASE WHEN WorkMacronizations.macronizedWord IS NOT NULL
+                                   CASE WHEN WorkContents.tokenType > 1
+                                        THEN 0 -- macron uncertainty is a word-token concept
+                                        WHEN WorkMacronizations.macronizedWord IS NOT NULL
                                         THEN WorkMacronizations.uncertaintyBitMask -- can also be 0
-                                        WHEN ExactMatches.macronizedWord IS NOT NULL
-                                             OR LowerCaseMatches.macronizedWord IS NOT NULL
+                                        WHEN ProperNounMatches.macronizedWord IS NOT NULL
+                                             OR CommonWordMatches.macronizedWord IS NOT NULL
                                         THEN 0
                                         ELSE -1
-                                    END AS finalMask
+                                   END AS finalMask
                                 FROM WorkContents
                                 LEFT JOIN WorkMacronizations
                                     ON WorkContents.workId = WorkMacronizations.workId
                                        AND WorkContents.idx = WorkMacronizations.idx
-                                LEFT JOIN UnambiguousMacronizations AS ExactMatches
-                                    ON ( WorkContents.properNounState IN (1, 2) OR WorkContents.properNounState IS NULL )
-                                       AND WorkContents.word = ExactMatches.word
-                                LEFT JOIN UnambiguousMacronizations AS LowerCaseMatches
-                                    ON ( WorkContents.properNounState IN (0, 2) OR WorkContents.properNounState IS NULL )
-                                       AND LOWER( WorkContents.word ) = LowerCaseMatches.word ),
+                                -- Non-word tokens ("M.", "?") are never contract-cased
+                                LEFT JOIN UnambiguousMacronizations AS RawMatches
+                                    ON WorkContents.tokenType > 1
+                                       AND WorkContents.word = RawMatches.word
+                                -- Word tokens are stored under the contract-cased form
+                                LEFT JOIN UnambiguousMacronizations AS ProperNounMatches
+                                    ON WorkContents.tokenType = 1
+                                       AND ( WorkContents.properNounState IN (1, 2)
+                                             OR WorkContents.properNounState IS NULL )
+                                       AND UPPER( SUBSTR( WorkContents.word, 1, 1 ) ) || LOWER( SUBSTR( WorkContents.word, 2 ) ) = ProperNounMatches.word
+                                -- These are stored under the contract-cased form too (inherent_state 0 -> .lower())
+                                LEFT JOIN UnambiguousMacronizations AS CommonWordMatches
+                                    ON WorkContents.tokenType = 1
+                                       AND ( WorkContents.properNounState IN (0, 2)
+                                             OR WorkContents.properNounState IS NULL )
+                                       AND LOWER( WorkContents.word ) = CommonWordMatches.word ),
     Lowered AS ( SELECT *,
                         "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"(
                             LOWER( rawMacron ),
@@ -242,24 +253,25 @@ CREATE VIEW "library.staging.ResolvedMacronizations" AS
            idx,
            finalMask AS uncertaintyBitMask,
            CASE -- 1. ALL CAPS (e.g. PROLOGUS -> PRŌLOGUS)
-                WHEN word = UPPER( word ) AND LENGTH( word ) > 1 
-                THEN "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( 
+                WHEN word = UPPER( word ) AND LENGTH( word ) > 1
+                THEN "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"(
                           UPPER( lowerCaseMacron ),
                          'ā','Ā'),'ē','Ē'),'ī','Ī'),'ō','Ō'), 'ū','Ū'),'ȳ','Ȳ')
-                -- 2. Title Case (e.g. Fabula -> Fābula)
+                -- 2. Title Case (e.g. Fabula -> Fābula). The tail check ignores mixed-case tokens
                 WHEN SUBSTR( word, 1, 1 ) = UPPER( SUBSTR( word, 1, 1 ) )
-                     AND SUBSTR( word, 1, 1 ) <> LOWER( SUBSTR( word, 1, 1 ) ) 
+                     AND SUBSTR( word, 1, 1 ) <> LOWER( SUBSTR( word, 1, 1 ) )
+                     AND SUBSTR( word, 2 ) = LOWER( SUBSTR( word, 2 ) )
                 THEN ( CASE SUBSTR( lowerCaseMacron, 1, 1 )
-                            WHEN 'ā' THEN 'Ā'  
+                            WHEN 'ā' THEN 'Ā'
                             WHEN 'ē' THEN 'Ē'
-                            WHEN 'ī' THEN 'Ī'  
+                            WHEN 'ī' THEN 'Ī'
                             WHEN 'ō' THEN 'Ō'
-                            WHEN 'ū' THEN 'Ū'  
+                            WHEN 'ū' THEN 'Ū'
                             WHEN 'ȳ' THEN 'Ȳ'
                             ELSE UPPER( SUBSTR( lowerCaseMacron, 1, 1 ) )
                        END ) || SUBSTR( lowerCaseMacron, 2 )
-                -- 3. Lowercase (e.g. fabula > fābula)
-                WHEN word = LOWER( word ) 
+                -- 3. Lowercase (e.g. fabula -> fābula)
+                WHEN word = LOWER( word )
                 THEN lowerCaseMacron
                 -- 4. Unrecognized casing shape: pass through unchanged
                 ELSE rawMacron
@@ -310,13 +322,12 @@ CREATE VIEW "library.AuthorDetails" AS
                           ON Authors.id = AuthorsAndWorks.authorId
                       INNER JOIN Works
                           ON AuthorsAndWorks.workId = Works.id ),
-         WorksContents AS ( SELECT WorkContents.workId,
-                                   COUNT(*) AS numberOfWords
-                                FROM Aux
-                                INNER JOIN WorkContents
-                                    ON Aux.workId = WorkContents.workId
-                                WHERE WorkContents.tokenType <= 3
-                                GROUP BY WorkContents.workId )
+         -- Per work count without join to authors(a potential coauthored work must not report the value once per author)
+         WorksContents AS ( SELECT workId,
+                                   COUNT(*) AS numberOfWords -- Purposely different from ScopedFreqTotals.totalTokens
+                                FROM WorkContents
+                                WHERE tokenType <= 3
+                                GROUP BY workId )
         SELECT Aux.*,
                WorksContents.numberOfWords
             FROM Aux
@@ -331,14 +342,16 @@ CREATE VIEW "library.WorkDetails" AS
                          about
                       FROM Works ),
          WorksContents AS ( SELECT WorkContents.workId,
-                                   COUNT(*) AS numberOfWords
+                                   COUNT( * ) FILTER( WHERE WorkContents.tokenType <= 3 ) AS numberOfWords,
+                                   -- COALESCE required because of Drift typing
+                                   COALESCE( MAX( WorkContents.idx ), -1 ) AS lastIndex
                                 FROM Aux
-                                INNER JOIN WorkContents 
+                                INNER JOIN WorkContents
                                     ON Aux.id = WorkContents.workId
-                                WHERE WorkContents.tokenType <= 3
                                 GROUP BY WorkContents.workId )
         SELECT Aux.*,
                WorksContents.numberOfWords,
+               WorksContents.lastIndex,
                AuthorsAndWorks.authorId,
                Authors.name AS authorName
             FROM Aux
@@ -362,7 +375,11 @@ CREATE VIEW "library.WorkContents" AS
                                         SubdivsHierarchy.typ,
                                         SubdivsHierarchy.parent,
                                         SubdivsHierarchy.depth,
-                                        ROW_NUMBER( ) OVER( PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC ) AS rn
+                                        ROW_NUMBER( ) OVER( PARTITION BY WorkContents.workId, WorkContents.idx
+                                                            ORDER BY SubdivsHierarchy.fromIndex DESC, -- deterministic ordering thanks to the node
+                                                                     SubdivsHierarchy.depth DESC,
+                                                                     SubdivsHierarchy.toIndex ASC,
+                                                                     SubdivsHierarchy.node ) AS rn
                                      FROM WorkContents
                                      INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy 
                                          ON WorkContents.workId = SubdivsHierarchy.workId
@@ -401,3 +418,17 @@ CREATE VIEW "library.WorkIndexes" AS
         ORDER BY SubdivsHierarchy.fromindex;
 
 getLibraryWorkIndexes: SELECT * FROM "library.WorkIndexes" WHERE workId = ?;
+
+CREATE VIEW "library.Catalog" AS 
+    SELECT Works.id AS workId,
+           Works.name AS workName,
+           Authors.id AS authorId,
+           Authors.name AS authorName
+        FROM Works
+        LEFT OUTER JOIN AuthorsAndWorks 
+            ON Works.id = AuthorsAndWorks.workId
+        LEFT OUTER JOIN Authors 
+            ON AuthorsAndWorks.authorId = Authors.id
+        ORDER BY Authors.name, Works.name;
+
+getLibraryCatalog: SELECT * FROM "library.Catalog";

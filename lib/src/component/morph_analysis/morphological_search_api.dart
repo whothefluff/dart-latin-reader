@@ -11,6 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'morph_analysis.drift.dart';
 
 part 'morphological_search_api.g.dart';
 
@@ -21,39 +22,41 @@ Future<Results> morphologicalSearch(Ref ref, String form) async {
   log.info(() => '@riverpod - using $form');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
-  final repo = MorphologicalDataRepository(db);
+  final repo = MorphologicalDataRepository(db.morphAnalysisDrift);
   return SearchMorphologicalDataUseCase(repo, form).invoke();
 }
 
 class MorphologicalDataRepository implements IMorphologicalDataRepository {
-  MorphologicalDataRepository(this._db) {
+  MorphologicalDataRepository(
+    this._db,
+  ) {
     _runnableQueries = {
       (hasMacrons: true, useLike: true): (String form) {
         log.fine(() => 'WHERE macronizedForm LIKE "$form"');
-        return _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithLike(form);
+        return _db.searchMacronizedMorphologicalDataWithLike(form);
       },
       (hasMacrons: true, useLike: false): (String form) {
         log.fine(() => 'WHERE macronizedForm MATCH "$form"');
-        return _db.morphAnalysisDrift.searchMacronizedMorphologicalDataWithFts(form);
+        return _db.searchMacronizedMorphologicalDataWithFts(form);
       },
       (hasMacrons: false, useLike: true): (String form) {
         log.fine(() => 'WHERE form LIKE "$form"');
-        return _db.morphAnalysisDrift.searchMorphologicalDataWithLike(form);
+        return _db.searchMorphologicalDataWithLike(form);
       },
       (hasMacrons: false, useLike: false): (String form) {
         log.fine(() => 'WHERE form MATCH "$form"');
-        return _db.morphAnalysisDrift.searchMorphologicalDataWithFts(form);
+        return _db.searchMorphologicalDataWithFts(form);
       },
     };
   }
 
-  final AppDb _db;
+  final MorphAnalysisDrift _db;
 
   // dart format off
-  late final Map<({bool hasMacrons, bool useLike}), 
+  late final Map<({bool hasMacrons, bool useLike}),
                  MultiSelectable<Result> Function(String form)>
       _runnableQueries;
-    // dart format on
+  // dart format on
 
   /// If the input contains macrons, the query will look for them explicitely
   /// and as they were specified
@@ -75,18 +78,15 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
   /// characters or more, the query looks for matches using full-text search
   @override
   Future<Results> getSearchResults(String form) async {
-    if (form.isNotEmpty) {
-      final key = (
-        hasMacrons: _hasMacrons(form),
-        useLike: _useLikeLogic(form),
-      );
-      final runQuery = _runnableQueries[key]!;
-      final parsedInput = _sanitizeQuotes(_sanitizeWildcards(form));
-      final dbData = await runQuery(parsedInput).get();
-      return Results(dbData);
-    } else {
-      return Results(List.empty());
-    }
+    final key = (
+      hasMacrons: _hasMacrons(form),
+      useLike: _useLikeLogic(form),
+    );
+    final runQuery = _runnableQueries[key]!;
+    final parsedInput = _sanitizeQuotes(_sanitizeWildcards(form));
+    return Results(
+      form.isEmpty ? const Iterable<Result>.empty() : await runQuery(parsedInput).get(),
+    );
   }
 
   String _sanitizeWildcards(String form) => form.replaceAll('*', '%').replaceAll('?', '_');
@@ -146,7 +146,9 @@ abstract interface class ISearchMorphologicalDataUseCase {
 @immutable
 extension type const Results._(UnmodifiableListView<Result> unm)
     implements UnmodifiableListView<Result> {
-  Results(Iterable<Result> iter) : this._(UnmodifiableListView(iter));
+  Results(
+    Iterable<Result> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable

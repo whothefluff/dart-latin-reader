@@ -10,6 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'library.drift.dart';
 
 part 'authors_api.g.dart';
 
@@ -20,19 +21,21 @@ Future<Authors> authors(Ref ref) async {
   log.info(() => '@riverpod');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
-  final repo = LibraryRepository(db);
+  final repo = LibraryRepository(db.libraryDrift);
   return GetAuthorsUseCase(repo).invoke();
 }
 
 class LibraryRepository implements ILibraryRepository {
-  LibraryRepository(this._db);
+  LibraryRepository(
+    this._db,
+  );
 
-  final AppDb _db;
+  final LibraryDrift _db;
 
   @override
   Future<Authors> getAuthors() async {
     log.fine('reading all authors from db');
-    final dbData = await _db.libraryDrift.getLibraryAuthors().get();
+    final dbData = await _db.getLibraryAuthors().get();
     return Authors(dbData);
   }
 
@@ -70,7 +73,9 @@ abstract interface class IGetAuthorsUseCase {
 @immutable
 extension type const Authors._(UnmodifiableListView<Author> unm)
     implements UnmodifiableListView<Author> {
-  Authors(Iterable<Author> iter) : this._(UnmodifiableListView(iter));
+  Authors(
+    Iterable<Author> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable

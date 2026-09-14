@@ -6,7 +6,7 @@ part of 'word_frequency_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$frequencyReportHash() => r'acb0a484387361df5216520a1bd1b1664fd0679f';
+String _$frequencyReportHash() => r'1e9aed5f4452f3219d6e2230ed0d451f6aee487f';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -80,7 +80,9 @@ abstract interface class IGetEntrySensesUseCase {
 @immutable
 extension type const DictionaryEntrySenses._(UnmodifiableListView<EntrySense> unm)
     implements UnmodifiableListView<EntrySense> {
-  DictionaryEntrySenses(Iterable<EntrySense> iter) : this._(UnmodifiableListView(iter));
+  DictionaryEntrySenses(
+    Iterable<EntrySense> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable

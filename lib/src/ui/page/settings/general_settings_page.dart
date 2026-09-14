@@ -32,7 +32,8 @@ class GeneralSettingsPage extends ConsumerWidget {
                       col: 1,
                       child: _AppearanceSection(
                         themeMode: settings.themeMode,
-                        onThemeModeChanged: notifier.updateThemeMode,
+                        onThemeModeChanged: (mode) =>
+                            notifier.updateSettings(settings.copyWith(themeMode: mode)),
                       ),
                     ),
                   ],
@@ -109,6 +110,7 @@ class _ThemeModeSelector extends StatelessWidget {
         ),
       )
       .toList();
+  //
 }
 
 class _ThemeTile extends StatelessWidget {
@@ -163,4 +165,6 @@ class _ThemeTile extends StatelessWidget {
       ),
     );
   }
+
+  //
 }

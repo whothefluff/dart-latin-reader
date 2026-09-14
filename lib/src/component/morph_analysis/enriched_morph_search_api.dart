@@ -1,6 +1,3 @@
-// Exception for APIs
-// ignore_for_file: one_member_abstracts
-
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -9,8 +6,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../../external/provider_ext.dart';
-import '../dictionary/lewis_and_short_basic_info_api.dart' hide IDictionaryRepository;
-import 'enriched_resolver.dart';
+import '../dictionary/lewis_and_short_basic_info_api.dart';
+import '../dictionary/lns_enricher.dart';
 import 'morphological_search_api.dart';
 
 part 'enriched_morph_search_api.g.dart';
@@ -22,47 +19,24 @@ Future<EnrichedResults> enrichedMorphologicalSearch(Ref ref, String form) async 
   log.info(() => '@riverpod - using $form');
   ref.cacheFor(const Duration(minutes: 5));
   final results = await ref.watch(morphologicalSearchProvider(form).future);
-  return SearchEnrichedMorphologicalDataUseCase(
-    results: results,
-    repo: RiverpodDictionaryRepository(ref),
-  ).invoke();
-}
-
-// interactors
-
-class SearchEnrichedMorphologicalDataUseCase implements ISearchEnrichedMorphologicalDataUseCase {
-  SearchEnrichedMorphologicalDataUseCase({
-    required this.results,
-    required this.repo,
-  });
-
-  final Results results;
-  final IDictionaryRepository repo;
-
-  @override
-  Future<EnrichedResults> invoke() async {
-    final resolver = DictionaryRefResolver(repo);
-    final enrichedItems = await resolver.resolveAndEnrich(
-      items: results,
-      getDictRef: (result) => result.dictionaryRef,
-      createEnriched: (result, lnsInfo) => EnrichedResult(base: result, lns: lnsInfo),
-    );
-    return EnrichedResults(enrichedItems);
-  }
-
+  final enrichedItems = await enrichWithLns(
+    ref: ref,
+    items: results,
+    getDictRef: (result) => result.dictionaryRef,
+    createEnriched: (result, lnsInfo) => EnrichedResult(base: result, lns: lnsInfo),
+  );
+  return EnrichedResults(enrichedItems);
   //
 }
 
 //domain
 
-abstract interface class ISearchEnrichedMorphologicalDataUseCase {
-  Future<EnrichedResults> invoke();
-}
-
 @immutable
 extension type const EnrichedResults._(UnmodifiableListView<EnrichedResult> unm)
     implements UnmodifiableListView<EnrichedResult> {
-  EnrichedResults(Iterable<EnrichedResult> iter) : this._(UnmodifiableListView(iter));
+  EnrichedResults(
+    Iterable<EnrichedResult> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable

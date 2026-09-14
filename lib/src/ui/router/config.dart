@@ -12,7 +12,7 @@ import '../page/library/work_details_page.dart';
 import '../page/morphology/morphological_data_page.dart';
 import '../page/morphology/morphological_search_page.dart';
 import '../page/settings/settings_shell_page.dart';
-import '../page/word_frequency_page.dart';
+import '../page/word_frequency/word_frequency_page.dart';
 import '../page/word_lookup_page.dart';
 
 part 'config.g.dart';
@@ -82,6 +82,7 @@ class SettingsRoute extends GoRouteData with _$SettingsRoute {
 
   @override
   Widget build(context, state) => SettingsShellPage(tab: tab);
+  //
 }
 
 @TypedStatefulShellRoute<MainRoute>(
@@ -164,8 +165,8 @@ class WordLookupBranch extends StatefulShellBranchData {
 class LibraryRoute extends GoRouteData with _$LibraryRoute {
   const LibraryRoute();
 
-  @override
   /// overriding redirect doesn't do shit to avoid the exception
+  @override
   Widget build(context, state) => const AuthorsRoute().build(context, state);
 
   @override

@@ -1,62 +1,230 @@
-CREATE TABLE "WorkFormCounts"(
+import 'package:latin_reader/src/component/word_frequency/word_frequency_api.dart';
+import 'package:latin_reader/src/component/word_frequency/resolved_freq_morph_form_api.dart';
+
+-- Occurrence counts for each work, plain form, and macronized spelling
+CREATE TABLE "ScopedFormFreq"(
     "workId" TEXT NOT NULL,
     "form" TEXT NOT NULL,
     "macronForm" TEXT NOT NULL,
-    "cnt" INTEGER NOT NULL CHECK( cnt > 0 ),
+    "occurrences" INTEGER NOT NULL CHECK( occurrences > 0 ),
     PRIMARY KEY( workId, form, macronForm )
 )
 STRICT,
 WITHOUT ROWID;
 
-CREATE TABLE "WorkLemmaCounts"(
+-- Stores the morphological matches found while populating the frequency tables,
+-- for each work, plain form, and macronized form.
+-- morphForm and morphItem identify the matching MorphologicalDetails record.
+-- A counted form can have several matches.
+CREATE TABLE "ResolvedFreqMorphForms"(
+    "workId" TEXT NOT NULL,
+    "form" TEXT NOT NULL,
+    "macronForm" TEXT NOT NULL,
+    "morphForm" TEXT NOT NULL,
+    "morphItem" INTEGER NOT NULL,
+    "dictionaryRef" TEXT NOT NULL,
+    PRIMARY KEY( workId, form, macronForm, morphForm, morphItem )
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE INDEX "ResolvedFreqMorphForms_Lemma"
+    ON ResolvedFreqMorphForms( workId, dictionaryRef );
+
+-- Candidate-lemma counts for each work, plain form, and macronized form.
+-- possibleOccurrences counts units that have this lemma as a candidate.
+-- singleCandidateOccurrences counts units with no other candidate lemma.
+-- A unit can contribute to possibleOccurrences for several lemmas.
+CREATE TABLE "ScopedFormLemmaFreq"(
+    "workId" TEXT NOT NULL,
+    "form" TEXT NOT NULL,
+    "macronForm" TEXT NOT NULL,
+    "dictionaryRef" TEXT NOT NULL,
+    "possibleOccurrences" INTEGER NOT NULL CHECK( possibleOccurrences > 0 ),
+    "singleCandidateOccurrences" INTEGER NOT NULL
+        CHECK( singleCandidateOccurrences BETWEEN 0 AND possibleOccurrences ),
+    PRIMARY KEY( workId, form, macronForm, dictionaryRef )
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE INDEX "ScopedFormLemmaFreq_MacronForm"
+    ON ScopedFormLemmaFreq( macronForm, workId );
+
+CREATE TABLE "ScopedLemmaFreq"(
     "workId" TEXT NOT NULL,
     "dictionaryRef" TEXT NOT NULL,
-    "cnt" INTEGER NOT NULL CHECK( cnt > 0 ),
+    "possibleOccurrences" INTEGER NOT NULL CHECK( possibleOccurrences > 0 ),
+    "singleCandidateOccurrences" INTEGER NOT NULL
+        CHECK( singleCandidateOccurrences BETWEEN 0 AND possibleOccurrences ),
     PRIMARY KEY( workId, dictionaryRef )
 )
 STRICT,
 WITHOUT ROWID;
 
--- Form frequency - macrons OFF -> group by plain form
-getFormFrequencies:
-    SELECT form,
-           MIN( macronForm ) AS macronForm,
-           SUM( cnt ) AS occurrences,
-           COUNT(*) OVER() AS totalForms,
-           SUM( SUM( cnt ) ) OVER() AS totalTokens
-        FROM WorkFormCounts
-        WHERE workId IN ?
-        GROUP BY form
-        ORDER BY occurrences DESC
-        LIMIT :limit OFFSET :offset;
+-- Totals for each work. The three candidate categories sum to totalTokens.
+-- Distinct form and lemma totals cannot simply be added across works:
+-- the same form or lemma may occur in several works.
+CREATE TABLE "ScopedFreqTotals"(
+    "workId" TEXT NOT NULL,
+    "totalForms" INTEGER NOT NULL, -- don't aggregate, just for reference
+    "totalMacronForms" INTEGER NOT NULL, -- don't aggregate, just for reference
+    "totalLemmas" INTEGER NOT NULL, -- don't aggregate, just for reference
+    "totalTokens" INTEGER NOT NULL,
+    "noCandidateTokens" INTEGER NOT NULL CHECK( noCandidateTokens >= 0 ),
+    "singleCandidateTokens" INTEGER NOT NULL CHECK( singleCandidateTokens >= 0 ),
+    "multipleCandidateTokens" INTEGER NOT NULL CHECK( multipleCandidateTokens >= 0 ),
+    PRIMARY KEY( workId ),
+    CHECK( totalTokens = noCandidateTokens + singleCandidateTokens + multipleCandidateTokens )
+)
+STRICT,
+WITHOUT ROWID;
+
+-- Count occurrences of each plain form across the selected works.
+-- Select the requested page before collecting candidate lemmas.
+-- This avoids collecting lemmas for forms that are not on the page.
+-- Candidate lemmas are restricted to the same selected works.
+getFormFrequenciesDesc WITH FormFrequencyRow.fromFormSql:
+    WITH Page AS ( SELECT form,
+                          SUM( occurrences ) AS occurrences
+                       FROM ScopedFormFreq
+                       WHERE workId IN :workIds
+                       GROUP BY form
+                       ORDER BY occurrences DESC, form
+                       LIMIT :limit OFFSET :offset )
+    SELECT Page.form,
+           Page.occurrences,
+           ( SELECT GROUP_CONCAT( DISTINCT ScopedFormLemmaFreq.dictionaryRef )
+                 FROM ScopedFormLemmaFreq
+                 WHERE ScopedFormLemmaFreq.form = Page.form
+                       AND ScopedFormLemmaFreq.workId IN :workIds ) AS possibleLemmas
+        FROM Page
+        ORDER BY Page.occurrences DESC, Page.form;
+
+getFormFrequenciesAsc WITH FormFrequencyRow.fromFormSql:
+    WITH Page AS ( SELECT form,
+                          SUM( occurrences ) AS occurrences
+                       FROM ScopedFormFreq
+                       WHERE workId IN :workIds
+                       GROUP BY form
+                       ORDER BY occurrences ASC, form
+                       LIMIT :limit OFFSET :offset )
+    SELECT Page.form,
+           Page.occurrences,
+           ( SELECT GROUP_CONCAT( DISTINCT ScopedFormLemmaFreq.dictionaryRef )
+                 FROM ScopedFormLemmaFreq
+                 WHERE ScopedFormLemmaFreq.form = Page.form
+                       AND ScopedFormLemmaFreq.workId IN :workIds ) AS possibleLemmas
+        FROM Page
+        ORDER BY Page.occurrences ASC, Page.form;
 
 -- Form frequency - macrons ON -> group by macron form
-getMacronFormFrequencies:
-    SELECT macronForm,
-           MIN( form ) AS form,
-           SUM( cnt ) AS occurrences,
-           COUNT(*) OVER() AS totalForms,
-           SUM( SUM( cnt ) ) OVER() AS totalTokens
-        FROM WorkFormCounts
-        WHERE workId IN ?
-        GROUP BY macronForm
-        ORDER BY occurrences DESC
-        LIMIT :limit OFFSET :offset;
+getMacronFormFrequenciesDesc WITH FormFrequencyRow.fromMacronFormSql:
+    WITH Page AS ( SELECT macronForm,
+                          MIN( form ) AS form,
+                          SUM( occurrences ) AS occurrences
+                       FROM ScopedFormFreq
+                       WHERE workId IN :workIds
+                       GROUP BY macronForm
+                       ORDER BY occurrences DESC, macronForm
+                       LIMIT :limit OFFSET :offset )
+    SELECT Page.macronForm,
+           Page.form,
+           Page.occurrences,
+           ( SELECT GROUP_CONCAT( DISTINCT ScopedFormLemmaFreq.dictionaryRef )
+                 FROM ScopedFormLemmaFreq
+                 WHERE ScopedFormLemmaFreq.macronForm = Page.macronForm
+                       AND ScopedFormLemmaFreq.workId IN :workIds ) AS possibleLemmas
+        FROM Page
+        ORDER BY Page.occurrences DESC, Page.macronForm;
+
+getMacronFormFrequenciesAsc WITH FormFrequencyRow.fromMacronFormSql:
+    WITH Page AS ( SELECT macronForm,
+                          MIN( form ) AS form,
+                          SUM( occurrences ) AS occurrences
+                       FROM ScopedFormFreq
+                       WHERE workId IN :workIds
+                       GROUP BY macronForm
+                       ORDER BY occurrences ASC, macronForm
+                       LIMIT :limit OFFSET :offset )
+    SELECT Page.macronForm,
+           Page.form,
+           Page.occurrences,
+           ( SELECT GROUP_CONCAT( DISTINCT ScopedFormLemmaFreq.dictionaryRef )
+                 FROM ScopedFormLemmaFreq
+                 WHERE ScopedFormLemmaFreq.macronForm = Page.macronForm
+                       AND ScopedFormLemmaFreq.workId IN :workIds ) AS possibleLemmas
+        FROM Page
+        ORDER BY Page.occurrences ASC, Page.macronForm;
 
 -- Lemma frequency (macron toggle is a no-op since counts can't differ)
-getLemmaFrequencies:
+getLemmaFrequenciesDesc WITH LemmaFrequencyRow.fromLemmaSql:
     SELECT dictionaryRef,
-           SUM( cnt ) AS occurrences,
-           COUNT(*) OVER() AS totalLemmas,
-           SUM( SUM( cnt ) ) OVER() AS totalTokens
-        FROM WorkLemmaCounts
+           SUM( possibleOccurrences ) AS possibleOccurrences,
+           SUM( singleCandidateOccurrences ) AS singleCandidateOccurrences
+        FROM ScopedLemmaFreq
         WHERE workId IN ?
         GROUP BY dictionaryRef
-        ORDER BY occurrences DESC
+        ORDER BY possibleOccurrences DESC, dictionaryRef
         LIMIT :limit OFFSET :offset;
 
--- Total distinct lemmas in scope
-getTotalLemmasInScope:
-    SELECT COUNT( DISTINCT dictionaryRef ) AS cnt
-        FROM WorkLemmaCounts
+getLemmaFrequenciesAsc WITH LemmaFrequencyRow.fromLemmaSql:
+    SELECT dictionaryRef,
+           SUM( possibleOccurrences ) AS possibleOccurrences,
+           SUM( singleCandidateOccurrences ) AS singleCandidateOccurrences
+        FROM ScopedLemmaFreq
+        WHERE workId IN ?
+        GROUP BY dictionaryRef
+        ORDER BY possibleOccurrences ASC, dictionaryRef
+        LIMIT :limit OFFSET :offset;
+
+-- Totals (additive); populusque counts as +2
+getFrequencyCoverage WITH FrequencyCoverage:
+    SELECT SUM( totalTokens ) AS totalTokens,
+           SUM( noCandidateTokens ) AS noCandidateTokens,
+           SUM( singleCandidateTokens ) AS singleCandidateTokens,
+           SUM( multipleCandidateTokens ) AS multipleCandidateTokens
+        FROM ScopedFreqTotals
         WHERE workId IN ?;
+
+-- Totals (non-additive, need DISTINCT)
+getTotalForms: SELECT COUNT( DISTINCT form ) AS totalForms FROM ScopedFormFreq WHERE workId IN ?;
+
+getTotalMacronForms: SELECT COUNT( DISTINCT macronForm ) AS totalMacronForms FROM ScopedFormFreq WHERE workId IN ?;
+
+getTotalLemmas: SELECT COUNT( DISTINCT dictionaryRef ) AS totalLemmas FROM ScopedLemmaFreq WHERE workId IN ?;
+
+-- Morphological matches for a plain form in the selected works.
+-- DISTINCT removes matches repeated across works or macronized spellings.
+getFormMorphIdentities WITH FrequencyMorphCandidate:
+    SELECT DISTINCT form,
+                    morphForm,
+                    morphItem,
+                    dictionaryRef
+        FROM ResolvedFreqMorphForms
+        WHERE workId IN :workIds
+              AND form = :form
+        ORDER BY morphForm, morphItem;
+
+-- Morphological matches for the specified plain and macronized spellings.
+getMacronFormMorphIdentities WITH FrequencyMorphCandidate:
+    SELECT DISTINCT form,
+                    morphForm,
+                    morphItem,
+                    dictionaryRef
+        FROM ResolvedFreqMorphForms
+        WHERE workId IN :workIds
+              AND form = :form
+              AND macronForm = :macronForm
+        ORDER BY morphForm, morphItem;
+
+-- Morphological matches for a lemma across its counted forms in the selected works.
+getLemmaMorphIdentities WITH FrequencyMorphCandidate:
+    SELECT DISTINCT form,
+                    morphForm,
+                    morphItem,
+                    dictionaryRef
+        FROM ResolvedFreqMorphForms
+        WHERE workId IN :workIds
+              AND dictionaryRef = :dictionaryRef
+        ORDER BY morphForm, morphItem;

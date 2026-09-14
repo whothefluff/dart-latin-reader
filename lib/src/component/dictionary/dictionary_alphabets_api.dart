@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -28,6 +29,7 @@ Future<DictionaryAlphabetLetterPosition> dictionaryAlphabetLetterPosition(
 
 //domain
 
+@immutable
 extension type const DictionaryAlphabetLetterPosition(int index) {
   double calculateHeight(double height) => index * height;
 }

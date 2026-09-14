@@ -100,10 +100,10 @@ class AppState extends ConsumerState<App> {
 
 class ScaffoldWithNavBar extends StatelessWidget {
   const ScaffoldWithNavBar({
+    super.key,
     required this.navigationShell,
     this.createBottomNavBar = true,
     this.createNavRail = true,
-    super.key,
   });
 
   final StatefulNavigationShell navigationShell;

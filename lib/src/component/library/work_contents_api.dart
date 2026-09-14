@@ -10,6 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'library.drift.dart';
 
 part 'work_contents_api.g.dart';
 
@@ -20,21 +21,21 @@ Future<WorkContentsSegments> workContents(Ref ref, String id, int fromIndex, int
   log.info(() => '@riverpod - with $id, $fromIndex, $toIndex');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
-  final repo = LibraryRepository(db);
+  final repo = LibraryRepository(db.libraryDrift);
   return GetPartialWorkContentsUseCase(repo, id, fromIndex, toIndex).invoke();
 }
 
 class LibraryRepository implements ILibraryRepository {
-  LibraryRepository(this._db);
+  LibraryRepository(
+    this._db,
+  );
 
-  final AppDb _db;
+  final LibraryDrift _db;
 
   @override
   Future<WorkContentsSegments> getWorkContents(String id, int fromIndex, int toIndex) async {
     log.fine('reading contents ($fromIndex - $toIndex) of work "$id" from db');
-    final dbData = await _db.libraryDrift
-        .getLibraryWorkContentsPartial(id, fromIndex, toIndex)
-        .get();
+    final dbData = await _db.getLibraryWorkContentsPartial(id, fromIndex, toIndex).get();
     return WorkContentsSegments(dbData);
   }
 
@@ -79,7 +80,9 @@ abstract interface class IGetPartialWorkContentsUseCase {
 @immutable
 extension type const WorkContentsSegments._(UnmodifiableListView<WorkContentsSegment> unm)
     implements UnmodifiableListView<WorkContentsSegment> {
-  WorkContentsSegments(Iterable<WorkContentsSegment> iter) : this._(UnmodifiableListView(iter));
+  WorkContentsSegments(
+    Iterable<WorkContentsSegment> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable

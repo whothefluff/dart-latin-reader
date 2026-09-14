@@ -6,7 +6,7 @@ part of 'lewis_and_short_basic_info_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lnsBasicInfoHash() => r'521d852a2a61cc49f3b94167175ad44967c3a864';
+String _$lnsBasicInfoHash() => r'96e5a5980b63441913f59ff5c9bbceec5b2b7c26';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -34,20 +34,20 @@ class _SystemHash {
 const lnsBasicInfoProvider = LnsBasicInfoFamily();
 
 /// See also [lnsBasicInfo].
-class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfo>> {
+class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfoByRef>> {
   /// See also [lnsBasicInfo].
   const LnsBasicInfoFamily();
 
   /// See also [lnsBasicInfo].
-  LnsBasicInfoProvider call(Lemmas lemmas) {
-    return LnsBasicInfoProvider(lemmas);
+  LnsBasicInfoProvider call(PossibleLemmas lnsRefs) {
+    return LnsBasicInfoProvider(lnsRefs);
   }
 
   @override
   LnsBasicInfoProvider getProviderOverride(
     covariant LnsBasicInfoProvider provider,
   ) {
-    return call(provider.lemmas);
+    return call(provider.lnsRefs);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -66,11 +66,12 @@ class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfo>> {
 }
 
 /// See also [lnsBasicInfo].
-class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
+class LnsBasicInfoProvider
+    extends AutoDisposeFutureProvider<LnsBasicInfoByRef> {
   /// See also [lnsBasicInfo].
-  LnsBasicInfoProvider(Lemmas lemmas)
+  LnsBasicInfoProvider(PossibleLemmas lnsRefs)
     : this._internal(
-        (ref) => lnsBasicInfo(ref as LnsBasicInfoRef, lemmas),
+        (ref) => lnsBasicInfo(ref as LnsBasicInfoRef, lnsRefs),
         from: lnsBasicInfoProvider,
         name: r'lnsBasicInfoProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -79,7 +80,7 @@ class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
         dependencies: LnsBasicInfoFamily._dependencies,
         allTransitiveDependencies:
             LnsBasicInfoFamily._allTransitiveDependencies,
-        lemmas: lemmas,
+        lnsRefs: lnsRefs,
       );
 
   LnsBasicInfoProvider._internal(
@@ -89,14 +90,14 @@ class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.lemmas,
+    required this.lnsRefs,
   }) : super.internal();
 
-  final Lemmas lemmas;
+  final PossibleLemmas lnsRefs;
 
   @override
   Override overrideWith(
-    FutureOr<LnsBasicInfo> Function(LnsBasicInfoRef provider) create,
+    FutureOr<LnsBasicInfoByRef> Function(LnsBasicInfoRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -107,25 +108,25 @@ class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        lemmas: lemmas,
+        lnsRefs: lnsRefs,
       ),
     );
   }
 
   @override
-  AutoDisposeFutureProviderElement<LnsBasicInfo> createElement() {
+  AutoDisposeFutureProviderElement<LnsBasicInfoByRef> createElement() {
     return _LnsBasicInfoProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is LnsBasicInfoProvider && other.lemmas == lemmas;
+    return other is LnsBasicInfoProvider && other.lnsRefs == lnsRefs;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, lemmas.hashCode);
+    hash = _SystemHash.combine(hash, lnsRefs.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -133,18 +134,18 @@ class LnsBasicInfoProvider extends AutoDisposeFutureProvider<LnsBasicInfo> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin LnsBasicInfoRef on AutoDisposeFutureProviderRef<LnsBasicInfo> {
-  /// The parameter `lemmas` of this provider.
-  Lemmas get lemmas;
+mixin LnsBasicInfoRef on AutoDisposeFutureProviderRef<LnsBasicInfoByRef> {
+  /// The parameter `lnsRefs` of this provider.
+  PossibleLemmas get lnsRefs;
 }
 
 class _LnsBasicInfoProviderElement
-    extends AutoDisposeFutureProviderElement<LnsBasicInfo>
+    extends AutoDisposeFutureProviderElement<LnsBasicInfoByRef>
     with LnsBasicInfoRef {
   _LnsBasicInfoProviderElement(super.provider);
 
   @override
-  Lemmas get lemmas => (origin as LnsBasicInfoProvider).lemmas;
+  PossibleLemmas get lnsRefs => (origin as LnsBasicInfoProvider).lnsRefs;
 }
 
 // ignore_for_file: type=lint

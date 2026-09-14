@@ -7,7 +7,7 @@ part of 'general_settings_api.dart';
 // **************************************************************************
 
 String _$generalSettingsNotifierHash() =>
-    r'33fabe0a4afe2928f187f2ea2a196d1c51c9f1f1';
+    r'852689c6b5d64f4b5654a848381f901f1e2992ce';
 
 /// A Notifier that many Widgets can interact with to read global user settings,
 /// update user settings, or listen to user settings changes.

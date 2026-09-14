@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'library.drift.dart';
 
 part 'work_details_api.g.dart';
 
@@ -18,19 +19,21 @@ Future<WorkDetails> workDetails(Ref ref, String work) async {
   log.info(() => '@riverpod - using $work');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
-  final repo = LibraryRepository(db);
+  final repo = LibraryRepository(db.libraryDrift);
   return GetWorkDetailsUseCase(repo, work).invoke();
 }
 
 class LibraryRepository implements ILibraryRepository {
-  LibraryRepository(this._db);
+  LibraryRepository(
+    this._db,
+  );
 
-  final AppDb _db;
+  final LibraryDrift _db;
 
   @override
   Future<WorkDetails> getWorkDetailsOf(String work) async {
     log.fine('reading details of work "$work" from db');
-    final dbData = await _db.libraryDrift.getLibraryWorkDetails(work).getSingle();
+    final dbData = await _db.getLibraryWorkDetails(work).getSingle();
     return dbData;
   }
 
@@ -73,15 +76,18 @@ class WorkDetails {
     required this.id,
     required this.name,
     required this.about,
+    required this.lastIndex,
     required this.numberOfWords,
     required this.authorId,
     required this.authorName,
   });
 
+  /// Highest WorkContents.idx in the work, counting punctuation. Inclusive.
+  final int lastIndex;
   final String id;
   final String name;
   final String about;
-  final int numberOfWords;
+  final int numberOfWords; // display only
   final String? authorId;
   final String? authorName;
 

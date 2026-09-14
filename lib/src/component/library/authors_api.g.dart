@@ -6,7 +6,7 @@ part of 'authors_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authorsHash() => r'd526c41cde0252d3dc0f1378bd18b51bae800bb0';
+String _$authorsHash() => r'8f0bf8c97542e4f1267a53cac409735e444dc594';
 
 /// See also [authors].
 @ProviderFor(authors)

@@ -6,6 +6,8 @@ import '../../external/settings.dart';
 
 part 'reader_settings_api.g.dart';
 
+//infrastructure
+
 @Riverpod(keepAlive: true)
 class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
   //
@@ -71,6 +73,8 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
   //
 }
 
+//domain
+
 /// Holds the settings for the reader.
 ///
 /// All fields have defaults and can be reset to them by omitting the parameter
@@ -123,7 +127,6 @@ class ReaderSettings {
     wordSpacing: wordSpacing ?? this.wordSpacing,
   );
 
-  @override
   @override
   String toString() =>
       'ReaderSettings{'

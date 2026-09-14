@@ -74,7 +74,9 @@ abstract interface class IGetEntriesUseCase {
 @immutable
 extension type const DictionaryEntries._(UnmodifiableListView<Entry> unm)
     implements UnmodifiableListView<Entry> {
-  DictionaryEntries(Iterable<Entry> iter) : this._(UnmodifiableListView(iter));
+  DictionaryEntries(
+    Iterable<Entry> iter,
+  ) : this._(UnmodifiableListView(iter));
 }
 
 @immutable

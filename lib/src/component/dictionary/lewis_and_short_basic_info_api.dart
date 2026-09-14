@@ -3,7 +3,6 @@
 
 import 'dart:collection';
 
-import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,12 +18,12 @@ part 'lewis_and_short_basic_info_api.g.dart';
 //infrastructure
 
 @riverpod
-Future<LnsBasicInfo> lnsBasicInfo(Ref ref, Lemmas lemmas) async {
-  log.info(() => '@riverpod - using $lemmas');
+Future<LnsBasicInfoByRef> lnsBasicInfo(Ref ref, PossibleLemmas lnsRefs) async {
+  log.info(() => '@riverpod - using $lnsRefs');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = DictionaryRepository(db.dictionaryDrift);
-  return GetLnsBasicInfoUseCase(repo, lemmas).invoke();
+  return GetLnsBasicInfoUseCase(repo, lnsRefs).invoke();
 }
 
 class DictionaryRepository implements IDictionaryRepository {
@@ -35,33 +34,22 @@ class DictionaryRepository implements IDictionaryRepository {
   final DictionaryDrift _db;
 
   @override
-  Future<LnsBasicInfo> getLnsInfoFor(lemmas) async {
-    log.fine('reading L&S lemmas $lemmas from db');
-    final dictId = _db.selectOnly(_db.dictionaries)
-      ..addColumns([_db.dictionaries.id])
-      ..where(_db.dictionaries.name.equals('Lewis & Short'));
-    final dbData =
-        await (_db.selectOnly(_db.dictionaryEntries)
-              ..addColumns([
-                _db.dictionaryEntries.lemma,
-                _db.dictionaryEntries.partOfSpeech,
-                _db.dictionaryEntries.inflection,
-              ])
-              ..where(
-                _db.dictionaryEntries.dictionary.equalsExp(subqueryExpression(dictId)) &
-                    _db.dictionaryEntries.lemma.isIn(lemmas),
-              ))
-            .get();
-    return LnsBasicInfo(
-      dbData
-          .map(
-            (row) => LnsBasicInfoEntry(
-              lemma: row.read(_db.dictionaryEntries.lemma)!,
-              inflection: row.read(_db.dictionaryEntries.inflection),
-              partOfSpeech: row.read(_db.dictionaryEntries.partOfSpeech),
+  Future<LnsBasicInfoByRef> getLnsInfoFor(lemmas) async {
+    log.fine('reading L&S info for dictionary refs $lemmas from db');
+    final dbData = await _db.getBasicLnsInfo(lemmas.toSet().toList()).get();
+    return LnsBasicInfoByRef(
+      Map.fromEntries(
+        dbData.map(
+          (row) => MapEntry(
+            row.dictionaryRef,
+            LnsBasicInfoEntry(
+              lemma: row.lemma,
+              inflection: row.inflection,
+              partOfSpeech: row.partOfSpeech,
             ),
-          )
-          .toList(),
+          ),
+        ),
+      ),
     );
   }
 
@@ -72,21 +60,21 @@ class DictionaryRepository implements IDictionaryRepository {
 
 abstract interface class IDictionaryRepository {
   //
-  Future<LnsBasicInfo> getLnsInfoFor(Iterable<String> lemmas);
+  Future<LnsBasicInfoByRef> getLnsInfoFor(Iterable<String> lemmas);
   //
 }
 
 class GetLnsBasicInfoUseCase implements IGetLnsBasicInfoUseCase {
   GetLnsBasicInfoUseCase(
     this._repository,
-    this._lemmas,
+    this._dictionaryRefs,
   );
 
   final IDictionaryRepository _repository;
-  final Iterable<String> _lemmas;
+  final Iterable<String> _dictionaryRefs;
 
   @override
-  Future<LnsBasicInfo> invoke() async => _repository.getLnsInfoFor(_lemmas);
+  Future<LnsBasicInfoByRef> invoke() async => _repository.getLnsInfoFor(_dictionaryRefs);
   //
 }
 
@@ -94,18 +82,20 @@ class GetLnsBasicInfoUseCase implements IGetLnsBasicInfoUseCase {
 
 abstract interface class IGetLnsBasicInfoUseCase {
   //
-  Future<LnsBasicInfo> invoke();
+  Future<LnsBasicInfoByRef> invoke();
   //
 }
 
+/// Associates requested dictionary references with their matched L&S entries
 @immutable
-extension type const LnsBasicInfo._(UnmodifiableListView<LnsBasicInfoEntry> unm)
-    implements UnmodifiableListView<LnsBasicInfoEntry> {
-  LnsBasicInfo(
-    Iterable<LnsBasicInfoEntry> iter,
-  ) : this._(UnmodifiableListView(iter));
+extension type const LnsBasicInfoByRef._(UnmodifiableMapView<String, LnsBasicInfoEntry> unm)
+    implements UnmodifiableMapView<String, LnsBasicInfoEntry> {
+  LnsBasicInfoByRef(
+    Map<String, LnsBasicInfoEntry> map,
+  ) : this._(UnmodifiableMapView(Map.of(map)));
 }
 
+/// Represents a pure L&S entry
 @immutable
 class LnsBasicInfoEntry {
   const LnsBasicInfoEntry({
@@ -130,9 +120,10 @@ class LnsBasicInfoEntry {
   //
 }
 
+/// These are **not _necessarily_** L&S lemmas, although they will often match
 @immutable
-extension type const Lemmas._(ValueList<String> unm) implements ValueList<String> {
-  Lemmas(
+extension type const PossibleLemmas._(ValueList<String> unm) implements ValueList<String> {
+  PossibleLemmas(
     Iterable<String> iter,
   ) : this._(ValueList(iter));
 }

@@ -1026,6 +1026,155 @@ typedef $DictEntrySenseQuotesProcessedTableManager =
       i1.DictEntrySenseQuote,
       i0.PrefetchHooks Function()
     >;
+typedef $LnsRefResolutionsCreateCompanionBuilder =
+    i1.LnsRefResolutionsCompanion Function({
+      required String dictionaryRef,
+      i0.Value<String?> lnsLemma,
+    });
+typedef $LnsRefResolutionsUpdateCompanionBuilder =
+    i1.LnsRefResolutionsCompanion Function({
+      i0.Value<String> dictionaryRef,
+      i0.Value<String?> lnsLemma,
+    });
+
+class $LnsRefResolutionsFilterComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.LnsRefResolutions> {
+  $LnsRefResolutionsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnFilters<String> get dictionaryRef => $composableBuilder(
+    column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get lnsLemma => $composableBuilder(
+    column: $table.lnsLemma,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+}
+
+class $LnsRefResolutionsOrderingComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.LnsRefResolutions> {
+  $LnsRefResolutionsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnOrderings<String> get dictionaryRef => $composableBuilder(
+    column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get lnsLemma => $composableBuilder(
+    column: $table.lnsLemma,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+}
+
+class $LnsRefResolutionsAnnotationComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.LnsRefResolutions> {
+  $LnsRefResolutionsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.GeneratedColumn<String> get dictionaryRef => $composableBuilder(
+    column: $table.dictionaryRef,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get lnsLemma =>
+      $composableBuilder(column: $table.lnsLemma, builder: (column) => column);
+}
+
+class $LnsRefResolutionsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.LnsRefResolutions,
+          i1.LnsRefResolution,
+          i1.$LnsRefResolutionsFilterComposer,
+          i1.$LnsRefResolutionsOrderingComposer,
+          i1.$LnsRefResolutionsAnnotationComposer,
+          $LnsRefResolutionsCreateCompanionBuilder,
+          $LnsRefResolutionsUpdateCompanionBuilder,
+          (
+            i1.LnsRefResolution,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.LnsRefResolutions,
+              i1.LnsRefResolution
+            >,
+          ),
+          i1.LnsRefResolution,
+          i0.PrefetchHooks Function()
+        > {
+  $LnsRefResolutionsTableManager(
+    i0.GeneratedDatabase db,
+    i1.LnsRefResolutions table,
+  ) : super(
+        i0.TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              i1.$LnsRefResolutionsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              i1.$LnsRefResolutionsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              i1.$LnsRefResolutionsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> dictionaryRef = const i0.Value.absent(),
+                i0.Value<String?> lnsLemma = const i0.Value.absent(),
+              }) => i1.LnsRefResolutionsCompanion(
+                dictionaryRef: dictionaryRef,
+                lnsLemma: lnsLemma,
+              ),
+          createCompanionCallback:
+              ({
+                required String dictionaryRef,
+                i0.Value<String?> lnsLemma = const i0.Value.absent(),
+              }) => i1.LnsRefResolutionsCompanion.insert(
+                dictionaryRef: dictionaryRef,
+                lnsLemma: lnsLemma,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $LnsRefResolutionsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.LnsRefResolutions,
+      i1.LnsRefResolution,
+      i1.$LnsRefResolutionsFilterComposer,
+      i1.$LnsRefResolutionsOrderingComposer,
+      i1.$LnsRefResolutionsAnnotationComposer,
+      $LnsRefResolutionsCreateCompanionBuilder,
+      $LnsRefResolutionsUpdateCompanionBuilder,
+      (
+        i1.LnsRefResolution,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.LnsRefResolutions,
+          i1.LnsRefResolution
+        >,
+      ),
+      i1.LnsRefResolution,
+      i0.PrefetchHooks Function()
+    >;
 
 class Dictionaries extends i0.Table
     with i0.TableInfo<Dictionaries, i1.Dictionary> {
@@ -2866,6 +3015,232 @@ class DictEntrySenseQuotesCompanion
   }
 }
 
+class LnsRefResolutions extends i0.Table
+    with i0.TableInfo<LnsRefResolutions, i1.LnsRefResolution> {
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  LnsRefResolutions(this.attachedDatabase, [this._alias]);
+  static const i0.VerificationMeta _dictionaryRefMeta =
+      const i0.VerificationMeta('dictionaryRef');
+  late final i0.GeneratedColumn<String> dictionaryRef =
+      i0.GeneratedColumn<String>(
+        'dictionaryRef',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
+  static const i0.VerificationMeta _lnsLemmaMeta = const i0.VerificationMeta(
+    'lnsLemma',
+  );
+  late final i0.GeneratedColumn<String> lnsLemma = i0.GeneratedColumn<String>(
+    'lnsLemma',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<i0.GeneratedColumn> get $columns => [dictionaryRef, lnsLemma];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'LnsRefResolutions';
+  @override
+  i0.VerificationContext validateIntegrity(
+    i0.Insertable<i1.LnsRefResolution> instance, {
+    bool isInserting = false,
+  }) {
+    final context = i0.VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('dictionaryRef')) {
+      context.handle(
+        _dictionaryRefMeta,
+        dictionaryRef.isAcceptableOrUnknown(
+          data['dictionaryRef']!,
+          _dictionaryRefMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dictionaryRefMeta);
+    }
+    if (data.containsKey('lnsLemma')) {
+      context.handle(
+        _lnsLemmaMeta,
+        lnsLemma.isAcceptableOrUnknown(data['lnsLemma']!, _lnsLemmaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<i0.GeneratedColumn> get $primaryKey => {dictionaryRef};
+  @override
+  i1.LnsRefResolution map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.LnsRefResolution(
+      dictionaryRef: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}dictionaryRef'],
+      )!,
+      lnsLemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}lnsLemma'],
+      ),
+    );
+  }
+
+  @override
+  LnsRefResolutions createAlias(String alias) {
+    return LnsRefResolutions(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
+  @override
+  List<String> get customConstraints => const ['PRIMARY KEY(dictionaryRef)'];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class LnsRefResolution extends i0.DataClass
+    implements i0.Insertable<i1.LnsRefResolution> {
+  final String dictionaryRef;
+  final String? lnsLemma;
+  const LnsRefResolution({required this.dictionaryRef, this.lnsLemma});
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
+    if (!nullToAbsent || lnsLemma != null) {
+      map['lnsLemma'] = i0.Variable<String>(lnsLemma);
+    }
+    return map;
+  }
+
+  i1.LnsRefResolutionsCompanion toCompanion(bool nullToAbsent) {
+    return i1.LnsRefResolutionsCompanion(
+      dictionaryRef: i0.Value(dictionaryRef),
+      lnsLemma: lnsLemma == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(lnsLemma),
+    );
+  }
+
+  factory LnsRefResolution.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return LnsRefResolution(
+      dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      lnsLemma: serializer.fromJson<String?>(json['lnsLemma']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'lnsLemma': serializer.toJson<String?>(lnsLemma),
+    };
+  }
+
+  i1.LnsRefResolution copyWith({
+    String? dictionaryRef,
+    i0.Value<String?> lnsLemma = const i0.Value.absent(),
+  }) => i1.LnsRefResolution(
+    dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    lnsLemma: lnsLemma.present ? lnsLemma.value : this.lnsLemma,
+  );
+  LnsRefResolution copyWithCompanion(i1.LnsRefResolutionsCompanion data) {
+    return LnsRefResolution(
+      dictionaryRef: data.dictionaryRef.present
+          ? data.dictionaryRef.value
+          : this.dictionaryRef,
+      lnsLemma: data.lnsLemma.present ? data.lnsLemma.value : this.lnsLemma,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LnsRefResolution(')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('lnsLemma: $lnsLemma')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(dictionaryRef, lnsLemma);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.LnsRefResolution &&
+          other.dictionaryRef == this.dictionaryRef &&
+          other.lnsLemma == this.lnsLemma);
+}
+
+class LnsRefResolutionsCompanion
+    extends i0.UpdateCompanion<i1.LnsRefResolution> {
+  final i0.Value<String> dictionaryRef;
+  final i0.Value<String?> lnsLemma;
+  const LnsRefResolutionsCompanion({
+    this.dictionaryRef = const i0.Value.absent(),
+    this.lnsLemma = const i0.Value.absent(),
+  });
+  LnsRefResolutionsCompanion.insert({
+    required String dictionaryRef,
+    this.lnsLemma = const i0.Value.absent(),
+  }) : dictionaryRef = i0.Value(dictionaryRef);
+  static i0.Insertable<i1.LnsRefResolution> custom({
+    i0.Expression<String>? dictionaryRef,
+    i0.Expression<String>? lnsLemma,
+  }) {
+    return i0.RawValuesInsertable({
+      if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
+      if (lnsLemma != null) 'lnsLemma': lnsLemma,
+    });
+  }
+
+  i1.LnsRefResolutionsCompanion copyWith({
+    i0.Value<String>? dictionaryRef,
+    i0.Value<String?>? lnsLemma,
+  }) {
+    return i1.LnsRefResolutionsCompanion(
+      dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+      lnsLemma: lnsLemma ?? this.lnsLemma,
+    );
+  }
+
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    if (dictionaryRef.present) {
+      map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
+    }
+    if (lnsLemma.present) {
+      map['lnsLemma'] = i0.Variable<String>(lnsLemma.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LnsRefResolutionsCompanion(')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('lnsLemma: $lnsLemma')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class DictionaryDictionary extends i0.DataClass {
   final String id;
   final String name;
@@ -3058,6 +3433,210 @@ class DictionaryDictionaries
   @override
   DictionaryDictionaries createAlias(String alias) {
     return DictionaryDictionaries(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {'Dictionaries', 'DictionaryEntries'};
+}
+
+class DictionaryLewisAndShortDictionaryData extends i0.DataClass {
+  final String id;
+  final String name;
+  final String language;
+  final String publisher;
+  final DateTime publicationDate;
+  final int numberOfEntries;
+  const DictionaryLewisAndShortDictionaryData({
+    required this.id,
+    required this.name,
+    required this.language,
+    required this.publisher,
+    required this.publicationDate,
+    required this.numberOfEntries,
+  });
+  factory DictionaryLewisAndShortDictionaryData.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return DictionaryLewisAndShortDictionaryData(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      language: serializer.fromJson<String>(json['language']),
+      publisher: serializer.fromJson<String>(json['publisher']),
+      publicationDate: serializer.fromJson<DateTime>(json['publicationDate']),
+      numberOfEntries: serializer.fromJson<int>(json['numberOfEntries']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'language': serializer.toJson<String>(language),
+      'publisher': serializer.toJson<String>(publisher),
+      'publicationDate': serializer.toJson<DateTime>(publicationDate),
+      'numberOfEntries': serializer.toJson<int>(numberOfEntries),
+    };
+  }
+
+  i1.DictionaryLewisAndShortDictionaryData copyWith({
+    String? id,
+    String? name,
+    String? language,
+    String? publisher,
+    DateTime? publicationDate,
+    int? numberOfEntries,
+  }) => i1.DictionaryLewisAndShortDictionaryData(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    language: language ?? this.language,
+    publisher: publisher ?? this.publisher,
+    publicationDate: publicationDate ?? this.publicationDate,
+    numberOfEntries: numberOfEntries ?? this.numberOfEntries,
+  );
+  @override
+  String toString() {
+    return (StringBuffer('DictionaryLewisAndShortDictionaryData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('language: $language, ')
+          ..write('publisher: $publisher, ')
+          ..write('publicationDate: $publicationDate, ')
+          ..write('numberOfEntries: $numberOfEntries')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    language,
+    publisher,
+    publicationDate,
+    numberOfEntries,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.DictionaryLewisAndShortDictionaryData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.language == this.language &&
+          other.publisher == this.publisher &&
+          other.publicationDate == this.publicationDate &&
+          other.numberOfEntries == this.numberOfEntries);
+}
+
+class DictionaryLewisAndShortDictionary
+    extends
+        i0.ViewInfo<
+          i1.DictionaryLewisAndShortDictionary,
+          i1.DictionaryLewisAndShortDictionaryData
+        >
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  DictionaryLewisAndShortDictionary(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    id,
+    name,
+    language,
+    publisher,
+    publicationDate,
+    numberOfEntries,
+  ];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'dictionary.LewisAndShortDictionary';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "dictionary.LewisAndShortDictionary" AS SELECT id, name, language, publisher, CAST(publicationDate AS TEXT) AS publicationDate, numberOfEntries FROM "dictionary.Dictionaries" WHERE name = \'Lewis & Short\' LIMIT 1',
+  };
+  @override
+  DictionaryLewisAndShortDictionary get asDslTable => this;
+  @override
+  i1.DictionaryLewisAndShortDictionaryData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.DictionaryLewisAndShortDictionaryData(
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      language: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}language'],
+      )!,
+      publisher: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}publisher'],
+      )!,
+      publicationDate: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.dateTime,
+        data['${effectivePrefix}publicationDate'],
+      )!,
+      numberOfEntries: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}numberOfEntries'],
+      )!,
+    );
+  }
+
+  late final i0.GeneratedColumn<String> id = i0.GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> language = i0.GeneratedColumn<String>(
+    'language',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> publisher = i0.GeneratedColumn<String>(
+    'publisher',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<DateTime> publicationDate =
+      i0.GeneratedColumn<DateTime>(
+        'publicationDate',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.dateTime,
+      );
+  late final i0.GeneratedColumn<int> numberOfEntries = i0.GeneratedColumn<int>(
+    'numberOfEntries',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  @override
+  DictionaryLewisAndShortDictionary createAlias(String alias) {
+    return DictionaryLewisAndShortDictionary(attachedDatabase, alias);
   }
 
   @override
@@ -3270,6 +3849,168 @@ class DictionaryDictionaryEntries
   Set<String> get readTables => const {'DictionaryEntries', 'DictEntrySenses'};
 }
 
+class DictionaryResolvedLnsRef extends i0.DataClass {
+  final String dictionaryRef;
+  final String lemma;
+  final String? inflection;
+  final String? partOfSpeech;
+  const DictionaryResolvedLnsRef({
+    required this.dictionaryRef,
+    required this.lemma,
+    this.inflection,
+    this.partOfSpeech,
+  });
+  factory DictionaryResolvedLnsRef.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return DictionaryResolvedLnsRef(
+      dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      lemma: serializer.fromJson<String>(json['lemma']),
+      inflection: serializer.fromJson<String?>(json['inflection']),
+      partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'lemma': serializer.toJson<String>(lemma),
+      'inflection': serializer.toJson<String?>(inflection),
+      'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
+    };
+  }
+
+  i1.DictionaryResolvedLnsRef copyWith({
+    String? dictionaryRef,
+    String? lemma,
+    i0.Value<String?> inflection = const i0.Value.absent(),
+    i0.Value<String?> partOfSpeech = const i0.Value.absent(),
+  }) => i1.DictionaryResolvedLnsRef(
+    dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    lemma: lemma ?? this.lemma,
+    inflection: inflection.present ? inflection.value : this.inflection,
+    partOfSpeech: partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
+  );
+  @override
+  String toString() {
+    return (StringBuffer('DictionaryResolvedLnsRef(')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('lemma: $lemma, ')
+          ..write('inflection: $inflection, ')
+          ..write('partOfSpeech: $partOfSpeech')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(dictionaryRef, lemma, inflection, partOfSpeech);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.DictionaryResolvedLnsRef &&
+          other.dictionaryRef == this.dictionaryRef &&
+          other.lemma == this.lemma &&
+          other.inflection == this.inflection &&
+          other.partOfSpeech == this.partOfSpeech);
+}
+
+class DictionaryResolvedLnsRefs
+    extends
+        i0.ViewInfo<i1.DictionaryResolvedLnsRefs, i1.DictionaryResolvedLnsRef>
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  DictionaryResolvedLnsRefs(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    dictionaryRef,
+    lemma,
+    inflection,
+    partOfSpeech,
+  ];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'dictionary.ResolvedLnsRefs';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "dictionary.ResolvedLnsRefs" AS SELECT LnsRefResolutions.dictionaryRef, DictionaryEntries.lemma, DictionaryEntries.inflection, DictionaryEntries.partOfSpeech FROM LnsRefResolutions INNER JOIN DictionaryEntries ON DictionaryEntries.lemma = LnsRefResolutions.lnsLemma AND DictionaryEntries.dictionary = (SELECT id FROM Dictionaries WHERE name = \'Lewis & Short\' LIMIT 1)',
+  };
+  @override
+  DictionaryResolvedLnsRefs get asDslTable => this;
+  @override
+  i1.DictionaryResolvedLnsRef map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.DictionaryResolvedLnsRef(
+      dictionaryRef: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}dictionaryRef'],
+      )!,
+      lemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}lemma'],
+      )!,
+      inflection: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}inflection'],
+      ),
+      partOfSpeech: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}partOfSpeech'],
+      ),
+    );
+  }
+
+  late final i0.GeneratedColumn<String> dictionaryRef =
+      i0.GeneratedColumn<String>(
+        'dictionaryRef',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
+  late final i0.GeneratedColumn<String> lemma = i0.GeneratedColumn<String>(
+    'lemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> inflection = i0.GeneratedColumn<String>(
+    'inflection',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> partOfSpeech =
+      i0.GeneratedColumn<String>(
+        'partOfSpeech',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
+  @override
+  DictionaryResolvedLnsRefs createAlias(String alias) {
+    return DictionaryResolvedLnsRefs(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {
+    'LnsRefResolutions',
+    'DictionaryEntries',
+    'Dictionaries',
+  };
+}
+
 class DictionaryDrift extends i2.ModularAccessor {
   DictionaryDrift(i0.GeneratedDatabase db) : super(db);
   Future<int> fillDictionaryAlphabets() {
@@ -3283,6 +4024,23 @@ class DictionaryDrift extends i2.ModularAccessor {
   i0.Selectable<i3.Dictionary> getDictionaries() {
     return customSelect(
       'SELECT id, name, language, publisher, CAST(publicationDate AS TEXT) AS publicationDate, numberOfEntries FROM "dictionary.Dictionaries"',
+      variables: [],
+      readsFrom: {dictionaries, dictionaryEntries},
+    ).map(
+      (i0.QueryRow row) => i3.Dictionary(
+        id: row.read<String>('id'),
+        name: row.read<String>('name'),
+        language: row.read<String>('language'),
+        publisher: row.read<String>('publisher'),
+        publicationDate: row.read<DateTime>('publicationDate'),
+        numberOfEntries: row.read<int>('numberOfEntries'),
+      ),
+    );
+  }
+
+  i0.Selectable<i3.Dictionary> getLewisAndShortDictionary() {
+    return customSelect(
+      'SELECT * FROM "dictionary.LewisAndShortDictionary"',
       variables: [],
       readsFrom: {dictionaries, dictionaryEntries},
     ).map(
@@ -3358,6 +4116,19 @@ class DictionaryDrift extends i2.ModularAccessor {
     );
   }
 
+  i0.Selectable<i1.DictionaryResolvedLnsRef> getBasicLnsInfo(
+    List<String> var1,
+  ) {
+    var $arrayStartIndex = 1;
+    final expandedvar1 = $expandVar($arrayStartIndex, var1.length);
+    $arrayStartIndex += var1.length;
+    return customSelect(
+      'SELECT * FROM "dictionary.ResolvedLnsRefs" WHERE dictionaryRef IN ($expandedvar1)',
+      variables: [for (var $ in var1) i0.Variable<String>($)],
+      readsFrom: {lnsRefResolutions, dictionaryEntries, dictionaries},
+    ).asyncMap(dictionaryResolvedLnsRefs.mapFromRow);
+  }
+
   i1.DictionaryAlphabets get dictionaryAlphabets => i2.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.DictionaryAlphabets>('DictionaryAlphabets');
@@ -3371,6 +4142,12 @@ class DictionaryDrift extends i2.ModularAccessor {
   i1.Dictionaries get dictionaries => i2.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.Dictionaries>('Dictionaries');
+  i1.DictionaryLewisAndShortDictionary get dictionaryLewisAndShortDictionary =>
+      i2.ReadDatabaseContainer(
+        attachedDatabase,
+      ).resultSet<i1.DictionaryLewisAndShortDictionary>(
+        'dictionary.LewisAndShortDictionary',
+      );
   i1.DictionaryDictionaryEntries get dictionaryDictionaryEntries =>
       i2.ReadDatabaseContainer(
         attachedDatabase,
@@ -3383,4 +4160,11 @@ class DictionaryDrift extends i2.ModularAccessor {
   i1.DictEntrySenseQuotes get dictEntrySenseQuotes => i2.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.DictEntrySenseQuotes>('DictEntrySenseQuotes');
+  i1.DictionaryResolvedLnsRefs get dictionaryResolvedLnsRefs =>
+      i2.ReadDatabaseContainer(
+        attachedDatabase,
+      ).resultSet<i1.DictionaryResolvedLnsRefs>('dictionary.ResolvedLnsRefs');
+  i1.LnsRefResolutions get lnsRefResolutions => i2.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.LnsRefResolutions>('LnsRefResolutions');
 }
