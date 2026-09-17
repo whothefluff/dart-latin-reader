@@ -93,11 +93,17 @@ class WorkContentsSegment {
     required this.node,
     required this.idx,
     required this.word,
+    required this.macronizedWord,
+    required this.uncertaintyBitMask,
     required this.typ,
     required this.depth,
     required this.sourceReference,
   });
 
+  /// Set bits mark uncertain characters, starting at bit 0.
+  /// A value of -1 marks the whole word as uncertain.
+  final int uncertaintyBitMask;
+  final String macronizedWord;
   final String workId;
   final String? parent;
   final String node;

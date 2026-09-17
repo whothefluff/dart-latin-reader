@@ -35,6 +35,15 @@ enum _PageFlow {
   next,
 }
 
+String _withoutMacrons(String word) {
+  const macronized = 'āēīōūȳĀĒĪŌŪȲ';
+  const plain = 'aeiouyAEIOUY';
+  return word.replaceAllMapped(
+    RegExp('[$macronized]'),
+    (match) => plain[macronized.indexOf(match[0]!)],
+  );
+}
+
 class TextPage extends ConsumerStatefulWidget {
   const TextPage(
     this.workId, {
@@ -143,12 +152,15 @@ class TextPageState extends ConsumerState<TextPage> {
 
 class _TextRenderer {
   _TextRenderer(
-    this.textTheme,
+    this.theme,
     this.workSegments,
     this.readerSettings,
   );
 
-  final TextTheme textTheme;
+  final ThemeData theme;
+  final WorkContentsSegments workSegments;
+  final ReaderSettings readerSettings;
+
   static final Map<String, String> styleToLineBreak = {
     'POEM': _lineTerminator + _lineTerminator,
     'PROL': _lineTerminator + _lineTerminator,
@@ -163,9 +175,9 @@ class _TextRenderer {
     'VERS': textTheme.bodyLarge!,
     'default': textTheme.bodyMedium!,
   };
-  final WorkContentsSegments workSegments;
   static const _empty = '';
-  final ReaderSettings readerSettings;
+
+  TextTheme get textTheme => theme.textTheme;
 
   String _getSpace(int index, WorkContentsSegment segment) {
     final nextIsPunctuation =
@@ -206,22 +218,43 @@ class _TextRenderer {
       final prevNode = previousSegment?.node;
       final currStyle = segment.typ;
       final currNode = segment.node;
-      final buffer = StringBuffer()
-        ..write(_getLineBreak(prevStyle, currStyle, prevNode, currNode))
-        ..write(segment.word)
-        ..write(_getSpace(i, segment));
       // Merge the theme style for this block (e.g. TITLE vs VERS) with the user settings
-      final currentStyle = segment.typ;
-      final blockThemeStyle = styles[currentStyle] ?? styles['default']!;
+      final blockThemeStyle = styles[currStyle] ?? styles['default']!;
       final mergedStyle = blockThemeStyle.merge(baseTextStyle);
       final finalStyle = readerSettings.fontFamily != null
           ? GoogleFonts.getFont(readerSettings.fontFamily!, textStyle: mergedStyle)
           : mergedStyle;
+      // Pagination expects one outer span per segment
       return TextSpan(
-        text: buffer.toString(),
+        text: _getLineBreak(prevStyle, currStyle, prevNode, currNode),
         style: finalStyle,
+        children: [
+          ..._wordSpans(segment),
+          TextSpan(text: _getSpace(i, segment)),
+        ],
       );
     }).toList();
+  }
+
+  /// Letter spans for [segment]
+  List<TextSpan> _wordSpans(WorkContentsSegment segment) {
+    final word = readerSettings.showMacrons ? segment.macronizedWord : segment.word;
+    final mask = readerSettings.showMacrons ? segment.uncertaintyBitMask : 0;
+    final uncertainStyle = TextStyle(
+      decoration: TextDecoration.underline,
+      decorationStyle: TextDecorationStyle.wavy,
+      decorationColor: theme.colorScheme.primary,
+      decorationThickness: 1,
+    );
+    return mask == 0
+        ? [TextSpan(text: word)]
+        : word.runes.mapIndexed((i, rune) {
+            final isUncertain = ((mask >> i) & 1) != 0;
+            return TextSpan(
+              text: String.fromCharCode(rune),
+              style: isUncertain ? uncertainStyle : null,
+            );
+          }).toList();
   }
 
   //
@@ -339,7 +372,15 @@ class _WordDetailsButton extends ContextMenuButtonItem {
     required String word,
     required this.ref,
     required this.context,
-  }) : super(onPressed: () => _onPressed(word, ref, context), label: 'See details for "$word"');
+    bool ignoreMacrons = false,
+  }) : super(
+         label: ignoreMacrons ? 'See details ignoring macrons' : 'See details for "$word"',
+         onPressed: () => _onPressed(
+           ignoreMacrons ? _withoutMacrons(word) : word,
+           ref,
+           context,
+         ),
+       );
 
   final WidgetRef ref;
   final BuildContext context;
@@ -391,7 +432,10 @@ class _WiktionaryButton extends ContextMenuButtonItem {
   static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
     log.entry(args: [word]);
     ContextMenuController.removeAny();
-    final queryWord = (await _isProperNoun(word, ref)) ? _capitalize(word) : word.toLowerCase();
+    final plainWord = _withoutMacrons(word);
+    final queryWord = (await _isProperNoun(word, ref))
+        ? _capitalize(plainWord)
+        : plainWord.toLowerCase();
     try {
       if (await launchUrl(Uri.parse('https://en.wiktionary.org/wiki/$queryWord#Latin'))) {
         log.exit<void>();
@@ -585,7 +629,6 @@ class _StyledWordList extends ConsumerStatefulWidget {
 class _StyledWordListState extends ConsumerState<_StyledWordList> {
   //
   final _textSelector = _TextSelector();
-  var _wordSelectionButtons = <ContextMenuButtonItem>[];
   late _GestureHandler _gestureHandler;
 
   @override
@@ -702,41 +745,155 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     final visibleTextSpan = _buildTextWithOverflowDetection(context, constraints, settings);
     return SelectableText.rich(
       visibleTextSpan,
-      onSelectionChanged: (selection, cause) =>
-          _handleSelectionChanged(selection, cause, visibleTextSpan.toPlainText()),
+      onSelectionChanged: (selection, _) => _preloadSelectionLookups(
+        selection,
+        visibleTextSpan.toPlainText(),
+      ),
       contextMenuBuilder: _buildContextMenu,
       // The scrollbar may appear when resizing with the default physics
       scrollPhysics: const NeverScrollableScrollPhysics(),
     );
   }
 
-  void _handleSelectionChanged(
+  /// Starts lookups immediately when a full word is selected and cache results
+  void _preloadSelectionLookups(
     TextSelection selection,
-    SelectionChangedCause? cause,
     String visibleText,
   ) {
-    log.info(() => 'user selected text "${selection.textInside(visibleText)}"');
-    final selectedWord = _textSelector.singleWord(selection, visibleText);
-    setState(() {
-      if (selectedWord != null) {
-        _wordSelectionButtons = [
-          _WordDetailsButton(word: selectedWord, ref: ref, context: context),
-          _WiktionaryButton(word: selectedWord, ref: ref, context: context),
-        ];
-      } else {
-        _wordSelectionButtons = [];
-      }
-    });
+    if (selection.isValid) {
+      log.info(() => 'user selected text "${selection.textInside(visibleText)}"');
+    }
+    final selectedWord = _getSelectedWord(selection, visibleText);
+    if (selectedWord != null) {
+      _preloadWordLookups(selectedWord);
+    }
   }
 
-  Widget _buildContextMenu(BuildContext context, EditableTextState state) =>
-      AdaptiveTextSelectionToolbar.buttonItems(
-        anchors: state.contextMenuAnchors,
-        buttonItems: [
-          ...state.contextMenuButtonItems,
-          ..._wordSelectionButtons,
-        ],
+  String? _getSelectedWord(
+    TextSelection selection,
+    String visibleText,
+  ) => selection.isValid ? _textSelector.singleWord(selection, visibleText) : null;
+
+  void _preloadWordLookups(String word) {
+    ref.read(enrichedMorphologicalSearchProvider('"$word"'));
+    final settings = ref.read(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings();
+    final plainWord = _getAlternativeLookupWord(word, settings.showMacrons);
+    if (plainWord != null) {
+      ref.read(enrichedMorphologicalSearchProvider('"$plainWord"'));
+    }
+  }
+
+  String? _getAlternativeLookupWord(String? word, bool showMacrons) {
+    final plainWord = word == null ? null : _withoutMacrons(word);
+    return showMacrons && plainWord != word ? plainWord : null;
+  }
+
+  Widget _buildContextMenu(BuildContext readerContext, EditableTextState state) =>
+      ValueListenableBuilder<TextEditingValue>(
+        valueListenable: state.widget.controller,
+        builder: (_, value, _) => Consumer(
+          builder: (_, menuRef, _) => _buildToolbarForSelection(
+            readerContext,
+            state,
+            value,
+            menuRef,
+          ),
+        ),
       );
+
+  Widget _buildToolbarForSelection(
+    BuildContext readerContext,
+    EditableTextState state,
+    TextEditingValue value,
+    WidgetRef menuRef,
+  ) {
+    final selectedWord = _getSelectedWord(value.selection, value.text);
+    final settings =
+        menuRef.watch(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings();
+    final comparison = _watchMacronLookupComparison(menuRef, selectedWord, settings.showMacrons);
+    return comparison.pending
+        ? const SizedBox.shrink()
+        : AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: state.contextMenuAnchors,
+            buttonItems: [
+              ...state.contextMenuButtonItems,
+              if (selectedWord != null)
+                ..._buildWordLookupButtons(
+                  readerContext,
+                  selectedWord,
+                  showIgnoringMacrons: comparison.showIgnoringMacrons,
+                ),
+            ],
+          );
+  }
+
+  /// Compares the normal lookup with a lookup that ignores macrons
+  ///
+  /// - `pending` is `true` while waiting for the lookup results
+  /// - `showIgnoringMacrons` is `true` when ignoring macrons finds results
+  ///   that differ from the normal lookup
+  ({bool pending, bool showIgnoringMacrons}) _watchMacronLookupComparison(
+    WidgetRef menuRef,
+    String? word,
+    bool showMacrons,
+  ) {
+    var comparison = (pending: false, showIgnoringMacrons: false);
+    final plainWord = _getAlternativeLookupWord(word, showMacrons);
+    if (word != null && plainWord != null) {
+      final displayedSearch = menuRef.watch(
+        enrichedMorphologicalSearchProvider('"$word"'),
+      );
+      final plainSearch = menuRef.watch(
+        enrichedMorphologicalSearchProvider('"$plainWord"'),
+      );
+      comparison = (
+        pending: _isLookupComparisonPending(displayedSearch, plainSearch),
+        showIgnoringMacrons: _plainLookupOffersDifferentResults(
+          displayedSearch.asData?.value,
+          plainSearch.asData?.value,
+        ),
+      );
+    }
+    return comparison;
+  }
+
+  bool _isLookupComparisonPending(
+    AsyncValue<EnrichedResults> displayed,
+    AsyncValue<EnrichedResults> plain,
+  ) => !displayed.hasError && !plain.hasError && (displayed.isLoading || plain.isLoading);
+
+  bool _plainLookupOffersDifferentResults(EnrichedResults? displayed, EnrichedResults? plain) =>
+      displayed != null &&
+      plain != null &&
+      plain.isNotEmpty &&
+      !const SetEquality<EnrichedResult>().equals(
+        displayed.toSet(),
+        plain.toSet(),
+      );
+
+  List<ContextMenuButtonItem> _buildWordLookupButtons(
+    BuildContext readerContext,
+    String word, {
+    required bool showIgnoringMacrons,
+  }) => [
+    _WordDetailsButton(
+      word: word,
+      ref: ref,
+      context: readerContext,
+    ),
+    if (showIgnoringMacrons)
+      _WordDetailsButton(
+        word: word,
+        ref: ref,
+        context: readerContext,
+        ignoreMacrons: true,
+      ),
+    _WiktionaryButton(
+      word: word,
+      ref: ref,
+      context: readerContext,
+    ),
+  ];
 
   void _rebuildOnScreenSizeChange(BuildContext context) {
     MediaQuery.of(context);
@@ -748,7 +905,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     ReaderSettings settings,
   ) {
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
-    final allSpans = _TextRenderer(TextTheme.of(context), widget.segments, settings).createSpans();
+    final allSpans = _TextRenderer(Theme.of(context), widget.segments, settings).createSpans();
     textPainter
       ..text = TextSpan(children: allSpans)
       ..layout(maxWidth: constraints.maxWidth);

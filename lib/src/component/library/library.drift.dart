@@ -7853,6 +7853,8 @@ class LibraryDrift extends i3.ModularAccessor {
         node: row.read<String>('node'),
         idx: row.read<int>('idx'),
         word: row.read<String>('word'),
+        macronizedWord: row.read<String>('macronizedWord'),
+        uncertaintyBitMask: row.read<int>('uncertaintyBitMask'),
         typ: row.read<String>('typ'),
         depth: row.read<int>('depth'),
         sourceReference: row.read<String>('sourceReference'),
