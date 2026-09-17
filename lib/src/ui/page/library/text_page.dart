@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -628,6 +629,11 @@ class _StyledWordList extends ConsumerStatefulWidget {
 
 class _StyledWordListState extends ConsumerState<_StyledWordList> {
   //
+
+  // TODO(whothefluff): add test that only passes with the mirrored gaps match
+  /// [RenderEditable] implementation detail (verify with Flutter version)
+  final _readerCaretGap = 1.0;
+  final _readerCursorWidth = 2.0;
   final _textSelector = _TextSelector();
   late _GestureHandler _gestureHandler;
 
@@ -745,6 +751,9 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     final visibleTextSpan = _buildTextWithOverflowDetection(context, constraints, settings);
     return SelectableText.rich(
       visibleTextSpan,
+      textScaler: MediaQuery.textScalerOf(context),
+      textDirection: TextDirection.ltr,
+      cursorWidth: _readerCursorWidth,
       onSelectionChanged: (selection, _) => _preloadSelectionLookups(
         selection,
         visibleTextSpan.toPlainText(),
@@ -904,18 +913,30 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     BoxConstraints constraints,
     ReaderSettings settings,
   ) {
-    final textPainter = TextPainter(textDirection: TextDirection.ltr);
-    final allSpans = _TextRenderer(Theme.of(context), widget.segments, settings).createSpans();
-    textPainter
-      ..text = TextSpan(children: allSpans)
-      ..layout(maxWidth: constraints.maxWidth);
-    final visible = _VisibleSegmentRange.build(
-      textPainter,
-      allSpans,
-      widget.segments,
-      widget.pageFlow,
-      constraints,
+    final measurementConstraints = BoxConstraints(
+      maxWidth: max(
+        0.0,
+        constraints.maxWidth - _readerCursorWidth - _readerCaretGap,
+      ),
+      maxHeight: constraints.maxHeight,
     );
+    final allSpans = _TextRenderer(Theme.of(context), widget.segments, settings).createSpans();
+    final textPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.textScalerOf(context),
+    );
+    late final _VisibleSegmentRange visible;
+    try {
+      visible = _VisibleSegmentRange.build(
+        textPainter,
+        allSpans,
+        widget.segments,
+        widget.pageFlow,
+        measurementConstraints,
+      );
+    } finally {
+      textPainter.dispose();
+    }
     // dart format off
     log.info(() => 'displaying new range (${widget.segments[visible.first].idx} - ${widget.segments[visible.last].idx})');
     // dart format on
