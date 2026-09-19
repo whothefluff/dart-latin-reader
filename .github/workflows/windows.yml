@@ -16,21 +16,16 @@ jobs:
     runs-on: windows-latest
 
     steps:
-        
+
     - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Set up Flutter
-      uses: subosito/flutter-action@v2 
+      uses: subosito/flutter-action@v2
       with:
         channel: stable
-
-    - name: Cache Flutter Dependencies
-      uses: actions/cache@v4
-      with:
-        path: C:\Users\runneradmin\AppData\Local\Pub\Cache
-        key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
-        restore-keys: ${{ runner.os }}-flutter-
+        cache: true
+        pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
 
     - name: Install dependencies
       run: flutter pub get
@@ -42,4 +37,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: app-release.exe
-        path: build/windows/runner/Release/
+        path: build/windows/x64/runner/Release/
