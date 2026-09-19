@@ -140,6 +140,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
     workContents,
     workContentSubdivisions,
     i4.workContentSubdivisionsParent,
+    i4.workContentSubdivisionsTitle,
     workContentSupplementary,
     unambiguousMacronizations,
     workMacronizations,

@@ -3,11 +3,13 @@
 import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/component/library/library.drift.dart' as i1;
 import 'dart:typed_data' as i2;
-import 'package:drift/internal/modular.dart' as i3;
-import 'package:latin_reader/src/component/library/authors_api.dart' as i4;
-import 'package:latin_reader/src/component/library/work_details_api.dart' as i5;
+import 'package:latin_reader/src/component/library/subdivision_type.dart' as i3;
+import 'package:drift/internal/modular.dart' as i4;
+import 'package:latin_reader/src/component/library/authors_api.dart' as i5;
+import 'package:latin_reader/src/component/library/work_details_api.dart' as i6;
 import 'package:latin_reader/src/component/library/work_contents_api.dart'
-    as i6;
+    as i7;
+import 'package:latin_reader/src/component/library/work_index_api.dart' as i8;
 
 typedef $AuthorsCreateCompanionBuilder =
     i1.AuthorsCompanion Function({
@@ -1139,7 +1141,7 @@ typedef $WorkContentSubdivisionsCreateCompanionBuilder =
     i1.WorkContentSubdivisionsCompanion Function({
       required String workId,
       required String node,
-      required String typ,
+      required i3.SubdivisionType typ,
       required int cnt,
       required String name,
       i0.Value<String?> parent,
@@ -1150,7 +1152,7 @@ typedef $WorkContentSubdivisionsUpdateCompanionBuilder =
     i1.WorkContentSubdivisionsCompanion Function({
       i0.Value<String> workId,
       i0.Value<String> node,
-      i0.Value<String> typ,
+      i0.Value<i3.SubdivisionType> typ,
       i0.Value<int> cnt,
       i0.Value<String> name,
       i0.Value<String?> parent,
@@ -1177,9 +1179,14 @@ class $WorkContentSubdivisionsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<String> get typ => $composableBuilder(
+  i0.ColumnWithTypeConverterFilters<
+    i3.SubdivisionType,
+    i3.SubdivisionType,
+    String
+  >
+  get typ => $composableBuilder(
     column: $table.typ,
-    builder: (column) => i0.ColumnFilters(column),
+    builder: (column) => i0.ColumnWithTypeConverterFilters(column),
   );
 
   i0.ColumnFilters<int> get cnt => $composableBuilder(
@@ -1273,7 +1280,7 @@ class $WorkContentSubdivisionsAnnotationComposer
   i0.GeneratedColumn<String> get node =>
       $composableBuilder(column: $table.node, builder: (column) => column);
 
-  i0.GeneratedColumn<String> get typ =>
+  i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String> get typ =>
       $composableBuilder(column: $table.typ, builder: (column) => column);
 
   i0.GeneratedColumn<int> get cnt =>
@@ -1334,7 +1341,7 @@ class $WorkContentSubdivisionsTableManager
               ({
                 i0.Value<String> workId = const i0.Value.absent(),
                 i0.Value<String> node = const i0.Value.absent(),
-                i0.Value<String> typ = const i0.Value.absent(),
+                i0.Value<i3.SubdivisionType> typ = const i0.Value.absent(),
                 i0.Value<int> cnt = const i0.Value.absent(),
                 i0.Value<String> name = const i0.Value.absent(),
                 i0.Value<String?> parent = const i0.Value.absent(),
@@ -1354,7 +1361,7 @@ class $WorkContentSubdivisionsTableManager
               ({
                 required String workId,
                 required String node,
-                required String typ,
+                required i3.SubdivisionType typ,
                 required int cnt,
                 required String name,
                 i0.Value<String?> parent = const i0.Value.absent(),
@@ -3252,7 +3259,8 @@ class WorkContents extends i0.Table
         false,
         type: i0.DriftSqlType.string,
         requiredDuringInsert: true,
-        $customConstraints: 'NOT NULL',
+        $customConstraints:
+            'NOT NULL CHECK (LENGTH(TRIM(sourceReference)) > 0)',
       );
   static const i0.VerificationMeta _properNounStateMeta =
       const i0.VerificationMeta('properNounState');
@@ -3284,7 +3292,7 @@ class WorkContents extends i0.Table
     false,
     type: i0.DriftSqlType.int,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
+    $customConstraints: 'NOT NULL CHECK (sentenceIdx >= 0)',
   );
   static const i0.VerificationMeta _wordIdxMeta = const i0.VerificationMeta(
     'wordIdx',
@@ -3295,7 +3303,7 @@ class WorkContents extends i0.Table
     true,
     type: i0.DriftSqlType.int,
     requiredDuringInsert: false,
-    $customConstraints: '',
+    $customConstraints: 'CHECK (wordIdx >= 0)',
   );
   static const i0.VerificationMeta _encliticMeta = const i0.VerificationMeta(
     'enclitic',
@@ -3831,6 +3839,8 @@ class WorkContents extends i0.Table
     'FOREIGN KEY(workId)REFERENCES Works(id)',
     'CHECK((wordIdx IS NULL)=(tokenType >= 4))',
     'CHECK(expansion IS NULL OR enclitic IS NULL)',
+    'CHECK(properNounState IS NULL OR tokenType <= 3)',
+    'CHECK(expansion IS NULL OR tokenType IN (2, 3))',
     'CHECK(enclitic IS NULL OR(LENGTH(enclitic) > 0 AND LENGTH(enclitic) < LENGTH(word) AND LOWER(SUBSTR(word, LENGTH(word) - LENGTH(enclitic) + 1)) = LOWER(enclitic)))',
     'CHECK(enclitic IS NULL OR tokenType = 1)',
   ];
@@ -4349,8 +4359,8 @@ class WorkContentSubdivisions extends i0.Table
     $customConstraints:
         'NOT NULL CHECK (node LIKE \'________-____-____-____-____________\')',
   );
-  static const i0.VerificationMeta _typMeta = const i0.VerificationMeta('typ');
-  late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
+  late final i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String>
+  typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
     false,
@@ -4358,7 +4368,7 @@ class WorkContentSubdivisions extends i0.Table
     requiredDuringInsert: true,
     $customConstraints:
         'NOT NULL CHECK (typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'TITL\', \'PARA\'))',
-  );
+  ).withConverter<i3.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   static const i0.VerificationMeta _cntMeta = const i0.VerificationMeta('cnt');
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
     'cnt',
@@ -4411,7 +4421,7 @@ class WorkContentSubdivisions extends i0.Table
     false,
     type: i0.DriftSqlType.int,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL CHECK (toIndex >= 0)',
+    $customConstraints: 'NOT NULL',
   );
   @override
   List<i0.GeneratedColumn> get $columns => [
@@ -4451,14 +4461,6 @@ class WorkContentSubdivisions extends i0.Table
       );
     } else if (isInserting) {
       context.missing(_nodeMeta);
-    }
-    if (data.containsKey('typ')) {
-      context.handle(
-        _typMeta,
-        typ.isAcceptableOrUnknown(data['typ']!, _typMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_typMeta);
     }
     if (data.containsKey('cnt')) {
       context.handle(
@@ -4518,10 +4520,12 @@ class WorkContentSubdivisions extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}node'],
       )!,
-      typ: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}typ'],
-      )!,
+      typ: i1.WorkContentSubdivisions.$convertertyp.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}typ'],
+        )!,
+      ),
       cnt: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}cnt'],
@@ -4550,6 +4554,8 @@ class WorkContentSubdivisions extends i0.Table
     return WorkContentSubdivisions(attachedDatabase, alias);
   }
 
+  static i0.TypeConverter<i3.SubdivisionType, String> $convertertyp =
+      const i3.SubdivisionTypeConverter();
   @override
   bool get withoutRowId => true;
   @override
@@ -4559,6 +4565,10 @@ class WorkContentSubdivisions extends i0.Table
     'PRIMARY KEY(workId, node)',
     'FOREIGN KEY(workId, fromIndex)REFERENCES WorkContents(workId, idx)',
     'FOREIGN KEY(workId, toIndex)REFERENCES WorkContents(workId, idx)',
+    'FOREIGN KEY(workId, parent)REFERENCES WorkContentSubdivisions(workId, node)DEFERRABLE INITIALLY DEFERRED',
+    'CHECK(fromIndex <= toIndex)',
+    'CHECK((parent IS NULL)=(typ = \'BOOK\'))',
+    'CHECK(typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'PARA\') OR LENGTH(TRIM(name)) > 0)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -4568,7 +4578,7 @@ class WorkContentSubdivision extends i0.DataClass
     implements i0.Insertable<i1.WorkContentSubdivision> {
   final String workId;
   final String node;
-  final String typ;
+  final i3.SubdivisionType typ;
   final int cnt;
   final String name;
   final String? parent;
@@ -4589,7 +4599,11 @@ class WorkContentSubdivision extends i0.DataClass
     final map = <String, i0.Expression>{};
     map['workId'] = i0.Variable<String>(workId);
     map['node'] = i0.Variable<String>(node);
-    map['typ'] = i0.Variable<String>(typ);
+    {
+      map['typ'] = i0.Variable<String>(
+        i1.WorkContentSubdivisions.$convertertyp.toSql(typ),
+      );
+    }
     map['cnt'] = i0.Variable<int>(cnt);
     map['name'] = i0.Variable<String>(name);
     if (!nullToAbsent || parent != null) {
@@ -4623,7 +4637,7 @@ class WorkContentSubdivision extends i0.DataClass
     return WorkContentSubdivision(
       workId: serializer.fromJson<String>(json['workId']),
       node: serializer.fromJson<String>(json['node']),
-      typ: serializer.fromJson<String>(json['typ']),
+      typ: serializer.fromJson<i3.SubdivisionType>(json['typ']),
       cnt: serializer.fromJson<int>(json['cnt']),
       name: serializer.fromJson<String>(json['name']),
       parent: serializer.fromJson<String?>(json['parent']),
@@ -4637,7 +4651,7 @@ class WorkContentSubdivision extends i0.DataClass
     return <String, dynamic>{
       'workId': serializer.toJson<String>(workId),
       'node': serializer.toJson<String>(node),
-      'typ': serializer.toJson<String>(typ),
+      'typ': serializer.toJson<i3.SubdivisionType>(typ),
       'cnt': serializer.toJson<int>(cnt),
       'name': serializer.toJson<String>(name),
       'parent': serializer.toJson<String?>(parent),
@@ -4649,7 +4663,7 @@ class WorkContentSubdivision extends i0.DataClass
   i1.WorkContentSubdivision copyWith({
     String? workId,
     String? node,
-    String? typ,
+    i3.SubdivisionType? typ,
     int? cnt,
     String? name,
     i0.Value<String?> parent = const i0.Value.absent(),
@@ -4716,7 +4730,7 @@ class WorkContentSubdivisionsCompanion
     extends i0.UpdateCompanion<i1.WorkContentSubdivision> {
   final i0.Value<String> workId;
   final i0.Value<String> node;
-  final i0.Value<String> typ;
+  final i0.Value<i3.SubdivisionType> typ;
   final i0.Value<int> cnt;
   final i0.Value<String> name;
   final i0.Value<String?> parent;
@@ -4735,7 +4749,7 @@ class WorkContentSubdivisionsCompanion
   WorkContentSubdivisionsCompanion.insert({
     required String workId,
     required String node,
-    required String typ,
+    required i3.SubdivisionType typ,
     required int cnt,
     required String name,
     this.parent = const i0.Value.absent(),
@@ -4773,7 +4787,7 @@ class WorkContentSubdivisionsCompanion
   i1.WorkContentSubdivisionsCompanion copyWith({
     i0.Value<String>? workId,
     i0.Value<String>? node,
-    i0.Value<String>? typ,
+    i0.Value<i3.SubdivisionType>? typ,
     i0.Value<int>? cnt,
     i0.Value<String>? name,
     i0.Value<String?>? parent,
@@ -4802,7 +4816,9 @@ class WorkContentSubdivisionsCompanion
       map['node'] = i0.Variable<String>(node.value);
     }
     if (typ.present) {
-      map['typ'] = i0.Variable<String>(typ.value);
+      map['typ'] = i0.Variable<String>(
+        i1.WorkContentSubdivisions.$convertertyp.toSql(typ.value),
+      );
     }
     if (cnt.present) {
       map['cnt'] = i0.Variable<int>(cnt.value);
@@ -4841,6 +4857,10 @@ class WorkContentSubdivisionsCompanion
 i0.Index get workContentSubdivisionsParent => i0.Index(
   'WorkContentSubdivisions_Parent',
   'CREATE INDEX WorkContentSubdivisions_Parent ON WorkContentSubdivisions (parent)',
+);
+i0.Index get workContentSubdivisionsTitle => i0.Index(
+  'WorkContentSubdivisions_Title',
+  'CREATE UNIQUE INDEX WorkContentSubdivisions_Title ON WorkContentSubdivisions (workId, parent) WHERE typ = \'TITL\'',
 );
 
 class WorkContentSupplementary extends i0.Table
@@ -4891,7 +4911,7 @@ class WorkContentSupplementary extends i0.Table
     false,
     type: i0.DriftSqlType.int,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
+    $customConstraints: 'NOT NULL CHECK (fromIndex >= 0)',
   );
   static const i0.VerificationMeta _toIndexMeta = const i0.VerificationMeta(
     'toIndex',
@@ -5034,6 +5054,7 @@ class WorkContentSupplementary extends i0.Table
   List<String> get customConstraints => const [
     'PRIMARY KEY(workId, typ, cnt)',
     'FOREIGN KEY(workId)REFERENCES Works(id)',
+    'CHECK(fromIndex <= toIndex)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -6221,7 +6242,7 @@ class LibraryStagingResolvedMacronizations
 class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
   final String workId;
   final String node;
-  final String typ;
+  final i3.SubdivisionType typ;
   final int cnt;
   final String name;
   final String? parent;
@@ -6247,7 +6268,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     return LibraryWorkContentSubdivisionsHierarchyData(
       workId: serializer.fromJson<String>(json['workId']),
       node: serializer.fromJson<String>(json['node']),
-      typ: serializer.fromJson<String>(json['typ']),
+      typ: serializer.fromJson<i3.SubdivisionType>(json['typ']),
       cnt: serializer.fromJson<int>(json['cnt']),
       name: serializer.fromJson<String>(json['name']),
       parent: serializer.fromJson<String?>(json['parent']),
@@ -6262,7 +6283,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     return <String, dynamic>{
       'workId': serializer.toJson<String>(workId),
       'node': serializer.toJson<String>(node),
-      'typ': serializer.toJson<String>(typ),
+      'typ': serializer.toJson<i3.SubdivisionType>(typ),
       'cnt': serializer.toJson<int>(cnt),
       'name': serializer.toJson<String>(name),
       'parent': serializer.toJson<String?>(parent),
@@ -6275,7 +6296,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
   i1.LibraryWorkContentSubdivisionsHierarchyData copyWith({
     String? workId,
     String? node,
-    String? typ,
+    i3.SubdivisionType? typ,
     int? cnt,
     String? name,
     i0.Value<String?> parent = const i0.Value.absent(),
@@ -6366,7 +6387,7 @@ class LibraryWorkContentSubdivisionsHierarchy
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1 FROM WorkContentSubdivisions AS s INNER JOIN Subsets ON s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
+        'CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1 FROM WorkContentSubdivisions AS s INNER JOIN Subsets ON s.workId = Subsets.workId AND s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
   };
   @override
   LibraryWorkContentSubdivisionsHierarchy get asDslTable => this;
@@ -6385,10 +6406,12 @@ class LibraryWorkContentSubdivisionsHierarchy
         i0.DriftSqlType.string,
         data['${effectivePrefix}node'],
       )!,
-      typ: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}typ'],
-      )!,
+      typ: i1.WorkContentSubdivisions.$convertertyp.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}typ'],
+        )!,
+      ),
       cnt: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}cnt'],
@@ -6428,12 +6451,13 @@ class LibraryWorkContentSubdivisionsHierarchy
     false,
     type: i0.DriftSqlType.string,
   );
-  late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
+  late final i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String>
+  typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  );
+  ).withConverter<i3.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
     'cnt',
     aliasedName,
@@ -7108,7 +7132,7 @@ class LibraryWorkContent extends i0.DataClass {
   final String word;
   final String macronizedWord;
   final int uncertaintyBitMask;
-  final String typ;
+  final i3.SubdivisionType typ;
   final int depth;
   final String sourceReference;
   const LibraryWorkContent({
@@ -7136,7 +7160,7 @@ class LibraryWorkContent extends i0.DataClass {
       word: serializer.fromJson<String>(json['word']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
       uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
-      typ: serializer.fromJson<String>(json['typ']),
+      typ: serializer.fromJson<i3.SubdivisionType>(json['typ']),
       depth: serializer.fromJson<int>(json['depth']),
       sourceReference: serializer.fromJson<String>(json['sourceReference']),
     );
@@ -7152,7 +7176,7 @@ class LibraryWorkContent extends i0.DataClass {
       'word': serializer.toJson<String>(word),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
       'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
-      'typ': serializer.toJson<String>(typ),
+      'typ': serializer.toJson<i3.SubdivisionType>(typ),
       'depth': serializer.toJson<int>(depth),
       'sourceReference': serializer.toJson<String>(sourceReference),
     };
@@ -7166,7 +7190,7 @@ class LibraryWorkContent extends i0.DataClass {
     String? word,
     String? macronizedWord,
     int? uncertaintyBitMask,
-    String? typ,
+    i3.SubdivisionType? typ,
     int? depth,
     String? sourceReference,
   }) => i1.LibraryWorkContent(
@@ -7290,10 +7314,12 @@ class LibraryWorkContents
         i0.DriftSqlType.int,
         data['${effectivePrefix}uncertaintyBitMask'],
       )!,
-      typ: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}typ'],
-      )!,
+      typ: i1.WorkContentSubdivisions.$convertertyp.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}typ'],
+        )!,
+      ),
       depth: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}depth'],
@@ -7349,12 +7375,13 @@ class LibraryWorkContents
         false,
         type: i0.DriftSqlType.int,
       );
-  late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
+  late final i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String>
+  typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  );
+  ).withConverter<i3.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   late final i0.GeneratedColumn<int> depth = i0.GeneratedColumn<int>(
     'depth',
     aliasedName,
@@ -7387,11 +7414,13 @@ class LibraryWorkIndexe extends i0.DataClass {
   final String? parent;
   final String node;
   final int depth;
-  final String typ;
+  final i3.SubdivisionType typ;
   final int cnt;
   final int fromIndex;
   final int toIndex;
-  final String name;
+  final String label;
+  final String startReference;
+  final String endReference;
   const LibraryWorkIndexe({
     required this.workId,
     this.parent,
@@ -7401,7 +7430,9 @@ class LibraryWorkIndexe extends i0.DataClass {
     required this.cnt,
     required this.fromIndex,
     required this.toIndex,
-    required this.name,
+    required this.label,
+    required this.startReference,
+    required this.endReference,
   });
   factory LibraryWorkIndexe.fromJson(
     Map<String, dynamic> json, {
@@ -7413,11 +7444,13 @@ class LibraryWorkIndexe extends i0.DataClass {
       parent: serializer.fromJson<String?>(json['parent']),
       node: serializer.fromJson<String>(json['node']),
       depth: serializer.fromJson<int>(json['depth']),
-      typ: serializer.fromJson<String>(json['typ']),
+      typ: serializer.fromJson<i3.SubdivisionType>(json['typ']),
       cnt: serializer.fromJson<int>(json['cnt']),
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
-      name: serializer.fromJson<String>(json['name']),
+      label: serializer.fromJson<String>(json['label']),
+      startReference: serializer.fromJson<String>(json['startReference']),
+      endReference: serializer.fromJson<String>(json['endReference']),
     );
   }
   @override
@@ -7428,11 +7461,13 @@ class LibraryWorkIndexe extends i0.DataClass {
       'parent': serializer.toJson<String?>(parent),
       'node': serializer.toJson<String>(node),
       'depth': serializer.toJson<int>(depth),
-      'typ': serializer.toJson<String>(typ),
+      'typ': serializer.toJson<i3.SubdivisionType>(typ),
       'cnt': serializer.toJson<int>(cnt),
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
-      'name': serializer.toJson<String>(name),
+      'label': serializer.toJson<String>(label),
+      'startReference': serializer.toJson<String>(startReference),
+      'endReference': serializer.toJson<String>(endReference),
     };
   }
 
@@ -7441,11 +7476,13 @@ class LibraryWorkIndexe extends i0.DataClass {
     i0.Value<String?> parent = const i0.Value.absent(),
     String? node,
     int? depth,
-    String? typ,
+    i3.SubdivisionType? typ,
     int? cnt,
     int? fromIndex,
     int? toIndex,
-    String? name,
+    String? label,
+    String? startReference,
+    String? endReference,
   }) => i1.LibraryWorkIndexe(
     workId: workId ?? this.workId,
     parent: parent.present ? parent.value : this.parent,
@@ -7455,7 +7492,9 @@ class LibraryWorkIndexe extends i0.DataClass {
     cnt: cnt ?? this.cnt,
     fromIndex: fromIndex ?? this.fromIndex,
     toIndex: toIndex ?? this.toIndex,
-    name: name ?? this.name,
+    label: label ?? this.label,
+    startReference: startReference ?? this.startReference,
+    endReference: endReference ?? this.endReference,
   );
   @override
   String toString() {
@@ -7468,7 +7507,9 @@ class LibraryWorkIndexe extends i0.DataClass {
           ..write('cnt: $cnt, ')
           ..write('fromIndex: $fromIndex, ')
           ..write('toIndex: $toIndex, ')
-          ..write('name: $name')
+          ..write('label: $label, ')
+          ..write('startReference: $startReference, ')
+          ..write('endReference: $endReference')
           ..write(')'))
         .toString();
   }
@@ -7483,7 +7524,9 @@ class LibraryWorkIndexe extends i0.DataClass {
     cnt,
     fromIndex,
     toIndex,
-    name,
+    label,
+    startReference,
+    endReference,
   );
   @override
   bool operator ==(Object other) =>
@@ -7497,7 +7540,9 @@ class LibraryWorkIndexe extends i0.DataClass {
           other.cnt == this.cnt &&
           other.fromIndex == this.fromIndex &&
           other.toIndex == this.toIndex &&
-          other.name == this.name);
+          other.label == this.label &&
+          other.startReference == this.startReference &&
+          other.endReference == this.endReference);
 }
 
 class LibraryWorkIndexes
@@ -7517,7 +7562,9 @@ class LibraryWorkIndexes
     cnt,
     fromIndex,
     toIndex,
-    name,
+    label,
+    startReference,
+    endReference,
   ];
   @override
   String get aliasedName => _alias ?? entityName;
@@ -7526,7 +7573,7 @@ class LibraryWorkIndexes
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS Titles ON SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ ORDER BY SubdivsHierarchy.fromindex',
+        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name AS label, StartToken.sourceReference AS startReference, EndToken.sourceReference AS endReference FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy INNER JOIN WorkContentSubdivisions AS Titles ON SubdivsHierarchy.workId = Titles.workId AND SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ INNER JOIN WorkContents AS StartToken ON Titles.workId = StartToken.workId AND Titles.fromIndex = StartToken.idx INNER JOIN WorkContents AS EndToken ON Titles.workId = EndToken.workId AND Titles.toIndex = EndToken.idx ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.cnt, SubdivsHierarchy.node',
   };
   @override
   LibraryWorkIndexes get asDslTable => this;
@@ -7550,10 +7597,12 @@ class LibraryWorkIndexes
         i0.DriftSqlType.int,
         data['${effectivePrefix}depth'],
       )!,
-      typ: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.string,
-        data['${effectivePrefix}typ'],
-      )!,
+      typ: i1.WorkContentSubdivisions.$convertertyp.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}typ'],
+        )!,
+      ),
       cnt: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}cnt'],
@@ -7566,9 +7615,17 @@ class LibraryWorkIndexes
         i0.DriftSqlType.int,
         data['${effectivePrefix}toIndex'],
       )!,
-      name: attachedDatabase.typeMapping.read(
+      label: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}name'],
+        data['${effectivePrefix}label'],
+      )!,
+      startReference: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}startReference'],
+      )!,
+      endReference: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}endReference'],
       )!,
     );
   }
@@ -7597,12 +7654,13 @@ class LibraryWorkIndexes
     false,
     type: i0.DriftSqlType.int,
   );
-  late final i0.GeneratedColumn<String> typ = i0.GeneratedColumn<String>(
+  late final i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String>
+  typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  );
+  ).withConverter<i3.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
     'cnt',
     aliasedName,
@@ -7621,12 +7679,26 @@ class LibraryWorkIndexes
     false,
     type: i0.DriftSqlType.int,
   );
-  late final i0.GeneratedColumn<String> name = i0.GeneratedColumn<String>(
-    'name',
+  late final i0.GeneratedColumn<String> label = i0.GeneratedColumn<String>(
+    'label',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
   );
+  late final i0.GeneratedColumn<String> startReference =
+      i0.GeneratedColumn<String>(
+        'startReference',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
+  late final i0.GeneratedColumn<String> endReference =
+      i0.GeneratedColumn<String>(
+        'endReference',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
   @override
   LibraryWorkIndexes createAlias(String alias) {
     return LibraryWorkIndexes(attachedDatabase, alias);
@@ -7635,7 +7707,10 @@ class LibraryWorkIndexes
   @override
   i0.Query? get query => null;
   @override
-  Set<String> get readTables => const {'WorkContentSubdivisions'};
+  Set<String> get readTables => const {
+    'WorkContentSubdivisions',
+    'WorkContents',
+  };
 }
 
 class LibraryCatalogData extends i0.DataClass {
@@ -7789,15 +7864,15 @@ class LibraryCatalog
   Set<String> get readTables => const {'Works', 'AuthorsAndWorks', 'Authors'};
 }
 
-class LibraryDrift extends i3.ModularAccessor {
+class LibraryDrift extends i4.ModularAccessor {
   LibraryDrift(i0.GeneratedDatabase db) : super(db);
-  i0.Selectable<i4.Author> getLibraryAuthors() {
+  i0.Selectable<i5.Author> getLibraryAuthors() {
     return customSelect(
       'SELECT * FROM "library.Authors"',
       variables: [],
       readsFrom: {authorsAndWorks, authors},
     ).map(
-      (i0.QueryRow row) => i4.Author(
+      (i0.QueryRow row) => i5.Author(
         id: row.read<String>('id'),
         name: row.read<String>('name'),
         about: row.read<String>('about'),
@@ -7815,13 +7890,13 @@ class LibraryDrift extends i3.ModularAccessor {
     ).asyncMap(libraryAuthorDetails.mapFromRow);
   }
 
-  i0.Selectable<i5.WorkDetails> getLibraryWorkDetails(String var1) {
+  i0.Selectable<i6.WorkDetails> getLibraryWorkDetails(String var1) {
     return customSelect(
       'SELECT * FROM "library.WorkDetails" WHERE id = ?1',
       variables: [i0.Variable<String>(var1)],
       readsFrom: {works, workContents, authorsAndWorks, authors},
     ).map(
-      (i0.QueryRow row) => i5.WorkDetails(
+      (i0.QueryRow row) => i6.WorkDetails(
         id: row.read<String>('id'),
         name: row.read<String>('name'),
         about: row.read<String>('about'),
@@ -7833,7 +7908,7 @@ class LibraryDrift extends i3.ModularAccessor {
     );
   }
 
-  i0.Selectable<i6.WorkContentsSegment> getLibraryWorkContentsPartial(
+  i0.Selectable<i7.WorkContentsSegment> getLibraryWorkContentsPartial(
     String var1,
     int var2,
     int var3,
@@ -7847,7 +7922,7 @@ class LibraryDrift extends i3.ModularAccessor {
       ],
       readsFrom: {workContents, workContentSubdivisions},
     ).map(
-      (i0.QueryRow row) => i6.WorkContentsSegment(
+      (i0.QueryRow row) => i7.WorkContentsSegment(
         workId: row.read<String>('workId'),
         parent: row.readNullable<String>('parent'),
         node: row.read<String>('node'),
@@ -7855,19 +7930,37 @@ class LibraryDrift extends i3.ModularAccessor {
         word: row.read<String>('word'),
         macronizedWord: row.read<String>('macronizedWord'),
         uncertaintyBitMask: row.read<int>('uncertaintyBitMask'),
-        typ: row.read<String>('typ'),
+        typ: i1.WorkContentSubdivisions.$convertertyp.fromSql(
+          row.read<String>('typ'),
+        ),
         depth: row.read<int>('depth'),
         sourceReference: row.read<String>('sourceReference'),
       ),
     );
   }
 
-  i0.Selectable<i1.LibraryWorkIndexe> getLibraryWorkIndexes(String var1) {
+  i0.Selectable<i8.WorkIndexEntry> getLibraryWorkIndexes(String var1) {
     return customSelect(
       'SELECT * FROM "library.WorkIndexes" WHERE workId = ?1',
       variables: [i0.Variable<String>(var1)],
-      readsFrom: {workContentSubdivisions},
-    ).asyncMap(libraryWorkIndexes.mapFromRow);
+      readsFrom: {workContentSubdivisions, workContents},
+    ).map(
+      (i0.QueryRow row) => i8.WorkIndexEntry(
+        workId: row.read<String>('workId'),
+        node: row.read<String>('node'),
+        parent: row.readNullable<String>('parent'),
+        depth: row.read<int>('depth'),
+        typ: i1.WorkContentSubdivisions.$convertertyp.fromSql(
+          row.read<String>('typ'),
+        ),
+        cnt: row.read<int>('cnt'),
+        fromIndex: row.read<int>('fromIndex'),
+        toIndex: row.read<int>('toIndex'),
+        label: row.read<String>('label'),
+        startReference: row.read<String>('startReference'),
+        endReference: row.read<String>('endReference'),
+      ),
+    );
   }
 
   i0.Selectable<i1.LibraryCatalogData> getLibraryCatalog() {
@@ -7878,37 +7971,37 @@ class LibraryDrift extends i3.ModularAccessor {
     ).asyncMap(libraryCatalog.mapFromRow);
   }
 
-  i1.LibraryAuthors get libraryAuthors => i3.ReadDatabaseContainer(
+  i1.LibraryAuthors get libraryAuthors => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthors>('library.Authors');
-  i1.AuthorsAndWorks get authorsAndWorks => i3.ReadDatabaseContainer(
+  i1.AuthorsAndWorks get authorsAndWorks => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.AuthorsAndWorks>('AuthorsAndWorks');
-  i1.Authors get authors => i3.ReadDatabaseContainer(
+  i1.Authors get authors => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.Authors>('Authors');
-  i1.LibraryAuthorDetails get libraryAuthorDetails => i3.ReadDatabaseContainer(
+  i1.LibraryAuthorDetails get libraryAuthorDetails => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthorDetails>('library.AuthorDetails');
   i1.Works get works =>
-      i3.ReadDatabaseContainer(attachedDatabase).resultSet<i1.Works>('Works');
-  i1.WorkContents get workContents => i3.ReadDatabaseContainer(
+      i4.ReadDatabaseContainer(attachedDatabase).resultSet<i1.Works>('Works');
+  i1.WorkContents get workContents => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.WorkContents>('WorkContents');
-  i1.LibraryWorkDetails get libraryWorkDetails => i3.ReadDatabaseContainer(
+  i1.LibraryWorkDetails get libraryWorkDetails => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryWorkDetails>('library.WorkDetails');
-  i1.LibraryWorkContents get libraryWorkContents => i3.ReadDatabaseContainer(
+  i1.LibraryWorkContents get libraryWorkContents => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryWorkContents>('library.WorkContents');
   i1.WorkContentSubdivisions get workContentSubdivisions =>
-      i3.ReadDatabaseContainer(
+      i4.ReadDatabaseContainer(
         attachedDatabase,
       ).resultSet<i1.WorkContentSubdivisions>('WorkContentSubdivisions');
-  i1.LibraryWorkIndexes get libraryWorkIndexes => i3.ReadDatabaseContainer(
+  i1.LibraryWorkIndexes get libraryWorkIndexes => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryWorkIndexes>('library.WorkIndexes');
-  i1.LibraryCatalog get libraryCatalog => i3.ReadDatabaseContainer(
+  i1.LibraryCatalog get libraryCatalog => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryCatalog>('library.Catalog');
 }

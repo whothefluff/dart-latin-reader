@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../logger.dart';
+import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_contents_api.dart';
 import '../../../component/library/work_details_api.dart';
 import '../../../component/morph_analysis/enriched_morph_search_api.dart';
@@ -24,9 +25,26 @@ import '../../widget/custom_adaptive_scaffold/slot_layout.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
+import 'work_index_sheet.dart';
 
 /// Line terminator that will be stable across all platforms even after rendering
 const _lineTerminator = '\n';
+
+/// Whether tokens of [type] introduce the text after them
+bool _isHeadingType(SubdivisionType type) => switch (type) {
+  (SubdivisionType.book ||
+      SubdivisionType.prologue ||
+      SubdivisionType.poem ||
+      SubdivisionType.epilogue ||
+      SubdivisionType.title) =>
+    true,
+  SubdivisionType.verse || SubdivisionType.paragraph => false,
+};
+
+/// Whether nodes of [type] never break across pages
+bool _isUnbreakableType(SubdivisionType type) =>
+    type == SubdivisionType.verse || _isHeadingType(type);
+
 const _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')', ']'];
 const _openingPunctSigns = ['(', '['];
 const _blank = ' ';
@@ -60,12 +78,17 @@ class TextPage extends ConsumerStatefulWidget {
 
 class TextPageState extends ConsumerState<TextPage> {
   //
-  static const _pageSize = 250;
+  /// Fetch buffer for pagination. Grows when necessary to be reused by later pages
+  static const _initialBufferSize = 250;
   late int _lastIndex; // Highest token index, punctuation included
+  int _bufferSize = _initialBufferSize;
   var _currentFirstVisibleIndex = 0;
   var _currentLastVisibleIndex = 0;
   var _fromIndex = 0;
-  int _toIndex = _pageSize;
+  var _contentGeneration = 0;
+  var _pageReady = false;
+  var _indexOpen = false;
+  int _toIndex = _initialBufferSize - 1;
   _PageFlow _pageFlow = _PageFlow.next;
 
   @override
@@ -105,11 +128,21 @@ class TextPageState extends ConsumerState<TextPage> {
         final isLargeScreen = pageConstraints.maxWidth > a4Width + marginsSpace;
         const largeScreenTxtConsts = BoxConstraints(maxWidth: a4Width);
         final textAreaConstraints = isLargeScreen ? largeScreenTxtConsts : null;
+        //keep the generation that produced these segments (so stale callbacks can be ignored)
+        final generation = _contentGeneration;
         return _StyledWordList(
+          key: ValueKey((widget.workId, generation)), // Recreate selection state after explicit nav
           segments: segments,
           onNavigateNext: _loadNextPage,
           onNavigatePrevious: _loadPreviousPage,
-          onVisibleIndicesChanged: _updateVisibleIndices,
+          onOpenIndex: _openIndex,
+          onVisibleIndicesChanged: (first, last, {required fitsWholeBuffer}) =>
+              _updateVisibleIndices(
+                first,
+                last,
+                fitsWholeBuffer: fitsWholeBuffer,
+                generation: generation,
+              ),
           pageFlow: _pageFlow,
           isLargeScreen: isLargeScreen,
           pageConstraints: pageConstraints,
@@ -119,33 +152,143 @@ class TextPageState extends ConsumerState<TextPage> {
     );
   }
 
-  void _updateVisibleIndices(int first, int last) {
-    _currentFirstVisibleIndex = first;
-    _currentLastVisibleIndex = last;
-    _pageFlow = _PageFlow.next;
+  void _updateVisibleIndices(
+    int first,
+    int last, {
+    required bool fitsWholeBuffer,
+    required int generation,
+  }) {
+    final isCurrentContent = mounted && generation == _contentGeneration;
+    final isWithinBuffer = first >= _fromIndex && last <= _toIndex && first <= last;
+    final isBufferCut = switch (_pageFlow) {
+      _PageFlow.next => _toIndex < _lastIndex,
+      _PageFlow.previous => _fromIndex > 0,
+    };
+    // A page holding the whole buffer may break at the cut instead of at a real
+    // break, and there's more text it could show
+    final needsMoreText = fitsWholeBuffer && isBufferCut;
+    if (isCurrentContent && isWithinBuffer && needsMoreText) {
+      _growBuffer();
+    } else if (isCurrentContent && isWithinBuffer) {
+      log.info(() => 'displaying range ($first - $last)');
+      _currentFirstVisibleIndex = first;
+      _currentLastVisibleIndex = last;
+      _pageReady = true;
+      _shrinkBufferIfOversized(first, last, fitsWholeBuffer: fitsWholeBuffer);
+    }
+  }
+
+  /// Refetches the current page with twice as many tokens
+  void _growBuffer() {
+    log.info(() => 'page holds all $_bufferSize fetched tokens, fetching more');
+    setState(() {
+      _contentGeneration++;
+      _pageReady = false;
+      _bufferSize *= 2;
+      switch (_pageFlow) {
+        case _PageFlow.next:
+          _toIndex = min(_fromIndex + _bufferSize - 1, _lastIndex);
+        case _PageFlow.previous:
+          _fromIndex = max(0, _toIndex - _bufferSize + 1);
+      }
+    });
+  }
+
+  /// Halves the buffer when a full page uses a quarter of it or less
+  void _shrinkBufferIfOversized(int first, int last, {required bool fitsWholeBuffer}) {
+    // Only a page cut short by the viewport tells how much a page holds. One
+    // that holds the whole buffer may just have reached the end of the work
+    final pageTokens = last - first + 1;
+    final isOversized = !fitsWholeBuffer && pageTokens * 4 <= _bufferSize;
+    if (isOversized && _bufferSize > _initialBufferSize) {
+      _bufferSize = max(_initialBufferSize, _bufferSize ~/ 2);
+      log.info(() => 'page holds $pageTokens tokens, fetching $_bufferSize from now on');
+    }
   }
 
   void _loadNextPage() {
     log.info(() => 'attempting to navigate to next page');
-    if (_currentLastVisibleIndex < _lastIndex) {
+    if (_pageReady && _currentLastVisibleIndex < _lastIndex) {
       setState(() {
+        _contentGeneration++;
+        _pageReady = false;
         _pageFlow = _PageFlow.next;
         _fromIndex = _currentLastVisibleIndex + 1;
-        _toIndex = min(_currentLastVisibleIndex + _pageSize, _lastIndex);
+        _toIndex = min(_currentLastVisibleIndex + _bufferSize, _lastIndex);
       });
     }
   }
 
   void _loadPreviousPage() {
     log.info(() => 'attempting to navigate to previous page');
-    setState(() {
-      if (_currentFirstVisibleIndex != 0) {
+    if (_pageReady && _currentFirstVisibleIndex > 0) {
+      setState(() {
+        _contentGeneration++;
+        _pageReady = false;
         _pageFlow = _PageFlow.previous;
         _currentLastVisibleIndex = _currentFirstVisibleIndex - 1;
-        _fromIndex = max(0, _currentLastVisibleIndex - _pageSize);
+        _fromIndex = max(0, _currentLastVisibleIndex - _bufferSize + 1);
         _toIndex = _currentLastVisibleIndex;
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(TextPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.workId != widget.workId) {
+      _contentGeneration++;
+      _pageReady = false;
+      _currentFirstVisibleIndex = 0;
+      _currentLastVisibleIndex = 0;
+      _fromIndex = 0;
+      _toIndex = _bufferSize - 1;
+      _pageFlow = _PageFlow.next;
+    }
+  }
+
+  Future<void> _openIndex() async {
+    final canOpen = !_indexOpen;
+    if (canOpen) {
+      _indexOpen = true;
+      final workId = widget.workId;
+      try {
+        ContextMenuController.removeAny();
+        final workName = ref.read(workDetailsProvider(workId)).valueOrNull?.name ?? 'This work';
+        final selected = await showWorkIndex(
+          context: context,
+          workId: workId,
+          workName: workName,
+          currentIndex: _currentFirstVisibleIndex,
+        );
+        // The displayed work may have changed while the sheet was open
+        final target = mounted && widget.workId == workId && selected?.workId == workId
+            ? selected
+            : null;
+        if (target != null) {
+          _jumpToIndex(target.fromIndex);
+        }
+      } finally {
+        _indexOpen = false;
       }
-    });
+    }
+  }
+
+  void _jumpToIndex(int tokenIndex) {
+    final hasContent = _lastIndex >= 0;
+    if (hasContent) {
+      final target = tokenIndex.clamp(0, _lastIndex);
+      log.info(() => 'Jumping to token $target in ${widget.workId}');
+      setState(() {
+        _contentGeneration++;
+        _pageReady = false;
+        _pageFlow = _PageFlow.next; //the selected subdivision starts the page
+        _fromIndex = target;
+        _toIndex = min(target + _bufferSize - 1, _lastIndex);
+        _currentFirstVisibleIndex = target;
+        _currentLastVisibleIndex = target;
+      });
+    }
   }
 
   //
@@ -162,21 +305,32 @@ class _TextRenderer {
   final WorkContentsSegments workSegments;
   final ReaderSettings readerSettings;
 
-  static final Map<String, String> styleToLineBreak = {
-    'POEM': _lineTerminator + _lineTerminator,
-    'PROL': _lineTerminator + _lineTerminator,
-    'EPIL': _lineTerminator + _lineTerminator,
-    'BOOK': _lineTerminator + _lineTerminator + _lineTerminator,
-  };
-  late final Map<String, TextStyle> styles = {
-    'BOOK': textTheme.headlineSmall!,
-    'PROL': textTheme.titleMedium!,
-    'POEM': textTheme.titleMedium!,
-    'EPIL': textTheme.titleMedium!,
-    'VERS': textTheme.bodyLarge!,
-    'default': textTheme.bodyMedium!,
-  };
   static const _empty = '';
+
+  /// Should be used to open every page no matter what preceded its first segment
+  static const String _pageStartBreak = _lineTerminator;
+
+  /// Separation before a block whose type differs from the previous one
+  static String _lineBreakBefore(SubdivisionType type) => switch (type) {
+    SubdivisionType.book => _lineTerminator * 3,
+    SubdivisionType.prologue => _lineTerminator * 2,
+    SubdivisionType.epilogue => _lineTerminator * 2,
+    SubdivisionType.poem => _lineTerminator * 2,
+    SubdivisionType.title => _lineTerminator,
+    SubdivisionType.verse => _lineTerminator,
+    SubdivisionType.paragraph => _lineTerminator,
+  };
+
+  /// Theme style for a block of [type]
+  TextStyle _themeStyle(SubdivisionType type) => switch (type) {
+    SubdivisionType.book => textTheme.headlineSmall!,
+    SubdivisionType.prologue => textTheme.titleMedium!,
+    SubdivisionType.epilogue => textTheme.titleMedium!,
+    SubdivisionType.poem => textTheme.titleMedium!,
+    SubdivisionType.title => textTheme.bodyMedium!,
+    SubdivisionType.verse => textTheme.bodyLarge!,
+    SubdivisionType.paragraph => textTheme.bodyMedium!,
+  };
 
   TextTheme get textTheme => theme.textTheme;
 
@@ -189,14 +343,14 @@ class _TextRenderer {
   }
 
   String _getLineBreak(
-    String? previousStyle,
-    String currentStyle,
+    SubdivisionType? previousStyle,
+    SubdivisionType currentStyle,
     String? previousNode,
     String currentNode,
   ) {
     var lineBreak = _empty;
     if (previousStyle != null && currentStyle != previousStyle) {
-      lineBreak = styleToLineBreak[currentStyle] ?? _lineTerminator;
+      lineBreak = _lineBreakBefore(currentStyle);
     } else {
       if (currentNode != previousNode) {
         lineBreak = _lineTerminator;
@@ -205,7 +359,7 @@ class _TextRenderer {
     return lineBreak;
   }
 
-  List<InlineSpan> createSpans() {
+  List<TextSpan> createSpans() {
     final baseTextStyle = TextStyle(
       fontFamily: readerSettings.fontFamily,
       fontSize: readerSettings.fontSize,
@@ -213,14 +367,14 @@ class _TextRenderer {
       letterSpacing: readerSettings.letterSpacing,
       wordSpacing: readerSettings.wordSpacing,
     );
-    return workSegments.mapIndexed<InlineSpan>((i, segment) {
+    return workSegments.mapIndexed((i, segment) {
       final previousSegment = i > 0 ? workSegments[i - 1] : null;
       final prevStyle = previousSegment?.typ;
       final prevNode = previousSegment?.node;
       final currStyle = segment.typ;
       final currNode = segment.node;
-      // Merge the theme style for this block (e.g. TITLE vs VERS) with the user settings
-      final blockThemeStyle = styles[currStyle] ?? styles['default']!;
+      // Merge the theme style for this block (e.g. TITL vs VERS) with the user settings
+      final blockThemeStyle = _themeStyle(currStyle);
       final mergedStyle = blockThemeStyle.merge(baseTextStyle);
       final finalStyle = readerSettings.fontFamily != null
           ? GoogleFonts.getFont(readerSettings.fontFamily!, textStyle: mergedStyle)
@@ -235,6 +389,15 @@ class _TextRenderer {
         ],
       );
     }).toList();
+  }
+
+  /// Spans for segments [first]..[last], as laid out on a page
+  static List<InlineSpan> pageSpans(List<TextSpan> spans, int first, int last) {
+    final opening = spans[first];
+    return [
+      TextSpan(text: _pageStartBreak, style: opening.style, children: opening.children),
+      ...spans.sublist(first + 1, last + 1),
+    ];
   }
 
   /// Letter spans for [segment]
@@ -488,112 +651,135 @@ class _WiktionaryButton extends ContextMenuButtonItem {
 }
 
 class _VisibleSegmentRange {
-  _VisibleSegmentRange.build(
-    TextPainter txtPainter,
-    List<InlineSpan> allSpans,
+  const _VisibleSegmentRange._({
+    required this.first,
+    required this.last,
+    required this.fitsWholeBuffer,
+  });
+
+  factory _VisibleSegmentRange.build(
+    List<TextSpan> allSpans,
     WorkContentsSegments segments,
     _PageFlow pageFlow,
     BoxConstraints textConstraints,
-  ) : first = pageFlow == _PageFlow.previous
-          ? _firstVisibleWord(txtPainter, allSpans, segments, textConstraints)
-          : 0,
-      last = pageFlow == _PageFlow.next
-          ? _lastVisibleWord(txtPainter, allSpans, segments, textConstraints)
-          : segments.length - 1;
+    TextScaler textScaler,
+    StrutStyle strutStyle,
+  ) {
+    //match the SelectableText strut so measurement and rendering use the same layout settings
+    final painter = TextPainter(
+      textDirection: TextDirection.ltr,
+      textScaler: textScaler,
+      strutStyle: strutStyle,
+    );
+    try {
+      final breaks = _PageBreaks(painter, allSpans, segments, textConstraints);
+      return switch (pageFlow) {
+        _PageFlow.next => breaks.pageFromStart(),
+        _PageFlow.previous => breaks.pageToEnd(),
+      };
+    } finally {
+      painter.dispose();
+    }
+  }
+
+  /// The page could hold more than the buffer, so its edge at the cut may not
+  /// be a real break
+  final bool fitsWholeBuffer;
 
   final int first;
   final int last;
+  //
+}
 
-  static int _firstVisibleWord(
-    TextPainter textPainter,
-    List<InlineSpan> allSpans,
-    WorkContentsSegments segments,
-    BoxConstraints textConstraints,
-  ) {
-    var high = allSpans.length - 1;
-    var low = 0;
-    var firstFittingIndex = high + 1;
-    while (low <= high) {
-      final mid = (low + high) ~/ 2;
-      textPainter
-        ..text = TextSpan(children: allSpans.sublist(mid))
-        ..layout(maxWidth: textConstraints.maxWidth);
-      if (textPainter.height <= textConstraints.maxHeight) {
-        firstFittingIndex = mid;
-        high = mid - 1;
-      } else {
-        low = mid + 1;
-      }
-    }
-    // Adjust firstFittingIndex to start of next verse if necessary
-    if (firstFittingIndex > 0 && firstFittingIndex < segments.length) {
-      final firstElement = segments[firstFittingIndex];
-      if (firstElement.typ == 'VERS') {
-        final currentNode = firstElement.node;
-        final previousNode = firstFittingIndex > 0 ? segments[firstFittingIndex - 1].node : null;
-        // If we're in the middle of a verse, move forward to the start of the next verse
-        if (currentNode == previousNode) {
-          while (firstFittingIndex < segments.length - 1 &&
-              segments[firstFittingIndex + 1].node == currentNode) {
-            firstFittingIndex++;
-          }
-          // Now firstFittingIndex is at the end of the current verse
-          // Move it forward one more to get to the start of the next verse
-          if (firstFittingIndex < segments.length - 1) {
-            firstFittingIndex++;
-          }
-        }
-      }
-    }
-    return firstFittingIndex;
+/// Where a page over the fetched buffer may start or end
+///
+/// A page never splits a unit (a verse, a heading, or a word and the
+/// punctuation after it) and never separates a heading from the start of the
+/// text it introduces. Neither rule may leave the page empty
+class _PageBreaks {
+  _PageBreaks(
+    this._painter,
+    this._spans,
+    this._segments,
+    this._constraints,
+  );
+
+  final TextPainter _painter;
+  final List<TextSpan> _spans;
+  final WorkContentsSegments _segments;
+  final BoxConstraints _constraints;
+
+  int get _length => _segments.length;
+
+  /// The page that starts the buffer
+  _VisibleSegmentRange pageFromStart() {
+    // The page overflows from the first end that doesn't fit
+    final lastFitting = _firstWhere(0, _length - 1, (end) => !_fits(0, end)) - 1;
+    return _VisibleSegmentRange._(
+      first: 0,
+      // Keep a non-empty range even if one token exceeds the viewport
+      last: _settleEnd(max(0, lastFitting)),
+      fitsWholeBuffer: lastFitting == _length - 1,
+    );
   }
 
-  static int _lastVisibleWord(
-    TextPainter textPainter,
-    List<InlineSpan> allSpans,
-    WorkContentsSegments segments,
-    BoxConstraints textConstraints,
-  ) {
-    var low = 0;
-    var high = allSpans.length - 1;
-    var lastFittingIndex = low - 1;
-    while (low <= high) {
-      final mid = (low + high) ~/ 2;
-      textPainter
-        ..text = TextSpan(children: allSpans.sublist(0, mid + 1))
-        ..layout(maxWidth: textConstraints.maxWidth);
-      if (textPainter.height <= textConstraints.maxHeight) {
-        lastFittingIndex = mid;
-        low = mid + 1;
-      } else {
-        high = mid - 1;
-      }
-    }
-    // Adjust lastFittingIndex to end of previous verse if necessary
-    if (lastFittingIndex < segments.length - 1) {
-      final lastElement = segments[lastFittingIndex];
-      if (lastElement.typ == 'VERS') {
-        final currentNode = lastElement.node;
-        final nextNode = lastFittingIndex + 1 < segments.length
-            ? segments[lastFittingIndex + 1].node
-            : null;
-        // If we're in the middle of a verse, move back to the end of the previous verse
-        if (currentNode == nextNode) {
-          while (lastFittingIndex > 0 && segments[lastFittingIndex - 1].node == currentNode) {
-            lastFittingIndex--;
-          }
-          // Now lastFittingIndex is at the start of the current verse
-          // Move it back one more to get to the end of the previous verse
-          if (lastFittingIndex > 0) {
-            lastFittingIndex--;
-          }
-        }
-      } else if (lastFittingIndex < segments.length &&
-          _isPunctuation(segments[lastFittingIndex + 1].word)) {
-        lastFittingIndex--;
-      }
-    }
-    return lastFittingIndex;
+  /// The page that ends the buffer
+  _VisibleSegmentRange pageToEnd() {
+    final firstFitting = _firstWhere(0, _length - 1, (start) => _fits(start, _length - 1));
+    return _VisibleSegmentRange._(
+      // Keep a non-empty range even if one token exceeds the viewport
+      first: _settleStart(min(firstFitting, _length - 1)),
+      last: _length - 1,
+      fitsWholeBuffer: firstFitting == 0,
+    );
+  }
+
+  /// Moves [end] back to avoid splitting a unit or stranding a heading
+  int _settleEnd(int end) {
+    final splitsUnit = _continuesPrevious(end + 1);
+    final strandsHeading = end + 1 < _length && _isHeading(end);
+    final unitStart = _unitStart(end);
+    return (splitsUnit || strandsHeading) && unitStart > 0 ? _settleEnd(unitStart - 1) : end;
+  }
+
+  /// Moves [start] forward to avoid splitting a unit or stranding a heading
+  int _settleStart(int start) {
+    final splitsUnit = _continuesPrevious(start);
+    final strandsHeading = start > 0 && _isHeading(start - 1);
+    final nextUnit = _unitEnd(start) + 1;
+    return (splitsUnit || strandsHeading) && nextUnit < _length ? _settleStart(nextUnit) : start;
+  }
+
+  int _unitStart(int index) => _continuesPrevious(index) ? _unitStart(index - 1) : index;
+
+  int _unitEnd(int index) => _continuesPrevious(index + 1) ? _unitEnd(index + 1) : index;
+
+  /// Whether [index] belongs to the same unit as the segment before it
+  bool _continuesPrevious(int index) =>
+      index > 0 &&
+      index < _length &&
+      (_isUnbreakableType(_segments[index].typ)
+          ? _segments[index - 1].node == _segments[index].node
+          : _isPunctuation(_segments[index].word));
+
+  bool _isHeading(int index) => _isHeadingType(_segments[index].typ);
+
+  bool _fits(int first, int last) {
+    _painter
+      ..text = TextSpan(children: _TextRenderer.pageSpans(_spans, first, last))
+      ..layout(maxWidth: _constraints.maxWidth);
+    return _painter.height <= _constraints.maxHeight;
+  }
+
+  /// Lowest index in [low]..[high] where [test] holds, or [high] + 1 when it
+  /// never does. [test] must fail up to some index and hold from there on
+  static int _firstWhere(int low, int high, bool Function(int) test) {
+    final mid = (low + high) ~/ 2;
+    return low > high
+        ? low
+        : test(mid)
+        ? _firstWhere(low, mid - 1, test)
+        : _firstWhere(mid + 1, high, test);
   }
 
   static bool _isPunctuation(String word) =>
@@ -603,9 +789,11 @@ class _VisibleSegmentRange {
 
 class _StyledWordList extends ConsumerStatefulWidget {
   const _StyledWordList({
+    super.key,
     required this.segments,
     required this.onNavigateNext,
     required this.onNavigatePrevious,
+    required this.onOpenIndex,
     required this.onVisibleIndicesChanged,
     required this.pageFlow,
     required this.isLargeScreen,
@@ -616,7 +804,8 @@ class _StyledWordList extends ConsumerStatefulWidget {
   final WorkContentsSegments segments;
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
-  final void Function(int, int) onVisibleIndicesChanged;
+  final Future<void> Function() onOpenIndex;
+  final void Function(int, int, {required bool fitsWholeBuffer}) onVisibleIndicesChanged;
   final _PageFlow pageFlow;
   final bool isLargeScreen;
   final BoxConstraints pageConstraints;
@@ -635,7 +824,10 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
   final _readerCaretGap = 1.0;
   final _readerCursorWidth = 2.0;
   final _textSelector = _TextSelector();
+  final StrutStyle _readerStrut = StrutStyle.disabled;
   late _GestureHandler _gestureHandler;
+  var _navMenuOpen = false;
+  var _layoutRevision = 0;
 
   @override
   void initState() {
@@ -648,30 +840,55 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
   }
 
   Future<void> _handleNavMenuToggle(BuildContext context) async {
-    final mainBranchesNames = mainBranches.map((e) => e.id).toList();
-    await showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Dismiss',
-      barrierColor: Theme.of(context).bottomSheetTheme.modalBarrierColor ?? Colors.black54,
-      transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (ctx, animation, secondaryAnimation) => _NavMenuModal(
-        scaffoldKey: customAdaptiveScaffoldKey,
-        //animation: animation,
-        onNavigate: (index) {
-          Navigator.of(ctx).pop();
-          context.go(mainBranchesNames[index]);
-        },
-        onSettings: () async {
-          Navigator.of(ctx).pop();
-          await const SettingsRoute(tab: SettingsTab.library).push<void>(context);
-        },
-        onBack: () {
-          Navigator.of(ctx).pop();
-          context.pop();
-        },
-      ),
-    );
+    final canOpen = !_navMenuOpen;
+    if (canOpen) {
+      _navMenuOpen = true;
+      // the dialog only records the choice (it runs once the modal is gone)
+      Future<void> Function()? pendingAction;
+      void choose(BuildContext dialogContext, Future<void> Function() action) {
+        if (pendingAction == null) {
+          pendingAction = action;
+          Navigator.of(dialogContext).pop();
+        }
+      }
+
+      try {
+        ContextMenuController.removeAny();
+        final branchIds = mainBranches.map((entry) => entry.id).toList();
+        await showGeneralDialog<void>(
+          context: context,
+          barrierDismissible: true,
+          barrierLabel: 'Dismiss',
+          barrierColor: Theme.of(context).bottomSheetTheme.modalBarrierColor ?? Colors.black54,
+          transitionDuration: const Duration(milliseconds: 250),
+          pageBuilder: (ctx, animation, secondaryAnimation) => _NavMenuModal(
+            scaffoldKey: customAdaptiveScaffoldKey,
+            onNavigate: (index) => choose(
+              ctx,
+              () async => context.go(branchIds[index]),
+            ),
+            onIndex: () => choose(
+              ctx,
+              widget.onOpenIndex,
+            ),
+            onSettings: () => choose(
+              ctx,
+              () async => const SettingsRoute(tab: SettingsTab.library).push<void>(context),
+            ),
+            onBack: () => choose(
+              ctx,
+              () async => context.pop(),
+            ),
+          ),
+        );
+        final action = mounted && context.mounted ? pendingAction : null;
+        if (action != null) {
+          await action();
+        }
+      } finally {
+        _navMenuOpen = false;
+      }
+    }
   }
 
   @override
@@ -751,6 +968,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     final visibleTextSpan = _buildTextWithOverflowDetection(context, constraints, settings);
     return SelectableText.rich(
       visibleTextSpan,
+      strutStyle: _readerStrut,
       textScaler: MediaQuery.textScalerOf(context),
       textDirection: TextDirection.ltr,
       cursorWidth: _readerCursorWidth,
@@ -759,8 +977,6 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
         visibleTextSpan.toPlainText(),
       ),
       contextMenuBuilder: _buildContextMenu,
-      // The scrollbar may appear when resizing with the default physics
-      scrollPhysics: const NeverScrollableScrollPhysics(),
     );
   }
 
@@ -913,40 +1129,45 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     BoxConstraints constraints,
     ReaderSettings settings,
   ) {
-    final measurementConstraints = BoxConstraints(
-      maxWidth: max(
-        0.0,
-        constraints.maxWidth - _readerCursorWidth - _readerCaretGap,
+    final revision = ++_layoutRevision;
+    final isMeasurable =
+        widget.segments.isNotEmpty && constraints.maxWidth > 0 && constraints.maxHeight > 0;
+    return isMeasurable
+        ? _layOutPage(context, constraints, settings, revision)
+        : const TextSpan(text: '');
+  }
+
+  /// Fits as much of the buffer as the page holds and reports the range once
+  /// it's on screen
+  TextSpan _layOutPage(
+    BuildContext context,
+    BoxConstraints constraints,
+    ReaderSettings settings,
+    int revision,
+  ) {
+    final segments = widget.segments;
+    final allSpans = _TextRenderer(Theme.of(context), segments, settings).createSpans();
+    final visible = _VisibleSegmentRange.build(
+      allSpans,
+      segments,
+      widget.pageFlow,
+      BoxConstraints(
+        maxWidth: max(0.0, constraints.maxWidth - _readerCursorWidth - _readerCaretGap),
+        maxHeight: constraints.maxHeight,
       ),
-      maxHeight: constraints.maxHeight,
+      MediaQuery.textScalerOf(context),
+      _readerStrut,
     );
-    final allSpans = _TextRenderer(Theme.of(context), widget.segments, settings).createSpans();
-    final textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      textScaler: MediaQuery.textScalerOf(context),
-    );
-    late final _VisibleSegmentRange visible;
-    try {
-      visible = _VisibleSegmentRange.build(
-        textPainter,
-        allSpans,
-        widget.segments,
-        widget.pageFlow,
-        measurementConstraints,
-      );
-    } finally {
-      textPainter.dispose();
-    }
-    // dart format off
-    log.info(() => 'displaying new range (${widget.segments[visible.first].idx} - ${widget.segments[visible.last].idx})');
-    // dart format on
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => widget.onVisibleIndicesChanged(
-        widget.segments[visible.first].idx,
-        widget.segments[visible.last].idx,
-      ),
-    );
-    return TextSpan(children: allSpans.sublist(visible.first, visible.last + 1));
+    final first = segments[visible.first].idx;
+    final last = segments[visible.last].idx;
+    final notify = widget.onVisibleIndicesChanged;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // A newer layout pass owns the reported range
+      if (mounted && revision == _layoutRevision) {
+        notify(first, last, fitsWholeBuffer: visible.fitsWholeBuffer);
+      }
+    });
+    return TextSpan(children: _TextRenderer.pageSpans(allSpans, visible.first, visible.last));
   }
 
   //
@@ -956,12 +1177,14 @@ class _NavMenuModal extends StatelessWidget {
   const _NavMenuModal({
     required this.scaffoldKey,
     required this.onNavigate,
+    required this.onIndex,
     required this.onSettings,
     required this.onBack,
   });
 
   final GlobalKey<CustomAdaptiveScaffoldState> scaffoldKey;
   final ValueChanged<int> onNavigate;
+  final VoidCallback onIndex;
   final VoidCallback onSettings;
   final VoidCallback onBack;
 
@@ -1056,7 +1279,16 @@ class _NavMenuModal extends StatelessWidget {
     elevation: 4,
     leading: BackButton(onPressed: onBack),
     actions: [
-      IconButton(icon: const Icon(Icons.settings), onPressed: onSettings),
+      IconButton(
+        tooltip: workIndexLabel,
+        icon: const Icon(workIndexIcon),
+        onPressed: onIndex,
+      ),
+      IconButton(
+        tooltip: 'Reader settings',
+        icon: const Icon(Icons.settings),
+        onPressed: onSettings,
+      ),
     ],
   );
 

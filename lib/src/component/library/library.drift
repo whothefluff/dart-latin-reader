@@ -1,7 +1,9 @@
-import 'package:latin_reader/src/component/library/authors_api.dart';
 import 'package:latin_reader/src/component/library/author_details_api.dart';
-import 'package:latin_reader/src/component/library/work_details_api.dart';
+import 'package:latin_reader/src/component/library/authors_api.dart';
+import 'package:latin_reader/src/component/library/subdivision_type.dart';
 import 'package:latin_reader/src/component/library/work_contents_api.dart';
+import 'package:latin_reader/src/component/library/work_details_api.dart';
+import 'package:latin_reader/src/component/library/work_index_api.dart';
 
 CREATE TABLE "Authors"(
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
@@ -47,11 +49,11 @@ CREATE TABLE "WorkContents"(
     "workId" TEXT NOT NULL,
     "idx" INTEGER NOT NULL CHECK( idx >= 0 ),
     "word" TEXT NOT NULL,
-    "sourceReference" TEXT NOT NULL,
+    "sourceReference" TEXT NOT NULL CHECK( LENGTH( TRIM( sourceReference ) ) > 0 ),
     "properNounState" INTEGER CHECK( properNounState IN (0, 1, 2) ), --NULL = unknown, 0 = no, 1 = yes, 2 = either/both
     "tokenType" INTEGER NOT NULL CHECK( tokenType BETWEEN 1 AND 6 ), -- 1 word, 2 abbrev, 3 roman numeral, 4 punct, 5 editorial, 6 other
-    "sentenceIdx" INTEGER NOT NULL,
-    "wordIdx" INTEGER, -- Increments only for tokenType <= 3
+    "sentenceIdx" INTEGER NOT NULL CHECK( sentenceIdx >= 0 ),
+    "wordIdx" INTEGER CHECK( wordIdx >= 0 ), -- Increments only for tokenType <= 3
     "enclitic" TEXT,
     "expansion" TEXT,
     "macronizedWord" TEXT NOT NULL,
@@ -133,6 +135,8 @@ CREATE TABLE "WorkContents"(
     FOREIGN KEY( workId ) REFERENCES Works( id ),
     CHECK( (wordIdx IS NULL) = (tokenType >= 4) ), --fancy XNOR expression (both must be true or both must be false)
     CHECK( expansion IS NULL OR enclitic IS NULL ),
+    CHECK( properNounState IS NULL OR tokenType <= 3 ),
+    CHECK( expansion IS NULL OR tokenType IN (2, 3) ),
     CHECK( enclitic IS NULL
            OR ( LENGTH( enclitic ) > 0
                 AND LENGTH( enclitic ) < LENGTH( word )
@@ -145,15 +149,19 @@ WITHOUT ROWID;
 CREATE TABLE "WorkContentSubdivisions"(
     "workId" TEXT NOT NULL,
     "node" TEXT NOT NULL CHECK( node LIKE '________-____-____-____-____________' ),
-    "typ" TEXT NOT NULL CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','TITL','PARA') ),
+    "typ" TEXT NOT NULL MAPPED BY `const SubdivisionTypeConverter()` CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','TITL','PARA') ),
     "cnt" INTEGER NOT NULL CHECK( cnt >= 0 ),
     "name" TEXT NOT NULL,
     "parent" TEXT CHECK( parent IS NULL OR parent LIKE '________-____-____-____-____________' ),
     "fromIndex" INTEGER NOT NULL CHECK( fromIndex >= 0 ),
-    "toIndex" INTEGER NOT NULL CHECK( toIndex >= 0 ),
+    "toIndex" INTEGER NOT NULL,
     PRIMARY KEY( workId, node ),
     FOREIGN KEY( workId, fromIndex ) REFERENCES WorkContents( workId, idx ),
-    FOREIGN KEY( workId, toIndex ) REFERENCES WorkContents( workId, idx )
+    FOREIGN KEY( workId, toIndex ) REFERENCES WorkContents( workId, idx ),
+    FOREIGN KEY( workId, parent ) REFERENCES WorkContentSubdivisions( workId, node ) DEFERRABLE INITIALLY DEFERRED,
+    CHECK( fromIndex <= toIndex ),
+    CHECK( ( parent IS NULL ) = ( typ = 'BOOK' ) ), --books are the roots, and only books
+    CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','PARA') OR LENGTH( TRIM( name ) ) > 0 ) --titles must be labelled
 ) 
 STRICT, 
 WITHOUT ROWID;
@@ -162,15 +170,21 @@ WITHOUT ROWID;
 CREATE INDEX "WorkContentSubdivisions_Parent"
     ON WorkContentSubdivisions( parent );
 
+-- Force one title per subdivision
+CREATE UNIQUE INDEX "WorkContentSubdivisions_Title"
+    ON WorkContentSubdivisions( workId, parent )
+    WHERE typ = 'TITL';
+
 CREATE TABLE "WorkContentSupplementary"(
     "workId" TEXT NOT NULL,
     "typ" TEXT NOT NULL CHECK( typ IN ('NOTE','GAP','ABBR') ),
     "cnt" INTEGER NOT NULL CHECK( cnt >= 0 ),
-    "fromIndex" INTEGER NOT NULL,
+    "fromIndex" INTEGER NOT NULL CHECK( fromIndex >= 0 ),
     "toIndex" INTEGER NOT NULL,
     "val" TEXT NOT NULL,
     PRIMARY KEY( workId, typ, cnt ),
-    FOREIGN KEY( workId ) REFERENCES Works( id )
+    FOREIGN KEY( workId ) REFERENCES Works( id ),
+    CHECK( fromIndex <= toIndex )
 ) 
 STRICT, 
 WITHOUT ROWID;
@@ -289,7 +303,8 @@ CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS
                                        Subsets.depth + 1
                                     FROM WorkContentSubdivisions AS s
                                     INNER JOIN Subsets 
-                                        ON s.parent = Subsets.node )
+                                        ON s.workId = Subsets.workId
+                                           AND s.parent = Subsets.node )
         SELECT *
             FROM Subsets
             ORDER BY fromindex, depth, toindex;
@@ -410,14 +425,23 @@ CREATE VIEW "library.WorkIndexes" AS
            SubdivsHierarchy.cnt,
            SubdivsHierarchy.fromIndex,
            SubdivsHierarchy.toIndex,
-           Titles.name
+           Titles.name AS label,
+           StartToken.sourceReference AS startReference,
+           EndToken.sourceReference AS endReference
         FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy
-        INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS Titles
-            ON SubdivsHierarchy.node = Titles.parent
+        INNER JOIN WorkContentSubdivisions AS Titles
+            ON SubdivsHierarchy.workId = Titles.workId
+               AND SubdivsHierarchy.node = Titles.parent
                AND 'TITL' = Titles.typ
-        ORDER BY SubdivsHierarchy.fromindex;
+        INNER JOIN WorkContents AS StartToken
+            ON Titles.workId = StartToken.workId
+               AND Titles.fromIndex = StartToken.idx
+        INNER JOIN WorkContents AS EndToken -- TODO(whothefluff): check after a few more works if necessary (might always match StartToken)
+            ON Titles.workId = EndToken.workId
+               AND Titles.toIndex = EndToken.idx
+        ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.cnt, SubdivsHierarchy.node;
 
-getLibraryWorkIndexes: SELECT * FROM "library.WorkIndexes" WHERE workId = ?;
+getLibraryWorkIndexes WITH WorkIndexEntry: SELECT * FROM "library.WorkIndexes" WHERE workId = ?;
 
 CREATE VIEW "library.Catalog" AS 
     SELECT Works.id AS workId,

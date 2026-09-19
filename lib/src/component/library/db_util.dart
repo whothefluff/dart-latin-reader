@@ -8,6 +8,7 @@ import '../../external/db_oracle.dart';
 import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'library.drift.dart';
+import 'subdivision_type.dart';
 
 const path = 'assets/preprocessed_data/';
 
@@ -141,7 +142,7 @@ final operations = [
                 (row) => WorkContentSubdivisionsCompanion(
                   workId: Value(row[0].toString()),
                   node: Value(row[1].toString()),
-                  typ: Value(row[2].toString()),
+                  typ: Value(SubdivisionType.fromCode(row[2].toString())),
                   cnt: Value(row[3] as int),
                   name: Value(row[4].toString()),
                   parent: stringValue(row[5].toString()),
