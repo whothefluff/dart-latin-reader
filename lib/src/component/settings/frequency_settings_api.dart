@@ -3,33 +3,34 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../../external/settings.dart';
+import 'frequency_filter_settings_api.dart' show FrequencyFilterSettingsNotifier;
 
 part 'frequency_settings_api.g.dart';
 
 //infrastructure
 
+/// Deliberately separate from [FrequencyFilterSettingsNotifier]
 @Riverpod(keepAlive: true)
-class FrequencySettingsNotifier extends _$FrequencySettingsNotifier {
+class FrequencyViewSettingsNotifier extends _$FrequencyViewSettingsNotifier {
   //
   static const _prefix = 'frequency.';
-  static const _pageSize = '${_prefix}pageSize';
-  static const _ascending = '${_prefix}ascending';
-  static const _groupByLemma = '${_prefix}groupByLemma';
-  static const _macronsOn = '${_prefix}showMacrons';
+  static const _showSummary = '${_prefix}showSummary';
+  static const _formTapAction = '${_prefix}formTapAction';
+
+  /// Stored by name; a renamed value falls back to the default
+  static final Map<String, FormTapAction> _formTapActionsByName = FormTapAction.values.asNameMap();
 
   @override
   Future<FrequencySettings> build() async {
     log.entry<void>();
     final repo = ref.watch(settingsRepositoryProvider);
-    final savedLimit = await repo.get(_pageSize, PrefInt.hint);
-    final savedAscending = await repo.get(_ascending, PrefBool.hint);
-    final savedGroupByLemma = await repo.get(_groupByLemma, PrefBool.hint);
-    final savedShowMacrons = await repo.get(_macronsOn, PrefBool.hint);
+    final savedShowSummary = await repo.get(_showSummary, PrefBool.hint);
+    final savedFormTapAction = await repo.get(_formTapAction, PrefString.hint);
     final settings = FrequencySettings(
-      pageSize: savedLimit?.value ?? FrequencySettings._defaultPageSize,
-      ascending: savedAscending?.value ?? FrequencySettings._defaultAscending,
-      groupByLemma: savedGroupByLemma?.value ?? FrequencySettings._defaultGroupByLemma,
-      showMacrons: savedShowMacrons?.value ?? FrequencySettings._defaultShowMacrons,
+      showSummary: savedShowSummary?.value ?? FrequencySettings._defaultShowSummary,
+      formTapAction:
+          _formTapActionsByName[savedFormTapAction?.value] ??
+          FrequencySettings._defaultFormTapAction,
     );
     return log.exit(r: settings)!;
   }
@@ -43,10 +44,8 @@ class FrequencySettingsNotifier extends _$FrequencySettingsNotifier {
       // Persist (with rollback on failure)
       try {
         final repo = ref.read(settingsRepositoryProvider);
-        await repo.set(_pageSize, PrefInt(newSettings.pageSize));
-        await repo.set(_ascending, PrefBool(newSettings.ascending));
-        await repo.set(_groupByLemma, PrefBool(newSettings.groupByLemma));
-        await repo.set(_macronsOn, PrefBool(newSettings.showMacrons));
+        await repo.set(_showSummary, PrefBool(newSettings.showSummary));
+        await repo.set(_formTapAction, PrefString(newSettings.formTapAction.name));
       } on Exception catch (e, st) {
         log
           ..catching(e, stackTrace: st)
@@ -64,60 +63,51 @@ class FrequencySettingsNotifier extends _$FrequencySettingsNotifier {
 
 //domain
 
-/// Holds the settings for the word frequency report.
+/// What tapping a row opens while the report lists forms.
 ///
-/// Passing `const FrequencySettings()` to
-/// [FrequencySettingsNotifier.updateSettings] resets all fields because they
-/// all have detaults
+/// Lemma rows always open the dictionary
+enum FormTapAction { ask, openMorphology, openDictionary }
+
+/// Holds the settings for the word frequency
+///
+/// All fields have defaults and can be reset to them by omitting the parameter
+/// in [copyWith].
 @immutable
 class FrequencySettings {
   const FrequencySettings({
-    this.pageSize = _defaultPageSize,
-    this.ascending = _defaultAscending,
-    this.groupByLemma = _defaultGroupByLemma,
-    this.showMacrons = _defaultShowMacrons,
+    this.showSummary = _defaultShowSummary,
+    this.formTapAction = _defaultFormTapAction,
   });
 
-  final int pageSize;
-  final bool ascending;
-  final bool groupByLemma;
-  final bool showMacrons;
-  static const int _defaultPageSize = 100;
-  static const bool _defaultAscending = false;
-  static const bool _defaultGroupByLemma = false;
-  static const bool _defaultShowMacrons = true;
+  /// Whether the notes between the filters and the table are shown
+  final bool showSummary;
+  final FormTapAction formTapAction;
+  static const bool _defaultShowSummary = true;
+  static const FormTapAction _defaultFormTapAction = FormTapAction.ask;
 
   /// Returns a copy with the given fields replaced.
   FrequencySettings copyWith({
-    int? pageSize,
-    bool? ascending,
-    bool? groupByLemma,
-    bool? showMacrons,
+    bool? showSummary,
+    FormTapAction? formTapAction,
   }) => FrequencySettings(
-    pageSize: pageSize ?? this.pageSize,
-    ascending: ascending ?? this.ascending,
-    groupByLemma: groupByLemma ?? this.groupByLemma,
-    showMacrons: showMacrons ?? this.showMacrons,
+    showSummary: showSummary ?? this.showSummary,
+    formTapAction: formTapAction ?? this.formTapAction,
   );
 
   @override
   String toString() =>
       'FrequencySettings{'
-      'pageSize: $pageSize, '
-      'ascending: $ascending, '
-      'groupByLemma: $groupByLemma, '
-      'showMacrons: $showMacrons}';
+      'showSummary: $showSummary, '
+      'formTapAction: $formTapAction}';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is FrequencySettings &&
-          other.pageSize == pageSize &&
-          other.ascending == ascending &&
-          other.groupByLemma == groupByLemma &&
-          other.showMacrons == showMacrons);
+          other.showSummary == showSummary &&
+          other.formTapAction == formTapAction);
 
   @override
-  int get hashCode => Object.hash(pageSize, ascending, groupByLemma, showMacrons);
+  int get hashCode => Object.hash(showSummary, formTapAction);
   //
 }

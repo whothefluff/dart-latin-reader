@@ -92,6 +92,10 @@ class EnrichedFrequencyReport {
 
   double relativeFrequency(int occ) => base.relativeFrequency(occ);
 
+  /// Distinct candidate lemmas among [rows]
+  int get representedLemmas =>
+      rows.expand((r) => r.possibleLemmas ?? const <String>[]).toSet().length;
+
   @override
   String toString() =>
       'EnrichedFrequencyReport{rows: ${rows.length}, totalTokens: $totalTokens, offset: $offset}';
