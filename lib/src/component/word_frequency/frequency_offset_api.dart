@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
-import '../settings/frequency_settings_api.dart';
+import '../settings/frequency_filter_settings_api.dart';
 import 'library_selection_api.dart';
 
 part 'frequency_offset_api.g.dart';
@@ -18,7 +18,7 @@ class FrequencyOffsetNotifier extends _$FrequencyOffsetNotifier {
   int build() {
     log.entry<void>();
     ref
-      ..watch(frequencySettingsNotifierProvider)
+      ..watch(frequencyFilterSettingsNotifierProvider)
       ..watch(librarySelectionNotifierProvider);
     return log.exit(r: 0)!;
   }

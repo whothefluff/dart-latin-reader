@@ -7,7 +7,7 @@ part of 'active_frequency_filter_api.dart';
 // **************************************************************************
 
 String _$activeFrequencyFilterHash() =>
-    r'430492a688b62ecaa1acbf9af57f62881e399533';
+    r'5688efb6de1491ba4acf8260cdea98c80e5ead21';
 
 /// The [FrequencyFilter] the report is currently showing.
 ///

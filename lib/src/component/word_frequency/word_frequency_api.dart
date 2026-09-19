@@ -332,6 +332,9 @@ class FrequencyReport {
 
   int get totalTokens => coverage.totalTokens;
 
+  // TODO(whothefluff): FREQ is COUNT times a constant, so it adds nothing within a report.
+  //  Replace it with something like a cumulative text coverage.
+  //  The page's FREQ. column changes with it
   double relativeFrequency(int occurrences) =>
       totalTokens > 0 ? occurrences / totalTokens * 1000 : 0;
 

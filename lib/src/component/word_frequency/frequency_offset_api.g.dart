@@ -7,7 +7,7 @@ part of 'frequency_offset_api.dart';
 // **************************************************************************
 
 String _$frequencyOffsetNotifierHash() =>
-    r'f13f9abd7a7fefe977e8d4c8f0ee81290c47a860';
+    r'53e1fed506de120cc84c260eb9a33415fcc42649';
 
 /// Tracks the pagination cursor for the word frequency report. Session state only.
 ///

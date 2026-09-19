@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../library/catalog_api.dart';
-import '../settings/frequency_settings_api.dart';
+import '../settings/frequency_filter_settings_api.dart';
 import 'frequency_offset_api.dart';
 import 'library_selection_api.dart';
 import 'resolved_freq_morph_form_api.dart' show WorkIds;
@@ -25,7 +25,7 @@ Future<FrequencyFilter> activeFrequencyFilter(Ref ref) async {
   final selection = ref.watch(librarySelectionNotifierProvider);
   final offset = ref.watch(frequencyOffsetNotifierProvider);
   final catalog = await ref.watch(libraryCatalogProvider.future);
-  final settings = await ref.watch(frequencySettingsNotifierProvider.future);
+  final settings = await ref.watch(frequencyFilterSettingsNotifierProvider.future);
   // Sort and deduplicate work IDs so selection order does not affect filter equality
   final workIds = (selection.isEmpty ? catalog.allWorkIds : selection.allWorkIds).toSet().toList()
     ..sort();
