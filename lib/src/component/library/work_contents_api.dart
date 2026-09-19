@@ -11,6 +11,7 @@ import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import 'library.drift.dart';
+import 'subdivision_type.dart';
 
 part 'work_contents_api.g.dart';
 
@@ -109,7 +110,7 @@ class WorkContentsSegment {
   final String node;
   final int idx;
   final String word;
-  final String typ;
+  final SubdivisionType typ;
   final int depth;
   final String sourceReference;
 
