@@ -2,8 +2,17 @@ name: Flutter Windows CI
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   common:
@@ -14,8 +23,13 @@ jobs:
   windows-specific-steps:
     needs: common
     runs-on: windows-latest
+    if: ${{ !cancelled() }}
 
     steps:
+
+    - name: Require static checks
+      if: ${{ needs.common.result != 'success' }}
+      run: exit 1
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -38,3 +52,49 @@ jobs:
       with:
         name: app-release.exe
         path: build/windows/x64/runner/Release/
+
+  publish-preview:
+    if: ${{ github.repository == 'whothefluff/dart-latin-reader' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    needs: windows-specific-steps
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+
+    - name: Download Windows build
+      uses: actions/download-artifact@v4
+      with:
+        name: app-release.exe
+        path: latin_reader
+
+    - name: Publish rolling Windows preview
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        zip -qr latin-reader-windows.zip latin_reader
+
+        printf 'Commit: %s\n\nBuild: %s/%s/actions/runs/%s\n' \
+          "$GITHUB_SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" \
+          > release-notes.md
+
+        if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/windows-preview" > /dev/null 2>&1; then
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/windows-preview" \
+            -f sha="$GITHUB_SHA" -F force=true > /dev/null
+        else
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f ref=refs/tags/windows-preview -f sha="$GITHUB_SHA" > /dev/null
+        fi
+
+        if gh release view windows-preview --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+          gh release upload windows-preview latin-reader-windows.zip \
+            --repo "$GITHUB_REPOSITORY" --clobber
+          gh release edit windows-preview --repo "$GITHUB_REPOSITORY" \
+            --title "Latest Windows preview" --notes-file release-notes.md \
+            --prerelease --latest=false
+        else
+          gh release create windows-preview latin-reader-windows.zip \
+            --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "Latest Windows preview" --notes-file release-notes.md \
+            --prerelease --latest=false
+        fi
