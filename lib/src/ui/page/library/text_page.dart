@@ -112,10 +112,12 @@ class TextPageState extends ConsumerState<TextPage> {
     final segmentsProvider = ref.watch(workContentsProvider(widget.workId, _fromIndex, _toIndex));
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: segmentsProvider.when(
-        data: _buildResponsiveContent,
-        loading: showLoading,
-        error: showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex)),
+      body: SafeArea(
+        child: segmentsProvider.when(
+          data: _buildResponsiveContent,
+          loading: showLoading,
+          error: showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex)),
+        ),
       ),
     );
   }
