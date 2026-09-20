@@ -538,9 +538,10 @@ class _WordDetailsButton extends ContextMenuButtonItem {
     required String word,
     required this.ref,
     required this.context,
+    required bool compact,
     bool ignoreMacrons = false,
   }) : super(
-         label: ignoreMacrons ? 'See details ignoring macrons' : 'See details for "$word"',
+         label: _label(word, compact: compact, ignoreMacrons: ignoreMacrons),
          onPressed: () => _onPressed(
            ignoreMacrons ? _withoutMacrons(word) : word,
            ref,
@@ -550,6 +551,14 @@ class _WordDetailsButton extends ContextMenuButtonItem {
 
   final WidgetRef ref;
   final BuildContext context;
+
+  static String _label(String word, {required bool compact, required bool ignoreMacrons}) =>
+      switch ((compact, ignoreMacrons)) {
+        (true, false) => 'Morph',
+        (true, true) => 'Morph (plain)',
+        (false, false) => 'See details for "$word"',
+        (false, true) => 'See details ignoring macrons',
+      };
 
   static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
     log.entry(args: [word]);
@@ -587,8 +596,9 @@ class _WiktionaryButton extends ContextMenuButtonItem {
     required String word,
     required this.ref,
     required this.context,
+    required bool compact,
   }) : super(
-         label: 'Look up in Wiktionary',
+         label: compact ? 'Wiktionary' : 'Look up in Wiktionary',
          onPressed: () => _onPressed(word, ref, context),
        );
 
@@ -1042,17 +1052,40 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
         ? const SizedBox.shrink()
         : AdaptiveTextSelectionToolbar.buttonItems(
             anchors: state.contextMenuAnchors,
-            buttonItems: [
-              ...state.contextMenuButtonItems,
-              if (selectedWord != null)
-                ..._buildWordLookupButtons(
-                  readerContext,
-                  selectedWord,
-                  showIgnoringMacrons: comparison.showIgnoringMacrons,
-                ),
-            ],
+            buttonItems: _arrangeButtonItems(
+              state.contextMenuButtonItems,
+              selectedWord == null
+                  ? const []
+                  : _buildWordLookupButtons(
+                      readerContext,
+                      selectedWord,
+                      showIgnoringMacrons: comparison.showIgnoringMacrons,
+                    ),
+            ),
           );
   }
+
+  /// Returns buttons set in specific order
+  List<ContextMenuButtonItem> _arrangeButtonItems(
+    List<ContextMenuButtonItem> builtIn,
+    List<ContextMenuButtonItem> lookups,
+  ) {
+    const copy = ContextMenuButtonType.copy;
+    const selectAll = ContextMenuButtonType.selectAll;
+    return [
+      ...lookups,
+      ...builtIn.where((item) => item.type == copy),
+      ...builtIn.where((item) => item.type == selectAll),
+      ...builtIn.where((item) => item.type != copy && item.type != selectAll),
+    ];
+  }
+
+  /// Returns true for devices with touchscreens
+  bool _usesCompactLabels(BuildContext context) => const {
+    TargetPlatform.android,
+    TargetPlatform.fuchsia,
+    TargetPlatform.iOS,
+  }.contains(Theme.of(context).platform);
 
   /// Compares the normal lookup with a lookup that ignores macrons
   ///
@@ -1102,25 +1135,31 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     BuildContext readerContext,
     String word, {
     required bool showIgnoringMacrons,
-  }) => [
-    _WordDetailsButton(
-      word: word,
-      ref: ref,
-      context: readerContext,
-    ),
-    if (showIgnoringMacrons)
+  }) {
+    final compact = _usesCompactLabels(readerContext);
+    return [
       _WordDetailsButton(
         word: word,
         ref: ref,
         context: readerContext,
-        ignoreMacrons: true,
+        compact: compact,
       ),
-    _WiktionaryButton(
-      word: word,
-      ref: ref,
-      context: readerContext,
-    ),
-  ];
+      if (showIgnoringMacrons)
+        _WordDetailsButton(
+          word: word,
+          ref: ref,
+          context: readerContext,
+          compact: compact,
+          ignoreMacrons: true,
+        ),
+      _WiktionaryButton(
+        word: word,
+        ref: ref,
+        context: readerContext,
+        compact: compact,
+      ),
+    ];
+  }
 
   void _rebuildOnScreenSizeChange(BuildContext context) {
     MediaQuery.of(context);
