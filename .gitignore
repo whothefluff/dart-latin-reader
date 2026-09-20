@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Generated database staged by CI
+/assets/preprocessed_data/data.db*
+
+# Android signing keys
+*.jks
+*.keystore

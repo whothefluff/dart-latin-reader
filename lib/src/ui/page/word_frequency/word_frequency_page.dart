@@ -311,14 +311,18 @@ class _LabeledDropdown<T> extends StatelessWidget {
     required this.label,
     required this.value,
     required this.items,
-    required this.onChanged,
+    required ValueChanged<T?> onChanged,
     this.selectedItemBuilder,
-  });
+  }) : _onChanged = onChanged;
 
   final String label;
   final T value;
   final List<DropdownMenuItem<T>> items;
-  final ValueChanged<T?> onChanged;
+
+  // Safe because this field is only read through this instance, with its original T
+  // ignore: unsafe_variance
+  final ValueChanged<T?> _onChanged;
+
   final DropdownButtonBuilder? selectedItemBuilder;
 
   @override
@@ -334,7 +338,7 @@ class _LabeledDropdown<T> extends StatelessWidget {
             value: value,
             items: items,
             selectedItemBuilder: selectedItemBuilder,
-            onChanged: onChanged,
+            onChanged: _onChanged,
             isDense: true,
             borderRadius: _controlBorderRadius,
             // Padding keeps the highlight clear of the text
