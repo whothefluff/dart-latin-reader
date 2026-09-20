@@ -22,7 +22,7 @@ jobs:
 
   windows-specific-steps:
     needs: common
-    runs-on: windows-latest
+    runs-on: windows-2022 # TODO(whothefluff): change back to 'windows-latest' after upgrading flutter
     if: ${{ !cancelled() }}
 
     steps:
