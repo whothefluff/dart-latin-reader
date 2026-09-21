@@ -280,6 +280,12 @@ class CustomAdaptiveScaffold extends StatefulWidget {
     );
   }
 
+  /// Safe-area padding on the rail's side of the screen
+  static double navigationRailStartInset(BuildContext context) {
+    final padding = MediaQuery.paddingOf(context);
+    return Directionality.of(context) == TextDirection.ltr ? padding.left : padding.right;
+  }
+
   /// Creates a Material 3 Design Spec abiding [NavigationRail] from a
   /// list of [NavigationDestination]s.
   ///
@@ -314,7 +320,8 @@ class CustomAdaptiveScaffold extends StatefulWidget {
         return Padding(
           padding: padding,
           child: SizedBox(
-            width: width,
+            // add room for SafeArea so it does not squeeze the rail's labels
+            width: width + navigationRailStartInset(context),
             height: MediaQuery.sizeOf(context).height,
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {

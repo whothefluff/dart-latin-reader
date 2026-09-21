@@ -1239,9 +1239,10 @@ class _NavMenuModal extends StatelessWidget {
     // Where the AppBar's left edge should sit, per active form.
     final isBottom = w.smallBreakpoint.isActive(context);
     final isUnextended = w.mediumBreakpoint.isActive(context); // medium range only
+    final railWidth = isUnextended ? w.navigationRailWidth : w.extendedNavigationRailWidth;
     final appBarLeft = isBottom
         ? 0.0
-        : (isUnextended ? w.navigationRailWidth : w.extendedNavigationRailWidth);
+        : railWidth + CustomAdaptiveScaffold.navigationRailStartInset(context);
     return Stack(
       children: [
         AdaptiveLayout(
@@ -1309,7 +1310,12 @@ class _NavMenuModal extends StatelessWidget {
           top: 0,
           left: appBarLeft,
           right: 0,
-          child: Material(color: Colors.transparent, child: _appBar(context)),
+          //the rail covers the left safe area so the AppBar needs no left padding
+          child: MediaQuery.removePadding(
+            context: context,
+            removeLeft: !isBottom,
+            child: Material(color: Colors.transparent, child: _appBar(context)),
+          ),
         ),
       ],
     );
