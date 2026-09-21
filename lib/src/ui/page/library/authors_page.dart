@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/library/authors_api.dart';
 import '../../router/config.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -13,7 +14,7 @@ class AuthorsPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(context, ref) => Scaffold(
+  Widget build(context, ref) => SafeBodyScaffold(
     // TODO(whothefluff): add fts5 encompasing Authors.name, AuthorAbbreviations.val, Works.name, WorkAbbreviations.val
     appBar: SearchableAppBar(
       onFilterPressed: () {},

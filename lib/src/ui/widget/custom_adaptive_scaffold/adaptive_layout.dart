@@ -297,11 +297,12 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
         ),
       );
     });
-    // primary navigation includes the safe-area padding on its side
-    // panels beside it must not add the same padding
+    // the navigation slots include the safe-area padding on their side
+    // panels beside or above them must not add the same padding
     final isLtr = Directionality.of(context) == TextDirection.ltr;
     final hasPrimaryNavigation = chosenWidgets[_SlotIds.primaryNavigation.name]?.builder != null;
-    final besidePrimaryNavigation = {
+    final hasBottomNavigation = chosenWidgets[_SlotIds.bottomNavigation.name]?.builder != null;
+    final besideNavigation = {
       _SlotIds.secondaryNavigation.name,
       _SlotIds.body.name,
       _SlotIds.secondaryBody.name,
@@ -313,11 +314,12 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
             //keep MediaQuery at every breakpoint so resizing does not reset child state
             return LayoutId(
               id: entry.key,
-              child: besidePrimaryNavigation.contains(entry.key)
+              child: besideNavigation.contains(entry.key)
                   ? MediaQuery.removePadding(
                       context: context,
                       removeLeft: hasPrimaryNavigation && isLtr,
                       removeRight: hasPrimaryNavigation && !isLtr,
+                      removeBottom: hasBottomNavigation,
                       child: child,
                     )
                   : child,

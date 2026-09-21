@@ -4,6 +4,7 @@ import 'package:intl/intl.dart' as int;
 
 import '../../../component/dictionary/dictionaries_api.dart';
 import '../../router/config.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -15,7 +16,7 @@ class DictionariesPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(context, ref) => Scaffold(
+  Widget build(context, ref) => SafeBodyScaffold(
     appBar: SearchableAppBar(
       onFilterPressed: () {},
       onSortPressed: () {},

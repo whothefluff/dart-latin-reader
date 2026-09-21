@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/dictionary/dictionary_entry_senses_api.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 
@@ -27,7 +28,7 @@ class DictionaryEntryPage extends ConsumerWidget {
   // dart format on
 
   @override
-  Widget build(context, ref) => Scaffold(
+  Widget build(context, ref) => SafeBodyScaffold(
     appBar: AppBar(title: Text(lemma)),
     body: entriesList(ref, context),
   );

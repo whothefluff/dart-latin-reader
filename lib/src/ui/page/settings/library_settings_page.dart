@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../component/settings/reader_settings_api.dart';
 import '../../../core/bundled_fonts.dart';
 import '../../../core/latin_ext_fonts.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/responsive_coordinate_grid.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -20,7 +21,7 @@ class LibrarySettingsPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(context, ref) => Scaffold(
+  Widget build(context, ref) => SafeBodyScaffold(
     appBar: AppBar(title: const Text('Library Settings')),
     body: ref
         .watch(readerSettingsNotifierProvider)
