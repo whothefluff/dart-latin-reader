@@ -297,12 +297,30 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
         ),
       );
     });
+    // primary navigation includes the safe-area padding on its side
+    // panels beside it must not add the same padding
+    final isLtr = Directionality.of(context) == TextDirection.ltr;
+    final hasPrimaryNavigation = chosenWidgets[_SlotIds.primaryNavigation.name]?.builder != null;
+    final besidePrimaryNavigation = {
+      _SlotIds.secondaryNavigation.name,
+      _SlotIds.body.name,
+      _SlotIds.secondaryBody.name,
+    };
     final entries = slots.entries
         .map((entry) {
           if (entry.value != null) {
+            final child = entry.value ?? const SizedBox();
+            //keep MediaQuery at every breakpoint so resizing does not reset child state
             return LayoutId(
               id: entry.key,
-              child: entry.value ?? const SizedBox(),
+              child: besidePrimaryNavigation.contains(entry.key)
+                  ? MediaQuery.removePadding(
+                      context: context,
+                      removeLeft: hasPrimaryNavigation && isLtr,
+                      removeRight: hasPrimaryNavigation && !isLtr,
+                      child: child,
+                    )
+                  : child,
             );
           }
         })
