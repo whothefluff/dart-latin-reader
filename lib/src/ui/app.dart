@@ -7,6 +7,7 @@ import '../../l10n/app_localizations.dart';
 import '../component/settings/general_settings_api.dart';
 import 'router/config.dart';
 import 'widget/custom_adaptive_scaffold.dart';
+import 'widget/page_scaffold.dart';
 import 'widget/show_loading.dart';
 
 final customAdaptiveScaffoldKey = GlobalKey<CustomAdaptiveScaffoldState>();
@@ -45,7 +46,7 @@ class AppState extends ConsumerState<App> {
   Widget build(context) => ref
       .watch(generalSettingsNotifierProvider)
       .when(
-        loading: () => MaterialApp(home: Scaffold(body: showLoading())),
+        loading: () => MaterialApp(home: SafeBodyScaffold(body: showLoading())),
         data: (settings) => MaterialApp.router(
           key: ValueKey(settings.themeMode),
           routerConfig: _router,
@@ -66,7 +67,7 @@ class AppState extends ConsumerState<App> {
           themeMode: settings.themeMode,
         ),
         error: (error, stack) => MaterialApp(
-          home: Scaffold(
+          home: SafeBodyScaffold(
             body: Center(child: Text('Error: $error')),
           ),
         ),
@@ -81,7 +82,7 @@ class AppState extends ConsumerState<App> {
     branches: _generatedRoute.branches,
   );
 
-  Widget backToHome(BuildContext context, GoRouterState state) => Scaffold(
+  Widget backToHome(BuildContext context, GoRouterState state) => SafeBodyScaffold(
     body: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

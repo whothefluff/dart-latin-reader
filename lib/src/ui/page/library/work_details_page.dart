@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../component/library/work_details_api.dart';
 import '../../router/config.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 
@@ -18,7 +19,7 @@ class WorkDetailsPage extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     final workDetailsAsync = ref.watch(workDetailsProvider(workId));
-    return Scaffold(
+    return SafeBodyScaffold(
       appBar: AppBar(
         title: workDetailsAsync.maybeWhen(
           data: (workDetails) => Text(workDetails.name),

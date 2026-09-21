@@ -6,6 +6,7 @@ import '../../../../logger.dart';
 import '../../../component/morph_analysis/enriched_morph_search_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../router/config.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
 import 'common.dart';
@@ -49,7 +50,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
     final colorTheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final dictRefStyle = textTheme.bodyMedium!.copyWith(color: colorTheme.primary);
-    return Scaffold(
+    return SafeBodyScaffold(
       appBar: AppBar(
         title: Row(
           children: [

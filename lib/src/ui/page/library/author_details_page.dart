@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/library/author_details_api.dart';
 import '../../router/config.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 
@@ -19,7 +20,7 @@ class AuthorDetailsPage extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     final authorDetailsAsync = ref.watch(authorDetailsProvider(authorId));
-    return Scaffold(
+    return SafeBodyScaffold(
       appBar: AppBar(
         title: authorDetailsAsync.maybeWhen(
           data: (authorDetails) => Text(authorDetails.name),

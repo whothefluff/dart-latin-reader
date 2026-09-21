@@ -5,6 +5,7 @@ import '../../../component/dictionary/dictionary_alphabets_api.dart';
 import '../../../component/dictionary/dictionary_entries_api.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -30,7 +31,7 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
   double _listTileHeight = 48.0; // Fallback height
 
   @override
-  Widget build(context) => Scaffold(
+  Widget build(context) => SafeBodyScaffold(
     appBar: SearchableAppBar(
       onSortPressed: () {},
       onSettingsPressed: () async {
@@ -306,7 +307,8 @@ class _MagnifiableAlphabetSidebarState extends State<MagnifiableAlphabetSidebar>
 
   OverlayEntry createOverlayEntry() => OverlayEntry(
     builder: (context) => Positioned(
-      right: 0,
+      //the sidebar now sits inside the page's safe area, so the magnifier follows it in
+      right: MediaQuery.paddingOf(context).right,
       top: _magnifierPosition.dy,
       child: const Magnifier(
         additionalFocalPointOffset: Offset(25, -5),

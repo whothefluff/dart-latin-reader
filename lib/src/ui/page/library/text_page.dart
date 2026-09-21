@@ -22,6 +22,7 @@ import '../../widget/custom_adaptive_scaffold/adaptive_layout.dart';
 import '../../widget/custom_adaptive_scaffold/adaptive_scaffold.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
 import '../../widget/custom_adaptive_scaffold/slot_layout.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
@@ -98,27 +99,25 @@ class TextPageState extends ConsumerState<TextPage> {
         widget.workId,
       ).select((model) => model.whenData((work) => work.lastIndex)),
     );
-    return lastIndexProvider.when(
-      data: (lastIndex) {
-        _lastIndex = lastIndex;
-        return _scaffold();
-      },
-      loading: showLoading,
-      error: showError(ref, workDetailsProvider(widget.workId)),
+    //the scaffold wraps both stages so the loading and error states are padded too
+    return SafeBodyScaffold(
+      body: lastIndexProvider.when(
+        data: (lastIndex) {
+          _lastIndex = lastIndex;
+          return _contents();
+        },
+        loading: showLoading,
+        error: showError(ref, workDetailsProvider(widget.workId)),
+      ),
     );
   }
 
-  Widget _scaffold() {
+  Widget _contents() {
     final segmentsProvider = ref.watch(workContentsProvider(widget.workId, _fromIndex, _toIndex));
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      body: SafeArea(
-        child: segmentsProvider.when(
-          data: _buildResponsiveContent,
-          loading: showLoading,
-          error: showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex)),
-        ),
-      ),
+    return segmentsProvider.when(
+      data: _buildResponsiveContent,
+      loading: showLoading,
+      error: showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex)),
     );
   }
 

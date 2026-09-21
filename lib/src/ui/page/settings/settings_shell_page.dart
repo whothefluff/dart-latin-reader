@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold.dart';
+import '../../widget/page_scaffold.dart';
 import 'frequency_settings_page.dart';
 import 'general_settings_page.dart';
 import 'library_settings_page.dart';
@@ -172,7 +173,7 @@ class _SettingsShellPageState extends State<SettingsShellPage> {
   Widget _unimplementedPage(String tabId) {
     final branch = mainBranches.where((b) => _extractId(b.id) == tabId).firstOrNull;
     final title = branch?.navDest.label ?? 'Settings';
-    return Scaffold(
+    return SafeBodyScaffold(
       appBar: AppBar(title: Text('$title Settings')),
       body: Center(child: Text('$title not implemented')),
     );

@@ -20,6 +20,7 @@ import '../../../component/word_frequency/resolved_freq_morph_form_api.dart';
 import '../../../component/word_frequency/word_frequency_api.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
@@ -35,7 +36,7 @@ class WordFrequencyPage extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     final filterAsync = ref.watch(activeFrequencyFilterProvider);
-    return Scaffold(
+    return SafeBodyScaffold(
       appBar: AppBar(
         title: const Text('Word Frequency'),
         notificationPredicate: (_) => false, //only the table scrolls

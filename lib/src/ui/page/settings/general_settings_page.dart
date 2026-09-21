@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/settings/general_settings_api.dart';
+import '../../widget/page_scaffold.dart';
 import '../../widget/responsive_coordinate_grid.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -13,7 +14,7 @@ class GeneralSettingsPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(context, ref) => Scaffold(
+  Widget build(context, ref) => SafeBodyScaffold(
     appBar: AppBar(title: const Text('Settings')),
     body: ref
         .watch(generalSettingsNotifierProvider)

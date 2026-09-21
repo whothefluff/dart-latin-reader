@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/morph_analysis/enriched_morph_details_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
+import '../../widget/page_scaffold.dart';
 import 'common.dart';
 
 class MorphologicalDataPage extends ConsumerWidget {
@@ -14,7 +15,7 @@ class MorphologicalDataPage extends ConsumerWidget {
   final AnalysisKeys keys;
 
   @override
-  Widget build(context, ref) => Scaffold(
+  Widget build(context, ref) => SafeBodyScaffold(
     appBar: AppBar(title: _title(ref)),
     body: MorphologicalDataView(keys: keys),
   );
