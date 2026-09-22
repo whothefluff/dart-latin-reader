@@ -1119,7 +1119,7 @@ Future<void> _onRowTapped(
     final view =
         ref.read(frequencyViewSettingsNotifierProvider).valueOrNull ?? const FrequencySettings();
     final choice = switch (view.formTapAction) {
-      FormTapAction.ask => await _askDestination(context),
+      FormTapAction.ask => await _askDestination(context, row.displayForm),
       FormTapAction.openMorphology => _RowDestination.morphology,
       FormTapAction.openDictionary => _RowDestination.dictionary,
     };
@@ -1142,26 +1142,24 @@ Future<void> _onRowTapped(
   }
 }
 
-Future<_RowDestination?> _askDestination(BuildContext context) =>
-    showModalBottomSheet<_RowDestination>(
+Future<_RowDestination?> _askDestination(BuildContext context, String form) =>
+    showDialog<_RowDestination>(
       context: context,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.auto_stories_outlined),
-              title: const Text('Morphology'),
-              onTap: () => Navigator.pop(context, _RowDestination.morphology),
-            ),
-            ListTile(
-              leading: const Icon(Icons.menu_book_outlined),
-              title: const Text('Dictionary'),
-              onTap: () => Navigator.pop(context, _RowDestination.dictionary),
-            ),
-          ],
-        ),
+      builder: (context) => SimpleDialog(
+        title: Text(form),
+        children: [
+          ListTile(
+            leading: const Icon(Icons.auto_stories_outlined),
+            title: const Text('Morphology'),
+            onTap: () => Navigator.pop(context, _RowDestination.morphology),
+          ),
+          ListTile(
+            leading: const Icon(Icons.menu_book_outlined),
+            title: const Text('Dictionary'),
+            onTap: () => Navigator.pop(context, _RowDestination.dictionary),
+          ),
+        ],
       ),
-      clipBehavior: Clip.antiAlias,
     );
 
 Future<void> _goToMorphologyForForm(
@@ -1277,17 +1275,14 @@ Future<void> _goToDictionaryForForm(
 
 Future<String?> _pickLemma(BuildContext context, List<String> lemmas) => lemmas.length == 1
     ? Future.value(lemmas.first)
-    : showModalBottomSheet<String>(
+    : showDialog<String>(
         context: context,
-        builder: (context) => SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            children: lemmas
-                .map((l) => ListTile(title: Text(l), onTap: () => Navigator.pop(context, l)))
-                .toList(),
-          ),
+        builder: (context) => SimpleDialog(
+          title: const Text('Which lemma?'),
+          children: lemmas
+              .map((l) => ListTile(title: Text(l), onTap: () => Navigator.pop(context, l)))
+              .toList(),
         ),
-        clipBehavior: Clip.antiAlias,
       );
 
 Future<void> _goToDictionaryForLemma(
