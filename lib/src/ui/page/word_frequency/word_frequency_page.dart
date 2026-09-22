@@ -75,7 +75,7 @@ class _WordFrequencyBody extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _FilterBar(filter: filter, layout: layout),
+        _FilterSummaryBar(layout: layout),
         const Divider(height: 1),
         Expanded(
           child: reportAsync.when(
@@ -91,18 +91,12 @@ class _WordFrequencyBody extends ConsumerWidget {
   //
 }
 
-class _FilterBar extends ConsumerWidget {
-  const _FilterBar({
-    required this.filter,
+class _FilterSummaryBar extends ConsumerWidget {
+  const _FilterSummaryBar({
     required this.layout,
   });
 
-  final FrequencyFilter filter;
   final _Layout layout;
-  static const List<int> _presetPageSizes = [10, 100, 1000];
-
-  /// Dropdown value of the "Custom…" entry (real page sizes are always positive)
-  static const int _customPageSizeSentinel = -1;
 
   @override
   Widget build(context, ref) {
@@ -110,141 +104,237 @@ class _FilterBar extends ConsumerWidget {
     final settings =
         ref.watch(frequencyFilterSettingsNotifierProvider).valueOrNull ??
         const FrequencyFilterSettings();
-    final notifier = ref.read(frequencyFilterSettingsNotifierProvider.notifier);
     final catalog = ref.watch(libraryCatalogProvider).valueOrNull;
     final count = _Formats(Localizations.localeOf(context)).count;
     final atDefaults = selection.isEmpty && settings == const FrequencyFilterSettings();
-    // include the current custom size so the dropdown can display it
-    final pageSizes = {..._presetPageSizes, settings.pageSize}.sorted((a, b) => a.compareTo(b));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          // Clear's TextButton supplies the final 8 px of the end margin
-          padding: EdgeInsetsDirectional.fromSTEB(layout.margin, 12, layout.margin - 8, 12),
-          child: Row(
-            children: [
-              Expanded(
-                child: _LibraryFilterField(
-                  summary: _selectionSummary(selection, count),
-                  onTap: catalog == null
-                      ? null
-                      : () => _pickWorks(context, ref, catalog, selection),
-                ),
+    return InkWell(
+      //null while the catalog is loading, as the sheet cannot offer works yet
+      onTap: catalog == null ? null : () => _edit(context, ref, catalog, selection, settings),
+      child: Padding(
+        // Clear's TextButton supplies the final 8 px of the end margin
+        padding: EdgeInsetsDirectional.fromSTEB(layout.margin, 4, layout.margin - 8, 4),
+        child: Row(
+          children: [
+            const Icon(Icons.checklist),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _filterSummary(selection, settings, count),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(width: 8),
-              Tooltip(
-                message: 'Reset all filters to their defaults',
-                child: TextButton(
-                  onPressed: atDefaults
-                      ? null
-                      : () async {
-                          ref
-                              .read(librarySelectionNotifierProvider.notifier)
-                              .updateSelection(const LibrarySelection.empty());
-                          await notifier.updateSettings(const FrequencyFilterSettings());
-                        },
-                  child: const Text('Clear'),
-                ),
+            ),
+            Tooltip(
+              message: 'Reset all filters to their defaults',
+              child: TextButton(
+                onPressed: atDefaults ? null : () => _clear(ref),
+                child: const Text('Clear'),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        const Divider(height: 1),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: layout.margin, vertical: 4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _OptionRow(
-                start: _LabeledDropdown<int>(
-                  label: 'Per page:',
-                  value: settings.pageSize,
-                  items: [
-                    for (final size in pageSizes)
-                      DropdownMenuItem(value: size, child: Text(count.format(size))),
-                    const DropdownMenuItem(value: _customPageSizeSentinel, child: Text('Custom…')),
-                  ],
-                  // Exclude "Custom…" so the button width follows the numeric entries
-                  selectedItemBuilder: (_) => [
-                    for (final size in pageSizes) Text(count.format(size)),
-                    const SizedBox.shrink(),
-                  ],
-                  onChanged: (v) async {
-                    final size = v == _customPageSizeSentinel
-                        ? await _promptCustomPageSize(context, settings.pageSize)
-                        : v;
-                    if (size != null && size > 0) {
-                      await notifier.updateSettings(settings.copyWith(pageSize: size));
-                    }
-                  },
-                ),
-                end: _LabeledCheckbox(
-                  label: 'Group by Lemma',
-                  value: settings.groupByLemma,
-                  onChanged: (v) => notifier.updateSettings(settings.copyWith(groupByLemma: v)),
-                ),
-              ),
-              _OptionRow(
-                start: _LabeledDropdown<bool>(
-                  label: 'Order:',
-                  value: settings.ascending,
-                  items: const [
-                    DropdownMenuItem(value: false, child: Text('Descending')),
-                    DropdownMenuItem(value: true, child: Text('Ascending')),
-                  ],
-                  onChanged: (v) async {
-                    if (v != null) {
-                      await notifier.updateSettings(settings.copyWith(ascending: v));
-                    }
-                  },
-                ),
-                end: _LabeledCheckbox(
-                  label: 'Consider Macrons',
-                  //lemmas don't have macrons, so display that (the saved choice is kept)
-                  value: settings.showMacrons && !settings.groupByLemma,
-                  disabledReason: 'Macrons do not change lemma counts',
-                  onChanged: settings.groupByLemma
-                      ? null
-                      : (v) => notifier.updateSettings(settings.copyWith(showMacrons: v)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  /// Opens the library filter dialog and applies the selection returned by Done
-  Future<void> _pickWorks(
+  /// Opens the sheet and commits changes
+  Future<void> _edit(
     BuildContext context,
     WidgetRef ref,
     LibraryCatalog catalog,
-    LibrarySelection current,
+    LibrarySelection selection,
+    FrequencyFilterSettings settings,
   ) async {
-    final picked = await showDialog<LibrarySelection>(
+    final edited = await showModalBottomSheet<_FilterEdit>(
       context: context,
-      builder: (context) => LibraryFilterDialog(catalog: catalog, selection: current),
+      isScrollControlled: true, // the controls are taller than the default sheet in landscape
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (context) =>
+          _FilterSheet(catalog: catalog, selection: selection, settings: settings),
     );
-    if (picked != null) {
-      ref.read(librarySelectionNotifierProvider.notifier).updateSelection(picked);
+    if (edited != null) {
+      ref.read(librarySelectionNotifierProvider.notifier).updateSelection(edited.selection);
+      await ref
+          .read(frequencyFilterSettingsNotifierProvider.notifier)
+          .updateSettings(edited.settings);
     }
   }
 
-  Future<int?> _promptCustomPageSize(BuildContext context, int current) => showDialog<int>(
-    context: context,
-    builder: (context) => _CustomPageSizeDialog(initial: current),
-  );
-
-  String _selectionSummary(LibrarySelection selection, NumberFormat count) {
-    final sources = selection.sourceCount;
-    final works = selection.allWorkIds.length;
-    return selection.isEmpty
-        ? 'All authors & works'
-        : '${count.format(sources)} source${sources == 1 ? '' : 's'}, '
-              '${count.format(works)} work${works == 1 ? '' : 's'}';
+  Future<void> _clear(WidgetRef ref) async {
+    ref
+        .read(librarySelectionNotifierProvider.notifier)
+        .updateSelection(const LibrarySelection.empty());
+    await ref
+        .read(frequencyFilterSettingsNotifierProvider.notifier)
+        .updateSettings(const FrequencyFilterSettings());
   }
+
+  //
+}
+
+/// "All authors & works · by form, macrons · 100 per page · descending"
+String _filterSummary(
+  LibrarySelection selection,
+  FrequencyFilterSettings settings,
+  NumberFormat count,
+) {
+  final grouping = settings.groupByLemma ? 'by lemma' : 'by form';
+  final macrons = settings.showMacrons && !settings.groupByLemma ? ', macrons' : '';
+  final order = settings.ascending ? 'ascending' : 'descending';
+  return '${_selectionSummary(selection, count)} · $grouping$macrons · '
+      '${count.format(settings.pageSize)} per page · $order';
+}
+
+/// "All authors & works", or "2 sources, 7 works"
+String _selectionSummary(LibrarySelection selection, NumberFormat count) {
+  final sources = selection.sourceCount;
+  final works = selection.allWorkIds.length;
+  return selection.isEmpty
+      ? 'All authors & works'
+      : '${count.format(sources)} source${sources == 1 ? '' : 's'}, '
+            '${count.format(works)} work${works == 1 ? '' : 's'}';
+}
+
+/// What [_FilterSheet] hands back when the user is done with it
+typedef _FilterEdit = ({LibrarySelection selection, FrequencyFilterSettings settings});
+
+class _FilterSheet extends StatefulWidget {
+  const _FilterSheet({
+    required this.catalog,
+    required this.selection,
+    required this.settings,
+  });
+
+  final LibraryCatalog catalog;
+  final LibrarySelection selection;
+  final FrequencyFilterSettings settings;
+
+  @override
+  State<_FilterSheet> createState() => _FilterSheetState();
+  //
+}
+
+class _FilterSheetState extends State<_FilterSheet> {
+  //
+
+  /// Dropdown value of the "Custom…" entry (real page sizes are always positive)
+  static const int _customPageSizeSentinel = -1;
+  static const List<int> _presetPageSizes = [10, 100, 1000];
+  late LibrarySelection _selection = widget.selection;
+  late FrequencyFilterSettings _settings = widget.settings;
+
+  @override
+  Widget build(context) {
+    final count = _Formats(Localizations.localeOf(context)).count;
+    // include the current custom size so the dropdown can display it
+    final pageSizes = {..._presetPageSizes, _settings.pageSize}.sorted((a, b) => a.compareTo(b));
+    final atDefaults = _selection.isEmpty && _settings == const FrequencyFilterSettings();
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _LibraryFilterField(
+            summary: _selectionSummary(_selection, count),
+            onTap: _pickWorks,
+          ),
+          const SizedBox(height: 8),
+          _OptionRow(
+            start: _LabeledDropdown<int>(
+              label: 'Per page:',
+              value: _settings.pageSize,
+              items: [
+                ...pageSizes.map(
+                  (size) => DropdownMenuItem(value: size, child: Text(count.format(size))),
+                ),
+                const DropdownMenuItem(value: _customPageSizeSentinel, child: Text('Custom…')),
+              ],
+              // Exclude "Custom…" so the button width follows the numeric entries
+              selectedItemBuilder: (_) => [
+                ...pageSizes.map(
+                  (size) => Text(count.format(size)),
+                ),
+                const SizedBox.shrink(),
+              ],
+              onChanged: (v) async {
+                final size = v == _customPageSizeSentinel
+                    ? await showDialog<int>(
+                        context: context,
+                        builder: (context) => _CustomPageSizeDialog(initial: _settings.pageSize),
+                      )
+                    : v;
+                if (size != null && size > 0 && mounted) {
+                  setState(() => _settings = _settings.copyWith(pageSize: size));
+                }
+              },
+            ),
+            end: _LabeledCheckbox(
+              label: 'Group by Lemma',
+              value: _settings.groupByLemma,
+              onChanged: (v) => setState(() => _settings = _settings.copyWith(groupByLemma: v)),
+            ),
+          ),
+          _OptionRow(
+            start: _LabeledDropdown<bool>(
+              label: 'Order:',
+              value: _settings.ascending,
+              items: const [
+                DropdownMenuItem(value: false, child: Text('Descending')),
+                DropdownMenuItem(value: true, child: Text('Ascending')),
+              ],
+              onChanged: (v) {
+                if (v != null) {
+                  setState(() => _settings = _settings.copyWith(ascending: v));
+                }
+              },
+            ),
+            end: _LabeledCheckbox(
+              label: 'Consider Macrons',
+              //lemmas don't have macrons, so display that (the saved choice is kept)
+              value: _settings.showMacrons && !_settings.groupByLemma,
+              disabledReason: 'Macrons do not change lemma counts',
+              onChanged: _settings.groupByLemma
+                  ? null
+                  : (v) => setState(() => _settings = _settings.copyWith(showMacrons: v)),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OverflowBar(
+            alignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: atDefaults ? null : _reset,
+                child: const Text('Clear'),
+              ),
+              FilledButton(
+                onPressed: () =>
+                    Navigator.pop(context, (selection: _selection, settings: _settings)),
+                child: const Text('Done'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Opens the library filter dialog and keeps the selection it returns
+  Future<void> _pickWorks() async {
+    final picked = await showDialog<LibrarySelection>(
+      context: context,
+      builder: (context) => LibraryFilterDialog(catalog: widget.catalog, selection: _selection),
+    );
+    if (picked != null && mounted) {
+      setState(() => _selection = picked);
+    }
+  }
+
+  void _reset() => setState(() {
+    _selection = const LibrarySelection.empty();
+    _settings = const FrequencyFilterSettings();
+  });
 
   //
 }
@@ -517,24 +607,23 @@ class _ReportView extends ConsumerWidget {
           ),
         ),
         const Divider(height: 1),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                tooltip: 'Previous page',
-                onPressed: filter.offset > 0 ? () => _loadPrevPage(offsetNotifier) : null,
-              ),
-              Text(_pageRange(formats.count, total)),
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                tooltip: 'Next page',
-                onPressed: hasNextPage ? () => _loadNextPage(offsetNotifier) : null,
-              ),
-            ],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_left),
+              tooltip: 'Previous page',
+              visualDensity: VisualDensity.compact,
+              onPressed: filter.offset > 0 ? () => _loadPrevPage(offsetNotifier) : null,
+            ),
+            Text(_pageRange(formats.count, total)),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              tooltip: 'Next page',
+              visualDensity: VisualDensity.compact,
+              onPressed: hasNextPage ? () => _loadNextPage(offsetNotifier) : null,
+            ),
+          ],
         ),
       ],
     );
@@ -595,45 +684,75 @@ class _ReportSummary extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final count = formats.count;
     final theme = Theme.of(context);
     final note = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
-    final coverage = report.base.coverage;
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: layout.margin, vertical: 8),
-      child: Column(
-        children: [
-          if (!filter.groupByLemma)
-            Text(
-              'Showing ${count.format(report.rows.length)} of '
-              '${count.format(report.totalForms)} unique forms',
-              textAlign: TextAlign.center,
+    return InkWell(
+      onTap: () => _showNotes(context),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: layout.margin, vertical: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Text(_headline(), style: note, maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
-          Text(
-            'Representing ${count.format(report.representedLemmas)} of '
-            '${count.format(report.totalLemmas)} possible lemmas',
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${count.format(coverage.totalTokens)} counted units: '
-            '${count.format(coverage.noCandidateTokens)} with no candidate lemma, '
-            '${count.format(coverage.singleCandidateTokens)} with one, '
-            '${count.format(coverage.multipleCandidateTokens)} with several.',
-            style: note,
-            textAlign: TextAlign.center,
-          ),
-          if (filter.groupByLemma)
-            Text(
-              'Counts are possible occurrences: the same occurrence can count '
-              'towards more than one lemma. SINGLE counts the occurrences where '
-              'this was the only candidate in the available analyses.',
-              style: note,
-              textAlign: TextAlign.center,
-            ),
-        ],
+            const SizedBox(width: 6),
+            Icon(Icons.info_outline, size: 14, color: note?.color),
+          ],
+        ),
       ),
     );
+  }
+
+  /// "108 of 3,695 lemmas · 11,593 counted units"
+  String _headline() {
+    final count = formats.count;
+    final units = '${count.format(report.base.coverage.totalTokens)} counted units';
+    return filter.groupByLemma
+        ? units
+        : '${count.format(report.representedLemmas)} of '
+              '${count.format(report.totalLemmas)} lemmas · $units';
+  }
+
+  Future<void> _showNotes(BuildContext context) => showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Counted units'),
+      content: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'A unit is one counted word. A word written with an enclitic '
+              'counts as two units.',
+            ),
+            const SizedBox(height: 12),
+            Text(_coverage()),
+            if (filter.groupByLemma) ...[
+              const SizedBox(height: 12),
+              const Text(
+                'Counts are possible occurrences: the same occurrence can count '
+                'towards more than one lemma. SINGLE counts the occurrences where '
+                'this was the only candidate in the available analyses.',
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+      ],
+    ),
+  );
+
+  String _coverage() {
+    final count = formats.count;
+    final coverage = report.base.coverage;
+    return '${count.format(coverage.totalTokens)} counted units: '
+        '${count.format(coverage.noCandidateTokens)} with no candidate lemma, '
+        '${count.format(coverage.singleCandidateTokens)} with one, '
+        '${count.format(coverage.multipleCandidateTokens)} with several.';
   }
 
   //
