@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'keyboard_closing_search_bar.dart';
+
 class SearchableAppBar extends AppBar {
   SearchableAppBar({
     super.key,
@@ -15,7 +17,9 @@ class SearchableAppBar extends AppBar {
              : null,
          title: Row(
            children: [
-             Expanded(child: SearchAnchor.bar(suggestionsBuilder: searchSuggestionsBuilder)),
+             Expanded(
+               child: KeyboardClosingSearchBar(suggestionsBuilder: searchSuggestionsBuilder),
+             ),
            ],
          ),
          actions: [
