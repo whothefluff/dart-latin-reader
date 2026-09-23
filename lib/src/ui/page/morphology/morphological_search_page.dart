@@ -6,6 +6,7 @@ import '../../../../logger.dart';
 import '../../../component/morph_analysis/enriched_morph_search_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../router/config.dart';
+import '../../widget/keyboard_closing_search_bar.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
@@ -56,7 +57,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
           children: [
             Expanded(
               key: ValueKey('search-anchor-${size.width}-$size.height}'),
-              child: SearchAnchor.bar(
+              child: KeyboardClosingSearchBar(
                 searchController: _searchController,
                 barHintText: 'Search forms (e.g., adv*, vid?s, "sum")...',
                 isFullScreen: true,
