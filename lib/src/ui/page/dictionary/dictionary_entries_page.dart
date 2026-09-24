@@ -193,7 +193,7 @@ class _AlphabetNavigationState extends ConsumerState<AlphabetNavigation> {
 
   Widget sidebar(BoxConstraints constraints) =>
       constraints.maxHeight < Breakpoints.large.beginHeight!
-      ? MagnifiableAlphabetSidebar(alphabet, constraints, onLetterSelected: scrollToLetter)
+      ? ScrubbableAlphabetSidebar(alphabet, constraints, onLetterSelected: scrollToLetter)
       : TappableAlphabetSidebar(alphabet, onLetterSelected: scrollToLetter);
 
   bool fits(BuildContext context, BoxConstraints constraints) {
@@ -257,8 +257,8 @@ class TappableAlphabetSidebar extends StatelessWidget {
   //
 }
 
-class MagnifiableAlphabetSidebar extends StatefulWidget {
-  const MagnifiableAlphabetSidebar(
+class ScrubbableAlphabetSidebar extends StatefulWidget {
+  const ScrubbableAlphabetSidebar(
     this.alphabet,
     this.constraints, {
     super.key,
@@ -270,25 +270,30 @@ class MagnifiableAlphabetSidebar extends StatefulWidget {
   final void Function(String letter) onLetterSelected;
 
   @override
-  State<MagnifiableAlphabetSidebar> createState() => _MagnifiableAlphabetSidebarState();
+  State<ScrubbableAlphabetSidebar> createState() => _ScrubbableAlphabetSidebarState();
   //
 }
 
-class _MagnifiableAlphabetSidebarState extends State<MagnifiableAlphabetSidebar> {
+class _ScrubbableAlphabetSidebarState extends State<ScrubbableAlphabetSidebar> {
   //
+  static const double _bubbleSize = 56;
+
+  /// space between the bubble and the sidebar, so the finger on the sidebar doesn't cover it
+  static const double _bubbleGap = 16;
+
   late final double totalHeight = widget.constraints.maxHeight;
   late final double letterHeight = totalHeight / widget.alphabet.length;
-  Offset _magnifierPosition = Offset.zero;
   var _currentLetter = '';
+  Offset _bubbleTopLeft = Offset.zero;
   OverlayEntry? _overlayEntry;
 
   @override
   Widget build(context) => SizedBox(
     width: 30,
     child: GestureDetector(
-      onLongPressStart: (details) => showMagnifier(details.localPosition),
-      onLongPressMoveUpdate: (det) => updateMagnifier(det.localPosition),
-      onLongPressEnd: (_) => hideMagnifier(and: widget.onLetterSelected),
+      onLongPressStart: (details) => showBubble(details.localPosition),
+      onLongPressMoveUpdate: (det) => updateBubble(det.localPosition),
+      onLongPressEnd: (_) => hideBubble(and: widget.onLetterSelected),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: widget.alphabet
@@ -307,34 +312,38 @@ class _MagnifiableAlphabetSidebarState extends State<MagnifiableAlphabetSidebar>
 
   OverlayEntry createOverlayEntry() => OverlayEntry(
     builder: (context) => Positioned(
-      //the sidebar now sits inside the page's safe area, so the magnifier follows it in
-      right: MediaQuery.paddingOf(context).right,
-      top: _magnifierPosition.dy,
-      child: const Magnifier(
-        additionalFocalPointOffset: Offset(25, -5),
-        clipBehavior: Clip.antiAlias,
+      left: _bubbleTopLeft.dx,
+      top: _bubbleTopLeft.dy,
+      width: _bubbleSize,
+      height: _bubbleSize,
+      child: Material(
+        color: ColorScheme.of(context).primaryContainer,
+        shape: const CircleBorder(),
+        elevation: 3,
+        child: Center(
+          child: Text(
+            _currentLetter,
+            style: TextTheme.of(context).headlineMedium?.copyWith(
+              color: ColorScheme.of(context).onPrimaryContainer,
+            ),
+          ),
+        ),
       ),
     ),
   );
 
-  void showMagnifier(Offset position) {
-    setState(() {
-      _currentLetter = getLetterAtPosition(position.dy);
-      _magnifierPosition = position;
-      _overlayEntry = createOverlayEntry();
-    });
+  void showBubble(Offset position) {
+    track(position);
+    _overlayEntry = createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
   }
 
-  void updateMagnifier(Offset position) {
-    setState(() {
-      _currentLetter = getLetterAtPosition(position.dy);
-      _magnifierPosition = position;
-      _overlayEntry?.markNeedsBuild();
-    });
+  void updateBubble(Offset position) {
+    track(position);
+    _overlayEntry?.markNeedsBuild();
   }
 
-  void hideMagnifier({required void Function(String letter) and}) {
+  void hideBubble({required void Function(String letter) and}) {
     setState(() {
       _overlayEntry?.remove();
       _overlayEntry = null;
@@ -342,9 +351,24 @@ class _MagnifiableAlphabetSidebarState extends State<MagnifiableAlphabetSidebar>
     and(_currentLetter);
   }
 
-  String getLetterAtPosition(double yPosition) {
-    final index = (yPosition / letterHeight).clamp(0, widget.alphabet.length - 1).toInt();
-    return widget.alphabet[index];
+  /// Picks the letter under [localPosition] and moves the bubble next to the finger.
+  ///
+  /// Converts the finger position from sidebar coordinates to overlay coordinates,
+  /// keeping the bubble beside the finger and within the overlay bounds.
+  void track(Offset localPosition) {
+    final sidebar = context.findRenderObject()! as RenderBox;
+    final overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
+    final index = (localPosition.dy / letterHeight).clamp(0, widget.alphabet.length - 1).toInt();
+    _currentLetter = widget.alphabet[index];
+    //anchor the bubble to the sidebar's left edge at the finger's vertical position
+    final anchor = sidebar.localToGlobal(
+      Offset(0, localPosition.dy.clamp(0.0, sidebar.size.height)),
+      ancestor: overlay,
+    );
+    _bubbleTopLeft = Offset(
+      (anchor.dx - _bubbleGap - _bubbleSize).clamp(0.0, overlay.size.width - _bubbleSize),
+      (anchor.dy - _bubbleSize / 2).clamp(0.0, overlay.size.height - _bubbleSize),
+    );
   }
 
   //
