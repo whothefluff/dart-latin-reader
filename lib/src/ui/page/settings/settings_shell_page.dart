@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold.dart';
 import '../../widget/page_scaffold.dart';
+import 'dictionary_settings_page.dart';
 import 'frequency_settings_page.dart';
 import 'general_settings_page.dart';
 import 'library_settings_page.dart';
@@ -26,6 +27,7 @@ class _SettingsShellPageState extends State<SettingsShellPage> {
   late final List<String> _tabIds;
   static const Map<String, Widget> implementedPages = {
     SettingsTab.library: LibrarySettingsPage(),
+    SettingsTab.dictionaries: DictionarySettingsPage(),
     SettingsTab.wordFrequency: FrequencySettingsPage(),
   };
 
