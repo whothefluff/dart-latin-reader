@@ -7,9 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/dictionary/dictionary_entry_senses_api.dart';
+import '../../../component/settings/dictionary_settings_api.dart';
+import '../../router/config.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
+import '../settings/settings_shell_page.dart' show SettingsTab;
 
 class DictionaryEntryPage extends ConsumerWidget {
   const DictionaryEntryPage(
@@ -23,7 +26,17 @@ class DictionaryEntryPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) => SafeBodyScaffold(
-    appBar: AppBar(title: Text(lemma)),
+    appBar: AppBar(
+      title: Text(lemma),
+      actions: [
+        IconButton(
+          tooltip: 'Dictionary settings',
+          icon: const Icon(Icons.settings),
+          onPressed: () async =>
+              const SettingsRoute(tab: SettingsTab.dictionaries).push<void>(context),
+        ),
+      ],
+    ),
     body: entriesList(ref, context),
   );
 
@@ -31,11 +44,23 @@ class DictionaryEntryPage extends ConsumerWidget {
       .watch(dictionaryEntrySensesProvider(dictionary, lemma))
       .when(
         data: (senses) => SingleChildScrollView(
-          child: _Senses(_groupSenses(senses)),
+          child: _senses(ref, senses),
         ),
         loading: showLoading,
         error: showError(ref, dictionaryEntrySensesProvider(dictionary, lemma)),
       );
+
+  _Senses _senses(WidgetRef ref, List<EntrySense> senses) {
+    final settings =
+        ref.watch(dictionarySettingsNotifierProvider).valueOrNull ?? const DictionarySettings();
+    return _Senses(
+      _groupSenses(senses),
+      // The settings can load after the senses, and a new value has to start them over
+      key: ValueKey(settings.openFirstSense),
+      openFirstSense: settings.openFirstSense,
+    );
+  }
+
   //
 }
 
@@ -52,10 +77,15 @@ LinkedHashMap<String, List<EntrySense>> _groupSenses(List<EntrySense> senses) =>
 /// The top-level senses of an entry, with at most one of them open
 class _Senses extends StatefulWidget {
   const _Senses(
-    this.groupedSenses,
-  );
+    this.groupedSenses, {
+    super.key,
+    required this.openFirstSense,
+  });
 
   final LinkedHashMap<String, List<EntrySense>> groupedSenses;
+
+  /// Whether the first sense starts open, when it has anything to open
+  final bool openFirstSense;
 
   @override
   State<_Senses> createState() => _SensesState();
@@ -65,6 +95,12 @@ class _Senses extends StatefulWidget {
 class _SensesState extends State<_Senses> {
   //
   String? _openLevel;
+
+  @override
+  void initState() {
+    super.initState();
+    _openLevel = widget.openFirstSense ? widget.groupedSenses.keys.firstOrNull : null;
+  }
 
   @override
   Widget build(context) => LayoutBuilder(

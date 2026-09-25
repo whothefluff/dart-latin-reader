@@ -4,16 +4,29 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latin_reader/src/component/dictionary/dictionary_entry_senses_api.dart';
+import 'package:latin_reader/src/component/settings/dictionary_settings_api.dart';
 import 'package:latin_reader/src/ui/page/dictionary/dictionary_entry_page.dart';
 
 /// Too long for one line of the test screen
 final String _long = 'long ' * 40;
+
+/// A saved setting, without the platform storage behind it
+class _SavedSettings extends DictionarySettingsNotifier {
+  _SavedSettings(this._settings);
+
+  final DictionarySettings _settings;
+
+  @override
+  Future<DictionarySettings> build() async => _settings;
+  //
+}
 
 // riverpod_lint only takes a scope passed straight to pumpWidget (or runApp) as the root one
 Future<void> _pumpPage(
   WidgetTester tester,
   List<String> prettyLevels, {
   Set<String> long = const {},
+  bool openFirstSense = false,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -28,6 +41,9 @@ Future<void> _pumpPage(
               ),
             ),
           ),
+        ),
+        dictionarySettingsNotifierProvider.overrideWith(
+          () => _SavedSettings(DictionarySettings(openFirstSense: openFirstSense)),
         ),
       ],
       child: const MaterialApp(home: DictionaryEntryPage('ls', 'amo')),
@@ -123,6 +139,22 @@ void main() {
       expect(copied, ['sense 1', 'sense 2']);
       expect(_expanded(tester), [false, false]);
       expect(find.text('Sense copied'), findsWidgets);
+    });
+
+    testWidgets('opens the first sense when set to', (tester) async {
+      // The setting loads after the senses here, as on the first entry after launch
+      await _pumpPage(tester, ['1', '1.1', '2', '2.1'], openFirstSense: true);
+
+      expect(_expanded(tester), [true, false]);
+      expect(_senseText('1.1'), findsOneWidget);
+    });
+
+    testWidgets('opens no sense when set to but the first one has nothing to open', (
+      tester,
+    ) async {
+      await _pumpPage(tester, ['1', '2', '2.1'], openFirstSense: true);
+
+      expect(_expanded(tester), [false]);
     });
   });
 }
