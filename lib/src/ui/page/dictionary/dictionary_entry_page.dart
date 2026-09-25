@@ -1,7 +1,9 @@
 import 'dart:collection';
+import 'dart:math' show max;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/dictionary/dictionary_entry_senses_api.dart';
@@ -18,17 +20,6 @@ class DictionaryEntryPage extends ConsumerWidget {
 
   final String dictionary;
   final String lemma;
-  // dart format off
-  static final Map<bool,
-                   ({int? maxLines, TextOverflow textOverflow})>
-      _toggle = {
-    true: (textOverflow: TextOverflow.visible, maxLines: null),
-    false: (textOverflow: TextOverflow.ellipsis, maxLines: 1),
-  };
-  // dart format on
-
-  /// The default of [ExpansionPanelList.expandedHeaderPadding]
-  static const _openHeaderPadding = EdgeInsets.symmetric(vertical: 16);
 
   @override
   Widget build(context, ref) => SafeBodyScaffold(
@@ -40,85 +31,187 @@ class DictionaryEntryPage extends ConsumerWidget {
       .watch(dictionaryEntrySensesProvider(dictionary, lemma))
       .when(
         data: (senses) => SingleChildScrollView(
-          child: sensesList(groupSenses(senses)),
+          child: _Senses(_groupSenses(senses)),
         ),
         loading: showLoading,
         error: showError(ref, dictionaryEntrySensesProvider(dictionary, lemma)),
       );
+  //
+}
 
-  Widget sensesList(LinkedHashMap<String, List<EntrySense>> groupedSenses) =>
-      switch (groupedSenses.values.toList()) {
-        [final hierarchy] => onlySense(hierarchy),
-        _ => ExpansionPanelList.radio(children: hierarchicalSenses(groupedSenses)),
-      };
+LinkedHashMap<String, List<EntrySense>> _groupSenses(List<EntrySense> senses) =>
+    LinkedHashMap.fromEntries(
+      groupBy(
+        senses,
+        (sense) => sense.prettyLevel.split('.').first,
+      ).entries.toList()..sort(
+        (a, b) => int.parse(a.key).compareTo(int.parse(b.key)),
+      ),
+    );
 
-  LinkedHashMap<String, List<EntrySense>> groupSenses(List<EntrySense> senses) =>
-      LinkedHashMap.fromEntries(
-        groupBy(
-          senses,
-          (sense) => sense.prettyLevel.split('.').first,
-        ).entries.toList()..sort(
-          (a, b) => int.parse(a.key).compareTo(int.parse(b.key)),
-        ),
-      );
+/// The top-level senses of an entry, with at most one of them open
+class _Senses extends StatefulWidget {
+  const _Senses(
+    this.groupedSenses,
+  );
 
-  List<ExpansionPanelRadio> hierarchicalSenses(
-    LinkedHashMap<String, List<EntrySense>> groupedSenses,
-  ) => groupedSenses
-      .map(
-        (level, hierarchy) => MapEntry(
-          level,
-          ExpansionPanelRadio(
-            canTapOnHeader: true,
-            value: level,
-            headerBuilder: topSense(hierarchy.first),
-            body: subsenses(hierarchy.sublist(1)),
-          ),
-        ),
-      )
-      .values
+  final LinkedHashMap<String, List<EntrySense>> groupedSenses;
+
+  @override
+  State<_Senses> createState() => _SensesState();
+  //
+}
+
+class _SensesState extends State<_Senses> {
+  //
+  String? _openLevel;
+
+  @override
+  Widget build(context) => LayoutBuilder(
+    builder: (context, constraints) => MergeableMaterial(
+      hasDividers: true,
+      children: _items(_tiles(context, constraints.maxWidth)),
+    ),
+  );
+
+  List<_SenseTile> _tiles(BuildContext context, double width) => widget.groupedSenses.entries
+      .map((group) => _tile(context, width, group.key, group.value))
       .toList();
 
-  ExpansionPanelHeaderBuilder topSense(EntrySense topSense) =>
-      (_, isExpanded) => TabulatedText(
-        textOverflow: _toggle[isExpanded]!.textOverflow,
-        prettyLevel: topSense.prettyLevel,
-        content: topSense.content,
-        maxLines: _toggle[isExpanded]!.maxLines,
-      );
+  _SenseTile _tile(BuildContext context, double width, String level, List<EntrySense> hierarchy) {
+    final top = TabulatedText(
+      prettyLevel: hierarchy.first.prettyLevel,
+      content: hierarchy.first.content,
+    );
+    final collapsible =
+        widget.groupedSenses.length > 1 &&
+        (hierarchy.length > 1 || !top.fitsOneLine(context, width - _SenseTile.arrowWidth));
+    return _SenseTile(
+      hierarchy,
+      collapsible: collapsible,
+      open: collapsible && _openLevel == level,
+      onToggle: () => setState(() => _openLevel = _openLevel == level ? null : level),
+    );
+  }
 
-  /// Looks like an open panel of [hierarchicalSenses] without the expand icon.
-  /// Selectable.
-  Widget onlySense(List<EntrySense> hierarchy) => MergeableMaterial(
-    children: [
-      MaterialSlice(
-        key: const ValueKey('onlySense'),
-        child: SelectionArea(
+  List<MergeableMaterialItem> _items(List<_SenseTile> tiles) => tiles
+      .expandIndexed(
+        (index, tile) => [
+          if (tile.open && index > 0) MaterialGap(key: ValueKey('gap ${index - 1}')),
+          MaterialSlice(key: ValueKey(tile.hierarchy.first.prettyLevel), child: tile),
+          if (tile.open && index < tiles.length - 1) MaterialGap(key: ValueKey('gap $index')),
+        ],
+      )
+      .toList();
+  //
+}
+
+/// A top-level sense over its subsenses.
+///
+/// When [collapsible], its header opens and closes it on tap, and copies the
+/// sense on long-press or right-click.
+/// Otherwise all of it is selectable
+class _SenseTile extends StatelessWidget {
+  const _SenseTile(
+    this.hierarchy, {
+    required this.collapsible,
+    required this.open,
+    required this.onToggle,
+  });
+
+  static const _arrowEndPadding = 8.0;
+  // dart format off
+  static final Map<bool,
+                   ({int? maxLines, TextOverflow textOverflow})>
+      _toggle = {
+    true: (textOverflow: TextOverflow.visible, maxLines: null),
+    false: (textOverflow: TextOverflow.ellipsis, maxLines: 1),
+  };
+  // dart format on
+
+  /// What the expand icon takes at the end of a header
+  static const double arrowWidth = kMinInteractiveDimension + _arrowEndPadding;
+
+  final List<EntrySense> hierarchy;
+  final bool collapsible;
+  final bool open;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(context) => collapsible
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            header(context),
+            body(),
+          ],
+        )
+      : SelectionArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: _openHeaderPadding,
-                child: TabulatedText(
-                  prettyLevel: hierarchy.first.prettyLevel,
-                  content: hierarchy.first.content,
-                ),
-              ),
-              subsenseList(hierarchy.sublist(1)),
+              topSense(),
+              subsenses(),
             ],
           ),
+        );
+
+  Widget header(BuildContext context) => MergeSemantics(
+    child: InkWell(
+      onTap: onToggle,
+      onLongPress: () async => copy(context),
+      onSecondaryTap: () async => copy(context),
+      child: Row(
+        children: [
+          Expanded(child: topSense()),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: _arrowEndPadding),
+            child: IgnorePointer(
+              child: SizedBox.square(
+                dimension: kMinInteractiveDimension,
+                child: ExpandIcon(
+                  isExpanded: open,
+                  padding: const EdgeInsets.all(12),
+                  onPressed: (_) => onToggle(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget body() => AnimatedSize(
+    duration: kThemeAnimationDuration,
+    curve: Curves.fastOutSlowIn,
+    alignment: Alignment.topCenter,
+    child: open
+        ? Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: SelectionArea(child: subsenses()),
+          )
+        : const SizedBox(width: double.infinity),
+  );
+
+  Widget topSense() => ConstrainedBox(
+    constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
+    child: Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: TabulatedText(
+          textOverflow: _toggle[!collapsible || open]!.textOverflow,
+          prettyLevel: hierarchy.first.prettyLevel,
+          content: hierarchy.first.content,
+          maxLines: _toggle[!collapsible || open]!.maxLines,
         ),
       ),
-    ],
+    ),
   );
 
-  Widget subsenses(List<EntrySense> senses) => Container(
-    alignment: Alignment.centerLeft,
-    child: SelectionArea(child: subsenseList(senses)),
-  );
-
-  Widget subsenseList(List<EntrySense> senses) {
-    final subsenses = groupSenses(senses).values.toList();
+  Widget subsenses() {
+    final subsenses = _groupSenses(hierarchy.sublist(1)).values.toList();
     const interline = EdgeInsets.symmetric(vertical: 8.0);
     return Column(
       children: subsenses
@@ -140,6 +233,13 @@ class DictionaryEntryPage extends ConsumerWidget {
           )
           .toList(),
     );
+  }
+
+  Future<void> copy(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: hierarchy.first.content));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sense copied')));
+    }
   }
 
   //
@@ -172,6 +272,19 @@ class TabulatedText extends StatelessWidget {
     overflow: textOverflow,
     maxLines: maxLines,
   );
+
+  /// Whether all of it fits in one line of [width], indentation included
+  bool fitsOneLine(BuildContext context, double width) {
+    final painter = TextPainter(
+      text: TextSpan(style: DefaultTextStyle.of(context).style, children: _textContent(context)),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+    )..layout(maxWidth: max(0.0, width - _indentation()));
+    final fits = !painter.didExceedMaxLines;
+    painter.dispose();
+    return fits;
+  }
 
   List<TextSpan> _textContent(BuildContext context) => [
     TextSpan(
