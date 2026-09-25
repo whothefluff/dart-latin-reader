@@ -1,19 +1,33 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latin_reader/src/component/dictionary/dictionary_entry_senses_api.dart';
 import 'package:latin_reader/src/ui/page/dictionary/dictionary_entry_page.dart';
 
-EntrySense _sense(String prettyLevel) =>
-    EntrySense(prettyLevel: prettyLevel, content: 'sense $prettyLevel', quotes: const []);
+/// Too long for one line of the test screen
+final String _long = 'long ' * 40;
 
 // riverpod_lint only takes a scope passed straight to pumpWidget (or runApp) as the root one
-Future<void> _pumpPage(WidgetTester tester, List<String> prettyLevels) async {
+Future<void> _pumpPage(
+  WidgetTester tester,
+  List<String> prettyLevels, {
+  Set<String> long = const {},
+}) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         dictionaryEntrySensesProvider('ls', 'amo').overrideWith(
-          (_) => DictionaryEntrySenses(prettyLevels.map(_sense)),
+          (_) => DictionaryEntrySenses(
+            prettyLevels.map(
+              (level) => EntrySense(
+                prettyLevel: level,
+                content: long.contains(level) ? _long : 'sense $level',
+                quotes: const [],
+              ),
+            ),
+          ),
         ),
       ],
       child: const MaterialApp(home: DictionaryEntryPage('ls', 'amo')),
@@ -23,6 +37,9 @@ Future<void> _pumpPage(WidgetTester tester, List<String> prettyLevels) async {
 }
 
 Finder _senseText(String prettyLevel) => find.text('$prettyLevel. sense $prettyLevel');
+
+List<bool> _expanded(WidgetTester tester) =>
+    tester.widgetList<ExpandIcon>(find.byType(ExpandIcon)).map((icon) => icon.isExpanded).toList();
 
 void main() {
   group('DictionaryEntryPage', () {
@@ -45,11 +62,67 @@ void main() {
       expect(find.descendant(of: area, matching: _senseText('1.1')), findsOneWidget);
     });
 
-    testWidgets('keeps several top-level senses as closed panels', (tester) async {
-      await _pumpPage(tester, ['1', '1.1', '2']);
+    testWidgets('makes collapsible only the senses that hide something, the rest selectable', (
+      tester,
+    ) async {
+      await _pumpPage(tester, ['1', '1.1', '2', '3'], long: {'3'});
 
-      final icons = tester.widgetList<ExpandIcon>(find.byType(ExpandIcon));
-      expect(icons.map((icon) => icon.isExpanded), [false, false]);
+      expect(_expanded(tester), [false, false]);
+      expect(
+        find.ancestor(of: _senseText('2'), matching: find.byType(SelectionArea)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('opens and closes a sense by tapping its header', (tester) async {
+      await _pumpPage(tester, ['1', '1.1', '2', '2.1']);
+      expect(_senseText('1.1'), findsNothing);
+
+      await tester.tap(_senseText('1'));
+      await tester.pumpAndSettle();
+      expect(_expanded(tester), [true, false]);
+      expect(_senseText('1.1'), findsOneWidget);
+
+      await tester.tap(_senseText('1'));
+      await tester.pumpAndSettle();
+      expect(_expanded(tester), [false, false]);
+      expect(_senseText('1.1'), findsNothing);
+    });
+
+    testWidgets('closes the open sense when another one opens', (tester) async {
+      await _pumpPage(tester, ['1', '1.1', '2', '2.1']);
+
+      await tester.tap(_senseText('1'));
+      await tester.pumpAndSettle();
+      await tester.tap(_senseText('2'));
+      await tester.pumpAndSettle();
+
+      expect(_expanded(tester), [false, true]);
+    });
+
+    testWidgets('copies a sense by long-pressing or right-clicking its header', (tester) async {
+      final copied = <Object?>[];
+      final messenger = tester.binding.defaultBinaryMessenger
+        ..setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          if (call.method == 'Clipboard.setData') {
+            copied.add((call.arguments as Map<Object?, Object?>)['text']);
+          }
+          return null;
+        });
+      addTearDown(() => messenger.setMockMethodCallHandler(SystemChannels.platform, null));
+      await _pumpPage(tester, ['1', '1.1', '2', '2.1']);
+
+      await tester.longPress(_senseText('1'));
+      await tester.tap(
+        _senseText('2'),
+        buttons: kSecondaryMouseButton,
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.pumpAndSettle();
+
+      expect(copied, ['sense 1', 'sense 2']);
+      expect(_expanded(tester), [false, false]);
+      expect(find.text('Sense copied'), findsWidgets);
     });
   });
 }
