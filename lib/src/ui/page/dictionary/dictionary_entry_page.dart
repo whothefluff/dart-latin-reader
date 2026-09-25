@@ -27,6 +27,9 @@ class DictionaryEntryPage extends ConsumerWidget {
   };
   // dart format on
 
+  /// The default of [ExpansionPanelList.expandedHeaderPadding]
+  static const _openHeaderPadding = EdgeInsets.symmetric(vertical: 16);
+
   @override
   Widget build(context, ref) => SafeBodyScaffold(
     appBar: AppBar(title: Text(lemma)),
@@ -37,13 +40,17 @@ class DictionaryEntryPage extends ConsumerWidget {
       .watch(dictionaryEntrySensesProvider(dictionary, lemma))
       .when(
         data: (senses) => SingleChildScrollView(
-          child: ExpansionPanelList.radio(
-            children: hierarchicalSenses(groupSenses(senses)),
-          ),
+          child: sensesList(groupSenses(senses)),
         ),
         loading: showLoading,
         error: showError(ref, dictionaryEntrySensesProvider(dictionary, lemma)),
       );
+
+  Widget sensesList(LinkedHashMap<String, List<EntrySense>> groupedSenses) =>
+      switch (groupedSenses.values.toList()) {
+        [final hierarchy] => onlySense(hierarchy),
+        _ => ExpansionPanelList.radio(children: hierarchicalSenses(groupedSenses)),
+      };
 
   LinkedHashMap<String, List<EntrySense>> groupSenses(List<EntrySense> senses) =>
       LinkedHashMap.fromEntries(
@@ -80,33 +87,58 @@ class DictionaryEntryPage extends ConsumerWidget {
         maxLines: _toggle[isExpanded]!.maxLines,
       );
 
-  Widget subsenses(List<EntrySense> senses) {
-    final subsenses = groupSenses(senses).values.toList();
-    const interline = EdgeInsets.symmetric(vertical: 8.0);
-    return Container(
-      alignment: Alignment.centerLeft,
-      child: SelectionArea(
-        child: Column(
-          children: subsenses
-              .map(
-                (senses) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: senses
-                      .map(
-                        (sense) => Padding(
-                          padding: interline,
-                          child: TabulatedText(
-                            prettyLevel: sense.prettyLevel,
-                            content: sense.content,
-                          ),
-                        ),
-                      )
-                      .toList(),
+  /// Looks like an open panel of [hierarchicalSenses] without the expand icon.
+  /// Selectable.
+  Widget onlySense(List<EntrySense> hierarchy) => MergeableMaterial(
+    children: [
+      MaterialSlice(
+        key: const ValueKey('onlySense'),
+        child: SelectionArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: _openHeaderPadding,
+                child: TabulatedText(
+                  prettyLevel: hierarchy.first.prettyLevel,
+                  content: hierarchy.first.content,
                 ),
-              )
-              .toList(),
+              ),
+              subsenseList(hierarchy.sublist(1)),
+            ],
+          ),
         ),
       ),
+    ],
+  );
+
+  Widget subsenses(List<EntrySense> senses) => Container(
+    alignment: Alignment.centerLeft,
+    child: SelectionArea(child: subsenseList(senses)),
+  );
+
+  Widget subsenseList(List<EntrySense> senses) {
+    final subsenses = groupSenses(senses).values.toList();
+    const interline = EdgeInsets.symmetric(vertical: 8.0);
+    return Column(
+      children: subsenses
+          .map(
+            (senses) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: senses
+                  .map(
+                    (sense) => Padding(
+                      padding: interline,
+                      child: TabulatedText(
+                        prettyLevel: sense.prettyLevel,
+                        content: sense.content,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          )
+          .toList(),
     );
   }
 
