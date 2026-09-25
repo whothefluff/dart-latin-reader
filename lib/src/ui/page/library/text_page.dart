@@ -26,6 +26,7 @@ import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
+import 'reader_input.dart';
 import 'work_index_sheet.dart';
 
 /// Line terminator that will be stable across all platforms even after rendering
@@ -89,6 +90,7 @@ class TextPageState extends ConsumerState<TextPage> {
   var _contentGeneration = 0;
   var _pageReady = false;
   var _indexOpen = false;
+  var _navMenuOpen = false;
   int _toIndex = _initialBufferSize - 1;
   _PageFlow _pageFlow = _PageFlow.next;
 
@@ -101,13 +103,19 @@ class TextPageState extends ConsumerState<TextPage> {
     );
     //the scaffold wraps both stages so the loading and error states are padded too
     return SafeBodyScaffold(
-      body: lastIndexProvider.when(
-        data: (lastIndex) {
-          _lastIndex = lastIndex;
-          return _contents();
-        },
-        loading: showLoading,
-        error: showError(ref, workDetailsProvider(widget.workId)),
+      //keep outside the loading/data/error content so its FocusScope survives page replacement
+      body: ReaderKeysAndWheel(
+        onNext: _loadNextPage,
+        onPrevious: _loadPreviousPage,
+        onOpenMenu: _openMenu,
+        child: lastIndexProvider.when(
+          data: (lastIndex) {
+            _lastIndex = lastIndex;
+            return _contents();
+          },
+          loading: showLoading,
+          error: showError(ref, workDetailsProvider(widget.workId)),
+        ),
       ),
     );
   }
@@ -121,37 +129,27 @@ class TextPageState extends ConsumerState<TextPage> {
     );
   }
 
-  Widget _buildResponsiveContent(WorkContentsSegments segments) {
-    const a4Width = 595.0;
-    const marginsSpace = 200;
-    return LayoutBuilder(
-      builder: (context, pageConstraints) {
-        final isLargeScreen = pageConstraints.maxWidth > a4Width + marginsSpace;
-        const largeScreenTxtConsts = BoxConstraints(maxWidth: a4Width);
-        final textAreaConstraints = isLargeScreen ? largeScreenTxtConsts : null;
-        //keep the generation that produced these segments (so stale callbacks can be ignored)
-        final generation = _contentGeneration;
-        return _StyledWordList(
-          key: ValueKey((widget.workId, generation)), // Recreate selection state after explicit nav
-          segments: segments,
-          onNavigateNext: _loadNextPage,
-          onNavigatePrevious: _loadPreviousPage,
-          onOpenIndex: _openIndex,
-          onVisibleIndicesChanged: (first, last, {required fitsWholeBuffer}) =>
-              _updateVisibleIndices(
-                first,
-                last,
-                fitsWholeBuffer: fitsWholeBuffer,
-                generation: generation,
-              ),
-          pageFlow: _pageFlow,
-          isLargeScreen: isLargeScreen,
-          pageConstraints: pageConstraints,
-          textAreaConstraints: textAreaConstraints,
-        );
-      },
-    );
-  }
+  Widget _buildResponsiveContent(WorkContentsSegments segments) => LayoutBuilder(
+    builder: (context, pageConstraints) {
+      //keep the generation that produced these segments (so stale callbacks can be ignored)
+      final generation = _contentGeneration;
+      return _StyledWordList(
+        key: ValueKey((widget.workId, generation)), // Recreate selection state after explicit nav
+        segments: segments,
+        onNavigateNext: _loadNextPage,
+        onNavigatePrevious: _loadPreviousPage,
+        onOpenMenu: _openMenu,
+        onVisibleIndicesChanged: (first, last, {required fitsWholeBuffer}) => _updateVisibleIndices(
+          first,
+          last,
+          fitsWholeBuffer: fitsWholeBuffer,
+          generation: generation,
+        ),
+        pageFlow: _pageFlow,
+        geometry: ReaderGeometry.inWindow(context, pageConstraints.maxWidth),
+      );
+    },
+  );
 
   void _updateVisibleIndices(
     int first,
@@ -245,6 +243,50 @@ class TextPageState extends ConsumerState<TextPage> {
       _fromIndex = 0;
       _toIndex = _bufferSize - 1;
       _pageFlow = _PageFlow.next;
+    }
+  }
+
+  Future<void> _openMenu() async {
+    final canOpen = !_navMenuOpen;
+    if (canOpen) {
+      _navMenuOpen = true;
+      try {
+        ContextMenuController.removeAny();
+        final branchIds = mainBranches.map((entry) => entry.id).toList();
+        //the menu closes registers what to do, but it doesn't run yet
+        final action = await showGeneralDialog<Future<void> Function()>(
+          context: context,
+          barrierDismissible: true,
+          barrierLabel: 'Dismiss',
+          barrierColor: Theme.of(context).bottomSheetTheme.modalBarrierColor ?? Colors.black54,
+          transitionDuration: const Duration(milliseconds: 250),
+          pageBuilder: (menuContext, _, _) => _NavMenuModal(
+            scaffoldKey: customAdaptiveScaffoldKey,
+            onNavigate: (index) => _closeMenu(
+              menuContext,
+              () async => context.go(branchIds[index]),
+            ),
+            onIndex: () => _closeMenu(menuContext, _openIndex),
+            onSettings: () => _closeMenu(
+              menuContext,
+              () async => const SettingsRoute(tab: SettingsTab.library).push<void>(context),
+            ),
+            onBack: () => _closeMenu(menuContext, () async => context.pop()),
+          ),
+        );
+        if (mounted && action != null) {
+          await action();
+        }
+      } finally {
+        _navMenuOpen = false;
+      }
+    }
+  }
+
+  /// Only the first choice closes the menu (popping again while it closes would pop the reader)
+  void _closeMenu(BuildContext menuContext, Future<void> Function() action) {
+    if (ModalRoute.isCurrentOf(menuContext) ?? false) {
+      Navigator.of(menuContext).pop(action);
     }
   }
 
@@ -420,42 +462,6 @@ class _TextRenderer {
               style: isUncertain ? uncertainStyle : null,
             );
           }).toList();
-  }
-
-  //
-}
-
-class _GestureHandler {
-  _GestureHandler({
-    required this.onNavigateNext,
-    required this.onNavigatePrevious,
-    required this.onNavMenuToggle,
-  });
-
-  final void Function() onNavigateNext;
-  final void Function() onNavigatePrevious;
-  final void Function(BuildContext context) onNavMenuToggle;
-
-  void handleTap(_PageFlow pageFlow) {
-    if (pageFlow == _PageFlow.next) {
-      log.info(() => 'handling right tap');
-      onNavigateNext();
-    } else if (pageFlow == _PageFlow.previous) {
-      log.info(() => 'handling left tap');
-      onNavigatePrevious();
-    }
-  }
-
-  void handleSwipe(double? velocity) {
-    if (velocity != null) {
-      if (velocity < 0) {
-        log.info(() => 'handling left swipe');
-        onNavigateNext();
-      } else if (velocity > 0) {
-        log.info(() => 'handling right swipe');
-        onNavigatePrevious();
-      }
-    }
   }
 
   //
@@ -804,23 +810,19 @@ class _StyledWordList extends ConsumerStatefulWidget {
     required this.segments,
     required this.onNavigateNext,
     required this.onNavigatePrevious,
-    required this.onOpenIndex,
+    required this.onOpenMenu,
     required this.onVisibleIndicesChanged,
     required this.pageFlow,
-    required this.isLargeScreen,
-    required this.pageConstraints,
-    required this.textAreaConstraints,
+    required this.geometry,
   });
 
   final WorkContentsSegments segments;
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
-  final Future<void> Function() onOpenIndex;
+  final VoidCallback onOpenMenu;
   final void Function(int, int, {required bool fitsWholeBuffer}) onVisibleIndicesChanged;
   final _PageFlow pageFlow;
-  final bool isLargeScreen;
-  final BoxConstraints pageConstraints;
-  final BoxConstraints? textAreaConstraints;
+  final ReaderGeometry geometry;
 
   @override
   _StyledWordListState createState() => _StyledWordListState();
@@ -836,128 +838,30 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
   final _readerCursorWidth = 2.0;
   final _textSelector = _TextSelector();
   final StrutStyle _readerStrut = StrutStyle.disabled;
-  late _GestureHandler _gestureHandler;
-  var _navMenuOpen = false;
   var _layoutRevision = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _gestureHandler = _GestureHandler(
-      onNavigateNext: widget.onNavigateNext,
-      onNavigatePrevious: widget.onNavigatePrevious,
-      onNavMenuToggle: _handleNavMenuToggle,
-    );
-  }
-
-  Future<void> _handleNavMenuToggle(BuildContext context) async {
-    final canOpen = !_navMenuOpen;
-    if (canOpen) {
-      _navMenuOpen = true;
-      // the dialog only records the choice (it runs once the modal is gone)
-      Future<void> Function()? pendingAction;
-      void choose(BuildContext dialogContext, Future<void> Function() action) {
-        if (pendingAction == null) {
-          pendingAction = action;
-          Navigator.of(dialogContext).pop();
-        }
-      }
-
-      try {
-        ContextMenuController.removeAny();
-        final branchIds = mainBranches.map((entry) => entry.id).toList();
-        await showGeneralDialog<void>(
-          context: context,
-          barrierDismissible: true,
-          barrierLabel: 'Dismiss',
-          barrierColor: Theme.of(context).bottomSheetTheme.modalBarrierColor ?? Colors.black54,
-          transitionDuration: const Duration(milliseconds: 250),
-          pageBuilder: (ctx, animation, secondaryAnimation) => _NavMenuModal(
-            scaffoldKey: customAdaptiveScaffoldKey,
-            onNavigate: (index) => choose(
-              ctx,
-              () async => context.go(branchIds[index]),
-            ),
-            onIndex: () => choose(
-              ctx,
-              widget.onOpenIndex,
-            ),
-            onSettings: () => choose(
-              ctx,
-              () async => const SettingsRoute(tab: SettingsTab.library).push<void>(context),
-            ),
-            onBack: () => choose(
-              ctx,
-              () async => context.pop(),
-            ),
-          ),
-        );
-        final action = mounted && context.mounted ? pendingAction : null;
-        if (action != null) {
-          await action();
-        }
-      } finally {
-        _navMenuOpen = false;
-      }
-    }
-  }
 
   @override
   Widget build(context) {
     _rebuildOnScreenSizeChange(context);
     final readerSettings =
         ref.watch(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings();
-    return widget.isLargeScreen
-        ? _buildLargeScreenLayout(context, readerSettings)
-        : _buildSmallScreenLayout(context, readerSettings);
-  }
-
-  Widget _buildSmallScreenLayout(BuildContext context, ReaderSettings settings) => Row(
-    children: [
-      Expanded(
-        child: SizedBox.expand(
-          child: GestureDetector(
-            onHorizontalDragEnd: (details) => _gestureHandler.handleSwipe(details.primaryVelocity),
-            onDoubleTap: () => _gestureHandler.onNavMenuToggle(context),
-            child: Container(
-              padding: const EdgeInsets.only(left: 20, right: 20),
-              // Use a LayoutBuilder to get the correct constraints
-              child: LayoutBuilder(
-                builder: (ctx, constr) => _buildSelectionArea(ctx, constr, settings),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
-
-  Widget _buildLargeScreenLayout(BuildContext context, ReaderSettings settings) {
-    final availableWidth = widget.pageConstraints.maxWidth;
-    final textWidth = widget.textAreaConstraints!.maxWidth;
-    final marginWidth = (availableWidth - textWidth) / 2;
-    return Row(
-      children: [
-        if (marginWidth > 0)
-          SizedBox(
-            width: marginWidth,
-            child: GestureDetector(
-              onTap: () => _gestureHandler.handleTap(_PageFlow.previous),
-              onSecondaryTap: () => _gestureHandler.onNavMenuToggle(context),
-            ),
-          ),
-        SizedBox(width: textWidth, child: _buildStylizedTextArea(settings)),
-        if (marginWidth > 0)
-          SizedBox(
-            width: marginWidth,
-            child: GestureDetector(
-              onTap: () => _gestureHandler.handleTap(_PageFlow.next),
-              onSecondaryTap: () => _gestureHandler.onNavMenuToggle(context),
-            ),
-          ),
-      ],
+    final geometry = widget.geometry;
+    return ReaderGestures(
+      geometry: geometry,
+      onNext: widget.onNavigateNext,
+      onPrevious: widget.onNavigatePrevious,
+      onOpenMenu: widget.onOpenMenu,
+      textArea: geometry.hasMargins
+          ? _buildStylizedTextArea(readerSettings)
+          : _buildFullPageTextArea(readerSettings),
     );
   }
+
+  Widget _buildFullPageTextArea(ReaderSettings settings) => Padding(
+    padding: EdgeInsets.symmetric(horizontal: Breakpoints.small.margin),
+    // Use a LayoutBuilder to get the correct constraints
+    child: LayoutBuilder(builder: (ctx, constr) => _buildSelectionArea(ctx, constr, settings)),
+  );
 
   Widget _buildStylizedTextArea(ReaderSettings settings) {
     const padding = EdgeInsets.only(left: 24, bottom: 14);
