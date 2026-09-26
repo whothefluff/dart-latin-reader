@@ -318,7 +318,7 @@ class ConcordanceRoute extends GoRouteData with _$ConcordanceRoute {
     this.search,
   });
 
-  /// A [ConcordanceQuery] as JSON to fill the form with. 
+  /// A [ConcordanceQuery] as JSON to fill the form with.
   /// Null for a blank one
   final String? search;
 
@@ -336,6 +336,7 @@ class ConcordanceHitsRoute extends GoRouteData with _$ConcordanceHitsRoute {
   const ConcordanceHitsRoute({
     required this.search,
     this.offset = 0,
+    this.locked = true,
   });
 
   /// A [ConcordanceQuery] as JSON
@@ -343,10 +344,14 @@ class ConcordanceHitsRoute extends GoRouteData with _$ConcordanceHitsRoute {
 
   final int offset;
 
+  /// Whether the cannot be edited
+  final bool locked;
+
   @override
   Widget build(context, state) => ConcordanceHitsPage(
     query: ConcordanceQuery.fromJson(search),
     offset: offset,
+    locked: locked,
   );
   //
 }

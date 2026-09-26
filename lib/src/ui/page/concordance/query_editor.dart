@@ -18,51 +18,74 @@ import 'common.dart';
 Future<ConcordanceQuery?> showQueryEditorDialog(BuildContext context, ConcordanceQuery query) =>
     showDialog<ConcordanceQuery>(
       context: context,
-      builder: (dialogContext) => Dialog(
-        insetPadding: const EdgeInsets.all(24),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(24, 16, 12, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Edit search',
-                        style: Theme.of(dialogContext).textTheme.titleLarge,
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: 'Close',
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(dialogContext),
-                    ),
-                  ],
-                ),
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                  child: QueryEditor(
-                    initial: query,
-                    onSearch: (edited) => Navigator.pop(dialogContext, edited),
-                  ),
-                ),
-              ),
-            ],
-          ),
+      builder: (dialogContext) => _QueryDialog(
+        title: 'Edit search',
+        child: QueryEditor(
+          initial: query,
+          onSearch: (edited) => Navigator.pop(dialogContext, edited),
         ),
       ),
     );
 
+/// Shows all of [query] in the editor, every control disabled
+Future<void> showQueryDetails(BuildContext context, ConcordanceQuery query) => showDialog<void>(
+  context: context,
+  builder: (_) => _QueryDialog(
+    title: 'Search',
+    child: QueryEditor(initial: query, onSearch: null),
+  ),
+);
+
+/// A dialog with a title and a close button over a scrolling [child]
+class _QueryDialog extends StatelessWidget {
+  const _QueryDialog({
+    required this.title,
+    required this.child,
+  });
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(context) => Dialog(
+    insetPadding: const EdgeInsets.all(24),
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 720),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(24, 16, 12, 0),
+            child: Row(
+              children: [
+                Expanded(child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+                IconButton(
+                  tooltip: 'Close',
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+              child: child,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  //
+}
+
 /// Edits a draft of a query: up to [ConcordanceQuery.maxSlots] words, each a
 /// form, a lemma or a grammatical description, and where to look for them
 ///
-/// Nothing is searched until [onSearch]
+/// Nothing is searched until [onSearch]; without it, the query can only be seen
 class QueryEditor extends ConsumerStatefulWidget {
   const QueryEditor({
     super.key,
@@ -73,7 +96,8 @@ class QueryEditor extends ConsumerStatefulWidget {
   /// Null for a new search
   final ConcordanceQuery? initial;
 
-  final ValueChanged<ConcordanceQuery> onSearch;
+  /// Null disables every control
+  final ValueChanged<ConcordanceQuery>? onSearch;
 
   @override
   ConsumerState<QueryEditor> createState() => _QueryEditorState();
@@ -90,7 +114,7 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
   late ConcordanceTitles _titles = widget.initial?.titles ?? ConcordanceTitles.included;
   late ConcordanceSort _sort = widget.initial?.sort ?? ConcordanceSort.textOrder;
 
-  /// Hits per page. 
+  /// Hits per page.
   /// Not part of the query.
   int? _pageSize;
 
@@ -129,6 +153,7 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
     final pageSizes = {...ConcordanceSettings.pageSizes, pageSize}.sorted((a, b) => a - b);
     final count = NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
     final query = _query;
+    final enabled = widget.onSearch != null;
     final singleWork = catalog == null ? null : _onlyWork(catalog);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -139,18 +164,20 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
             key: ValueKey(slot.id),
             number: i + 1,
             draft: slot,
-            onChanged: (edited) => setState(() => _slots = [..._slots]..[i] = edited),
+            onChanged: enabled
+                ? (edited) => setState(() => _slots = [..._slots]..[i] = edited)
+                : null,
             onRemove: _slots.length == 1
                 ? null
                 : () => setState(() => _slots = [..._slots]..removeAt(i)),
-            onSubmitted: query == null ? null : () async => _search(query),
+            onSubmitted: enabled && query != null ? () async => _search(query) : null,
           ),
         ),
         if (_slots.length < ConcordanceQuery.maxSlots)
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: TextButton.icon(
-              onPressed: _addSlot,
+              onPressed: enabled ? _addSlot : null,
               icon: const Icon(Icons.add_circle_outline),
               label: const Text('Add a word after it'),
             ),
@@ -160,7 +187,7 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
           label: 'Works',
           icon: Icons.filter_alt_outlined,
           value: selectionSummary(_selection),
-          onTap: catalog == null ? null : () => _pickWorks(catalog),
+          onTap: enabled && catalog != null ? () => _pickWorks(catalog) : null,
         ),
         if (singleWork != null) ...[
           const SizedBox(height: 12),
@@ -168,8 +195,8 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
             label: 'Part',
             icon: workIndexIcon,
             value: _part?.label ?? 'The whole work',
-            onTap: () => _pickPart(singleWork),
-            onClear: _part == null ? null : () => setState(() => _part = null),
+            onTap: enabled ? () => _pickPart(singleWork) : null,
+            onClear: enabled && _part != null ? () => setState(() => _part = null) : null,
           ),
         ],
         const SizedBox(height: 8),
@@ -181,14 +208,16 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
             Tooltip(
               message: 'A typed word only matches the same macrons (rosa is not rosā)',
               child: InkWell(
-                onTap: () => setState(() => _matchMacrons = !_matchMacrons),
+                onTap: enabled ? () => setState(() => _matchMacrons = !_matchMacrons) : null,
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Checkbox(
                       value: _matchMacrons,
-                      onChanged: (value) => setState(() => _matchMacrons = value ?? false),
+                      onChanged: enabled
+                          ? (value) => setState(() => _matchMacrons = value ?? false)
+                          : null,
                     ),
                     const Text('Match macrons'),
                     const SizedBox(width: 8),
@@ -211,7 +240,9 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
                             DropdownMenuItem(value: titles, child: Text(titlesLabel(titles))),
                       )
                       .toList(),
-                  onChanged: (titles) => setState(() => _titles = titles ?? _titles),
+                  onChanged: enabled
+                      ? (titles) => setState(() => _titles = titles ?? _titles)
+                      : null,
                 ),
               ],
             ),
@@ -227,7 +258,7 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
                   items: ConcordanceSort.values
                       .map((sort) => DropdownMenuItem(value: sort, child: Text(sortLabel(sort))))
                       .toList(),
-                  onChanged: (sort) => setState(() => _sort = sort ?? _sort),
+                  onChanged: enabled ? (sort) => setState(() => _sort = sort ?? _sort) : null,
                 ),
               ],
             ),
@@ -243,7 +274,9 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
                   items: pageSizes
                       .map((size) => DropdownMenuItem(value: size, child: Text(count.format(size))))
                       .toList(),
-                  onChanged: (size) => setState(() => _pageSize = size ?? _pageSize),
+                  onChanged: enabled
+                      ? (size) => setState(() => _pageSize = size ?? _pageSize)
+                      : null,
                 ),
               ],
             ),
@@ -254,11 +287,11 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
           alignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton(
-              onPressed: _clear,
+              onPressed: enabled ? _clear : null,
               child: const Text('Clear'),
             ),
             FilledButton.icon(
-              onPressed: query == null ? null : () async => _search(query),
+              onPressed: enabled && query != null ? () async => _search(query) : null,
               icon: const Icon(Icons.search),
               label: const Text('Search'),
             ),
@@ -305,7 +338,7 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
         : ref
               .read(concordanceSettingsNotifierProvider.notifier)
               .updateSettings(settings.copyWith(pageSize: pageSize));
-    widget.onSearch(query);
+    widget.onSearch?.call(query);
     await saving;
   }
 
@@ -475,7 +508,9 @@ class _SlotEditor extends StatelessWidget {
   final int number;
 
   final _SlotDraft draft;
-  final ValueChanged<_SlotDraft> onChanged;
+
+  /// Null disables the word
+  final ValueChanged<_SlotDraft>? onChanged;
 
   /// Null for the only slot
   final VoidCallback? onRemove;
@@ -496,6 +531,7 @@ class _SlotEditor extends StatelessWidget {
   @override
   Widget build(context) {
     final theme = Theme.of(context);
+    final onChanged = this.onChanged;
     final distance = draft.distance ?? 0;
     // A distance from elsewhere (a link) may not be one of the usual ones
     final distances = {
@@ -519,8 +555,11 @@ class _SlotEditor extends StatelessWidget {
                   items: distances.entries
                       .map((entry) => DropdownMenuItem(value: entry.key, child: Text(entry.value)))
                       .toList(),
-                  onChanged: (value) =>
-                      onChanged(draft.withDistance(value == 0 ? null : (value ?? draft.distance))),
+                  onChanged: onChanged == null
+                      ? null
+                      : (value) => onChanged(
+                          draft.withDistance(value == 0 ? null : (value ?? draft.distance)),
+                        ),
                 ),
               ],
             ),
@@ -545,7 +584,9 @@ class _SlotEditor extends StatelessWidget {
                     ButtonSegment(value: _SlotKind.grammar, label: Text('Grammar')),
                   ],
                   selected: {draft.kind},
-                  onSelectionChanged: (kinds) => onChanged(draft.withKind(kinds.single)),
+                  onSelectionChanged: onChanged == null
+                      ? null
+                      : (kinds) => onChanged(draft.withKind(kinds.single)),
                 ),
               ),
             ),
@@ -553,7 +594,7 @@ class _SlotEditor extends StatelessWidget {
               IconButton(
                 tooltip: 'Remove word $number',
                 icon: const Icon(Icons.remove_circle_outline),
-                onPressed: onRemove,
+                onPressed: onChanged == null ? null : onRemove,
               ),
           ],
         ),
@@ -567,7 +608,7 @@ class _SlotEditor extends StatelessWidget {
           _SlotKind.lemma => _LemmaField(
             lemma: draft.lemma,
             label: 'Lemma',
-            onChanged: (lemma) => onChanged(draft.withLemma(lemma)),
+            onChanged: onChanged == null ? null : (lemma) => onChanged(draft.withLemma(lemma)),
           ),
           _SlotKind.grammar => _GrammarFields(draft: draft, onChanged: onChanged),
         },
@@ -587,7 +628,10 @@ class _FormField extends StatefulWidget {
   });
 
   final _SlotDraft draft;
-  final ValueChanged<_SlotDraft> onChanged;
+
+  /// Null disables the field
+  final ValueChanged<_SlotDraft>? onChanged;
+
   final VoidCallback? onSubmitted;
 
   @override
@@ -608,8 +652,10 @@ class _FormFieldState extends State<_FormField> {
   @override
   Widget build(context) {
     final draft = widget.draft;
+    final onChanged = widget.onChanged;
     return TextField(
       controller: _controller,
+      enabled: onChanged != null,
       autocorrect: false,
       enableSuggestions: false,
       textInputAction: TextInputAction.search,
@@ -626,10 +672,12 @@ class _FormFieldState extends State<_FormField> {
           isSelected: draft.exactCase,
           icon: const Icon(Icons.text_fields),
           selectedIcon: const Icon(Icons.text_format),
-          onPressed: () => widget.onChanged(draft.withExactCase(exactCase: !draft.exactCase)),
+          onPressed: onChanged == null
+              ? null
+              : () => onChanged(draft.withExactCase(exactCase: !draft.exactCase)),
         ),
       ),
-      onChanged: (text) => widget.onChanged(draft.withText(text)),
+      onChanged: (text) => onChanged?.call(draft.withText(text)),
       onSubmitted: (_) => widget.onSubmitted?.call(),
     );
   }
@@ -647,7 +695,9 @@ class _LemmaField extends ConsumerStatefulWidget {
 
   final LemmaChoice? lemma;
   final String label;
-  final ValueChanged<LemmaChoice?> onChanged;
+
+  /// Null disables the field
+  final ValueChanged<LemmaChoice?>? onChanged;
 
   @override
   ConsumerState<_LemmaField> createState() => _LemmaFieldState();
@@ -681,10 +731,11 @@ class _LemmaFieldState extends ConsumerState<_LemmaField> {
       optionsBuilder: (value) async => value.text.trim().isEmpty
           ? const <LemmaChoice>[]
           : await ref.read(lemmaChoicesProvider(value.text).future),
-      onSelected: widget.onChanged,
+      onSelected: (choice) => widget.onChanged?.call(choice),
       fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) => TextField(
         controller: controller,
         focusNode: focusNode,
+        enabled: widget.onChanged != null,
         autocorrect: false,
         enableSuggestions: false,
         decoration: InputDecoration(
@@ -698,7 +749,7 @@ class _LemmaFieldState extends ConsumerState<_LemmaField> {
         // Editing the text drops the lemma until another is picked
         onChanged: (_) {
           if (lemma != null) {
-            widget.onChanged(null);
+            widget.onChanged?.call(null);
           }
         },
         onSubmitted: (_) => onFieldSubmitted(),
@@ -741,11 +792,14 @@ class _GrammarFields extends ConsumerWidget {
   });
 
   final _SlotDraft draft;
-  final ValueChanged<_SlotDraft> onChanged;
+
+  /// Null disables the fields
+  final ValueChanged<_SlotDraft>? onChanged;
 
   @override
   Widget build(context, ref) {
     final values = ref.watch(grammarValuesProvider).valueOrNull;
+    final onChanged = this.onChanged;
     final grammar = draft.grammar;
     final partOfSpeech = grammar.values[GrammarFeature.partOfSpeech];
     return Column(
@@ -759,7 +813,9 @@ class _GrammarFields extends ConsumerWidget {
               feature: GrammarFeature.partOfSpeech,
               value: partOfSpeech,
               options: values?.partsOfSpeech ?? const [],
-              onChanged: (value) => onChanged(draft.withGrammar(_withPartOfSpeech(value, values))),
+              onChanged: onChanged == null
+                  ? null
+                  : (value) => onChanged(draft.withGrammar(_withPartOfSpeech(value, values))),
             ),
             ...GrammarFeature.values
                 .where((feature) => feature != GrammarFeature.partOfSpeech)
@@ -776,8 +832,10 @@ class _GrammarFields extends ConsumerWidget {
                     feature: entry.feature,
                     value: grammar.values[entry.feature],
                     options: grammarOrder(entry.options),
-                    onChanged: (value) =>
-                        onChanged(draft.withGrammar(grammar.withValue(entry.feature, value))),
+                    onChanged: onChanged == null
+                        ? null
+                        : (value) =>
+                              onChanged(draft.withGrammar(grammar.withValue(entry.feature, value))),
                   ),
                 ),
           ],
@@ -786,7 +844,7 @@ class _GrammarFields extends ConsumerWidget {
         _LemmaField(
           lemma: draft.lemma,
           label: 'Lemma (optional)',
-          onChanged: (lemma) => onChanged(draft.withLemma(lemma)),
+          onChanged: onChanged == null ? null : (lemma) => onChanged(draft.withLemma(lemma)),
         ),
       ],
     );
@@ -824,38 +882,46 @@ class _FeatureDropdown extends StatelessWidget {
   final String? value;
 
   final List<String> options;
-  final ValueChanged<String?> onChanged;
+
+  /// Null disables the dropdown
+  final ValueChanged<String?>? onChanged;
 
   /// DropdownButton shows its hint for a null value, so '' stands for any
   static const _any = '';
 
   @override
-  Widget build(context) => SizedBox(
-    width: 176,
-    child: InputDecorator(
-      decoration: InputDecoration(
-        labelText: featureLabel(feature),
-        border: const OutlineInputBorder(),
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: options.contains(value) ? value : _any,
+  Widget build(context) {
+    final onChanged = this.onChanged;
+    return SizedBox(
+      width: 176,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: featureLabel(feature),
+          enabled: onChanged != null,
+          border: const OutlineInputBorder(),
           isDense: true,
-          isExpanded: true,
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-          items: [
-            const DropdownMenuItem(value: _any, child: Text('Any')),
-            ...options.map(
-              (option) => DropdownMenuItem(value: option, child: Text(grammarValueLabel(option))),
-            ),
-          ],
-          onChanged: (option) => onChanged(option == _any ? null : option),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: options.contains(value) ? value : _any,
+            isDense: true,
+            isExpanded: true,
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            items: [
+              const DropdownMenuItem(value: _any, child: Text('Any')),
+              ...options.map(
+                (option) => DropdownMenuItem(value: option, child: Text(grammarValueLabel(option))),
+              ),
+            ],
+            onChanged: onChanged == null
+                ? null
+                : (option) => onChanged(option == _any ? null : option),
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   //
 }
