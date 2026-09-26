@@ -478,6 +478,13 @@ mixin _$ConcordanceHitsRoute on GoRouteData {
         offset:
             _$convertMapValue('offset', state.uri.queryParameters, int.parse) ??
             0,
+        locked:
+            _$convertMapValue(
+              'locked',
+              state.uri.queryParameters,
+              _$boolConverter,
+            ) ??
+            true,
       );
 
   ConcordanceHitsRoute get _self => this as ConcordanceHitsRoute;
@@ -488,6 +495,7 @@ mixin _$ConcordanceHitsRoute on GoRouteData {
     queryParams: {
       'search': _self.search,
       if (_self.offset != 0) 'offset': _self.offset.toString(),
+      if (_self.locked != true) 'locked': _self.locked.toString(),
     },
   );
 
@@ -525,5 +533,16 @@ bool _$iterablesEqual<T>(Iterable<T>? iterable1, Iterable<T>? iterable2) {
     if (hasNext1 != hasNext2) return false;
     if (!hasNext1) return true;
     if (iterator1.current != iterator2.current) return false;
+  }
+}
+
+bool _$boolConverter(String value) {
+  switch (value) {
+    case 'true':
+      return true;
+    case 'false':
+      return false;
+    default:
+      throw UnsupportedError('Cannot convert "$value" into a bool.');
   }
 }

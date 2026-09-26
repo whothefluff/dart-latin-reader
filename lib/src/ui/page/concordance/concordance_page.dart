@@ -52,10 +52,12 @@ class ConcordanceHitsPage extends StatelessWidget {
     super.key,
     required this.query,
     required this.offset,
+    required this.locked,
   });
 
   final ConcordanceQuery query;
   final int offset;
+  final bool locked;
 
   @override
   Widget build(context) => SafeBodyScaffold(
@@ -63,15 +65,21 @@ class ConcordanceHitsPage extends StatelessWidget {
       title: const Text('Concordance'),
       notificationPredicate: (_) => false, //only the hits scroll
     ),
-    body: _Results(query: query, offset: offset),
+    body: _Results(query: query, offset: offset, locked: locked),
   );
 
   //
 }
 
 /// Shows the hits over the form, which then holds [query]
-void _search(BuildContext context, ConcordanceQuery query, {int offset = 0}) =>
-    ConcordanceHitsRoute(search: query.toJson(), offset: offset).go(context);
+void _search(BuildContext context, ConcordanceQuery query, {int offset = 0, bool locked = false}) {
+  final route = ConcordanceHitsRoute(search: query.toJson(), offset: offset, locked: locked);
+  if (locked) {
+    route.replace(context);
+  } else {
+    route.go(context);
+  }
+}
 
 /// The query editor, introduced when the search is a new one
 class _Editor extends StatelessWidget {
@@ -125,10 +133,12 @@ class _Results extends ConsumerWidget {
   const _Results({
     required this.query,
     required this.offset,
+    required this.locked,
   });
 
   final ConcordanceQuery query;
   final int offset;
+  final bool locked;
 
   @override
   Widget build(context, ref) {
@@ -136,13 +146,18 @@ class _Results extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _QuerySummary(query: query),
+        _QuerySummary(query: query, locked: locked),
         const Divider(height: 1),
         Expanded(
           child: ref
               .watch(provider)
               .when(
-                data: (settings) => _Page(query: query, offset: offset, size: settings.pageSize),
+                data: (settings) => _Page(
+                  query: query,
+                  offset: offset,
+                  size: settings.pageSize,
+                  locked: locked,
+                ),
                 loading: showLoading,
                 error: showError(ref, provider),
               ),
@@ -160,11 +175,13 @@ class _Page extends ConsumerWidget {
     required this.query,
     required this.offset,
     required this.size,
+    required this.locked,
   });
 
   final ConcordanceQuery query;
   final int offset;
   final int size;
+  final bool locked;
 
   @override
   Widget build(context, ref) {
@@ -172,7 +189,12 @@ class _Page extends ConsumerWidget {
     return ref
         .watch(provider)
         .when(
-          data: (hits) => _HitList(query: query, hits: hits, pageSize: size),
+          data: (hits) => _HitList(
+            query: query,
+            hits: hits,
+            pageSize: size,
+            locked: locked,
+          ),
           loading: showLoading,
           error: showError(ref, provider),
         );
@@ -181,21 +203,23 @@ class _Page extends ConsumerWidget {
   //
 }
 
-/// The searched phrase and scope; tapping it edits the query, over the hits on
-/// wide windows (back is for editing it alone)
+/// The searched phrase and scope. Tapping it edits the query (over the hits on
+/// wide windows; back is for editing it alone), or shows it whole when [locked]
 class _QuerySummary extends StatelessWidget {
   const _QuerySummary({
     required this.query,
+    required this.locked,
   });
 
   final ConcordanceQuery query;
+  final bool locked;
 
   @override
   Widget build(context) {
     final theme = Theme.of(context);
     final margin = _margin(context);
     return InkWell(
-      onTap: () => _edit(context),
+      onTap: () => _open(context),
       child: Padding(
         padding: EdgeInsetsDirectional.fromSTEB(margin, 8, margin - 8, 8),
         child: Row(
@@ -219,15 +243,18 @@ class _QuerySummary extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Edit the search',
-              icon: const Icon(Icons.edit),
-              onPressed: () => _edit(context),
+              tooltip: locked ? 'See the search' : 'Edit the search',
+              icon: Icon(locked ? Icons.info_outline : Icons.edit),
+              onPressed: () => _open(context),
             ),
           ],
         ),
       ),
     );
   }
+
+  Future<void> _open(BuildContext context) =>
+      locked ? showQueryDetails(context, query) : _edit(context);
 
   /// In a dialog on wide windows. On narrow ones, where it would cover the
   /// hits anyway, back on the form under them, which holds their query
@@ -250,11 +277,13 @@ class _HitList extends ConsumerWidget {
     required this.query,
     required this.hits,
     required this.pageSize,
+    required this.locked,
   });
 
   final ConcordanceQuery query;
   final ConcordanceHits hits;
   final int pageSize;
+  final bool locked;
 
   @override
   Widget build(context, ref) {
@@ -283,7 +312,7 @@ class _HitList extends ConsumerWidget {
                 tooltip: 'Sort',
                 icon: const Icon(Icons.sort),
                 initialValue: query.sort,
-                onSelected: (sort) => _search(context, query.withSort(sort)),
+                onSelected: (sort) => _search(context, query.withSort(sort), locked: locked),
                 itemBuilder: (_) => ConcordanceSort.values
                     .map((sort) => PopupMenuItem(value: sort, child: Text(sortLabel(sort))))
                     .toList(),
@@ -328,6 +357,7 @@ class _HitList extends ConsumerWidget {
                       context,
                       query,
                       offset: max(0, hits.offset - pageSize),
+                      locked: locked,
                     )
                   : null,
             ),
@@ -337,7 +367,12 @@ class _HitList extends ConsumerWidget {
               tooltip: 'Next page',
               visualDensity: VisualDensity.compact,
               onPressed: hits.hasNextPage
-                  ? () => _search(context, query, offset: hits.offset + pageSize)
+                  ? () => _search(
+                      context,
+                      query,
+                      offset: hits.offset + pageSize,
+                      locked: locked,
+                    )
                   : null,
             ),
           ],
