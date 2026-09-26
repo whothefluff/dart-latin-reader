@@ -7,6 +7,7 @@ import '../../../component/morph_analysis/enriched_morph_search_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../router/config.dart';
 import '../../widget/keyboard_closing_search_bar.dart';
+import '../../widget/lemma_text.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
@@ -102,7 +103,9 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                             title: Text.rich(
                               TextSpan(
                                 text: '${result.title} ',
-                                children: [TextSpan(text: result.dictRef, style: dictRefStyle)],
+                                children: [
+                                  TextSpan(text: lemmaText(result.dictRef), style: dictRefStyle),
+                                ],
                               ),
                             ),
                             subtitle: Text(details),

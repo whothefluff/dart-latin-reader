@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../component/dictionary/dictionary_entry_senses_api.dart';
 import '../../../component/settings/dictionary_settings_api.dart';
 import '../../router/config.dart';
+import '../../widget/lemma_text.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -27,7 +28,7 @@ class DictionaryEntryPage extends ConsumerWidget {
   @override
   Widget build(context, ref) => SafeBodyScaffold(
     appBar: AppBar(
-      title: Text(lemma),
+      title: Text(lemmaText(lemma)),
       actions: [
         IconButton(
           tooltip: 'Dictionary settings',

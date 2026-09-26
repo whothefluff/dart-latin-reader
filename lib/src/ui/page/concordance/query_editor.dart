@@ -9,6 +9,7 @@ import '../../../component/concordance/lemma_choices_api.dart';
 import '../../../component/library/catalog_api.dart';
 import '../../../component/settings/concordance_settings_api.dart';
 import '../../../component/word_frequency/library_selection_api.dart';
+import '../../widget/lemma_text.dart';
 import '../../widget/library_filter_dialog.dart';
 import '../library/work_index_sheet.dart';
 import 'common.dart';

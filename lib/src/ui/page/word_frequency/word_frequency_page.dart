@@ -21,6 +21,7 @@ import '../../../component/word_frequency/resolved_freq_morph_form_api.dart';
 import '../../../component/word_frequency/word_frequency_api.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
+import '../../widget/lemma_text.dart';
 import '../../widget/library_filter_dialog.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
@@ -910,7 +911,7 @@ class _TableRow extends StatelessWidget {
       fontFeatures: const [FontFeature.tabularFigures()],
     );
     final count = formats.count;
-    final lemmas = row.lemmaDisplay;
+    final lemmas = row.possibleLemmas?.map(lemmaText).join(', ');
     final base = row.base;
     return InkWell(
       onTap: onTap,
@@ -921,11 +922,11 @@ class _TableRow extends StatelessWidget {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(row.displayForm, style: textTheme.bodyLarge),
+                  Text(_rowLabel(row), style: textTheme.bodyLarge),
                   Text(lemmas, style: textTheme.bodySmall?.copyWith(color: muted)),
                 ],
               )
-            : Text(row.displayForm, style: textTheme.bodyLarge),
+            : Text(_rowLabel(row), style: textTheme.bodyLarge),
         lemma: layout.lemmaColumn
             ? Text(lemmas ?? '—', style: textTheme.bodyMedium?.copyWith(color: muted))
             : null,
@@ -1103,6 +1104,12 @@ class _TableLine extends StatelessWidget {
 
 enum _RowDestination { morphology, dictionary, concordance }
 
+/// The row's form, or its lemma when grouping by lemma (displayForm is then a dictionaryRef)
+String _rowLabel(EnrichedFrequencyRow row) => switch (row.base) {
+  LemmaFrequencyRow(:final displayForm) => lemmaText(displayForm),
+  FormFrequencyRow(:final displayForm) => displayForm,
+};
+
 Future<void> _onRowTapped(
   BuildContext context,
   WidgetRef ref,
@@ -1122,7 +1129,7 @@ Future<void> _onRowTapped(
   if (view.formTapAction == FormTapAction.ask) {
     choice = await _askDestination(
       context,
-      row.displayForm,
+      _rowLabel(row),
       morphology: !filter.groupByLemma,
     );
   }
@@ -1329,7 +1336,9 @@ Future<String?> _pickLemma(BuildContext context, List<String> lemmas) => lemmas.
         builder: (context) => SimpleDialog(
           title: const Text('Which lemma?'),
           children: lemmas
-              .map((l) => ListTile(title: Text(l), onTap: () => Navigator.pop(context, l)))
+              .map(
+                (l) => ListTile(title: Text(lemmaText(l)), onTap: () => Navigator.pop(context, l)),
+              )
               .toList(),
         ),
       );
