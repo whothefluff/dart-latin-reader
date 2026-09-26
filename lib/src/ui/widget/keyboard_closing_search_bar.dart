@@ -11,12 +11,14 @@ class KeyboardClosingSearchBar extends StatefulWidget {
     this.searchController,
     this.barHintText,
     this.isFullScreen,
+    this.barTrailing,
     required this.suggestionsBuilder,
   });
 
   final SearchController? searchController;
   final String? barHintText;
   final bool? isFullScreen;
+  final Iterable<Widget>? barTrailing;
   final SuggestionsBuilder suggestionsBuilder;
 
   @override
@@ -53,6 +55,7 @@ class _KeyboardClosingSearchBarState extends State<KeyboardClosingSearchBar> {
       searchController: _controller,
       barHintText: widget.barHintText,
       isFullScreen: widget.isFullScreen,
+      barTrailing: widget.barTrailing,
       suggestionsBuilder: widget.suggestionsBuilder,
       onClose: _forgetBar,
     ),

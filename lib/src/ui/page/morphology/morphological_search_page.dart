@@ -12,10 +12,15 @@ import '../../widget/show_error.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
 import 'common.dart';
 
+/// Searches forms and shows the analyses of the one picked
 class MorphologicalSearchPage extends ConsumerStatefulWidget {
   const MorphologicalSearchPage({
     super.key,
+    required this.keys,
   });
+
+  /// The analyses under the search bar. Null for a clean search
+  final AnalysisKeys? keys;
 
   @override
   ConsumerState<MorphologicalSearchPage> createState() => _MorphologyPageState();
@@ -24,8 +29,15 @@ class MorphologicalSearchPage extends ConsumerStatefulWidget {
 
 class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
   //
-  AnalysisKeys _selectedKeys = AnalysisKeys(const []);
   final SearchController _searchController = SearchController();
+
+  @override
+  void didUpdateWidget(MorphologicalSearchPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.keys == null && oldWidget.keys != null) {
+      _searchController.clear();
+    }
+  }
 
   @override
   void dispose() {
@@ -34,14 +46,13 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
   }
 
   /// Called when a search result is selected
-  Future<void> _handleResultSelected(EnrichedResults results) async {
-    setState(() {
-      _selectedKeys = AnalysisKeys(
-        results.map((r) => AnalysisKey(form: r.form, item: r.item, cnt: r.cnt)),
-      );
-      _searchController.closeView(_searchController.text);
-    });
-    log.info(() => 'selecting $_selectedKeys');
+  void _handleResultSelected(EnrichedResults results) {
+    final keys = AnalysisKeys(
+      results.map((r) => AnalysisKey(form: r.form, item: r.item, cnt: r.cnt)),
+    );
+    log.info(() => 'selecting $keys');
+    _searchController.closeView(_searchController.text);
+    MorphologicalSearchRoute(keys: keys.toJson()).go(context);
   }
 
   @override
@@ -61,6 +72,14 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                 searchController: _searchController,
                 barHintText: 'Search forms (e.g., adv*, vid?s, "sum")...',
                 isFullScreen: true,
+                barTrailing: [
+                  if (widget.keys != null)
+                    IconButton(
+                      tooltip: 'Clear the search',
+                      icon: const Icon(Icons.close),
+                      onPressed: () => const MorphologicalSearchRoute().go(context),
+                    ),
+                ],
                 suggestionsBuilder: (context, controller) async {
                   final searchTerm = controller.text.trim();
                   final provider = enrichedMorphologicalSearchProvider(searchTerm);
@@ -113,8 +132,63 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [Expanded(child: MorphologicalDataView(keys: _selectedKeys))],
+      body: switch (widget.keys) {
+        final keys? => MorphologicalDataView(keys: keys),
+        null => const _SearchHelp(),
+      },
+    );
+  }
+
+  //
+}
+
+class _SearchHelp extends StatelessWidget {
+  const _SearchHelp();
+
+  static const List<(String, String)> _examples = [
+    ('adv*', 'forms starting with adv: * (or %) stands for any letters'),
+    ('vid?s', 'vides: ? (or _) stands for one letter'),
+    ('"sum"', 'exactly this form'),
+    ('rosā', 'typed macrons must match; without them, macrons are ignored'),
+  ];
+
+  @override
+  Widget build(context) {
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Search a form to see how it can be analyzed',
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 16),
+              ..._examples.map(
+                (example) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      SizedBox(
+                        width: 72,
+                        child: Text(example.$1, style: theme.textTheme.bodyLarge),
+                      ),
+                      Expanded(child: Text(example.$2, style: muted)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

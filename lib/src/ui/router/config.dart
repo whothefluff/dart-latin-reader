@@ -291,11 +291,22 @@ class WordFrequencyRoute extends GoRouteData with _$WordFrequencyRoute {
   //
 }
 
+/// The picked analyses are part of the location, so leaving them is going to the clean search
 class MorphologicalSearchRoute extends GoRouteData with _$MorphologicalSearchRoute {
-  const MorphologicalSearchRoute();
+  const MorphologicalSearchRoute({
+    this.keys,
+  });
+
+  /// The [AnalysisKeys] shown, as JSON. Null before a form is picked
+  final String? keys;
 
   @override
-  Widget build(context, state) => const MorphologicalSearchPage();
+  Widget build(context, state) => MorphologicalSearchPage(
+    keys: switch (keys) {
+      final keys? => AnalysisKeys.fromJson(keys),
+      null => null,
+    },
+  );
   //
 }
 

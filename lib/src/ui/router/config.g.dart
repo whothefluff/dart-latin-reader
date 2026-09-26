@@ -402,10 +402,15 @@ mixin _$WordFrequencyRoute on GoRouteData {
 
 mixin _$MorphologicalSearchRoute on GoRouteData {
   static MorphologicalSearchRoute _fromState(GoRouterState state) =>
-      const MorphologicalSearchRoute();
+      MorphologicalSearchRoute(keys: state.uri.queryParameters['keys']);
+
+  MorphologicalSearchRoute get _self => this as MorphologicalSearchRoute;
 
   @override
-  String get location => GoRouteData.$location('/morph-search');
+  String get location => GoRouteData.$location(
+    '/morph-search',
+    queryParams: {if (_self.keys != null) 'keys': _self.keys},
+  );
 
   @override
   void go(BuildContext context) => context.go(location);
