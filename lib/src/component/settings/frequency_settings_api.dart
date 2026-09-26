@@ -65,8 +65,8 @@ class FrequencyViewSettingsNotifier extends _$FrequencyViewSettingsNotifier {
 
 /// What tapping a row opens while the report lists forms.
 ///
-/// Lemma rows always open the dictionary
-enum FormTapAction { ask, openMorphology, openDictionary }
+/// Lemma rows have no morphology to open
+enum FormTapAction { ask, openMorphology, openDictionary, openConcordance }
 
 /// Holds the settings for the word frequency
 ///
