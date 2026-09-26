@@ -1,0 +1,312 @@
+import '../library/library.drift';
+import '../morph_analysis/morph_analysis.drift';
+import '../dictionary/dictionary.drift';
+import 'package:latin_reader/src/component/concordance/concordance_query.dart';
+import 'package:latin_reader/src/component/concordance/grammar_values_api.dart';
+
+-- One row per analysis of a form, with what a lemma or grammar criterion filters by.
+-- capitalizedForm is how a properNounState = 2 token writes a lowercase form: those tokens are
+-- looked up both ways, exactly as frequency does it (ResolvedFreqMorphForms)
+CREATE VIEW "concordance.Analyses" AS
+    SELECT Details.form,
+           CASE WHEN Details.form = LOWER( Details.form )
+                THEN UPPER( SUBSTR( Details.form, 1, 1 ) ) || SUBSTR( Details.form, 2 )
+           END AS capitalizedForm,
+           Details.item,
+           Details.dictionaryRef,
+           Infl.partOfSpeech,
+           Infl.gramCase,
+           Infl.number,
+           Infl.gender,
+           Infl.person,
+           Infl.verbForm,
+           Infl.tense,
+           Infl.voice
+        FROM MorphologicalDetails AS Details
+        LEFT OUTER JOIN MorphologicalDetailInflections AS Infl
+            ON Infl.form = Details.form
+               AND Infl.item = Details.item;
+
+-- Lemmas that have forms in the corpus, with their Lewis & Short entry when there is one.
+-- Several dictionaryRefs can share an entry (ad-tingo, attingo)
+CREATE VIEW "concordance.Lemmas" AS
+    SELECT DISTINCT Details.dictionaryRef,
+                    Resolved.lemma AS lnsLemma,
+                    Resolved.partOfSpeech AS lnsPartOfSpeech,
+                    Resolved.inflection AS lnsInflection
+        FROM MorphologicalDetails AS Details
+        LEFT OUTER JOIN "dictionary.ResolvedLnsRefs" AS Resolved
+            ON Resolved.dictionaryRef = Details.dictionaryRef;
+
+-- Lemmas whose dictionaryRef or entry starts with :prefix, one per entry
+searchConcordanceLemmas WITH LemmaChoice.fromSql:
+    SELECT COALESCE( lnsLemma, dictionaryRef ) AS label,
+           GROUP_CONCAT( dictionaryRef ) AS dictionaryRefs,
+           MIN( lnsPartOfSpeech ) AS partOfSpeech,
+           MIN( lnsInflection ) AS inflection
+        FROM "concordance.Lemmas"
+        WHERE dictionaryRef LIKE :prefix || '%'
+              OR lnsLemma LIKE :prefix || '%'
+        GROUP BY COALESCE( lnsLemma, dictionaryRef )
+        ORDER BY COALESCE( lnsLemma, dictionaryRef ) <> :prefix, -- exact match first
+                 LENGTH( COALESCE( lnsLemma, dictionaryRef ) ),
+                 COALESCE( lnsLemma, dictionaryRef )
+        LIMIT :limit;
+
+-- Every value a grammatical feature takes, per part of speech. 
+-- Combined values are stored as such (masculine/feminine/neuter)
+CREATE VIEW "concordance.GrammarValues" AS
+    SELECT partOfSpeech, 
+           'partOfSpeech' AS feature, 
+           partOfSpeech AS value
+        FROM MorphologicalDetailInflections
+    UNION
+    SELECT partOfSpeech, 
+           'gramCase', 
+           gramCase
+        FROM MorphologicalDetailInflections
+        WHERE gramCase IS NOT NULL
+    UNION
+    SELECT partOfSpeech, 
+           'number', 
+           number
+        FROM MorphologicalDetailInflections
+        WHERE number IS NOT NULL
+    UNION
+    SELECT partOfSpeech, 
+           'gender', 
+           gender
+        FROM MorphologicalDetailInflections
+        WHERE gender IS NOT NULL
+    UNION
+    SELECT partOfSpeech, 
+           'person', 
+           person
+        FROM MorphologicalDetailInflections
+        WHERE person IS NOT NULL
+    UNION
+    SELECT partOfSpeech, 
+           'verbForm', 
+           verbForm
+        FROM MorphologicalDetailInflections
+        WHERE verbForm IS NOT NULL
+    UNION
+    SELECT partOfSpeech, 
+           'tense', 
+           tense
+        FROM MorphologicalDetailInflections
+        WHERE tense IS NOT NULL
+    UNION
+    SELECT partOfSpeech, 
+           'voice', 
+           voice
+        FROM MorphologicalDetailInflections
+        WHERE voice IS NOT NULL;
+
+getConcordanceGrammarValues WITH GrammarValueRow.fromSql: SELECT partOfSpeech, 
+                                                                 feature, 
+                                                                 value 
+                                                              FROM "concordance.GrammarValues" 
+                                                              ORDER BY partOfSpeech, feature, value;
+
+-- TODO(whothefluff): simplify comment
+-- A page of the hits of a phrase of one to three words, in the order of :sort, with the text
+-- around them. One row per context token: up to 12 before the first word, the words and what's
+-- between them, and up to 12 after the last one.
+--
+-- :phrase is a JSON array with an object per word (see ConcordanceParameters):
+--   distance         words after the previous one at most (null: anywhere later in the sentence)
+--   spellings        a form as the match columns may have it (Cum: ["cum", "Cum"])
+--   macronSpellings  the same with its macrons, when they have to match too
+-- or, for a lemma or grammar word, any of
+--   lemma            the dictionaryRefs of a lemma (any lemma when absent)
+--   partOfSpeech, gramCase, number, gender, person, verbForm, tense, voice
+-- :works is a JSON array of the works to search, in the order hits are sorted by. :fromIdx and
+-- :toIdx limit it to a part of a work. :titles and :sort are a ConcordanceTitles and a
+-- ConcordanceSort by name.
+--
+-- A word is found as frequency counts it: by lookupForm, also capitalized when
+-- properNounState = 2, by the enclitic, and, for a spelled word, as written with an enclitic
+-- (populusque, by the host's baseNormForm). The macron columns only add macrons to the same
+-- letters, so they can only narrow what the plain ones find.
+--
+-- SQLite has no estimate for the IN subqueries, so it gets some help: MATERIALIZED works out
+-- each word's forms once, the unary + keeps it from reading the part's idx range instead of the
+-- form indexes, and CROSS JOIN fixes the order (the first word leads, context is read for the
+-- page only).
+getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :titles AS TEXT, :sort AS TEXT):
+    WITH WorkOrder AS ( SELECT CAST( Work.key AS INTEGER ) AS position,
+                               Work.value AS workId
+                            FROM json_each( :works ) AS Work ),
+         Criteria AS MATERIALIZED ( SELECT CAST( Word.key AS INTEGER ) + 1 AS slot,
+                                           IFNULL( json_extract( Word.value, '$.distance' ), 1000000 ) AS distance,
+                                           CAST( json_extract( Word.value, '$.spellings' ) AS TEXT ) AS spellings,
+                                           CAST( json_extract( Word.value, '$.macronSpellings' ) AS TEXT ) AS macronSpellings,
+                                           CAST( json_extract( Word.value, '$.lemma' ) AS TEXT ) AS lemma,
+                                           CAST( json_extract( Word.value, '$.partOfSpeech' ) AS TEXT ) AS partOfSpeech,
+                                           CAST( json_extract( Word.value, '$.gramCase' ) AS TEXT ) AS gramCase,
+                                           CAST( json_extract( Word.value, '$.number' ) AS TEXT ) AS number,
+                                           CAST( json_extract( Word.value, '$.gender' ) AS TEXT ) AS gender,
+                                           CAST( json_extract( Word.value, '$.person' ) AS TEXT ) AS person,
+                                           CAST( json_extract( Word.value, '$.verbForm' ) AS TEXT ) AS verbForm,
+                                           CAST( json_extract( Word.value, '$.tense' ) AS TEXT ) AS tense,
+                                           CAST( json_extract( Word.value, '$.voice' ) AS TEXT ) AS voice
+                                        FROM json_each( :phrase ) AS Word ),
+         Spellings AS MATERIALIZED ( SELECT Criteria.slot, 
+                                            Spelling.value AS form
+                                         FROM Criteria, json_each( Criteria.spellings ) AS Spelling ),
+         MacronSpellings AS MATERIALIZED ( SELECT Criteria.slot, 
+                                                  Spelling.value AS form
+                                               FROM Criteria, json_each( Criteria.macronSpellings ) AS Spelling ),
+         LemmaRefs AS MATERIALIZED ( SELECT Criteria.slot, 
+                                            Ref.value AS dictionaryRef
+                                         FROM Criteria, json_each( Criteria.lemma ) AS Ref ),
+         -- Every form an analysed word can have
+         -- A combined value (masculine/feminine/neuter) has each of its values
+         Analysed AS MATERIALIZED ( SELECT Criteria.slot, 
+                                           Analyses.form, 
+                                           Analyses.capitalizedForm
+                                        FROM Criteria
+                                        CROSS JOIN "concordance.Analyses" AS Analyses
+                                        WHERE Criteria.spellings IS NULL
+                                              AND ( Criteria.lemma IS NULL
+                                                    OR Analyses.dictionaryRef IN ( SELECT dictionaryRef
+                                                                                       FROM LemmaRefs
+                                                                                       WHERE LemmaRefs.slot = Criteria.slot ) )
+                                              AND ( Criteria.partOfSpeech IS NULL
+                                                    OR Analyses.partOfSpeech = Criteria.partOfSpeech )
+                                              AND ( Criteria.gramCase IS NULL
+                                                    OR instr( '/' || Analyses.gramCase || '/',
+                                                              '/' || Criteria.gramCase || '/' ) > 0 )
+                                              AND ( Criteria.number IS NULL
+                                                    OR instr( '/' || Analyses.number || '/',
+                                                              '/' || Criteria.number || '/' ) > 0 )
+                                              AND ( Criteria.gender IS NULL
+                                                    OR instr( '/' || Analyses.gender || '/',
+                                                              '/' || Criteria.gender || '/' ) > 0 )
+                                              AND ( Criteria.person IS NULL
+                                                    OR instr( '/' || Analyses.person || '/',
+                                                              '/' || Criteria.person || '/' ) > 0 )
+                                              AND ( Criteria.verbForm IS NULL
+                                                    OR instr( '/' || Analyses.verbForm || '/',
+                                                              '/' || Criteria.verbForm || '/' ) > 0 )
+                                              AND ( Criteria.tense IS NULL
+                                                    OR instr( '/' || Analyses.tense || '/',
+                                                              '/' || Criteria.tense || '/' ) > 0 )
+                                              AND ( Criteria.voice IS NULL
+                                                    OR instr( '/' || Analyses.voice || '/',
+                                                              '/' || Criteria.voice || '/' ) > 0 ) ),
+         -- What a token's lookupForm or enclitic can be: a spelling or an analysed form
+         Forms AS MATERIALIZED ( SELECT slot, form FROM Spellings
+                                 UNION ALL
+                                 SELECT slot, form FROM Analysed ),
+         Hits AS ( SELECT WorkOrder.position,
+                          t1.workId,
+                          t1.sentenceIdx,
+                          t1.sourceReference AS reference,
+                          t1.isTitle,
+                          t1.idx AS firstIdx,
+                          COALESCE( t3.idx, t2.idx, t1.idx ) AS lastIdx,
+                          t1.wordIdx AS firstWordIdx,
+                          COALESCE( t3.wordIdx, t2.wordIdx, t1.wordIdx ) AS lastWordIdx,
+                          t1.idx AS slot1Idx,
+                          t2.idx AS slot2Idx,
+                          t3.idx AS slot3Idx
+                       FROM WorkOrder
+                       CROSS JOIN WorkContents AS t1
+                       LEFT OUTER JOIN WorkContents AS t2
+                           ON EXISTS ( SELECT * FROM Criteria WHERE slot = 2 )
+                              AND t2.workId = t1.workId
+                              AND t2.sentenceIdx = t1.sentenceIdx
+                              -- A few titles share a sentence with the text after them
+                              AND t2.isTitle = t1.isTitle
+                              AND t2.wordIdx BETWEEN t1.wordIdx + 1 AND t1.wordIdx + ( SELECT distance FROM Criteria WHERE slot = 2 )
+                              AND t2.idx BETWEEN :fromIdx AND :toIdx
+                              AND ( t2.lookupForm IN ( SELECT form FROM Forms WHERE slot = 2 )
+                                    OR t2.enclitic IN ( SELECT form FROM Forms WHERE slot = 2 )
+                                    OR ( t2.enclitic IS NOT NULL
+                                         AND t2.baseNormForm IN ( SELECT form FROM Spellings WHERE slot = 2 ) )
+                                    OR ( t2.properNounState = 2
+                                         AND t2.lookupForm IN ( SELECT capitalizedForm FROM Analysed WHERE slot = 2 ) ) )
+                              AND ( NOT EXISTS ( SELECT * FROM MacronSpellings WHERE slot = 2 )
+                                    OR t2.macronLookupForm IN ( SELECT form FROM MacronSpellings WHERE slot = 2 )
+                                    OR t2.enclitic IN ( SELECT form FROM MacronSpellings WHERE slot = 2 )
+                                    OR ( t2.enclitic IS NOT NULL
+                                         AND t2.macronBaseNormForm IN ( SELECT form FROM MacronSpellings WHERE slot = 2 ) ) )
+                       LEFT OUTER JOIN WorkContents AS t3
+                           ON EXISTS ( SELECT * FROM Criteria WHERE slot = 3 )
+                              AND t3.workId = t2.workId
+                              AND t3.sentenceIdx = t2.sentenceIdx
+                              AND t3.isTitle = t2.isTitle
+                              AND t3.wordIdx BETWEEN t2.wordIdx + 1 AND t2.wordIdx + ( SELECT distance FROM Criteria WHERE slot = 3 )
+                              AND t3.idx BETWEEN :fromIdx AND :toIdx
+                              AND ( t3.lookupForm IN ( SELECT form FROM Forms WHERE slot = 3 )
+                                    OR t3.enclitic IN ( SELECT form FROM Forms WHERE slot = 3 )
+                                    OR ( t3.enclitic IS NOT NULL
+                                         AND t3.baseNormForm IN ( SELECT form FROM Spellings WHERE slot = 3 ) )
+                                    OR ( t3.properNounState = 2
+                                         AND t3.lookupForm IN ( SELECT capitalizedForm FROM Analysed WHERE slot = 3 ) ) )
+                              AND ( NOT EXISTS ( SELECT * FROM MacronSpellings WHERE slot = 3 )
+                                    OR t3.macronLookupForm IN ( SELECT form FROM MacronSpellings WHERE slot = 3 )
+                                    OR t3.enclitic IN ( SELECT form FROM MacronSpellings WHERE slot = 3 )
+                                    OR ( t3.enclitic IS NOT NULL
+                                         AND t3.macronBaseNormForm IN ( SELECT form FROM MacronSpellings WHERE slot = 3 ) ) )
+                       WHERE t1.workId = WorkOrder.workId
+                             AND +t1.idx BETWEEN :fromIdx AND :toIdx
+                             AND CASE :titles 
+                                 WHEN 'only' THEN t1.isTitle
+                                 WHEN 'excluded' THEN NOT t1.isTitle
+                                 ELSE TRUE
+                                 END
+                             AND ( t1.lookupForm IN ( SELECT form FROM Forms WHERE slot = 1 )
+                                   OR t1.enclitic IN ( SELECT form FROM Forms WHERE slot = 1 )
+                                   OR ( t1.enclitic IS NOT NULL
+                                        AND t1.baseNormForm IN ( SELECT form FROM Spellings WHERE slot = 1 ) )
+                                   OR ( t1.properNounState = 2
+                                        AND t1.lookupForm IN ( SELECT capitalizedForm FROM Analysed WHERE slot = 1 ) ) )
+                             AND ( NOT EXISTS ( SELECT * FROM MacronSpellings WHERE slot = 1 )
+                                   OR t1.macronLookupForm IN ( SELECT form FROM MacronSpellings WHERE slot = 1 )
+                                   OR t1.enclitic IN ( SELECT form FROM MacronSpellings WHERE slot = 1 )
+                                   OR ( t1.enclitic IS NOT NULL
+                                        AND t1.macronBaseNormForm IN ( SELECT form FROM MacronSpellings WHERE slot = 1 ) ) )
+                             AND ( t2.idx IS NOT NULL 
+                                   OR NOT EXISTS ( SELECT * FROM Criteria WHERE slot = 2 ) )
+                             AND ( t3.idx IS NOT NULL 
+                                   OR NOT EXISTS ( SELECT * FROM Criteria WHERE slot = 3 ) ) ),
+         -- The word right after or before a hit in its sentence, on its side of a title's end
+         Sorted AS ( SELECT Hits.*,
+                            CASE :sort
+                            WHEN 'followingWord' 
+                            THEN ( SELECT LOWER( Neighbour.normForm )
+                                       FROM WorkContents AS Neighbour
+                                       WHERE Neighbour.workId = Hits.workId
+                                             AND Neighbour.sentenceIdx = Hits.sentenceIdx
+                                             AND Neighbour.isTitle = Hits.isTitle
+                                             AND Neighbour.wordIdx = Hits.lastWordIdx + 1 )
+                            WHEN 'precedingWord' 
+                            THEN ( SELECT LOWER( Neighbour.normForm )
+                                       FROM WorkContents AS Neighbour
+                                       WHERE Neighbour.workId = Hits.workId
+                                             AND Neighbour.sentenceIdx = Hits.sentenceIdx
+                                             AND Neighbour.isTitle = Hits.isTitle
+                                             AND Neighbour.wordIdx = Hits.firstWordIdx - 1 )
+                            END AS sortKey
+                         FROM Hits ),
+         -- Pages need a total order: a hit is identified by its words
+         -- A hit with no neighbour to sort by (at the edge of its sentence) goes last
+         Page AS ( SELECT Sorted.*,
+                          COUNT( * ) OVER ( ) AS totalHits
+                       FROM Sorted
+                       ORDER BY Sorted.sortKey IS NULL, Sorted.sortKey, Sorted.position, Sorted.firstIdx, Sorted.lastIdx, Sorted.slot2Idx, Sorted.slot3Idx
+                       LIMIT :limit 
+                       OFFSET :offset )
+        SELECT Page.*,
+               Context.idx AS contextIdx,
+               Context.word AS contextWord,
+               Context.macronizedWord AS contextMacronizedWord,
+               Context.sourceReference AS contextReference
+            FROM Page
+            CROSS JOIN WorkContents AS Context
+            WHERE Context.workId = Page.workId
+                  AND Context.idx BETWEEN Page.firstIdx - 12 AND Page.lastIdx + 12
+            ORDER BY Page.sortKey IS NULL, Page.sortKey, Page.position, Page.firstIdx, Page.lastIdx, Page.slot2Idx, Page.slot3Idx, Context.idx;

@@ -55,6 +55,18 @@ class LibrarySelection {
 
   const LibrarySelection.empty() : _byAuthor = const {};
 
+  /// Reads a selection written by [toJsonMap]
+  LibrarySelection.fromJsonMap(
+    Map<String, Object?> map,
+  ) : this(
+        map.map(
+          (authorId, works) => MapEntry(
+            authorId.isEmpty ? null : authorId,
+            (works! as List).cast<String>().toSet(),
+          ),
+        ),
+      );
+
   final Map<String?, Set<String>> _byAuthor;
   static const _equality = MapEquality<String?, Set<String>>(values: SetEquality<String>());
 
@@ -88,6 +100,11 @@ class LibrarySelection {
     }
     return LibrarySelection(next);
   }
+
+  /// Work IDs by author ID, with works that have no author under `''`
+  Map<String, Object?> toJsonMap() => _byAuthor.map(
+    (authorId, works) => MapEntry(authorId ?? '', works.sorted((a, b) => a.compareTo(b))),
+  );
 
   @override
   String toString() => 'LibrarySelection{sources: $sourceCount, works: ${allWorkIds.length}}';

@@ -10,10 +10,13 @@ import '../../external/db_oracle.dart';
 /// It's basically what frequency ultimately counts.
 ///
 /// `lookupForm` is the spelling used to find matches in `MorphologicalDetails`:
-/// - Expansions use `baseNormForm`, such as `Marcus`.
-/// - Words with an enclitic keep it attached for the lookup, such as `populusque`.
-/// - Other words use `normForm`.
+/// - For the word itself, `WorkContents.lookupForm`: expansions by what they
+///   stand for (`Marcus`), words with an enclitic as written (`populusque`).
+///   It's NULL for tokens that aren't counted words, which is what excludes them.
 /// - Enclitics counted separately use their own spelling, such as `que`.
+///
+/// The concordance matches tokens with the same columns, so both features agree
+/// on what a word is and on how it's looked up.
 ///
 /// The body is indented for the use site, not for this declaration(we make it
 /// so that `WITH` lands at column 12 and CTE names align at col 17
@@ -31,10 +34,7 @@ const _countUnits = '''WITH TokenComponents( ordinal ) AS ( VALUES (0), (1) ),
                                  ELSE WorkContents.enclitic
                             END AS macronForm,
                             CASE TokenComponents.ordinal
-                                 WHEN 0 THEN CASE WHEN WorkContents.expansion IS NOT NULL
-                                                  THEN WorkContents.baseNormForm
-                                                  ELSE WorkContents.normForm
-                                             END
+                                 WHEN 0 THEN WorkContents.lookupForm
                                  ELSE WorkContents.enclitic
                             END AS lookupForm,
                             CASE TokenComponents.ordinal
@@ -44,11 +44,9 @@ const _countUnits = '''WITH TokenComponents( ordinal ) AS ( VALUES (0), (1) ),
                          FROM WorkContents
                          CROSS JOIN TokenComponents
                          WHERE ( TokenComponents.ordinal = 0
-                                 AND ( WorkContents.tokenType = 1
-                                       OR ( WorkContents.tokenType IN (2, 3) AND WorkContents.expansion IS NOT NULL ) ) )
+                                 AND WorkContents.lookupForm IS NOT NULL )
                                OR ( TokenComponents.ordinal = 1
-                                    AND WorkContents.tokenType = 1
-                                    AND WorkContents.enclitic IS NOT NULL )
+                                    AND WorkContents.enclitic IS NOT NULL ) -- only ever on tokenType 1
                  )''';
 
 // Type not important

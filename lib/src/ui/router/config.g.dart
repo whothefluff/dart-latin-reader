@@ -130,9 +130,16 @@ RouteBase get $mainRoute => StatefulShellRouteData.$route(
     StatefulShellBranchData.$branch(
       routes: [
         GoRouteData.$route(
-          path: '/word-lookup',
+          path: '/concordance',
 
-          factory: _$WordLookupRoute._fromState,
+          factory: _$ConcordanceRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: 'hits',
+
+              factory: _$ConcordanceHitsRoute._fromState,
+            ),
+          ],
         ),
       ],
     ),
@@ -254,14 +261,34 @@ mixin _$WorkDetailsRoute on GoRouteData {
 }
 
 mixin _$ReaderRoute on GoRouteData {
-  static ReaderRoute _fromState(GoRouterState state) =>
-      ReaderRoute(state.pathParameters['workId']!);
+  static ReaderRoute _fromState(GoRouterState state) => ReaderRoute(
+    state.pathParameters['workId']!,
+    startingPoint: _$convertMapValue(
+      'starting-point',
+      state.uri.queryParameters,
+      int.tryParse,
+    ),
+    highlights:
+        (state.uri.queryParametersAll['highlights']
+                    ?.map(int.parse)
+                    .cast<int>()
+                    ?.toList()
+                as List<int>?)
+            ?.toList() ??
+        const [],
+  );
 
   ReaderRoute get _self => this as ReaderRoute;
 
   @override
   String get location => GoRouteData.$location(
     '/library/reader/${Uri.encodeComponent(_self.workId)}',
+    queryParams: {
+      if (_self.startingPoint != null)
+        'starting-point': _self.startingPoint!.toString(),
+      if (!_$iterablesEqual(_self.highlights, const []))
+        'highlights': _self.highlights.map((e) => e.toString()).toList(),
+    },
   );
 
   @override
@@ -418,12 +445,17 @@ mixin _$MorphologicalDataRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-mixin _$WordLookupRoute on GoRouteData {
-  static WordLookupRoute _fromState(GoRouterState state) =>
-      const WordLookupRoute();
+mixin _$ConcordanceRoute on GoRouteData {
+  static ConcordanceRoute _fromState(GoRouterState state) =>
+      ConcordanceRoute(search: state.uri.queryParameters['search']);
+
+  ConcordanceRoute get _self => this as ConcordanceRoute;
 
   @override
-  String get location => GoRouteData.$location('/word-lookup');
+  String get location => GoRouteData.$location(
+    '/concordance',
+    queryParams: {if (_self.search != null) 'search': _self.search},
+  );
 
   @override
   void go(BuildContext context) => context.go(location);
@@ -437,4 +469,61 @@ mixin _$WordLookupRoute on GoRouteData {
 
   @override
   void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$ConcordanceHitsRoute on GoRouteData {
+  static ConcordanceHitsRoute _fromState(GoRouterState state) =>
+      ConcordanceHitsRoute(
+        search: state.uri.queryParameters['search']!,
+        offset:
+            _$convertMapValue('offset', state.uri.queryParameters, int.parse) ??
+            0,
+      );
+
+  ConcordanceHitsRoute get _self => this as ConcordanceHitsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/concordance/hits',
+    queryParams: {
+      'search': _self.search,
+      if (_self.offset != 0) 'offset': _self.offset.toString(),
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+T? _$convertMapValue<T>(
+  String key,
+  Map<String, String> map,
+  T? Function(String) converter,
+) {
+  final value = map[key];
+  return value == null ? null : converter(value);
+}
+
+bool _$iterablesEqual<T>(Iterable<T>? iterable1, Iterable<T>? iterable2) {
+  if (identical(iterable1, iterable2)) return true;
+  if (iterable1 == null || iterable2 == null) return false;
+  final iterator1 = iterable1.iterator;
+  final iterator2 = iterable2.iterator;
+  while (true) {
+    final hasNext1 = iterator1.moveNext();
+    final hasNext2 = iterator2.moveNext();
+    if (hasNext1 != hasNext2) return false;
+    if (!hasNext1) return true;
+    if (iterator1.current != iterator2.current) return false;
+  }
 }

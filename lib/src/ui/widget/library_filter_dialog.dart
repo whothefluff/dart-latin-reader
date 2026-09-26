@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../component/library/catalog_api.dart';
-import '../../../component/word_frequency/library_selection_api.dart';
+import '../../component/library/catalog_api.dart';
+import '../../component/word_frequency/library_selection_api.dart';
 
-/// Lets the user choose works for the word frequency report.
+/// Lets the user choose works (for the word frequency report or the concordance).
 ///
 /// Pressing Done returns the edited [LibrarySelection] to the caller.
 /// Closing the dialog without pressing Done discards the edits.

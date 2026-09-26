@@ -1084,6 +1084,11 @@ class MorphologicalDetailsCompanion
   }
 }
 
+i0.Index get morphologicalDetailsDictRef => i0.Index(
+  'MorphologicalDetails_DictRef',
+  'CREATE INDEX MorphologicalDetails_DictRef ON MorphologicalDetails (dictionaryRef)',
+);
+
 class MorphologicalDetailInflections extends i0.Table
     with
         i0.TableInfo<

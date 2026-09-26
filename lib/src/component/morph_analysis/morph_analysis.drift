@@ -10,6 +10,10 @@ CREATE TABLE "MorphologicalDetails"(
 STRICT, 
 WITHOUT ROWID;
 
+-- Concordance lemma criteria go from the lemma to its forms
+CREATE INDEX "MorphologicalDetails_DictRef"
+    ON MorphologicalDetails( dictionaryRef );
+
 /* 
 for the coexistance of several sources of analyses, something like this would be necessary
 but (for the time being) forcing all navigations from an analysis to a L&S entry will suffice

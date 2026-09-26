@@ -156,6 +156,21 @@ final operations = [
     },
   ),
   (
+    id: 'ResolveTitles',
+    delete: (_) async {},
+    insert: (AppDb db) async {
+      // TITL subdivisions are leaves that hold nothing but their title's tokens
+      await db.customStatement('''
+      UPDATE WorkContents
+        SET isTitle = TRUE
+        FROM WorkContentSubdivisions AS Titles
+        WHERE Titles.typ = 'TITL'
+              AND WorkContents.workId = Titles.workId
+              AND WorkContents.idx BETWEEN Titles.fromIndex AND Titles.toIndex
+    ''');
+    },
+  ),
+  (
     id: 'WorkContentSupplementary',
     delete: (AppDb db) async {
       await db.delete(db.workContentSupplementary).go();
