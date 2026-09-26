@@ -58,6 +58,7 @@ CREATE TABLE "WorkContents"(
     "expansion" TEXT,
     "macronizedWord" TEXT NOT NULL,
     "uncertaintyBitMask" INTEGER NOT NULL,
+    "isTitle" BOOLEAN NOT NULL DEFAULT FALSE, --TRUE when part of a TITL sequence
     -- aux (internal use only)
     "aux_expansionNoMacrons" TEXT GENERATED ALWAYS AS (
         "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"(
@@ -131,6 +132,21 @@ CREATE TABLE "WorkContents"(
              ELSE aux_macronBaseLower
         END
     ) VIRTUAL,
+    -- Its form in MorphologicalDetails; NULL when it isn't a counted word
+    "lookupForm" TEXT GENERATED ALWAYS AS (
+        CASE WHEN expansion IS NOT NULL 
+             THEN baseNormForm
+             WHEN tokenType = 1 
+             THEN normForm
+        END
+    ) VIRTUAL,
+    "macronLookupForm" TEXT GENERATED ALWAYS AS (
+        CASE WHEN expansion IS NOT NULL 
+             THEN macronBaseNormForm
+             WHEN tokenType = 1 
+             THEN macronNormForm
+        END
+    ) VIRTUAL,
     PRIMARY KEY( workId, idx ),
     FOREIGN KEY( workId ) REFERENCES Works( id ),
     CHECK( (wordIdx IS NULL) = (tokenType >= 4) ), --fancy XNOR expression (both must be true or both must be false)
@@ -145,6 +161,26 @@ CREATE TABLE "WorkContents"(
 )
 STRICT,
 WITHOUT ROWID;
+
+-- Corpus search (concordance): a criterion seeks the counted words by lookupForm...
+CREATE INDEX "WorkContents_LookupForm"
+    ON WorkContents( lookupForm )
+    WHERE lookupForm IS NOT NULL;
+
+-- plus the few tokens carrying an enclitic by host (baseNormForm; for the rest it's lookupForm)...
+CREATE INDEX "WorkContents_EncliticHost"
+    ON WorkContents( baseNormForm )
+    WHERE enclitic IS NOT NULL;
+
+-- and by enclitic...
+CREATE INDEX "WorkContents_Enclitic"
+    ON WorkContents( enclitic )
+    WHERE enclitic IS NOT NULL;
+
+-- and the next word of a phrase by its position.
+CREATE INDEX "WorkContents_WordPosition"
+    ON WorkContents( workId, sentenceIdx, wordIdx )
+    WHERE wordIdx IS NOT NULL;
 
 CREATE TABLE "WorkContentSubdivisions"(
     "workId" TEXT NOT NULL,
@@ -415,6 +451,29 @@ CREATE VIEW "library.WorkContents" AS
             ORDER BY idx;
 
 getLibraryWorkContentsPartial WITH WorkContentsSegment: SELECT * FROM "library.WorkContents" WHERE workId = ? AND idx BETWEEN ? AND ?;
+
+CREATE VIEW "library.ReadingStarts" AS
+    SELECT WorkContents.workId,
+           WorkContents.idx,
+           -- TODO(whothefluff): simplify comment
+           -- The reader never splits a verse or a title across pages, so a page has to start
+           -- where the one holding the token does. A token is in one at most: MAX only makes
+           -- that a value, NULL in prose. Paragraphs do split, and can run for pages, so there
+           -- the page starts where the sentence does, at most 30 tokens back
+           COALESCE( ( SELECT MAX( Lines.fromIndex )
+                           FROM WorkContentSubdivisions AS Lines
+                           WHERE Lines.workId = WorkContents.workId
+                                 AND Lines.typ IN ('VERS', 'TITL')
+                                 AND WorkContents.idx BETWEEN Lines.fromIndex AND Lines.toIndex ),
+                     ( SELECT MIN( Sentence.idx )
+                           FROM WorkContents AS Sentence
+                           WHERE Sentence.workId = WorkContents.workId
+                                 AND Sentence.idx BETWEEN WorkContents.idx - 30 AND WorkContents.idx --long prose sentence would push the token off the page
+                                 AND Sentence.sentenceIdx = WorkContents.sentenceIdx ),
+                     WorkContents.idx ) AS startIdx -- only for Drift's nullability analysis
+        FROM WorkContents;
+
+getLibraryReadingStart: SELECT startIdx FROM "library.ReadingStarts" WHERE workId = :workId AND idx = :idx;
 
 CREATE VIEW "library.WorkIndexes" AS
     SELECT SubdivsHierarchy.workId,

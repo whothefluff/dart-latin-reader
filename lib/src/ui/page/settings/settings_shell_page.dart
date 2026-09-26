@@ -196,6 +196,6 @@ abstract final class SettingsTab {
 
   static const String morphAnalysis = morphAnalysisId;
 
-  static const String wordLookup = wordLookupId;
+  static const String concordance = concordanceId;
   //
 }

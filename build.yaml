@@ -16,7 +16,7 @@ targets:
               version: "3.48" #TODO(whothefluff): bump to latest supported major.minor every release (although it only affects syntax checks)
               known_functions:
                 regexp: "integer( text, text )"
-              modules: [fts5]
+              modules: [fts5, json1]
           databases:
             AppDb: lib/src/external/database.dart
       drift_dev:modular:

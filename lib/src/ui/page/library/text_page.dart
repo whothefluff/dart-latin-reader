@@ -69,9 +69,18 @@ class TextPage extends ConsumerStatefulWidget {
   const TextPage(
     this.workId, {
     super.key,
+    this.startingPoint,
+    this.highlights = const [],
   });
 
   final String workId;
+
+  /// Where the first page starts at.
+  /// The beginning of the work when `null`.
+  final int? startingPoint;
+
+  /// Tokens marked on a page
+  final List<int> highlights;
 
   @override
   TextPageState createState() => TextPageState();
@@ -93,6 +102,12 @@ class TextPageState extends ConsumerState<TextPage> {
   var _navMenuOpen = false;
   int _toIndex = _initialBufferSize - 1;
   _PageFlow _pageFlow = _PageFlow.next;
+
+  @override
+  void initState() {
+    super.initState();
+    _restartAt(widget.startingPoint ?? 0);
+  }
 
   @override
   Widget build(context) {
@@ -136,6 +151,7 @@ class TextPageState extends ConsumerState<TextPage> {
       return _StyledWordList(
         key: ValueKey((widget.workId, generation)), // Recreate selection state after explicit nav
         segments: segments,
+        highlights: widget.highlights,
         onNavigateNext: _loadNextPage,
         onNavigatePrevious: _loadPreviousPage,
         onOpenMenu: _openMenu,
@@ -235,15 +251,20 @@ class TextPageState extends ConsumerState<TextPage> {
   @override
   void didUpdateWidget(TextPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.workId != widget.workId) {
-      _contentGeneration++;
-      _pageReady = false;
-      _currentFirstVisibleIndex = 0;
-      _currentLastVisibleIndex = 0;
-      _fromIndex = 0;
-      _toIndex = _bufferSize - 1;
-      _pageFlow = _PageFlow.next;
+    if (oldWidget.workId != widget.workId || oldWidget.startingPoint != widget.startingPoint) {
+      _restartAt(widget.startingPoint ?? 0);
     }
+  }
+
+  /// Discards the current page and lays out a new one from [start]
+  void _restartAt(int start) {
+    _contentGeneration++;
+    _pageReady = false;
+    _currentFirstVisibleIndex = start;
+    _currentLastVisibleIndex = start;
+    _fromIndex = start;
+    _toIndex = start + _bufferSize - 1;
+    _pageFlow = _PageFlow.next;
   }
 
   Future<void> _openMenu() async {
@@ -342,11 +363,15 @@ class _TextRenderer {
     this.theme,
     this.workSegments,
     this.readerSettings,
+    this.highlights,
   );
 
   final ThemeData theme;
   final WorkContentsSegments workSegments;
   final ReaderSettings readerSettings;
+
+  /// Token indices to mark
+  final List<int> highlights;
 
   static const _empty = '';
 
@@ -443,7 +468,7 @@ class _TextRenderer {
     ];
   }
 
-  /// Letter spans for [segment]
+  /// Letter spans for [segment], inside a marked span when it's highlighted
   List<TextSpan> _wordSpans(WorkContentsSegment segment) {
     final word = readerSettings.showMacrons ? segment.macronizedWord : segment.word;
     final mask = readerSettings.showMacrons ? segment.uncertaintyBitMask : 0;
@@ -453,7 +478,7 @@ class _TextRenderer {
       decorationColor: theme.colorScheme.primary,
       decorationThickness: 1,
     );
-    return mask == 0
+    final letters = mask == 0
         ? [TextSpan(text: word)]
         : word.runes.mapIndexed((i, rune) {
             final isUncertain = ((mask >> i) & 1) != 0;
@@ -462,6 +487,14 @@ class _TextRenderer {
               style: isUncertain ? uncertainStyle : null,
             );
           }).toList();
+    //backgrounddoes not affect pagination
+    final highlightStyle = TextStyle(
+      backgroundColor: theme.colorScheme.tertiaryContainer,
+      color: theme.colorScheme.onTertiaryContainer,
+    );
+    return highlights.contains(segment.idx)
+        ? [TextSpan(style: highlightStyle, children: letters)]
+        : letters;
   }
 
   //
@@ -808,6 +841,7 @@ class _StyledWordList extends ConsumerStatefulWidget {
   const _StyledWordList({
     super.key,
     required this.segments,
+    required this.highlights,
     required this.onNavigateNext,
     required this.onNavigatePrevious,
     required this.onOpenMenu,
@@ -817,6 +851,7 @@ class _StyledWordList extends ConsumerStatefulWidget {
   });
 
   final WorkContentsSegments segments;
+  final List<int> highlights;
   final VoidCallback onNavigateNext;
   final VoidCallback onNavigatePrevious;
   final VoidCallback onOpenMenu;
@@ -1090,7 +1125,12 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     int revision,
   ) {
     final segments = widget.segments;
-    final allSpans = _TextRenderer(Theme.of(context), segments, settings).createSpans();
+    final allSpans = _TextRenderer(
+      Theme.of(context),
+      segments,
+      settings,
+      widget.highlights,
+    ).createSpans();
     final visible = _VisibleSegmentRange.build(
       allSpans,
       segments,

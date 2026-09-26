@@ -673,6 +673,7 @@ typedef $WorkContentsCreateCompanionBuilder =
       i0.Value<String?> expansion,
       required String macronizedWord,
       required int uncertaintyBitMask,
+      i0.Value<bool> isTitle,
     });
 typedef $WorkContentsUpdateCompanionBuilder =
     i1.WorkContentsCompanion Function({
@@ -688,6 +689,7 @@ typedef $WorkContentsUpdateCompanionBuilder =
       i0.Value<String?> expansion,
       i0.Value<String> macronizedWord,
       i0.Value<int> uncertaintyBitMask,
+      i0.Value<bool> isTitle,
     });
 
 class $WorkContentsFilterComposer
@@ -759,6 +761,11 @@ class $WorkContentsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
+  i0.ColumnFilters<bool> get isTitle => $composableBuilder(
+    column: $table.isTitle,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
   i0.ColumnFilters<String> get auxExpansionNoMacrons => $composableBuilder(
     column: $table.auxExpansionNoMacrons,
     builder: (column) => i0.ColumnFilters(column),
@@ -801,6 +808,16 @@ class $WorkContentsFilterComposer
 
   i0.ColumnFilters<String> get macronBaseNormForm => $composableBuilder(
     column: $table.macronBaseNormForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -874,6 +891,11 @@ class $WorkContentsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<bool> get isTitle => $composableBuilder(
+    column: $table.isTitle,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<String> get auxExpansionNoMacrons => $composableBuilder(
     column: $table.auxExpansionNoMacrons,
     builder: (column) => i0.ColumnOrderings(column),
@@ -916,6 +938,16 @@ class $WorkContentsOrderingComposer
 
   i0.ColumnOrderings<String> get macronBaseNormForm => $composableBuilder(
     column: $table.macronBaseNormForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
     builder: (column) => i0.ColumnOrderings(column),
   );
 }
@@ -975,6 +1007,9 @@ class $WorkContentsAnnotationComposer
     builder: (column) => column,
   );
 
+  i0.GeneratedColumn<bool> get isTitle =>
+      $composableBuilder(column: $table.isTitle, builder: (column) => column);
+
   i0.GeneratedColumn<String> get auxExpansionNoMacrons => $composableBuilder(
     column: $table.auxExpansionNoMacrons,
     builder: (column) => column,
@@ -1015,6 +1050,16 @@ class $WorkContentsAnnotationComposer
 
   i0.GeneratedColumn<String> get macronBaseNormForm => $composableBuilder(
     column: $table.macronBaseNormForm,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
     builder: (column) => column,
   );
 }
@@ -1066,6 +1111,7 @@ class $WorkContentsTableManager
                 i0.Value<String?> expansion = const i0.Value.absent(),
                 i0.Value<String> macronizedWord = const i0.Value.absent(),
                 i0.Value<int> uncertaintyBitMask = const i0.Value.absent(),
+                i0.Value<bool> isTitle = const i0.Value.absent(),
               }) => i1.WorkContentsCompanion(
                 workId: workId,
                 idx: idx,
@@ -1079,6 +1125,7 @@ class $WorkContentsTableManager
                 expansion: expansion,
                 macronizedWord: macronizedWord,
                 uncertaintyBitMask: uncertaintyBitMask,
+                isTitle: isTitle,
               ),
           createCompanionCallback:
               ({
@@ -1094,6 +1141,7 @@ class $WorkContentsTableManager
                 i0.Value<String?> expansion = const i0.Value.absent(),
                 required String macronizedWord,
                 required int uncertaintyBitMask,
+                i0.Value<bool> isTitle = const i0.Value.absent(),
               }) => i1.WorkContentsCompanion.insert(
                 workId: workId,
                 idx: idx,
@@ -1107,6 +1155,7 @@ class $WorkContentsTableManager
                 expansion: expansion,
                 macronizedWord: macronizedWord,
                 uncertaintyBitMask: uncertaintyBitMask,
+                isTitle: isTitle,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -3349,6 +3398,18 @@ class WorkContents extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _isTitleMeta = const i0.VerificationMeta(
+    'isTitle',
+  );
+  late final i0.GeneratedColumn<bool> isTitle = i0.GeneratedColumn<bool>(
+    'isTitle',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.bool,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT FALSE',
+    defaultValue: const i0.CustomExpression('FALSE'),
+  );
   static const i0.VerificationMeta _auxExpansionNoMacronsMeta =
       const i0.VerificationMeta('auxExpansionNoMacrons');
   late final i0.GeneratedColumn<String>
@@ -3511,6 +3572,42 @@ class WorkContents extends i0.Table
     $customConstraints:
         'GENERATED ALWAYS AS (CASE WHEN properNounState IN (1, 2) THEN CASE SUBSTR(aux_macronBase, 1, 1) WHEN \'ā\' THEN \'Ā\' WHEN \'ē\' THEN \'Ē\' WHEN \'ī\' THEN \'Ī\' WHEN \'ō\' THEN \'Ō\' WHEN \'ū\' THEN \'Ū\' WHEN \'ȳ\' THEN \'Ȳ\' ELSE UPPER(SUBSTR(aux_macronBase, 1, 1)) END || SUBSTR(aux_macronBaseLower, 2) ELSE aux_macronBaseLower END) VIRTUAL',
   );
+  static const i0.VerificationMeta _lookupFormMeta = const i0.VerificationMeta(
+    'lookupForm',
+  );
+  late final i0.GeneratedColumn<String> lookupForm = i0.GeneratedColumn<String>(
+    'lookupForm',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        'CASE WHEN expansion IS NOT NULL THEN baseNormForm WHEN tokenType = 1 THEN normForm END',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS (CASE WHEN expansion IS NOT NULL THEN baseNormForm WHEN tokenType = 1 THEN normForm END) VIRTUAL',
+  );
+  static const i0.VerificationMeta _macronLookupFormMeta =
+      const i0.VerificationMeta('macronLookupForm');
+  late final i0.GeneratedColumn<String>
+  macronLookupForm = i0.GeneratedColumn<String>(
+    'macronLookupForm',
+    aliasedName,
+    true,
+    generatedAs: i0.GeneratedAs(
+      const i0.CustomExpression(
+        'CASE WHEN expansion IS NOT NULL THEN macronBaseNormForm WHEN tokenType = 1 THEN macronNormForm END',
+      ),
+      false,
+    ),
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'GENERATED ALWAYS AS (CASE WHEN expansion IS NOT NULL THEN macronBaseNormForm WHEN tokenType = 1 THEN macronNormForm END) VIRTUAL',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [
     workId,
@@ -3525,6 +3622,7 @@ class WorkContents extends i0.Table
     expansion,
     macronizedWord,
     uncertaintyBitMask,
+    isTitle,
     auxExpansionNoMacrons,
     auxPlainBase,
     auxMacronBase,
@@ -3534,6 +3632,8 @@ class WorkContents extends i0.Table
     macronNormForm,
     baseNormForm,
     macronBaseNormForm,
+    lookupForm,
+    macronLookupForm,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3650,6 +3750,12 @@ class WorkContents extends i0.Table
     } else if (isInserting) {
       context.missing(_uncertaintyBitMaskMeta);
     }
+    if (data.containsKey('isTitle')) {
+      context.handle(
+        _isTitleMeta,
+        isTitle.isAcceptableOrUnknown(data['isTitle']!, _isTitleMeta),
+      );
+    }
     if (data.containsKey('aux_expansionNoMacrons')) {
       context.handle(
         _auxExpansionNoMacronsMeta,
@@ -3728,6 +3834,21 @@ class WorkContents extends i0.Table
         ),
       );
     }
+    if (data.containsKey('lookupForm')) {
+      context.handle(
+        _lookupFormMeta,
+        lookupForm.isAcceptableOrUnknown(data['lookupForm']!, _lookupFormMeta),
+      );
+    }
+    if (data.containsKey('macronLookupForm')) {
+      context.handle(
+        _macronLookupFormMeta,
+        macronLookupForm.isAcceptableOrUnknown(
+          data['macronLookupForm']!,
+          _macronLookupFormMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3785,6 +3906,10 @@ class WorkContents extends i0.Table
         i0.DriftSqlType.int,
         data['${effectivePrefix}uncertaintyBitMask'],
       )!,
+      isTitle: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.bool,
+        data['${effectivePrefix}isTitle'],
+      )!,
       auxExpansionNoMacrons: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}aux_expansionNoMacrons'],
@@ -3820,6 +3945,14 @@ class WorkContents extends i0.Table
       macronBaseNormForm: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}macronBaseNormForm'],
+      ),
+      lookupForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}lookupForm'],
+      ),
+      macronLookupForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronLookupForm'],
       ),
     );
   }
@@ -3868,7 +4001,9 @@ class WorkContent extends i0.DataClass
   final String? expansion;
   final String macronizedWord;
   final int uncertaintyBitMask;
+  final bool isTitle;
 
+  ///TRUE when part of a TITL sequence
   /// aux (internal use only)
   final String? auxExpansionNoMacrons;
   final String? auxPlainBase;
@@ -3881,6 +4016,10 @@ class WorkContent extends i0.DataClass
   final String? macronNormForm;
   final String? baseNormForm;
   final String? macronBaseNormForm;
+
+  /// Its form in MorphologicalDetails; NULL when it isn't a counted word
+  final String? lookupForm;
+  final String? macronLookupForm;
   const WorkContent({
     required this.workId,
     required this.idx,
@@ -3894,6 +4033,7 @@ class WorkContent extends i0.DataClass
     this.expansion,
     required this.macronizedWord,
     required this.uncertaintyBitMask,
+    required this.isTitle,
     this.auxExpansionNoMacrons,
     this.auxPlainBase,
     this.auxMacronBase,
@@ -3903,6 +4043,8 @@ class WorkContent extends i0.DataClass
     this.macronNormForm,
     this.baseNormForm,
     this.macronBaseNormForm,
+    this.lookupForm,
+    this.macronLookupForm,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -3927,6 +4069,7 @@ class WorkContent extends i0.DataClass
     }
     map['macronizedWord'] = i0.Variable<String>(macronizedWord);
     map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
+    map['isTitle'] = i0.Variable<bool>(isTitle);
     return map;
   }
 
@@ -3952,6 +4095,7 @@ class WorkContent extends i0.DataClass
           : i0.Value(expansion),
       macronizedWord: i0.Value(macronizedWord),
       uncertaintyBitMask: i0.Value(uncertaintyBitMask),
+      isTitle: i0.Value(isTitle),
     );
   }
 
@@ -3973,6 +4117,7 @@ class WorkContent extends i0.DataClass
       expansion: serializer.fromJson<String?>(json['expansion']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
       uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
+      isTitle: serializer.fromJson<bool>(json['isTitle']),
       auxExpansionNoMacrons: serializer.fromJson<String?>(
         json['aux_expansionNoMacrons'],
       ),
@@ -3990,6 +4135,8 @@ class WorkContent extends i0.DataClass
       macronBaseNormForm: serializer.fromJson<String?>(
         json['macronBaseNormForm'],
       ),
+      lookupForm: serializer.fromJson<String?>(json['lookupForm']),
+      macronLookupForm: serializer.fromJson<String?>(json['macronLookupForm']),
     );
   }
   @override
@@ -4008,6 +4155,7 @@ class WorkContent extends i0.DataClass
       'expansion': serializer.toJson<String?>(expansion),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
       'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
+      'isTitle': serializer.toJson<bool>(isTitle),
       'aux_expansionNoMacrons': serializer.toJson<String?>(
         auxExpansionNoMacrons,
       ),
@@ -4019,6 +4167,8 @@ class WorkContent extends i0.DataClass
       'macronNormForm': serializer.toJson<String?>(macronNormForm),
       'baseNormForm': serializer.toJson<String?>(baseNormForm),
       'macronBaseNormForm': serializer.toJson<String?>(macronBaseNormForm),
+      'lookupForm': serializer.toJson<String?>(lookupForm),
+      'macronLookupForm': serializer.toJson<String?>(macronLookupForm),
     };
   }
 
@@ -4035,6 +4185,7 @@ class WorkContent extends i0.DataClass
     i0.Value<String?> expansion = const i0.Value.absent(),
     String? macronizedWord,
     int? uncertaintyBitMask,
+    bool? isTitle,
     i0.Value<String?> auxExpansionNoMacrons = const i0.Value.absent(),
     i0.Value<String?> auxPlainBase = const i0.Value.absent(),
     i0.Value<String?> auxMacronBase = const i0.Value.absent(),
@@ -4044,6 +4195,8 @@ class WorkContent extends i0.DataClass
     i0.Value<String?> macronNormForm = const i0.Value.absent(),
     i0.Value<String?> baseNormForm = const i0.Value.absent(),
     i0.Value<String?> macronBaseNormForm = const i0.Value.absent(),
+    i0.Value<String?> lookupForm = const i0.Value.absent(),
+    i0.Value<String?> macronLookupForm = const i0.Value.absent(),
   }) => i1.WorkContent(
     workId: workId ?? this.workId,
     idx: idx ?? this.idx,
@@ -4059,6 +4212,7 @@ class WorkContent extends i0.DataClass
     expansion: expansion.present ? expansion.value : this.expansion,
     macronizedWord: macronizedWord ?? this.macronizedWord,
     uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
+    isTitle: isTitle ?? this.isTitle,
     auxExpansionNoMacrons: auxExpansionNoMacrons.present
         ? auxExpansionNoMacrons.value
         : this.auxExpansionNoMacrons,
@@ -4080,6 +4234,10 @@ class WorkContent extends i0.DataClass
     macronBaseNormForm: macronBaseNormForm.present
         ? macronBaseNormForm.value
         : this.macronBaseNormForm,
+    lookupForm: lookupForm.present ? lookupForm.value : this.lookupForm,
+    macronLookupForm: macronLookupForm.present
+        ? macronLookupForm.value
+        : this.macronLookupForm,
   );
   @override
   String toString() {
@@ -4096,6 +4254,7 @@ class WorkContent extends i0.DataClass
           ..write('expansion: $expansion, ')
           ..write('macronizedWord: $macronizedWord, ')
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
+          ..write('isTitle: $isTitle, ')
           ..write('auxExpansionNoMacrons: $auxExpansionNoMacrons, ')
           ..write('auxPlainBase: $auxPlainBase, ')
           ..write('auxMacronBase: $auxMacronBase, ')
@@ -4104,7 +4263,9 @@ class WorkContent extends i0.DataClass
           ..write('normForm: $normForm, ')
           ..write('macronNormForm: $macronNormForm, ')
           ..write('baseNormForm: $baseNormForm, ')
-          ..write('macronBaseNormForm: $macronBaseNormForm')
+          ..write('macronBaseNormForm: $macronBaseNormForm, ')
+          ..write('lookupForm: $lookupForm, ')
+          ..write('macronLookupForm: $macronLookupForm')
           ..write(')'))
         .toString();
   }
@@ -4123,6 +4284,7 @@ class WorkContent extends i0.DataClass
     expansion,
     macronizedWord,
     uncertaintyBitMask,
+    isTitle,
     auxExpansionNoMacrons,
     auxPlainBase,
     auxMacronBase,
@@ -4132,6 +4294,8 @@ class WorkContent extends i0.DataClass
     macronNormForm,
     baseNormForm,
     macronBaseNormForm,
+    lookupForm,
+    macronLookupForm,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -4149,6 +4313,7 @@ class WorkContent extends i0.DataClass
           other.expansion == this.expansion &&
           other.macronizedWord == this.macronizedWord &&
           other.uncertaintyBitMask == this.uncertaintyBitMask &&
+          other.isTitle == this.isTitle &&
           other.auxExpansionNoMacrons == this.auxExpansionNoMacrons &&
           other.auxPlainBase == this.auxPlainBase &&
           other.auxMacronBase == this.auxMacronBase &&
@@ -4157,7 +4322,9 @@ class WorkContent extends i0.DataClass
           other.normForm == this.normForm &&
           other.macronNormForm == this.macronNormForm &&
           other.baseNormForm == this.baseNormForm &&
-          other.macronBaseNormForm == this.macronBaseNormForm);
+          other.macronBaseNormForm == this.macronBaseNormForm &&
+          other.lookupForm == this.lookupForm &&
+          other.macronLookupForm == this.macronLookupForm);
 }
 
 class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
@@ -4173,6 +4340,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
   final i0.Value<String?> expansion;
   final i0.Value<String> macronizedWord;
   final i0.Value<int> uncertaintyBitMask;
+  final i0.Value<bool> isTitle;
   const WorkContentsCompanion({
     this.workId = const i0.Value.absent(),
     this.idx = const i0.Value.absent(),
@@ -4186,6 +4354,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     this.expansion = const i0.Value.absent(),
     this.macronizedWord = const i0.Value.absent(),
     this.uncertaintyBitMask = const i0.Value.absent(),
+    this.isTitle = const i0.Value.absent(),
   });
   WorkContentsCompanion.insert({
     required String workId,
@@ -4200,6 +4369,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     this.expansion = const i0.Value.absent(),
     required String macronizedWord,
     required int uncertaintyBitMask,
+    this.isTitle = const i0.Value.absent(),
   }) : workId = i0.Value(workId),
        idx = i0.Value(idx),
        word = i0.Value(word),
@@ -4221,6 +4391,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     i0.Expression<String>? expansion,
     i0.Expression<String>? macronizedWord,
     i0.Expression<int>? uncertaintyBitMask,
+    i0.Expression<bool>? isTitle,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
@@ -4235,6 +4406,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
       if (expansion != null) 'expansion': expansion,
       if (macronizedWord != null) 'macronizedWord': macronizedWord,
       if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
+      if (isTitle != null) 'isTitle': isTitle,
     });
   }
 
@@ -4251,6 +4423,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     i0.Value<String?>? expansion,
     i0.Value<String>? macronizedWord,
     i0.Value<int>? uncertaintyBitMask,
+    i0.Value<bool>? isTitle,
   }) {
     return i1.WorkContentsCompanion(
       workId: workId ?? this.workId,
@@ -4265,6 +4438,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
       expansion: expansion ?? this.expansion,
       macronizedWord: macronizedWord ?? this.macronizedWord,
       uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
+      isTitle: isTitle ?? this.isTitle,
     );
   }
 
@@ -4307,6 +4481,9 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     if (uncertaintyBitMask.present) {
       map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask.value);
     }
+    if (isTitle.present) {
+      map['isTitle'] = i0.Variable<bool>(isTitle.value);
+    }
     return map;
   }
 
@@ -4324,11 +4501,29 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
           ..write('enclitic: $enclitic, ')
           ..write('expansion: $expansion, ')
           ..write('macronizedWord: $macronizedWord, ')
-          ..write('uncertaintyBitMask: $uncertaintyBitMask')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
+          ..write('isTitle: $isTitle')
           ..write(')'))
         .toString();
   }
 }
+
+i0.Index get workContentsLookupForm => i0.Index(
+  'WorkContents_LookupForm',
+  'CREATE INDEX WorkContents_LookupForm ON WorkContents (lookupForm) WHERE lookupForm IS NOT NULL',
+);
+i0.Index get workContentsEncliticHost => i0.Index(
+  'WorkContents_EncliticHost',
+  'CREATE INDEX WorkContents_EncliticHost ON WorkContents (baseNormForm) WHERE enclitic IS NOT NULL',
+);
+i0.Index get workContentsEnclitic => i0.Index(
+  'WorkContents_Enclitic',
+  'CREATE INDEX WorkContents_Enclitic ON WorkContents (enclitic) WHERE enclitic IS NOT NULL',
+);
+i0.Index get workContentsWordPosition => i0.Index(
+  'WorkContents_WordPosition',
+  'CREATE INDEX WorkContents_WordPosition ON WorkContents (workId, sentenceIdx, wordIdx) WHERE wordIdx IS NOT NULL',
+);
 
 class WorkContentSubdivisions extends i0.Table
     with i0.TableInfo<WorkContentSubdivisions, i1.WorkContentSubdivision> {
@@ -7409,6 +7604,134 @@ class LibraryWorkContents
   };
 }
 
+class LibraryReadingStart extends i0.DataClass {
+  final String workId;
+  final int idx;
+  final int startIdx;
+  const LibraryReadingStart({
+    required this.workId,
+    required this.idx,
+    required this.startIdx,
+  });
+  factory LibraryReadingStart.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return LibraryReadingStart(
+      workId: serializer.fromJson<String>(json['workId']),
+      idx: serializer.fromJson<int>(json['idx']),
+      startIdx: serializer.fromJson<int>(json['startIdx']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'idx': serializer.toJson<int>(idx),
+      'startIdx': serializer.toJson<int>(startIdx),
+    };
+  }
+
+  i1.LibraryReadingStart copyWith({String? workId, int? idx, int? startIdx}) =>
+      i1.LibraryReadingStart(
+        workId: workId ?? this.workId,
+        idx: idx ?? this.idx,
+        startIdx: startIdx ?? this.startIdx,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('LibraryReadingStart(')
+          ..write('workId: $workId, ')
+          ..write('idx: $idx, ')
+          ..write('startIdx: $startIdx')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(workId, idx, startIdx);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.LibraryReadingStart &&
+          other.workId == this.workId &&
+          other.idx == this.idx &&
+          other.startIdx == this.startIdx);
+}
+
+class LibraryReadingStarts
+    extends i0.ViewInfo<i1.LibraryReadingStarts, i1.LibraryReadingStart>
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  LibraryReadingStarts(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [workId, idx, startIdx];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'library.ReadingStarts';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "library.ReadingStarts" AS SELECT WorkContents.workId, WorkContents.idx, COALESCE((SELECT MAX(Lines.fromIndex) FROM WorkContentSubdivisions AS Lines WHERE Lines.workId = WorkContents.workId AND Lines.typ IN (\'VERS\', \'TITL\') AND WorkContents.idx BETWEEN Lines.fromIndex AND Lines.toIndex), (SELECT MIN(Sentence.idx) FROM WorkContents AS Sentence WHERE Sentence.workId = WorkContents.workId AND Sentence.idx BETWEEN WorkContents.idx - 30 AND WorkContents.idx AND Sentence.sentenceIdx = WorkContents.sentenceIdx), WorkContents.idx) AS startIdx FROM WorkContents',
+  };
+  @override
+  LibraryReadingStarts get asDslTable => this;
+  @override
+  i1.LibraryReadingStart map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.LibraryReadingStart(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      startIdx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}startIdx'],
+      )!,
+    );
+  }
+
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  late final i0.GeneratedColumn<int> startIdx = i0.GeneratedColumn<int>(
+    'startIdx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  @override
+  LibraryReadingStarts createAlias(String alias) {
+    return LibraryReadingStarts(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {
+    'WorkContents',
+    'WorkContentSubdivisions',
+  };
+}
+
 class LibraryWorkIndexe extends i0.DataClass {
   final String workId;
   final String? parent;
@@ -7939,6 +8262,17 @@ class LibraryDrift extends i4.ModularAccessor {
     );
   }
 
+  i0.Selectable<int> getLibraryReadingStart({
+    required String workId,
+    required int idx,
+  }) {
+    return customSelect(
+      'SELECT startIdx FROM "library.ReadingStarts" WHERE workId = ?1 AND idx = ?2',
+      variables: [i0.Variable<String>(workId), i0.Variable<int>(idx)],
+      readsFrom: {workContents, workContentSubdivisions},
+    ).map((i0.QueryRow row) => row.read<int>('startIdx'));
+  }
+
   i0.Selectable<i8.WorkIndexEntry> getLibraryWorkIndexes(String var1) {
     return customSelect(
       'SELECT * FROM "library.WorkIndexes" WHERE workId = ?1',
@@ -7998,6 +8332,9 @@ class LibraryDrift extends i4.ModularAccessor {
       i4.ReadDatabaseContainer(
         attachedDatabase,
       ).resultSet<i1.WorkContentSubdivisions>('WorkContentSubdivisions');
+  i1.LibraryReadingStarts get libraryReadingStarts => i4.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.LibraryReadingStarts>('library.ReadingStarts');
   i1.LibraryWorkIndexes get libraryWorkIndexes => i4.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryWorkIndexes>('library.WorkIndexes');

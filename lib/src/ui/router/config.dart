@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../component/concordance/concordance_query.dart';
 import '../../component/morph_analysis/morphological_details_api.dart';
+import '../page/concordance/concordance_page.dart';
 import '../page/dictionary/dictionaries_page.dart';
 import '../page/dictionary/dictionary_entries_page.dart';
 import '../page/dictionary/dictionary_entry_page.dart';
@@ -13,7 +15,6 @@ import '../page/morphology/morphological_data_page.dart';
 import '../page/morphology/morphological_search_page.dart';
 import '../page/settings/settings_shell_page.dart';
 import '../page/word_frequency/word_frequency_page.dart';
-import '../page/word_lookup_page.dart';
 
 part 'config.g.dart';
 
@@ -25,7 +26,7 @@ const String wordFrequencyId = 'word-frequency';
 
 const String morphAnalysisId = 'morph-analysis';
 
-const String wordLookupId = 'word-lookup';
+const String concordanceId = 'concordance';
 
 const List<({String id, NavigationDestination navDest})> mainBranches = [
   (
@@ -59,11 +60,11 @@ const List<({String id, NavigationDestination navDest})> mainBranches = [
     ),
   ),
   (
-    id: '/$wordLookupId',
+    id: '/$concordanceId',
     navDest: NavigationDestination(
-      icon: Icon(Icons.find_in_page),
-      label: 'Usage',
-      tooltip: 'Corpus Usage',
+      icon: Icon(Icons.manage_search),
+      label: 'Concordance',
+      tooltip: 'Search the library',
     ),
   ),
 ];
@@ -127,8 +128,13 @@ class SettingsRoute extends GoRouteData with _$SettingsRoute {
         TypedGoRoute<MorphologicalDataRoute>(path: '/morph-detail/:keys'),
       ],
     ),
-    TypedStatefulShellBranch<WordLookupBranch>(
-      routes: <TypedRoute<RouteData>>[TypedGoRoute<WordLookupRoute>(path: '/word-lookup')],
+    TypedStatefulShellBranch<ConcordanceBranch>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<ConcordanceRoute>(
+          path: '/concordance',
+          routes: [TypedGoRoute<ConcordanceHitsRoute>(path: 'hits')],
+        ),
+      ],
     ),
   ],
 )
@@ -158,8 +164,8 @@ class MorphologyBranch extends StatefulShellBranchData {
   const MorphologyBranch();
 }
 
-class WordLookupBranch extends StatefulShellBranchData {
-  const WordLookupBranch();
+class ConcordanceBranch extends StatefulShellBranchData {
+  const ConcordanceBranch();
 }
 
 class LibraryRoute extends GoRouteData with _$LibraryRoute {
@@ -216,15 +222,28 @@ class WorkDetailsRoute extends GoRouteData with _$WorkDetailsRoute {
 
 class ReaderRoute extends GoRouteData with _$ReaderRoute {
   const ReaderRoute(
-    this.workId,
-  );
+    this.workId, {
+    this.startingPoint,
+    this.highlights = const [],
+  });
 
   final String workId;
+
+  /// Where the first page starts at.
+  /// The beginning of the work when `null`.
+  final int? startingPoint;
+
+  /// Tokens marked on the page
+  final List<int> highlights;
 
   @override
   Page<void> buildPage(context, state) => MaterialPage(
     fullscreenDialog: true,
-    child: TextPage(workId),
+    child: TextPage(
+      workId,
+      startingPoint: startingPoint,
+      highlights: highlights,
+    ),
   );
   //
 }
@@ -292,10 +311,42 @@ class MorphologicalDataRoute extends GoRouteData with _$MorphologicalDataRoute {
   //
 }
 
-class WordLookupRoute extends GoRouteData with _$WordLookupRoute {
-  const WordLookupRoute();
+/// The Concordance tab's first page (the search).
+/// The searches themselves are part of [ConcordanceHitsRoute].
+class ConcordanceRoute extends GoRouteData with _$ConcordanceRoute {
+  const ConcordanceRoute({
+    this.search,
+  });
+
+  /// A [ConcordanceQuery] as JSON to fill the form with. 
+  /// Null for a blank one
+  final String? search;
 
   @override
-  Widget build(context, state) => const WordLookupPage();
+  Widget build(context, state) => ConcordancePage(
+    query: switch (search) {
+      final search? => ConcordanceQuery.fromJson(search),
+      null => null,
+    },
+  );
+  //
+}
+
+class ConcordanceHitsRoute extends GoRouteData with _$ConcordanceHitsRoute {
+  const ConcordanceHitsRoute({
+    required this.search,
+    this.offset = 0,
+  });
+
+  /// A [ConcordanceQuery] as JSON
+  final String search;
+
+  final int offset;
+
+  @override
+  Widget build(context, state) => ConcordanceHitsPage(
+    query: ConcordanceQuery.fromJson(search),
+    offset: offset,
+  );
   //
 }
