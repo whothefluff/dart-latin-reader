@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' show NumberFormat;
 
 import '../../../../logger.dart';
+import '../../../component/concordance/concordance_query.dart';
 import '../../../component/dictionary/lewis_and_short_api.dart';
 import '../../../component/dictionary/lewis_and_short_basic_info_api.dart';
 import '../../../component/library/catalog_api.dart';
@@ -1100,7 +1101,7 @@ class _TableLine extends StatelessWidget {
   //
 }
 
-enum _RowDestination { morphology, dictionary }
+enum _RowDestination { morphology, dictionary, concordance }
 
 Future<void> _onRowTapped(
   BuildContext context,
@@ -1108,59 +1109,107 @@ Future<void> _onRowTapped(
   FrequencyFilter filter,
   EnrichedFrequencyRow row,
 ) async {
-  // The lemma's dictionary form may have no stored morphological analysis
-  if (filter.groupByLemma) {
-    // We can't show the choice for the morphology page because we
-    // cannot guarantee that we have the analysis for the form that
-    // matches the lemma
-    // TODO(whothefluff): create aware bottom sheet instead of circuit-breaking here
-    await _goToDictionaryForLemma(context, ref, row.displayForm);
-  } else {
-    final view =
-        ref.read(frequencyViewSettingsNotifierProvider).valueOrNull ?? const FrequencySettings();
-    final choice = switch (view.formTapAction) {
-      FormTapAction.ask => await _askDestination(context, row.displayForm),
-      FormTapAction.openMorphology => _RowDestination.morphology,
-      FormTapAction.openDictionary => _RowDestination.dictionary,
-    };
-    if (choice != null && context.mounted) {
-      switch (choice) {
-        case _RowDestination.morphology:
-          //if (filter.groupByLemma) {
-          //await _goToMorphologyForLemma(context, ref, filter, row.displayForm);
-          //} else {
-          await _goToMorphologyForForm(context, ref, filter, row);
-        //}
-        case _RowDestination.dictionary:
-          //if (filter.groupByLemma) {
-          //await _goToDictionaryForLemma(context, ref, row.displayForm);
-          //} else {
-          await _goToDictionaryForForm(context, ref, row);
-        //}
-      }
+  final view =
+      ref.read(frequencyViewSettingsNotifierProvider).valueOrNull ?? const FrequencySettings();
+  var choice = switch (view.formTapAction) {
+    FormTapAction.ask => null,
+    //lemma rows fall back to the dictionary (their citation form may have no stored analysis)
+    FormTapAction.openMorphology =>
+      filter.groupByLemma ? _RowDestination.dictionary : _RowDestination.morphology,
+    FormTapAction.openDictionary => _RowDestination.dictionary,
+    FormTapAction.openConcordance => _RowDestination.concordance,
+  };
+  if (view.formTapAction == FormTapAction.ask) {
+    choice = await _askDestination(
+      context,
+      row.displayForm,
+      morphology: !filter.groupByLemma,
+    );
+  }
+  if (choice != null && context.mounted) {
+    switch ((filter.groupByLemma, choice)) {
+      case (true, _RowDestination.morphology || _RowDestination.dictionary):
+        await _goToDictionaryForLemma(context, ref, row.displayForm);
+      case (false, _RowDestination.morphology):
+        await _goToMorphologyForForm(context, ref, filter, row);
+      case (false, _RowDestination.dictionary):
+        await _goToDictionaryForForm(context, ref, row);
+      case (_, _RowDestination.concordance):
+        await _goToConcordance(context, ref, filter, row);
     }
   }
 }
 
-Future<_RowDestination?> _askDestination(BuildContext context, String form) =>
-    showDialog<_RowDestination>(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: Text(form),
-        children: [
-          ListTile(
-            leading: const Icon(Icons.auto_stories_outlined),
-            title: const Text('Morphology'),
-            onTap: () => Navigator.pop(context, _RowDestination.morphology),
-          ),
-          ListTile(
-            leading: const Icon(Icons.menu_book_outlined),
-            title: const Text('Dictionary'),
-            onTap: () => Navigator.pop(context, _RowDestination.dictionary),
-          ),
-        ],
+Future<_RowDestination?> _askDestination(
+  BuildContext context,
+  String form, {
+  required bool morphology,
+}) => showDialog<_RowDestination>(
+  context: context,
+  builder: (context) => SimpleDialog(
+    title: Text(form),
+    children: [
+      if (morphology)
+        ListTile(
+          leading: const Icon(Icons.auto_stories_outlined),
+          title: const Text('Morphology'),
+          onTap: () => Navigator.pop(context, _RowDestination.morphology),
+        ),
+      ListTile(
+        leading: const Icon(Icons.menu_book_outlined),
+        title: const Text('Dictionary'),
+        onTap: () => Navigator.pop(context, _RowDestination.dictionary),
       ),
-    );
+      ListTile(
+        leading: const Icon(Icons.manage_search),
+        title: const Text('Concordance'),
+        onTap: () => Navigator.pop(context, _RowDestination.concordance),
+      ),
+    ],
+  ),
+);
+
+/// Searches the concordance for the row, in the works of the report
+///
+/// A form is searched exactly as counted (its capitalization, and its macrons
+/// when the report shows them, a lemma by its own dictionaryRef), so the hits
+/// are the occurrences the row counts
+Future<void> _goToConcordance(
+  BuildContext context,
+  WidgetRef ref,
+  FrequencyFilter filter,
+  EnrichedFrequencyRow row,
+) async {
+  final criterion = switch (row.base) {
+    LemmaFrequencyRow(displayForm: final dictionaryRef) => LemmaCriterion(
+      await _lemmaChoice(ref, dictionaryRef),
+    ),
+    FormFrequencyRow(:final displayForm, :final lookupForm) => FormCriterion(
+      filter.showMacrons ? displayForm : lookupForm,
+      exactCase: true,
+    ),
+  };
+  final query = ConcordanceQuery(
+    slots: [criterion],
+    matchMacrons: filter.showMacrons && !filter.groupByLemma,
+    selection: ref.read(librarySelectionNotifierProvider),
+  );
+  if (context.mounted) {
+    await ConcordanceHitsRoute(search: query.toJson()).push<void>(context);
+  }
+}
+
+/// [dictionaryRef] alone, labelled by its Lewis & Short entry when it has one
+Future<LemmaChoice> _lemmaChoice(WidgetRef ref, String dictionaryRef) async {
+  final resolved = await ref.read(lnsBasicInfoProvider(PossibleLemmas([dictionaryRef])).future);
+  final entry = resolved[dictionaryRef];
+  return LemmaChoice(
+    label: entry?.lemma ?? dictionaryRef,
+    dictionaryRefs: [dictionaryRef],
+    partOfSpeech: entry?.partOfSpeech,
+    inflection: entry?.inflection,
+  );
+}
 
 Future<void> _goToMorphologyForForm(
   BuildContext context,

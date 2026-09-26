@@ -121,7 +121,7 @@ class _FormTapChoice extends StatelessWidget {
         children: [
           Text('Tapping a Form Opens', style: theme.textTheme.bodyLarge),
           Text(
-            'Lemma rows always open the dictionary',
+            'Lemma rows never navigate to morphology',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -151,6 +151,7 @@ class _FormTapChoice extends StatelessWidget {
     FormTapAction.ask => 'Ask',
     FormTapAction.openMorphology => 'Morphology',
     FormTapAction.openDictionary => 'Dictionary',
+    FormTapAction.openConcordance => 'Concordance',
   };
 
   //
