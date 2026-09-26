@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import '../../../component/concordance/concordance_query.dart';
 import '../../../component/library/catalog_api.dart';
 import '../../../component/word_frequency/library_selection_api.dart';
+import '../../widget/lemma_text.dart';
 
 String sortLabel(ConcordanceSort sort) => switch (sort) {
   ConcordanceSort.textOrder => 'Text order',
@@ -52,15 +53,6 @@ const List<String> _grammarOrder = [
   'present', 'imperfect', 'future', 'perfect', 'pluperfect', 'future perfect',
   'active', 'passive',
 ];
-
-/// A lemma with its homograph number raised, as dictionaries print it: sum1
-/// is sum¹
-String lemmaText(String label) => label.replaceAllMapped(
-  RegExp(r'\d+$'),
-  (match) => match[0]!.split('').map((digit) => _superscripts[int.parse(digit)]).join(),
-);
-
-const List<String> _superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
 
 /// What the dictionary says of [lemma], to tell homographs apart
 String lemmaDetails(LemmaChoice lemma) {

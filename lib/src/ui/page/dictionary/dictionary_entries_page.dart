@@ -5,6 +5,7 @@ import '../../../component/dictionary/dictionary_alphabets_api.dart';
 import '../../../component/dictionary/dictionary_entries_api.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
+import '../../widget/lemma_text.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
@@ -139,7 +140,7 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
     TextSpan(
       children: [
         TextSpan(
-          text: removeDigits(entry.lemma),
+          text: lemmaText(entry.lemma),
           style: titleStyle,
         ),
         const TextSpan(text: ' '),
@@ -160,8 +161,6 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
       },
     );
   }
-
-  String removeDigits(String original) => original.replaceAll(RegExp(r'\d'), '');
   //
 }
 

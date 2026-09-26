@@ -10,6 +10,7 @@ import '../../../component/dictionary/lewis_and_short_api.dart';
 import '../../../component/morph_analysis/enriched_morph_details_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../router/config.dart';
+import '../../widget/lemma_text.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 
@@ -256,7 +257,7 @@ class _MorphEntryCard extends ConsumerWidget {
   );
 
   String _lexicalForm(EnrichedAnalysis analysis) =>
-      '${analysis.dictionaryRef.replaceAll(RegExp(r'\d'), '')}${analysis.lnsInflection != null ? ', ${analysis.lnsInflection}' : ''}';
+      '${lemmaText(analysis.dictionaryRef)}${analysis.lnsInflection != null ? ', ${analysis.lnsInflection}' : ''}';
 
   Text? _additional(EnrichedAnalysis analysis) =>
       analysis.additional != null ? Text(analysis.additional!) : null;
