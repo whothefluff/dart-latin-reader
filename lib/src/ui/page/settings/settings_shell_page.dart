@@ -31,6 +31,15 @@ class _SettingsShellPageState extends State<SettingsShellPage> {
     SettingsTab.wordFrequency: FrequencySettingsPage(),
   };
 
+  /// In some devices the full names don't fit along with the General label
+  static const Map<String, String> _shortBarLabels = {
+    SettingsTab.library: 'Lib.',
+    SettingsTab.dictionaries: 'Dict.',
+    SettingsTab.wordFrequency: 'Freq.',
+    SettingsTab.morphAnalysis: 'Morph.',
+    SettingsTab.concordance: 'Conc.',
+  };
+
   /// Translates the overall shell index into the inner NavigationBar's index space.
   ///
   /// NavigationBar asserts selectedIndex >= 0. We map "General" (shell 0) to bar 0,
@@ -44,18 +53,27 @@ class _SettingsShellPageState extends State<SettingsShellPage> {
 
   List<NavigationDestination> get _destinations => [
     const NavigationDestination(icon: Icon(Icons.settings), label: 'General'),
-    ...mainBranches.map((b) {
-      final id = _extractId(b.id);
-      final isEnabled = implementedPages.containsKey(id);
-      return NavigationDestination(
-        icon: b.navDest.icon,
-        selectedIcon: b.navDest.selectedIcon,
-        label: b.navDest.label,
-        tooltip: isEnabled ? b.navDest.tooltip : 'Not available',
-        enabled: isEnabled,
-      );
-    }),
+    ...mainBranches.map((b) => _destination(b, label: b.navDest.label)),
   ];
+
+  /// The tabs after General, with the shortened bottom bar's labels
+  List<NavigationDestination> get _barDestinations => mainBranches
+      .map((b) => _destination(b, label: _shortBarLabels[_extractId(b.id)] ?? b.navDest.label))
+      .toList();
+
+  NavigationDestination _destination(
+    ({String id, NavigationDestination navDest}) branch, {
+    required String label,
+  }) {
+    final isEnabled = implementedPages.containsKey(_extractId(branch.id));
+    return NavigationDestination(
+      icon: branch.navDest.icon,
+      selectedIcon: branch.navDest.selectedIcon,
+      label: label,
+      tooltip: isEnabled ? branch.navDest.tooltip ?? branch.navDest.label : 'Not available',
+      enabled: isEnabled,
+    );
+  }
 
   @override
   void initState() {
@@ -108,7 +126,7 @@ class _SettingsShellPageState extends State<SettingsShellPage> {
                   ),
                   child: NavigationBar(
                     selectedIndex: _barIndexFromShell(_currentIndex),
-                    destinations: _destinations.skip(1).toList(),
+                    destinations: _barDestinations,
                     onDestinationSelected: (i) => setState(
                       () => _currentIndex = _shellIndexFromBar(i),
                     ),
