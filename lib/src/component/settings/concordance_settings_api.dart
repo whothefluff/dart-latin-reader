@@ -62,11 +62,7 @@ class ConcordanceSettings {
   /// Hits per page
   final int pageSize;
 
-  /// The page sizes offered. Every page reads the whole search again, so large
-  /// ones mean fewer waits when going through many hits
-  static const List<int> pageSizes = [50, 100, 500, 1000];
-
-  static const int _defaultPageSize = 50;
+  static const int _defaultPageSize = 25; //first value in the proposed list
 
   /// Returns a copy with the given fields replaced.
   ConcordanceSettings copyWith({

@@ -81,7 +81,7 @@ class FrequencyFilterSettings {
   final bool ascending;
   final bool groupByLemma;
   final bool showMacrons;
-  static const int _defaultPageSize = 100;
+  static const int _defaultPageSize = 50; //first value in the proposed list
   static const bool _defaultAscending = false;
   static const bool _defaultGroupByLemma = false;
   static const bool _defaultShowMacrons = true;
