@@ -14,7 +14,12 @@ void main() {
       slots: [
         const FormCriterion('rosā'),
         LemmaCriterion(LemmaChoice(label: 'sum1', dictionaryRefs: const ['sum1', 'esum'])),
-        GrammarCriterion(GrammarFilter(const {GrammarFeature.partOfSpeech: 'verb'})),
+        GrammarCriterion(
+          GrammarFilter(const {
+            GrammarFeature.partOfSpeech: 'adjective',
+            GrammarFeature.declension: '1st & 2nd',
+          }),
+        ),
       ],
       distances: const [null, 3],
       matchMacrons: true,

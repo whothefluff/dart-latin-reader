@@ -23,6 +23,7 @@ class ConcordanceAnalyse extends i0.DataClass {
   final String? gramCase;
   final String? number;
   final String? gender;
+  final String? declension;
   final String? person;
   final String? verbForm;
   final String? tense;
@@ -36,6 +37,7 @@ class ConcordanceAnalyse extends i0.DataClass {
     this.gramCase,
     this.number,
     this.gender,
+    this.declension,
     this.person,
     this.verbForm,
     this.tense,
@@ -55,6 +57,7 @@ class ConcordanceAnalyse extends i0.DataClass {
       gramCase: serializer.fromJson<String?>(json['gramCase']),
       number: serializer.fromJson<String?>(json['number']),
       gender: serializer.fromJson<String?>(json['gender']),
+      declension: serializer.fromJson<String?>(json['declension']),
       person: serializer.fromJson<String?>(json['person']),
       verbForm: serializer.fromJson<String?>(json['verbForm']),
       tense: serializer.fromJson<String?>(json['tense']),
@@ -73,6 +76,7 @@ class ConcordanceAnalyse extends i0.DataClass {
       'gramCase': serializer.toJson<String?>(gramCase),
       'number': serializer.toJson<String?>(number),
       'gender': serializer.toJson<String?>(gender),
+      'declension': serializer.toJson<String?>(declension),
       'person': serializer.toJson<String?>(person),
       'verbForm': serializer.toJson<String?>(verbForm),
       'tense': serializer.toJson<String?>(tense),
@@ -89,6 +93,7 @@ class ConcordanceAnalyse extends i0.DataClass {
     i0.Value<String?> gramCase = const i0.Value.absent(),
     i0.Value<String?> number = const i0.Value.absent(),
     i0.Value<String?> gender = const i0.Value.absent(),
+    i0.Value<String?> declension = const i0.Value.absent(),
     i0.Value<String?> person = const i0.Value.absent(),
     i0.Value<String?> verbForm = const i0.Value.absent(),
     i0.Value<String?> tense = const i0.Value.absent(),
@@ -102,6 +107,7 @@ class ConcordanceAnalyse extends i0.DataClass {
     gramCase: gramCase.present ? gramCase.value : this.gramCase,
     number: number.present ? number.value : this.number,
     gender: gender.present ? gender.value : this.gender,
+    declension: declension.present ? declension.value : this.declension,
     person: person.present ? person.value : this.person,
     verbForm: verbForm.present ? verbForm.value : this.verbForm,
     tense: tense.present ? tense.value : this.tense,
@@ -118,6 +124,7 @@ class ConcordanceAnalyse extends i0.DataClass {
           ..write('gramCase: $gramCase, ')
           ..write('number: $number, ')
           ..write('gender: $gender, ')
+          ..write('declension: $declension, ')
           ..write('person: $person, ')
           ..write('verbForm: $verbForm, ')
           ..write('tense: $tense, ')
@@ -136,6 +143,7 @@ class ConcordanceAnalyse extends i0.DataClass {
     gramCase,
     number,
     gender,
+    declension,
     person,
     verbForm,
     tense,
@@ -153,6 +161,7 @@ class ConcordanceAnalyse extends i0.DataClass {
           other.gramCase == this.gramCase &&
           other.number == this.number &&
           other.gender == this.gender &&
+          other.declension == this.declension &&
           other.person == this.person &&
           other.verbForm == this.verbForm &&
           other.tense == this.tense &&
@@ -176,6 +185,7 @@ class ConcordanceAnalyses
     gramCase,
     number,
     gender,
+    declension,
     person,
     verbForm,
     tense,
@@ -188,7 +198,7 @@ class ConcordanceAnalyses
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "concordance.Analyses" AS SELECT Details.form, CASE WHEN Details.form = LOWER(Details.form) THEN UPPER(SUBSTR(Details.form, 1, 1)) || SUBSTR(Details.form, 2) END AS capitalizedForm, Details.item, Details.dictionaryRef, Infl.partOfSpeech, Infl.gramCase, Infl.number, Infl.gender, Infl.person, Infl.verbForm, Infl.tense, Infl.voice FROM MorphologicalDetails AS Details LEFT OUTER JOIN MorphologicalDetailInflections AS Infl ON Infl.form = Details.form AND Infl.item = Details.item',
+        'CREATE VIEW "concordance.Analyses" AS SELECT Details.form, CASE WHEN Details.form = LOWER(Details.form) THEN UPPER(SUBSTR(Details.form, 1, 1)) || SUBSTR(Details.form, 2) END AS capitalizedForm, Details.item, Details.dictionaryRef, Infl.partOfSpeech, Infl.gramCase, Infl.number, Infl.gender, Infl.declension, Infl.person, Infl.verbForm, Infl.tense, Infl.voice FROM MorphologicalDetails AS Details LEFT OUTER JOIN MorphologicalDetailInflections AS Infl ON Infl.form = Details.form AND Infl.item = Details.item',
   };
   @override
   ConcordanceAnalyses get asDslTable => this;
@@ -227,6 +237,10 @@ class ConcordanceAnalyses
       gender: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}gender'],
+      ),
+      declension: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}declension'],
       ),
       person: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -294,6 +308,12 @@ class ConcordanceAnalyses
   );
   late final i0.GeneratedColumn<String> gender = i0.GeneratedColumn<String>(
     'gender',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<String> declension = i0.GeneratedColumn<String>(
+    'declension',
     aliasedName,
     true,
     type: i0.DriftSqlType.string,
@@ -576,7 +596,7 @@ class ConcordanceGrammarValues
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "concordance.GrammarValues" AS SELECT partOfSpeech, \'partOfSpeech\' AS feature, partOfSpeech AS value FROM MorphologicalDetailInflections UNION SELECT partOfSpeech, \'gramCase\', gramCase FROM MorphologicalDetailInflections WHERE gramCase IS NOT NULL UNION SELECT partOfSpeech, \'number\', number FROM MorphologicalDetailInflections WHERE number IS NOT NULL UNION SELECT partOfSpeech, \'gender\', gender FROM MorphologicalDetailInflections WHERE gender IS NOT NULL UNION SELECT partOfSpeech, \'person\', person FROM MorphologicalDetailInflections WHERE person IS NOT NULL UNION SELECT partOfSpeech, \'verbForm\', verbForm FROM MorphologicalDetailInflections WHERE verbForm IS NOT NULL UNION SELECT partOfSpeech, \'tense\', tense FROM MorphologicalDetailInflections WHERE tense IS NOT NULL UNION SELECT partOfSpeech, \'voice\', voice FROM MorphologicalDetailInflections WHERE voice IS NOT NULL',
+        'CREATE VIEW "concordance.GrammarValues" AS SELECT partOfSpeech, \'partOfSpeech\' AS feature, partOfSpeech AS value FROM MorphologicalDetailInflections UNION SELECT partOfSpeech, \'gramCase\', gramCase FROM MorphologicalDetailInflections WHERE gramCase IS NOT NULL UNION SELECT partOfSpeech, \'number\', number FROM MorphologicalDetailInflections WHERE number IS NOT NULL UNION SELECT partOfSpeech, \'gender\', gender FROM MorphologicalDetailInflections WHERE gender IS NOT NULL UNION SELECT partOfSpeech, \'declension\', declension FROM MorphologicalDetailInflections WHERE declension IS NOT NULL UNION SELECT partOfSpeech, \'person\', person FROM MorphologicalDetailInflections WHERE person IS NOT NULL UNION SELECT partOfSpeech, \'verbForm\', verbForm FROM MorphologicalDetailInflections WHERE verbForm IS NOT NULL UNION SELECT partOfSpeech, \'tense\', tense FROM MorphologicalDetailInflections WHERE tense IS NOT NULL UNION SELECT partOfSpeech, \'voice\', voice FROM MorphologicalDetailInflections WHERE voice IS NOT NULL',
   };
   @override
   ConcordanceGrammarValues get asDslTable => this;
@@ -688,7 +708,7 @@ class ConcordanceDrift extends i2.ModularAccessor {
     );
     $arrayStartIndex += isTitleValues.length;
     return customSelect(
-      'WITH WorkOrder AS (SELECT CAST(Work."key" AS INTEGER) AS position, Work.value AS workId FROM json_each(?1)AS Work), Criteria AS MATERIALIZED (SELECT CAST(Word."key" AS INTEGER) + 1 AS slot, IFNULL(json_extract(Word.value, \'\$.distance\'), 1000000) AS distance, CAST(json_extract(Word.value, \'\$.spellings\') AS TEXT) AS spellings, CAST(json_extract(Word.value, \'\$.macronSpellings\') AS TEXT) AS macronSpellings, CAST(json_extract(Word.value, \'\$.lemma\') AS TEXT) AS lemma, CAST(json_extract(Word.value, \'\$.partOfSpeech\') AS TEXT) AS partOfSpeech, CAST(json_extract(Word.value, \'\$.gramCase\') AS TEXT) AS gramCase, CAST(json_extract(Word.value, \'\$.number\') AS TEXT) AS number, CAST(json_extract(Word.value, \'\$.gender\') AS TEXT) AS gender, CAST(json_extract(Word.value, \'\$.person\') AS TEXT) AS person, CAST(json_extract(Word.value, \'\$.verbForm\') AS TEXT) AS verbForm, CAST(json_extract(Word.value, \'\$.tense\') AS TEXT) AS tense, CAST(json_extract(Word.value, \'\$.voice\') AS TEXT) AS voice FROM json_each(?2)AS Word), Spellings AS MATERIALIZED (SELECT Criteria.slot, Spelling.value AS form FROM Criteria,json_each(Criteria.spellings)AS Spelling), MacronSpellings AS MATERIALIZED (SELECT Criteria.slot, Spelling.value AS form FROM Criteria,json_each(Criteria.macronSpellings)AS Spelling), LemmaRefs AS MATERIALIZED (SELECT Criteria.slot, Ref.value AS dictionaryRef FROM Criteria,json_each(Criteria.lemma)AS Ref), Analysed AS MATERIALIZED (SELECT Criteria.slot, Analyses.form, Analyses.capitalizedForm FROM Criteria CROSS JOIN "concordance.Analyses" AS Analyses WHERE Criteria.spellings IS NULL AND(Criteria.lemma IS NULL OR Analyses.dictionaryRef IN (SELECT dictionaryRef FROM LemmaRefs WHERE LemmaRefs.slot = Criteria.slot))AND(Criteria.partOfSpeech IS NULL OR Analyses.partOfSpeech = Criteria.partOfSpeech)AND(Criteria.gramCase IS NULL OR instr(\'/\' || Analyses.gramCase || \'/\', \'/\' || Criteria.gramCase || \'/\') > 0)AND(Criteria.number IS NULL OR instr(\'/\' || Analyses.number || \'/\', \'/\' || Criteria.number || \'/\') > 0)AND(Criteria.gender IS NULL OR instr(\'/\' || Analyses.gender || \'/\', \'/\' || Criteria.gender || \'/\') > 0)AND(Criteria.person IS NULL OR instr(\'/\' || Analyses.person || \'/\', \'/\' || Criteria.person || \'/\') > 0)AND(Criteria.verbForm IS NULL OR instr(\'/\' || Analyses.verbForm || \'/\', \'/\' || Criteria.verbForm || \'/\') > 0)AND(Criteria.tense IS NULL OR instr(\'/\' || Analyses.tense || \'/\', \'/\' || Criteria.tense || \'/\') > 0)AND(Criteria.voice IS NULL OR instr(\'/\' || Analyses.voice || \'/\', \'/\' || Criteria.voice || \'/\') > 0)), Forms AS MATERIALIZED (SELECT slot, form FROM Spellings UNION ALL SELECT slot, form FROM Analysed), Hits AS (SELECT WorkOrder.position, t1.workId, t1.sentenceIdx, t1.sourceReference AS reference, t1.isTitle, t1.idx AS firstIdx, COALESCE(t3.idx, t2.idx, t1.idx) AS lastIdx, t1.wordIdx AS firstWordIdx, COALESCE(t3.wordIdx, t2.wordIdx, t1.wordIdx) AS lastWordIdx, t1.idx AS slot1Idx, t2.idx AS slot2Idx, t3.idx AS slot3Idx FROM WorkOrder CROSS JOIN WorkContents AS t1 LEFT OUTER JOIN WorkContents AS t2 ON EXISTS (SELECT * FROM Criteria WHERE slot = 2) AND t2.workId = t1.workId AND t2.sentenceIdx = t1.sentenceIdx AND t2.isTitle = t1.isTitle AND t2.wordIdx BETWEEN t1.wordIdx + 1 AND t1.wordIdx + (SELECT distance FROM Criteria WHERE slot = 2) AND t2.idx BETWEEN ?3 AND ?4 AND(t2.lookupForm IN (SELECT form FROM Forms WHERE slot = 2) OR t2.enclitic IN (SELECT form FROM Forms WHERE slot = 2) OR(t2.enclitic IS NOT NULL AND t2.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 2))OR(t2.properNounState = 2 AND t2.lookupForm IN (SELECT capitalizedForm FROM Analysed WHERE slot = 2)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 2) OR t2.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 2) OR t2.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 2) OR(t2.enclitic IS NOT NULL AND t2.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 2)))LEFT OUTER JOIN WorkContents AS t3 ON EXISTS (SELECT * FROM Criteria WHERE slot = 3) AND t3.workId = t2.workId AND t3.sentenceIdx = t2.sentenceIdx AND t3.isTitle = t2.isTitle AND t3.wordIdx BETWEEN t2.wordIdx + 1 AND t2.wordIdx + (SELECT distance FROM Criteria WHERE slot = 3) AND t3.idx BETWEEN ?3 AND ?4 AND(t3.lookupForm IN (SELECT form FROM Forms WHERE slot = 3) OR t3.enclitic IN (SELECT form FROM Forms WHERE slot = 3) OR(t3.enclitic IS NOT NULL AND t3.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 3))OR(t3.properNounState = 2 AND t3.lookupForm IN (SELECT capitalizedForm FROM Analysed WHERE slot = 3)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 3) OR t3.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 3) OR t3.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 3) OR(t3.enclitic IS NOT NULL AND t3.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 3)))WHERE t1.workId = WorkOrder.workId AND +t1.idx BETWEEN ?3 AND ?4 AND t1.isTitle IN ($expandedisTitleValues) AND(t1.lookupForm IN (SELECT form FROM Forms WHERE slot = 1) OR t1.enclitic IN (SELECT form FROM Forms WHERE slot = 1) OR(t1.enclitic IS NOT NULL AND t1.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 1))OR(t1.properNounState = 2 AND t1.lookupForm IN (SELECT capitalizedForm FROM Analysed WHERE slot = 1)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 1) OR t1.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 1) OR t1.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 1) OR(t1.enclitic IS NOT NULL AND t1.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 1)))AND(t2.idx IS NOT NULL OR NOT EXISTS (SELECT * FROM Criteria WHERE slot = 2))AND(t3.idx IS NOT NULL OR NOT EXISTS (SELECT * FROM Criteria WHERE slot = 3))), Sorted AS (SELECT Hits.*, (SELECT LOWER(Neighbour.normForm) FROM WorkContents AS Neighbour WHERE ?5 <> 0 AND Neighbour.workId = Hits.workId AND Neighbour.sentenceIdx = Hits.sentenceIdx AND Neighbour.isTitle = Hits.isTitle AND Neighbour.wordIdx = ?5 + IIF(?5 > 0, Hits.lastWordIdx, Hits.firstWordIdx)) AS sortKey FROM Hits), Page AS (SELECT Sorted.*, COUNT(*)OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS totalHits FROM Sorted ORDER BY Sorted.sortKey IS NULL, Sorted.sortKey, Sorted.position, Sorted.firstIdx, Sorted.lastIdx, Sorted.slot2Idx, Sorted.slot3Idx LIMIT ?6 OFFSET ?7) SELECT Page.*, Context.idx AS contextIdx, Context.word AS contextWord, Context.macronizedWord AS contextMacronizedWord, Context.sourceReference AS contextReference FROM Page CROSS JOIN WorkContents AS Context WHERE Context.workId = Page.workId AND Context.idx BETWEEN Page.firstIdx - 12 AND Page.lastIdx + 12 ORDER BY Page.sortKey IS NULL, Page.sortKey, Page.position, Page.firstIdx, Page.lastIdx, Page.slot2Idx, Page.slot3Idx, Context.idx',
+      'WITH WorkOrder AS (SELECT CAST(Work."key" AS INTEGER) AS position, Work.value AS workId FROM json_each(?1)AS Work), Criteria AS MATERIALIZED (SELECT CAST(Word."key" AS INTEGER) + 1 AS slot, IFNULL(json_extract(Word.value, \'\$.distance\'), 1000000) AS distance, CAST(json_extract(Word.value, \'\$.spellings\') AS TEXT) AS spellings, CAST(json_extract(Word.value, \'\$.macronSpellings\') AS TEXT) AS macronSpellings, CAST(json_extract(Word.value, \'\$.lemma\') AS TEXT) AS lemma, CAST(json_extract(Word.value, \'\$.partOfSpeech\') AS TEXT) AS partOfSpeech, CAST(json_extract(Word.value, \'\$.gramCase\') AS TEXT) AS gramCase, CAST(json_extract(Word.value, \'\$.number\') AS TEXT) AS number, CAST(json_extract(Word.value, \'\$.gender\') AS TEXT) AS gender, CAST(json_extract(Word.value, \'\$.declension\') AS TEXT) AS declension, CAST(json_extract(Word.value, \'\$.person\') AS TEXT) AS person, CAST(json_extract(Word.value, \'\$.verbForm\') AS TEXT) AS verbForm, CAST(json_extract(Word.value, \'\$.tense\') AS TEXT) AS tense, CAST(json_extract(Word.value, \'\$.voice\') AS TEXT) AS voice FROM json_each(?2)AS Word), Spellings AS MATERIALIZED (SELECT Criteria.slot, Spelling.value AS form FROM Criteria,json_each(Criteria.spellings)AS Spelling), MacronSpellings AS MATERIALIZED (SELECT Criteria.slot, Spelling.value AS form FROM Criteria,json_each(Criteria.macronSpellings)AS Spelling), LemmaRefs AS MATERIALIZED (SELECT Criteria.slot, Ref.value AS dictionaryRef FROM Criteria,json_each(Criteria.lemma)AS Ref), Analysed AS MATERIALIZED (SELECT Criteria.slot, Analyses.form, Analyses.capitalizedForm FROM Criteria CROSS JOIN "concordance.Analyses" AS Analyses WHERE Criteria.spellings IS NULL AND(Criteria.lemma IS NULL OR Analyses.dictionaryRef IN (SELECT dictionaryRef FROM LemmaRefs WHERE LemmaRefs.slot = Criteria.slot))AND(Criteria.partOfSpeech IS NULL OR Analyses.partOfSpeech = Criteria.partOfSpeech)AND(Criteria.gramCase IS NULL OR instr(\'/\' || Analyses.gramCase || \'/\', \'/\' || Criteria.gramCase || \'/\') > 0)AND(Criteria.number IS NULL OR instr(\'/\' || Analyses.number || \'/\', \'/\' || Criteria.number || \'/\') > 0)AND(Criteria.gender IS NULL OR instr(\'/\' || Analyses.gender || \'/\', \'/\' || Criteria.gender || \'/\') > 0)AND(Criteria.declension IS NULL OR Analyses.declension = Criteria.declension)AND(Criteria.person IS NULL OR instr(\'/\' || Analyses.person || \'/\', \'/\' || Criteria.person || \'/\') > 0)AND(Criteria.verbForm IS NULL OR instr(\'/\' || Analyses.verbForm || \'/\', \'/\' || Criteria.verbForm || \'/\') > 0)AND(Criteria.tense IS NULL OR instr(\'/\' || Analyses.tense || \'/\', \'/\' || Criteria.tense || \'/\') > 0)AND(Criteria.voice IS NULL OR instr(\'/\' || Analyses.voice || \'/\', \'/\' || Criteria.voice || \'/\') > 0)), Forms AS MATERIALIZED (SELECT slot, form FROM Spellings UNION ALL SELECT slot, form FROM Analysed), Hits AS (SELECT WorkOrder.position, t1.workId, t1.sentenceIdx, t1.sourceReference AS reference, t1.isTitle, t1.idx AS firstIdx, COALESCE(t3.idx, t2.idx, t1.idx) AS lastIdx, t1.wordIdx AS firstWordIdx, COALESCE(t3.wordIdx, t2.wordIdx, t1.wordIdx) AS lastWordIdx, t1.idx AS slot1Idx, t2.idx AS slot2Idx, t3.idx AS slot3Idx FROM WorkOrder CROSS JOIN WorkContents AS t1 LEFT OUTER JOIN WorkContents AS t2 ON EXISTS (SELECT * FROM Criteria WHERE slot = 2) AND t2.workId = t1.workId AND t2.sentenceIdx = t1.sentenceIdx AND t2.isTitle = t1.isTitle AND t2.wordIdx BETWEEN t1.wordIdx + 1 AND t1.wordIdx + (SELECT distance FROM Criteria WHERE slot = 2) AND t2.idx BETWEEN ?3 AND ?4 AND(t2.lookupForm IN (SELECT form FROM Forms WHERE slot = 2) OR t2.enclitic IN (SELECT form FROM Forms WHERE slot = 2) OR(t2.enclitic IS NOT NULL AND t2.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 2))OR(t2.properNounState = 2 AND t2.lookupForm IN (SELECT capitalizedForm FROM Analysed WHERE slot = 2)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 2) OR t2.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 2) OR t2.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 2) OR(t2.enclitic IS NOT NULL AND t2.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 2)))LEFT OUTER JOIN WorkContents AS t3 ON EXISTS (SELECT * FROM Criteria WHERE slot = 3) AND t3.workId = t2.workId AND t3.sentenceIdx = t2.sentenceIdx AND t3.isTitle = t2.isTitle AND t3.wordIdx BETWEEN t2.wordIdx + 1 AND t2.wordIdx + (SELECT distance FROM Criteria WHERE slot = 3) AND t3.idx BETWEEN ?3 AND ?4 AND(t3.lookupForm IN (SELECT form FROM Forms WHERE slot = 3) OR t3.enclitic IN (SELECT form FROM Forms WHERE slot = 3) OR(t3.enclitic IS NOT NULL AND t3.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 3))OR(t3.properNounState = 2 AND t3.lookupForm IN (SELECT capitalizedForm FROM Analysed WHERE slot = 3)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 3) OR t3.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 3) OR t3.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 3) OR(t3.enclitic IS NOT NULL AND t3.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 3)))WHERE t1.workId = WorkOrder.workId AND +t1.idx BETWEEN ?3 AND ?4 AND t1.isTitle IN ($expandedisTitleValues) AND(t1.lookupForm IN (SELECT form FROM Forms WHERE slot = 1) OR t1.enclitic IN (SELECT form FROM Forms WHERE slot = 1) OR(t1.enclitic IS NOT NULL AND t1.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 1))OR(t1.properNounState = 2 AND t1.lookupForm IN (SELECT capitalizedForm FROM Analysed WHERE slot = 1)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 1) OR t1.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 1) OR t1.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 1) OR(t1.enclitic IS NOT NULL AND t1.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 1)))AND(t2.idx IS NOT NULL OR NOT EXISTS (SELECT * FROM Criteria WHERE slot = 2))AND(t3.idx IS NOT NULL OR NOT EXISTS (SELECT * FROM Criteria WHERE slot = 3))), Sorted AS (SELECT Hits.*, (SELECT LOWER(Neighbour.normForm) FROM WorkContents AS Neighbour WHERE ?5 <> 0 AND Neighbour.workId = Hits.workId AND Neighbour.sentenceIdx = Hits.sentenceIdx AND Neighbour.isTitle = Hits.isTitle AND Neighbour.wordIdx = ?5 + IIF(?5 > 0, Hits.lastWordIdx, Hits.firstWordIdx)) AS sortKey FROM Hits), Page AS (SELECT Sorted.*, COUNT(*)OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS totalHits FROM Sorted ORDER BY Sorted.sortKey IS NULL, Sorted.sortKey, Sorted.position, Sorted.firstIdx, Sorted.lastIdx, Sorted.slot2Idx, Sorted.slot3Idx LIMIT ?6 OFFSET ?7) SELECT Page.*, Context.idx AS contextIdx, Context.word AS contextWord, Context.macronizedWord AS contextMacronizedWord, Context.sourceReference AS contextReference FROM Page CROSS JOIN WorkContents AS Context WHERE Context.workId = Page.workId AND Context.idx BETWEEN Page.firstIdx - 12 AND Page.lastIdx + 12 ORDER BY Page.sortKey IS NULL, Page.sortKey, Page.position, Page.firstIdx, Page.lastIdx, Page.slot2Idx, Page.slot3Idx, Context.idx',
       variables: [
         i0.Variable<String>(works),
         i0.Variable<String>(phrase),
