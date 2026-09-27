@@ -22,6 +22,7 @@ String featureLabel(GrammarFeature feature) => switch (feature) {
   GrammarFeature.gramCase => 'Case',
   GrammarFeature.number => 'Number',
   GrammarFeature.gender => 'Gender',
+  GrammarFeature.declension => 'Declension',
   GrammarFeature.person => 'Person',
   GrammarFeature.verbForm => 'Verb form',
   GrammarFeature.tense => 'Tense',
@@ -47,7 +48,7 @@ const List<String> _grammarOrder = [
   'nominative', 'genitive', 'dative', 'accusative', 'ablative', 'vocative', 'locative', //
   'singular', 'plural',
   'masculine', 'feminine', 'neuter',
-  '1st', '2nd', '3rd',
+  '1st', '1st & 2nd', '2nd', '3rd', '4th', '5th',
   'indicative', 'subjunctive', 'imperative', 'infinitive', 'participle', 'gerund', 'gerundive',
   'supine',
   'present', 'imperfect', 'future', 'perfect', 'pluperfect', 'future perfect',
@@ -112,14 +113,20 @@ String describeScope(ConcordanceQuery query) => [
   if (query.sort != ConcordanceSort.textOrder) 'by ${sortLabel(query.sort).toLowerCase()}',
 ].join(' · ');
 
-/// e.g. verb, subjunctive, 1st: the part of speech, then the rest as grammars
-/// order them
+/// e.g. noun, 3rd declension, accusative: the part of speech and the
+/// declension, then the rest as grammars order them
 String _grammarText(GrammarFilter grammar) {
+  const leading = {GrammarFeature.partOfSpeech, GrammarFeature.declension};
   final partOfSpeech = grammar.values[GrammarFeature.partOfSpeech];
+  final declension = grammar.values[GrammarFeature.declension];
   final others = grammar.values.entries
-      .where((entry) => entry.key != GrammarFeature.partOfSpeech)
+      .where((entry) => !leading.contains(entry.key))
       .map((entry) => entry.value);
-  final text = [?partOfSpeech, ...grammarOrder(others)].join(', ');
+  final text = [
+    ?partOfSpeech,
+    if (declension != null) '$declension declension',
+    ...grammarOrder(others),
+  ].join(', ');
   return text.isEmpty ? 'any form' : text;
 }
 

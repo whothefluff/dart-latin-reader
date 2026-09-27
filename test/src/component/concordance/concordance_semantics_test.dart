@@ -220,6 +220,52 @@ void main() {
     expect(values.valuesOf(GrammarFeature.gender, partOfSpeech: 'verb'), isEmpty);
   });
 
+  test('a declension holds in one analysis with the rest, and 1st & 2nd is not 1st', () async {
+    await token(db, 0, 'reges');
+    await token(db, 1, 'dominos');
+    await token(db, 2, 'bonos');
+    await token(db, 3, 'nos');
+    await token(db, 4, 'mixta');
+    await analysis(db, 'reges', 'rex', gramCase: 'accusative', declension: '3rd');
+    await analysis(db, 'dominos', 'dominus', gramCase: 'accusative', declension: '2nd');
+    await analysis(db, 'bonos', 'bonus', pos: 'adjective', declension: '1st & 2nd');
+    await analysis(db, 'nos', 'ego', pos: 'pronoun', gramCase: 'accusative');
+    await analysis(db, 'mixta', 'mixtum', gramCase: 'nominative', declension: '3rd');
+    await analysis(db, 'mixta', 'mixtum', count: 1, gramCase: 'accusative', declension: '2nd');
+    Future<List<int>> declined(
+      String declension, {
+      Map<GrammarFeature, String> others = const {},
+      String? lemma,
+    }) => starts([
+      GrammarCriterion(
+        GrammarFilter({GrammarFeature.declension: declension, ...others}),
+        lemma: lemma == null ? null : _lemma(lemma).lemma,
+      ),
+    ]);
+    expect(await declined('3rd', others: const {GrammarFeature.gramCase: 'accusative'}), [0]);
+    expect(await declined('3rd', others: const {GrammarFeature.partOfSpeech: 'noun'}), [0, 4]);
+    expect(await declined('2nd'), [1, 4]);
+    expect(await declined('1st & 2nd'), [2]);
+    expect(await declined('1st'), isEmpty);
+    expect(await declined('3rd', others: const {GrammarFeature.partOfSpeech: 'pronoun'}), isEmpty);
+    expect(await declined('3rd', lemma: 'rex'), [0]);
+    expect(await declined('3rd', lemma: 'dominus'), isEmpty);
+    // without a declension, analyses that have none still match
+    expect(
+      await starts([
+        GrammarCriterion(GrammarFilter(const {GrammarFeature.gramCase: 'accusative'})),
+      ]),
+      [0, 1, 3, 4],
+    );
+    final values = await grammar.ConcordanceRepository(db.concordanceDrift).getGrammarValues();
+    expect(
+      values.valuesOf(GrammarFeature.declension, partOfSpeech: 'noun'),
+      unorderedEquals(['2nd', '3rd']),
+    );
+    expect(values.valuesOf(GrammarFeature.declension, partOfSpeech: 'adjective'), {'1st & 2nd'});
+    expect(values.valuesOf(GrammarFeature.declension, partOfSpeech: 'pronoun'), isEmpty);
+  });
+
   test('macrons filter before the count and the pages', () async {
     for (var idx = 0; idx < 8; idx++) {
       await token(db, idx, 'rosa', macron: idx.isEven ? 'rosā' : 'rosa');

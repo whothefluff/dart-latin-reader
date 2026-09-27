@@ -18,6 +18,7 @@ CREATE VIEW "concordance.Analyses" AS
            Infl.gramCase,
            Infl.number,
            Infl.gender,
+           Infl.declension,
            Infl.person,
            Infl.verbForm,
            Infl.tense,
@@ -80,6 +81,12 @@ CREATE VIEW "concordance.GrammarValues" AS
         FROM MorphologicalDetailInflections
         WHERE gender IS NOT NULL
     UNION
+    SELECT partOfSpeech,
+           'declension',
+           declension
+        FROM MorphologicalDetailInflections
+        WHERE declension IS NOT NULL
+    UNION
     SELECT partOfSpeech, 
            'person', 
            person
@@ -121,7 +128,7 @@ getConcordanceGrammarValues WITH GrammarValueRow.fromSql: SELECT partOfSpeech,
 --   macronSpellings  the same with its macrons, when they have to match too
 -- or, for a lemma or grammar word, any of
 --   lemma            the dictionaryRefs of a lemma (any lemma when absent)
---   partOfSpeech, gramCase, number, gender, person, verbForm, tense, voice
+--   partOfSpeech, gramCase, number, gender, declension, person, verbForm, tense, voice
 -- :works is a JSON array of the works to search, in the order hits are sorted by. :fromIdx and
 -- :toIdx limit it to a part of a work. :isTitleValues are the isTitle values a hit may have
 -- (both, or one to leave titles out or keep only them). :sortNeighbour is the word hits are
@@ -149,6 +156,7 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                                            CAST( json_extract( Word.value, '$.gramCase' ) AS TEXT ) AS gramCase,
                                            CAST( json_extract( Word.value, '$.number' ) AS TEXT ) AS number,
                                            CAST( json_extract( Word.value, '$.gender' ) AS TEXT ) AS gender,
+                                           CAST( json_extract( Word.value, '$.declension' ) AS TEXT ) AS declension,
                                            CAST( json_extract( Word.value, '$.person' ) AS TEXT ) AS person,
                                            CAST( json_extract( Word.value, '$.verbForm' ) AS TEXT ) AS verbForm,
                                            CAST( json_extract( Word.value, '$.tense' ) AS TEXT ) AS tense,
@@ -164,7 +172,8 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                                             Ref.value AS dictionaryRef
                                          FROM Criteria, json_each( Criteria.lemma ) AS Ref ),
          -- Every form an analysed word can have
-         -- A combined value (masculine/feminine/neuter) has each of its values
+         -- A combined value (masculine/feminine/neuter) has each of its values, but a
+         -- declension is one value (1st & 2nd isn't 1st)
          Analysed AS MATERIALIZED ( SELECT Criteria.slot, 
                                            Analyses.form, 
                                            Analyses.capitalizedForm
@@ -186,6 +195,8 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                                               AND ( Criteria.gender IS NULL
                                                     OR instr( '/' || Analyses.gender || '/',
                                                               '/' || Criteria.gender || '/' ) > 0 )
+                                              AND ( Criteria.declension IS NULL
+                                                    OR Analyses.declension = Criteria.declension )
                                               AND ( Criteria.person IS NULL
                                                     OR instr( '/' || Analyses.person || '/',
                                                               '/' || Criteria.person || '/' ) > 0 )

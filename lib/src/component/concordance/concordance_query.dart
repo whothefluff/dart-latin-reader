@@ -115,8 +115,7 @@ class ConcordanceQuery {
           other.sort == sort);
 
   @override
-  int get hashCode =>
-      Object.hash(slots, distances, matchMacrons, selection, part, titles, sort);
+  int get hashCode => Object.hash(slots, distances, matchMacrons, selection, part, titles, sort);
   //
 }
 
@@ -330,6 +329,7 @@ enum GrammarFeature {
   gramCase,
   number,
   gender,
+  declension,
   person,
   verbForm,
   tense,

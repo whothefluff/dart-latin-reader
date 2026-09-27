@@ -79,6 +79,7 @@ Future<void> analysis(
   String pos = 'noun',
   String? gender,
   String? number,
+  String? declension,
   String? gramCase,
   String? verbForm,
   String? person,
@@ -91,10 +92,10 @@ Future<void> analysis(
   await db.customStatement(
     '''
     INSERT INTO MorphologicalDetailInflections(form, item, cnt, partOfSpeech, stem,
-      gender, number, gramCase, verbForm, person)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      gender, number, declension, gramCase, verbForm, person)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   ''',
-    [form, item, count, pos, form, gender, number, gramCase, verbForm, person],
+    [form, item, count, pos, form, gender, number, declension, gramCase, verbForm, person],
   );
 }
 
