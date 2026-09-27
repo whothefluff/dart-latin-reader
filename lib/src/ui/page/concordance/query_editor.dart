@@ -11,6 +11,7 @@ import '../../../component/settings/concordance_settings_api.dart';
 import '../../../component/word_frequency/library_selection_api.dart';
 import '../../widget/lemma_text.dart';
 import '../../widget/library_filter_dialog.dart';
+import '../../widget/page_size.dart';
 import '../library/work_index_sheet.dart';
 import 'common.dart';
 
@@ -119,6 +120,9 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
   /// Not part of the query.
   int? _pageSize;
 
+  /// The first is the default (see [ConcordanceSettings])
+  static final Iterable<int> _pageSizes = pageSizes.take(4);
+
   static List<_SlotDraft> _initialSlots(ConcordanceQuery? query) => switch (query) {
     final query? =>
       query.slots
@@ -151,7 +155,6 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
     final settings =
         ref.watch(concordanceSettingsNotifierProvider).valueOrNull ?? const ConcordanceSettings();
     final pageSize = _pageSize ?? settings.pageSize;
-    final pageSizes = {...ConcordanceSettings.pageSizes, pageSize}.sorted((a, b) => a - b);
     final count = NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
     final query = _query;
     final enabled = widget.onSearch != null;
@@ -272,11 +275,20 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
                   value: pageSize,
                   isDense: true,
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  items: pageSizes
-                      .map((size) => DropdownMenuItem(value: size, child: Text(count.format(size))))
-                      .toList(),
+                  items: pageSizeItems(_pageSizes, pageSize, count),
+                  selectedItemBuilder: pageSizeSelectedItems(_pageSizes, pageSize, count),
                   onChanged: enabled
-                      ? (size) => setState(() => _pageSize = size ?? _pageSize)
+                      ? (picked) async {
+                          final size = await pickPageSize(
+                            context,
+                            picked,
+                            current: pageSize,
+                            title: 'Hits per page',
+                          );
+                          if (size != null && mounted) {
+                            setState(() => _pageSize = size);
+                          }
+                        }
                       : null,
                 ),
               ],

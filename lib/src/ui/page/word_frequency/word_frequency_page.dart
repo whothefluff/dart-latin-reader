@@ -24,6 +24,7 @@ import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
 import '../../widget/lemma_text.dart';
 import '../../widget/library_filter_dialog.dart';
 import '../../widget/page_scaffold.dart';
+import '../../widget/page_size.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
@@ -220,17 +221,14 @@ class _FilterSheet extends StatefulWidget {
 class _FilterSheetState extends State<_FilterSheet> {
   //
 
-  /// Dropdown value of the "Custom…" entry (real page sizes are always positive)
-  static const int _customPageSizeSentinel = -1;
-  static const List<int> _presetPageSizes = [10, 100, 1000];
+  /// The first is the default (see [FrequencyFilterSettings])
+  static final Iterable<int> _pageSizes = pageSizes.skip(1);
   late LibrarySelection _selection = widget.selection;
   late FrequencyFilterSettings _settings = widget.settings;
 
   @override
   Widget build(context) {
     final count = _Formats(Localizations.localeOf(context)).count;
-    // include the current custom size so the dropdown can display it
-    final pageSizes = {..._presetPageSizes, _settings.pageSize}.sorted((a, b) => a.compareTo(b));
     final atDefaults = _selection.isEmpty && _settings == const FrequencyFilterSettings();
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -247,27 +245,16 @@ class _FilterSheetState extends State<_FilterSheet> {
             start: _LabeledDropdown<int>(
               label: 'Per page:',
               value: _settings.pageSize,
-              items: [
-                ...pageSizes.map(
-                  (size) => DropdownMenuItem(value: size, child: Text(count.format(size))),
-                ),
-                const DropdownMenuItem(value: _customPageSizeSentinel, child: Text('Custom…')),
-              ],
-              // Exclude "Custom…" so the button width follows the numeric entries
-              selectedItemBuilder: (_) => [
-                ...pageSizes.map(
-                  (size) => Text(count.format(size)),
-                ),
-                const SizedBox.shrink(),
-              ],
+              items: pageSizeItems(_pageSizes, _settings.pageSize, count),
+              selectedItemBuilder: pageSizeSelectedItems(_pageSizes, _settings.pageSize, count),
               onChanged: (v) async {
-                final size = v == _customPageSizeSentinel
-                    ? await showDialog<int>(
-                        context: context,
-                        builder: (context) => _CustomPageSizeDialog(initial: _settings.pageSize),
-                      )
-                    : v;
-                if (size != null && size > 0 && mounted) {
+                final size = await pickPageSize(
+                  context,
+                  v,
+                  current: _settings.pageSize,
+                  title: 'Rows per page',
+                );
+                if (size != null && mounted) {
                   setState(() => _settings = _settings.copyWith(pageSize: size));
                 }
               },
@@ -492,50 +479,6 @@ class _LabeledCheckbox extends StatelessWidget {
         ? Tooltip(message: disabledReason, child: control)
         : control;
   }
-
-  //
-}
-
-/// Keeps its text controller alive until the dialog finishes closing
-class _CustomPageSizeDialog extends StatefulWidget {
-  const _CustomPageSizeDialog({
-    required this.initial,
-  });
-
-  final int initial;
-
-  @override
-  State<_CustomPageSizeDialog> createState() => _CustomPageSizeDialogState();
-  //
-}
-
-class _CustomPageSizeDialogState extends State<_CustomPageSizeDialog> {
-  //
-  late final _controller = TextEditingController(text: '${widget.initial}');
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(context) => AlertDialog(
-    title: const Text('Rows per page'),
-    content: TextField(
-      controller: _controller,
-      keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      autofocus: true,
-      onSubmitted: (_) => _apply(),
-    ),
-    actions: [
-      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-      FilledButton(onPressed: _apply, child: const Text('Apply')),
-    ],
-  );
-
-  void _apply() => Navigator.pop(context, int.tryParse(_controller.text));
 
   //
 }
