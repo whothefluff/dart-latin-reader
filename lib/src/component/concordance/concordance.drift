@@ -110,7 +110,7 @@ getConcordanceGrammarValues WITH GrammarValueRow.fromSql: SELECT partOfSpeech,
                                                               ORDER BY partOfSpeech, feature, value;
 
 -- TODO(whothefluff): simplify comment
--- A page of the hits of a phrase of one to three words, in the order of :sort, with the text
+-- A page of the hits of a phrase of one to three words, sorted by :sortNeighbour, with the text
 -- around them. One row per context token: up to 12 before the first word, the words and what's
 -- between them, and up to 12 after the last one.
 --
@@ -122,8 +122,9 @@ getConcordanceGrammarValues WITH GrammarValueRow.fromSql: SELECT partOfSpeech,
 --   lemma            the dictionaryRefs of a lemma (any lemma when absent)
 --   partOfSpeech, gramCase, number, gender, person, verbForm, tense, voice
 -- :works is a JSON array of the works to search, in the order hits are sorted by. :fromIdx and
--- :toIdx limit it to a part of a work. :titles and :sort are a ConcordanceTitles and a
--- ConcordanceSort by name.
+-- :toIdx limit it to a part of a work. :isTitleValues are the isTitle values a hit may have
+-- (both, or one to leave titles out or keep only them). :sortNeighbour is the word hits are
+-- sorted by, counted from the hit: 1 is the next one, -1 the previous one, 0 none (text order).
 --
 -- A word is found as frequency counts it: by lookupForm, also capitalized when
 -- properNounState = 2, by the enclitic, and, for a spelled word, as written with an enclitic
@@ -134,7 +135,7 @@ getConcordanceGrammarValues WITH GrammarValueRow.fromSql: SELECT partOfSpeech,
 -- each word's forms once, the unary + keeps it from reading the part's idx range instead of the
 -- form indexes, and CROSS JOIN fixes the order (the first word leads, context is read for the
 -- page only).
-getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :titles AS TEXT, :sort AS TEXT):
+getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
     WITH WorkOrder AS ( SELECT CAST( Work.key AS INTEGER ) AS position,
                                Work.value AS workId
                             FROM json_each( :works ) AS Work ),
@@ -253,11 +254,7 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :titles AS TEXT, :sort AS TE
                                          AND t3.macronBaseNormForm IN ( SELECT form FROM MacronSpellings WHERE slot = 3 ) ) )
                        WHERE t1.workId = WorkOrder.workId
                              AND +t1.idx BETWEEN :fromIdx AND :toIdx
-                             AND CASE :titles 
-                                 WHEN 'only' THEN t1.isTitle
-                                 WHEN 'excluded' THEN NOT t1.isTitle
-                                 ELSE TRUE
-                                 END
+                             AND t1.isTitle IN :isTitleValues
                              AND ( t1.lookupForm IN ( SELECT form FROM Forms WHERE slot = 1 )
                                    OR t1.enclitic IN ( SELECT form FROM Forms WHERE slot = 1 )
                                    OR ( t1.enclitic IS NOT NULL
@@ -273,24 +270,16 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :titles AS TEXT, :sort AS TE
                                    OR NOT EXISTS ( SELECT * FROM Criteria WHERE slot = 2 ) )
                              AND ( t3.idx IS NOT NULL 
                                    OR NOT EXISTS ( SELECT * FROM Criteria WHERE slot = 3 ) ) ),
-         -- The word right after or before a hit in its sentence, on its side of a title's end
+         -- The word :sortNeighbour words after the last one or before the first one, in the hit's
+         -- sentence and on its side of a title's end
          Sorted AS ( SELECT Hits.*,
-                            CASE :sort
-                            WHEN 'followingWord' 
-                            THEN ( SELECT LOWER( Neighbour.normForm )
-                                       FROM WorkContents AS Neighbour
-                                       WHERE Neighbour.workId = Hits.workId
-                                             AND Neighbour.sentenceIdx = Hits.sentenceIdx
-                                             AND Neighbour.isTitle = Hits.isTitle
-                                             AND Neighbour.wordIdx = Hits.lastWordIdx + 1 )
-                            WHEN 'precedingWord' 
-                            THEN ( SELECT LOWER( Neighbour.normForm )
-                                       FROM WorkContents AS Neighbour
-                                       WHERE Neighbour.workId = Hits.workId
-                                             AND Neighbour.sentenceIdx = Hits.sentenceIdx
-                                             AND Neighbour.isTitle = Hits.isTitle
-                                             AND Neighbour.wordIdx = Hits.firstWordIdx - 1 )
-                            END AS sortKey
+                            ( SELECT LOWER( Neighbour.normForm )
+                                  FROM WorkContents AS Neighbour
+                                  WHERE :sortNeighbour <> 0
+                                        AND Neighbour.workId = Hits.workId
+                                        AND Neighbour.sentenceIdx = Hits.sentenceIdx
+                                        AND Neighbour.isTitle = Hits.isTitle
+                                        AND Neighbour.wordIdx = :sortNeighbour + IIF( :sortNeighbour > 0, Hits.lastWordIdx, Hits.firstWordIdx ) ) AS sortKey
                          FROM Hits ),
          -- Pages need a total order: a hit is identified by its words
          -- A hit with no neighbour to sort by (at the edge of its sentence) goes last

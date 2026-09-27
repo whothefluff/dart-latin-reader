@@ -30,8 +30,16 @@ class ConcordanceParameters {
       phrase: jsonEncode(phrase.toList()),
       fromIdx: part?.fromIndex ?? 0,
       toIdx: part?.toIndex ?? _pastAnyToken,
-      titles: query.titles.name,
-      sort: query.sort.name,
+      isTitleValues: switch (query.titles) {
+        ConcordanceTitles.included => const [true, false],
+        ConcordanceTitles.excluded => const [false],
+        ConcordanceTitles.only => const [true],
+      },
+      sortNeighbour: switch (query.sort) {
+        ConcordanceSort.textOrder => 0,
+        ConcordanceSort.followingWord => 1,
+        ConcordanceSort.precedingWord => -1,
+      },
       workCount: workIds.length,
     );
   }
@@ -41,8 +49,8 @@ class ConcordanceParameters {
     required this.phrase,
     required this.fromIdx,
     required this.toIdx,
-    required this.titles,
-    required this.sort,
+    required this.isTitleValues,
+    required this.sortNeighbour,
     required int workCount,
   }) : _workCount = workCount;
 
@@ -55,11 +63,11 @@ class ConcordanceParameters {
   final int fromIdx;
   final int toIdx;
 
-  /// A [ConcordanceTitles] by name
-  final String titles;
+  /// What [ConcordanceTitles] leaves in, as the isTitle values a hit may have
+  final List<bool> isTitleValues;
 
-  /// A [ConcordanceSort] by name
-  final String sort;
+  /// The word [ConcordanceSort] sorts by, counted from the hit (0 for none)
+  final int sortNeighbour;
 
   final int _workCount;
 
@@ -70,7 +78,7 @@ class ConcordanceParameters {
   @override
   String toString() =>
       'ConcordanceParameters{phrase: $phrase, $_workCount works, idx: $fromIdx-$toIdx, '
-      'titles: $titles, sort: $sort}';
+      'isTitle: $isTitleValues, sortNeighbour: $sortNeighbour}';
   //
 }
 

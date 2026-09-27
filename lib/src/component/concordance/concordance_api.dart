@@ -53,8 +53,8 @@ class ConcordanceRepository implements IConcordanceRepository {
           phrase: parameters.phrase,
           fromIdx: parameters.fromIdx,
           toIdx: parameters.toIdx,
-          titles: parameters.titles,
-          sort: parameters.sort,
+          isTitleValues: parameters.isTitleValues,
+          sortNeighbour: parameters.sortNeighbour,
           limit: limit,
           offset: offset,
         )
