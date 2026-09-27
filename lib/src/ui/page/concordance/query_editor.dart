@@ -678,6 +678,9 @@ class _FormFieldState extends State<_FormField> {
         helperText: draft.exactCase
             ? 'Only this capitalization'
             : 'Capitalized (proper nouns) or not',
+        errorText: FormCriterion(draft.text).isPhrase
+            ? 'One word only. For a phrase, add a word after it'
+            : null,
         border: const OutlineInputBorder(),
         isDense: true,
         suffixIcon: IconButton(

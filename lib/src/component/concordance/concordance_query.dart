@@ -182,8 +182,13 @@ final class FormCriterion extends ConcordanceCriterion {
   /// not. When true, only the capitalization of [text] does
   final bool exactCase;
 
+  static final _space = RegExp(r'\s');
+
+  /// Whether [text] is several words
+  bool get isPhrase => _space.hasMatch(text.trim());
+
   @override
-  bool get isComplete => text.trim().isNotEmpty;
+  bool get isComplete => text.trim().isNotEmpty && !isPhrase;
 
   @override
   Map<String, Object?> toJsonMap() => {'form': text, if (exactCase) 'exactCase': true};
