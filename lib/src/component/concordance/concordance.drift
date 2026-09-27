@@ -38,16 +38,17 @@ CREATE VIEW "concordance.Lemmas" AS
         LEFT OUTER JOIN "dictionary.ResolvedLnsRefs" AS Resolved
             ON Resolved.dictionaryRef = Details.dictionaryRef;
 
--- Lemmas whose dictionaryRef or entry starts with :prefix, one per entry
+-- Lemmas whose dictionaryRef or entry starts with :prefix, one per entry, with all
+-- its dictionaryRefs: filtering before grouping would keep only the ones that match
 searchConcordanceLemmas WITH LemmaChoice.fromSql:
     SELECT COALESCE( lnsLemma, dictionaryRef ) AS label,
            GROUP_CONCAT( dictionaryRef ) AS dictionaryRefs,
            MIN( lnsPartOfSpeech ) AS partOfSpeech,
            MIN( lnsInflection ) AS inflection
         FROM "concordance.Lemmas"
-        WHERE dictionaryRef LIKE :prefix || '%'
-              OR lnsLemma LIKE :prefix || '%'
         GROUP BY COALESCE( lnsLemma, dictionaryRef )
+        HAVING MAX( dictionaryRef LIKE :prefix || '%'
+                    OR lnsLemma LIKE :prefix || '%' )
         ORDER BY COALESCE( lnsLemma, dictionaryRef ) <> :prefix, -- exact match first
                  LENGTH( COALESCE( lnsLemma, dictionaryRef ) ),
                  COALESCE( lnsLemma, dictionaryRef )
