@@ -9,6 +9,7 @@ import '../../../component/concordance/lemma_choices_api.dart';
 import '../../../component/library/catalog_api.dart';
 import '../../../component/settings/concordance_settings_api.dart';
 import '../../../component/word_frequency/library_selection_api.dart';
+import '../../widget/labeled_dropdown.dart';
 import '../../widget/lemma_text.dart';
 import '../../widget/library_filter_dialog.dart';
 import '../../widget/page_size.dart';
@@ -228,69 +229,42 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
                 ),
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Titles'),
-                const SizedBox(width: 8),
-                DropdownButton<ConcordanceTitles>(
-                  value: _titles,
-                  isDense: true,
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  items: ConcordanceTitles.values
-                      .map(
-                        (titles) =>
-                            DropdownMenuItem(value: titles, child: Text(titlesLabel(titles))),
-                      )
-                      .toList(),
-                  onChanged: enabled
-                      ? (titles) => setState(() => _titles = titles ?? _titles)
-                      : null,
-                ),
-              ],
+            LabeledDropdown<ConcordanceTitles>(
+              label: 'Titles',
+              value: _titles,
+              items: ConcordanceTitles.values
+                  .map(
+                    (titles) => DropdownMenuItem(value: titles, child: Text(titlesLabel(titles))),
+                  )
+                  .toList(),
+              onChanged: enabled ? (titles) => setState(() => _titles = titles ?? _titles) : null,
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Sort by'),
-                const SizedBox(width: 8),
-                DropdownButton<ConcordanceSort>(
-                  value: _sort,
-                  isDense: true,
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  items: ConcordanceSort.values
-                      .map((sort) => DropdownMenuItem(value: sort, child: Text(sortLabel(sort))))
-                      .toList(),
-                  onChanged: enabled ? (sort) => setState(() => _sort = sort ?? _sort) : null,
-                ),
-              ],
+            LabeledDropdown<ConcordanceSort>(
+              label: 'Sort by',
+              value: _sort,
+              items: ConcordanceSort.values
+                  .map((sort) => DropdownMenuItem(value: sort, child: Text(sortLabel(sort))))
+                  .toList(),
+              onChanged: enabled ? (sort) => setState(() => _sort = sort ?? _sort) : null,
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Per page'),
-                const SizedBox(width: 8),
-                DropdownButton<int>(
-                  value: pageSize,
-                  isDense: true,
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  items: pageSizeItems(_pageSizes, pageSize, count),
-                  selectedItemBuilder: pageSizeSelectedItems(_pageSizes, pageSize, count),
-                  onChanged: enabled
-                      ? (picked) async {
-                          final size = await pickPageSize(
-                            context,
-                            picked,
-                            current: pageSize,
-                            title: 'Hits per page',
-                          );
-                          if (size != null && mounted) {
-                            setState(() => _pageSize = size);
-                          }
-                        }
-                      : null,
-                ),
-              ],
+            LabeledDropdown<int>(
+              label: 'Per page',
+              value: pageSize,
+              items: pageSizeItems(_pageSizes, pageSize, count),
+              selectedItemBuilder: pageSizeSelectedItems(_pageSizes, pageSize, count),
+              onChanged: enabled
+                  ? (picked) async {
+                      final size = await pickPageSize(
+                        context,
+                        picked,
+                        current: pageSize,
+                        title: 'Hits per page',
+                      );
+                      if (size != null && mounted) {
+                        setState(() => _pageSize = size);
+                      }
+                    }
+                  : null,
             ),
           ],
         ),
