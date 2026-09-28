@@ -246,7 +246,6 @@ class _FilterSheetState extends State<_FilterSheet> {
               label: 'Per page:',
               value: _settings.pageSize,
               items: pageSizeItems(_pageSizes, _settings.pageSize, count),
-              selectedItemBuilder: pageSizeSelectedItems(_pageSizes, _settings.pageSize, count),
               onChanged: (v) async {
                 final size = await pickPageSize(
                   context,

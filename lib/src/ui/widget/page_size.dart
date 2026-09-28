@@ -24,16 +24,6 @@ List<DropdownMenuItem<int>> pageSizeItems(
   const DropdownMenuItem(value: _customPageSize, child: Text('Custom…')),
 ];
 
-DropdownButtonBuilder pageSizeSelectedItems(
-  Iterable<int> offered,
-  int current,
-  NumberFormat count,
-) =>
-    (_) => [
-      ..._sizes(offered, current).map((size) => Text(count.format(size))),
-      const SizedBox.shrink(),
-    ];
-
 /// The size [picked] in [pageSizeItems].
 ///
 /// Null when the dialog is cancelled
