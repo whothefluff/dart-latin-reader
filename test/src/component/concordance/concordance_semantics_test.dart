@@ -297,10 +297,11 @@ void main() {
     expect(page.hits.single.reference, '1.1');
   });
 
-  test('typed text is literal: no SQL, no LIKE wildcards', () async {
-    await token(db, 0, 'rosa');
-    expect(await starts([const FormCriterion("rosa' OR '1'='1")]), isEmpty);
-    expect(await starts([const FormCriterion('%')]), isEmpty);
-    expect(await starts([const FormCriterion('_')]), isEmpty);
+  test('an apostrophe is part of a word, and _ and % are no wildcards', () async {
+    await token(db, 0, "viden'");
+    await token(db, 1, 'rosa');
+    expect(await starts([const FormCriterion("viden'")]), [0]);
+    expect(await starts([const FormCriterion('ros_')]), isEmpty);
+    expect(await starts([const FormCriterion('ros%')]), isEmpty);
   });
 }
