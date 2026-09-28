@@ -11,7 +11,6 @@ class LabeledDropdown<T> extends StatelessWidget {
     required this.value,
     required this.items,
     required ValueChanged<T?>? onChanged,
-    this.selectedItemBuilder,
   }) : _onChanged = onChanged;
 
   final String label;
@@ -22,8 +21,6 @@ class LabeledDropdown<T> extends StatelessWidget {
   // Safe because this field is only read through this instance, with its original T
   // ignore: unsafe_variance
   final ValueChanged<T?>? _onChanged;
-
-  final DropdownButtonBuilder? selectedItemBuilder;
 
   @override
   Widget build(context) => Row(
@@ -37,7 +34,6 @@ class LabeledDropdown<T> extends StatelessWidget {
           builder: (_, keyboard, _) => DropdownButton<T>(
             value: value,
             items: items,
-            selectedItemBuilder: selectedItemBuilder,
             onChanged: _onChanged,
             isDense: true,
             borderRadius: const BorderRadius.all(Radius.circular(8)),

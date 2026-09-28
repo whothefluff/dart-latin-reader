@@ -251,7 +251,6 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
               label: 'Per page',
               value: pageSize,
               items: pageSizeItems(_pageSizes, pageSize, count),
-              selectedItemBuilder: pageSizeSelectedItems(_pageSizes, pageSize, count),
               onChanged: enabled
                   ? (picked) async {
                       final size = await pickPageSize(
