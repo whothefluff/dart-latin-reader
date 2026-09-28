@@ -17,6 +17,7 @@ import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
+import '../settings/settings_shell_page.dart' show SettingsTab;
 import 'common.dart';
 import 'query_editor.dart';
 
@@ -36,7 +37,10 @@ class ConcordancePage extends StatelessWidget {
 
   @override
   Widget build(context) => SafeBodyScaffold(
-    appBar: AppBar(title: const Text('Concordance')),
+    appBar: AppBar(
+      title: const Text('Concordance'),
+      actions: const [_SettingsButton()],
+    ),
     body: _Editor(initial: query),
   );
 
@@ -64,8 +68,22 @@ class ConcordanceHitsPage extends StatelessWidget {
     appBar: AppBar(
       title: const Text('Concordance'),
       notificationPredicate: (_) => false, //only the hits scroll
+      actions: const [_SettingsButton()],
     ),
     body: _Results(query: query, offset: offset, locked: locked),
+  );
+
+  //
+}
+
+class _SettingsButton extends StatelessWidget {
+  const _SettingsButton();
+
+  @override
+  Widget build(context) => IconButton(
+    tooltip: 'Concordance settings',
+    icon: const Icon(Icons.settings),
+    onPressed: () async => const SettingsRoute(tab: SettingsTab.concordance).push<void>(context),
   );
 
   //
