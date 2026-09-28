@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' show NumberFormat;
 
@@ -21,6 +20,7 @@ import '../../../component/word_frequency/resolved_freq_morph_form_api.dart';
 import '../../../component/word_frequency/word_frequency_api.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
+import '../../widget/labeled_dropdown.dart';
 import '../../widget/lemma_text.dart';
 import '../../widget/library_filter_dialog.dart';
 import '../../widget/page_scaffold.dart';
@@ -242,7 +242,7 @@ class _FilterSheetState extends State<_FilterSheet> {
           ),
           const SizedBox(height: 8),
           _OptionRow(
-            start: _LabeledDropdown<int>(
+            start: LabeledDropdown<int>(
               label: 'Per page:',
               value: _settings.pageSize,
               items: pageSizeItems(_pageSizes, _settings.pageSize, count),
@@ -266,7 +266,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             ),
           ),
           _OptionRow(
-            start: _LabeledDropdown<bool>(
+            start: LabeledDropdown<bool>(
               label: 'Order:',
               value: _settings.ascending,
               items: const [
@@ -378,56 +378,6 @@ class _OptionRow extends StatelessWidget {
     crossAxisAlignment: WrapCrossAlignment.center,
     spacing: 16,
     children: [start, end],
-  );
-
-  //
-}
-
-/// Dropdown with a label beside the selected value
-///
-/// Focus highlighting is shown only during keyboard navigation
-class _LabeledDropdown<T> extends StatelessWidget {
-  const _LabeledDropdown({
-    required this.label,
-    required this.value,
-    required this.items,
-    required ValueChanged<T?> onChanged,
-    this.selectedItemBuilder,
-  }) : _onChanged = onChanged;
-
-  final String label;
-  final T value;
-  final List<DropdownMenuItem<T>> items;
-
-  // Safe because this field is only read through this instance, with its original T
-  // ignore: unsafe_variance
-  final ValueChanged<T?> _onChanged;
-
-  final DropdownButtonBuilder? selectedItemBuilder;
-
-  @override
-  Widget build(context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text(label),
-      const SizedBox(width: 4),
-      DropdownButtonHideUnderline(
-        child: ValueListenableBuilder(
-          valueListenable: _keyboardNavigation,
-          builder: (_, keyboard, _) => DropdownButton<T>(
-            value: value,
-            items: items,
-            selectedItemBuilder: selectedItemBuilder,
-            onChanged: _onChanged,
-            isDense: true,
-            borderRadius: _controlBorderRadius,
-            // Padding keeps the highlight clear of the text
-            padding: const EdgeInsetsDirectional.fromSTEB(8, 4, 4, 4),
-            focusColor: keyboard ? null : Colors.transparent,
-          ),
-        ),
-      ),
-    ],
   );
 
   //
@@ -1309,52 +1259,3 @@ void _notFound(
   BuildContext context, {
   String message = 'No dictionary entry found for this form.',
 }) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-
-/// Whether focus highlights should be shown for keyboard navigation.
-///
-/// Some Flutter controls retain focus after mouse input or Alt+Tab, leaving
-/// their focus highlight visible. Pointer input hides it; keyboard navigation
-/// restores it.
-final _InputModality _keyboardNavigation = _InputModality();
-
-class _InputModality extends ValueNotifier<bool> {
-  _InputModality() : super(false) {
-    WidgetsBinding.instance.pointerRouter.addGlobalRoute(_onPointer);
-    HardwareKeyboard.instance.addHandler(_onKey);
-  }
-
-  /// Keys that only modify others: pressing them alone isn't navigating
-  static final Set<LogicalKeyboardKey> _modifiers = {
-    ...LogicalKeyboardKey.expandSynonyms({
-      LogicalKeyboardKey.shift,
-      LogicalKeyboardKey.control,
-      LogicalKeyboardKey.alt,
-      LogicalKeyboardKey.meta,
-    }),
-    LogicalKeyboardKey.altGraph,
-    LogicalKeyboardKey.capsLock,
-    LogicalKeyboardKey.fn,
-  };
-
-  void _onPointer(PointerEvent event) {
-    if (event is PointerDownEvent) {
-      value = false;
-    }
-  }
-
-  /// Only observes, so it never claims the event
-  bool _onKey(KeyEvent event) {
-    final keyboard = HardwareKeyboard.instance;
-    if (event is KeyDownEvent &&
-        !event.synthesized &&
-        !_modifiers.contains(event.logicalKey) &&
-        !keyboard.isControlPressed &&
-        !keyboard.isAltPressed &&
-        !keyboard.isMetaPressed) {
-      value = true;
-    }
-    return false;
-  }
-
-  //
-}
