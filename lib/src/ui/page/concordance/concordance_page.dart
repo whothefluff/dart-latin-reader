@@ -112,34 +112,30 @@ class _Editor extends StatelessWidget {
   Widget build(context) {
     final theme = Theme.of(context);
     return SingleChildScrollView(
-      padding: EdgeInsets.all(Breakpoints.mediumAndUp.isActive(context) ? 24 : 16),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (initial == null) ...[
-                Text(
-                  'Find how words are used in the library. A word can be a form as '
-                  'written, any form of a lemma, or a grammatical description. Add '
-                  'more words to find them together in a sentence.',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
-              QueryEditor(
-                // Starts over when the hits above are of another search (from
-                // Frequency, sorted another way), not for another page of them
-                key: ValueKey(initial?.toJson()),
-                initial: initial,
-                onSearch: (query) => _search(context, query),
+      // The hits' margin, so the form lines up with them
+      padding: EdgeInsets.all(_margin(context)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (initial == null) ...[
+            Text(
+              'Find how words are used in the library. A word can be a form as '
+              'written, any form of a lemma, or a grammatical description. Add '
+              'more words to find them together in a sentence.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-            ],
+            ),
+            const SizedBox(height: 24),
+          ],
+          QueryEditor(
+            // Starts over when the hits above are of another search (from
+            // Frequency, sorted another way), not for another page of them
+            key: ValueKey(initial?.toJson()),
+            initial: initial,
+            onSearch: (query) => _search(context, query),
           ),
-        ),
+        ],
       ),
     );
   }
