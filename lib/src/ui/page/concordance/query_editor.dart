@@ -205,7 +205,6 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
         ],
         const SizedBox(height: 8),
         Wrap(
-          alignment: WrapAlignment.spaceBetween,
           crossAxisAlignment: WrapCrossAlignment.center,
           spacing: 16,
           children: [
