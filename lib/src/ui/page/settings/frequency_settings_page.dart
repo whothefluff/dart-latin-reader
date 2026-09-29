@@ -94,11 +94,13 @@ class _ReportSettingsSection extends StatelessWidget {
       _ChipChoice(
         title: 'Tapping a Form Opens',
         subtitle: 'Lemma rows never navigate to morphology',
-        values: FormTapAction.values,
-        label: _formTapLabel,
-        current: settings.formTapAction,
-        onChanged: (action) => notifier.updateSettings(
-          settings.copyWith(formTapAction: action),
+        chips: _choiceChips(
+          values: FormTapAction.values,
+          current: settings.formTapAction,
+          label: _formTapLabel,
+          onChanged: (action) => notifier.updateSettings(
+            settings.copyWith(formTapAction: action),
+          ),
         ),
       ),
     ],
@@ -108,12 +110,16 @@ class _ReportSettingsSection extends StatelessWidget {
     rows: [
       _ChipChoice(
         title: 'Lemma Coverage on Small Screens',
-        subtitle: 'Larger screens show both. On small screens, long-press a row for the other',
-        values: NarrowLemmaCoverage.values,
-        label: _narrowLemmaCoverageLabel,
-        current: settings.narrowLemmaCoverage,
-        onChanged: (coverage) => notifier.updateSettings(
-          settings.copyWith(narrowLemmaCoverage: coverage),
+        subtitle:
+            'Larger screens show both. On small screens, long-press or hover over a row '
+            'for the other',
+        chips: _choiceChips(
+          values: NarrowLemmaCoverage.values,
+          current: settings.narrowLemmaCoverage,
+          label: _narrowLemmaCoverageLabel,
+          onChanged: (coverage) => notifier.updateSettings(
+            settings.copyWith(narrowLemmaCoverage: coverage),
+          ),
         ),
       ),
     ],
@@ -133,24 +139,18 @@ class _ReportSettingsSection extends StatelessWidget {
   //
 }
 
-/// Title, subtitle and one chip per value.
+/// Title, subtitle and [chips].
 /// The chips wrap on narrow screens.
-class _ChipChoice<T> extends StatelessWidget {
+class _ChipChoice extends StatelessWidget {
   const _ChipChoice({
     required this.title,
     required this.subtitle,
-    required this.values,
-    required this.label,
-    required this.current,
-    required this.onChanged,
+    required this.chips,
   });
 
   final String title;
   final String subtitle;
-  final List<T> values;
-  final String Function(T value) label;
-  final T current;
-  final ValueChanged<T> onChanged;
+  final List<ChoiceChip> chips;
 
   @override
   Widget build(context) {
@@ -172,22 +172,28 @@ class _ChipChoice<T> extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _chips(),
+            children: chips,
           ),
         ],
       ),
     );
   }
 
-  List<ChoiceChip> _chips() => values
-      .map(
-        (value) => ChoiceChip(
-          label: Text(label(value)),
-          selected: value == current,
-          onSelected: (_) => onChanged(value),
-        ),
-      )
-      .toList();
-
   //
 }
+
+/// One chip per value, with [current] selected
+List<ChoiceChip> _choiceChips<T>({
+  required List<T> values,
+  required T current,
+  required String Function(T value) label,
+  required ValueChanged<T> onChanged,
+}) => values
+    .map(
+      (value) => ChoiceChip(
+        label: Text(label(value)),
+        selected: value == current,
+        onSelected: (_) => onChanged(value),
+      ),
+    )
+    .toList();
