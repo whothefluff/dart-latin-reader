@@ -11,12 +11,17 @@ import '../../../component/library/catalog_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../../component/settings/frequency_filter_settings_api.dart';
 import '../../../component/settings/frequency_settings_api.dart'
-    show FormTapAction, FrequencySettings, frequencyViewSettingsNotifierProvider;
+    show
+        FormTapAction,
+        FrequencySettings,
+        NarrowLemmaCoverage,
+        frequencyViewSettingsNotifierProvider;
 import '../../../component/word_frequency/active_frequency_filter_api.dart';
 import '../../../component/word_frequency/enriched_word_frequency_api.dart';
 import '../../../component/word_frequency/frequency_offset_api.dart';
 import '../../../component/word_frequency/library_selection_api.dart';
 import '../../../component/word_frequency/resolved_freq_morph_form_api.dart';
+import '../../../component/word_frequency/text_coverage_api.dart' show TextCoverage;
 import '../../../component/word_frequency/word_frequency_api.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
@@ -74,7 +79,13 @@ class _WordFrequencyBody extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     final reportAsync = ref.watch(enrichedFrequencyReportProvider(filter));
-    final layout = _Layout.of(context, groupByLemma: filter.groupByLemma);
+    final view =
+        ref.watch(frequencyViewSettingsNotifierProvider).valueOrNull ?? const FrequencySettings();
+    final layout = _Layout.of(
+      context,
+      groupByLemma: filter.groupByLemma,
+      narrowLemmaCoverage: view.narrowLemmaCoverage,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -432,15 +443,22 @@ class _LabeledCheckbox extends StatelessWidget {
   //
 }
 
-/// Locale-aware number formats for counts and relative frequencies
 class _Formats {
   _Formats(
     Locale locale,
   ) : count = NumberFormat.decimalPattern(locale.toString()),
-      frequency = NumberFormat('#,##0.0', locale.toString());
+      _percentage = NumberFormat.decimalPercentPattern(locale: locale.toString(), decimalDigits: 1);
 
   final NumberFormat count;
-  final NumberFormat frequency;
+  final NumberFormat _percentage;
+
+  /// Floors to 0.1% so partial coverage never displays as 100%.
+  String coverage(TextCoverage textCoverage, int atLeast) {
+    final total = textCoverage.totalUnits;
+    final perMille = total > 0 ? textCoverage.unitsCovered(atLeast: atLeast) * 1000 ~/ total : 0;
+    return _percentage.format(perMille / 1000);
+  }
+
   //
 }
 
@@ -492,7 +510,8 @@ class _ReportView extends ConsumerWidget {
                           formats: formats,
                           rank: report.offset + index + 1,
                           row: row,
-                          frequency: report.relativeFrequency(row.occurrences),
+                          coverage: report.textCoverage,
+                          certainCoverage: report.certainCoverage,
                           onTap: () => _onRowTapped(context, ref, filter, row),
                         ),
                       );
@@ -626,9 +645,27 @@ class _ReportSummary extends StatelessWidget {
             if (filter.groupByLemma) ...[
               const SizedBox(height: 12),
               const Text(
-                'Counts are possible occurrences: the same occurrence can count '
-                'towards more than one lemma. SINGLE counts the occurrences where '
-                'this was the only candidate in the available analyses.',
+                'A word can belong to more than one lemma: est can be sum ("is") '
+                'or edo ("eats"). COUNT counts it for both; SINGLE only counts '
+                'words with one possible lemma.',
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "COVER. is how much of the text you'd recognize if you knew every lemma "
+                'from the most common down to this one. It counts est once you know sum '
+                'or edo; CERT. waits until you know both. The real figure is in between.',
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'On small screens, Settings picks which one shows. Long-press or hover '
+                'over a row to see both.',
+              ),
+            ] else ...[
+              const SizedBox(height: 12),
+              const Text(
+                'COVER. is how much of the text is made up of every form from the most '
+                'common down to this one. If et is 3% of the text and est 2%, est shows '
+                '5%. Forms with the same count show the same value.',
               ),
             ],
           ],
@@ -654,10 +691,15 @@ class _ReportSummary extends StatelessWidget {
 
 /// Responsive report geometry based on the scaffold's [Breakpoints]
 class _Layout {
-  _Layout.of(BuildContext context, {required this.groupByLemma})
-    : _withRail = Breakpoints.mediumAndUp.isActive(context);
+  _Layout.of(
+    BuildContext context, {
+    required this.groupByLemma,
+    required this.narrowLemmaCoverage,
+  }) : _withRail = Breakpoints.mediumAndUp.isActive(context);
 
   final bool groupByLemma;
+
+  final NarrowLemmaCoverage narrowLemmaCoverage;
 
   final bool _withRail;
 
@@ -671,7 +713,7 @@ class _Layout {
 
   // Fixed columns leave extra room as the layout widens
   double get rankWidth => _withRail ? 48 : 40;
-  double get frequencyWidth => _withRail ? 72 : 56;
+  double get coverageWidth => _withRail ? 72 : 56;
   double get singleWidth => _withRail ? 80 : 64;
   double get countWidth => _withRail ? 96 : 80;
 
@@ -683,6 +725,16 @@ class _Layout {
 
   /// Whether SINGLE is shown
   bool get singleColumn => groupByLemma;
+
+  /// Whether the certain lemma coverage has a CERT. column of its own
+  bool get certainColumn => groupByLemma && _withRail;
+
+  /// Whether a lemma coverage is left out, so the row's tooltip shows both
+  bool get coverageTooltip => groupByLemma && !_withRail;
+
+  /// Whether the one coverage column shows the certain coverage instead
+  bool get certainInCoverageColumn =>
+      coverageTooltip && narrowLemmaCoverage == NarrowLemmaCoverage.certain;
 
   //
 }
@@ -711,6 +763,12 @@ class _TableHeader extends StatelessWidget {
       return tooltip == null ? label : Tooltip(message: tooltip, child: label);
     }
 
+    final certain = cell(
+      'CERT.',
+      "How much of the text you'd recognize knowing the lemmas from the most common down "
+          'to this one, counting a word only once you know all its lemmas',
+    );
+
     return _TableLine(
       layout: layout,
       // Account for the sort button's own vertical padding
@@ -725,12 +783,17 @@ class _TableHeader extends StatelessWidget {
       lemma: layout.lemmaColumn
           ? cell('LEMMA', 'Candidate lemmas in the available analyses')
           : null,
-      frequency: cell(
-        'FREQ.',
-        layout.groupByLemma
-            ? 'Possible occurrences per 1,000 words in the selected works'
-            : 'Occurrences per 1,000 words in the selected works',
-      ),
+      coverage: layout.certainInCoverageColumn
+          ? certain
+          : cell(
+              'COVER.',
+              layout.groupByLemma
+                  ? "How much of the text you'd recognize knowing the lemmas from the most "
+                        'common down to this one, counting a word once you know any of its lemmas'
+                  : 'How much of the text the forms from the most common down to this one '
+                        'make up',
+            ),
+      certain: layout.certainColumn ? certain : null,
       single: layout.singleColumn
           ? cell('SINGLE', 'Occurrences where this was the only candidate lemma')
           : null,
@@ -783,7 +846,8 @@ class _TableRow extends StatelessWidget {
     required this.formats,
     required this.rank,
     required this.row,
-    required this.frequency,
+    required this.coverage,
+    required this.certainCoverage,
     required this.onTap,
   });
 
@@ -791,7 +855,8 @@ class _TableRow extends StatelessWidget {
   final _Formats formats;
   final int rank;
   final EnrichedFrequencyRow row;
-  final double frequency;
+  final TextCoverage coverage;
+  final TextCoverage? certainCoverage;
   final VoidCallback onTap;
 
   @override
@@ -805,33 +870,50 @@ class _TableRow extends StatelessWidget {
     final count = formats.count;
     final lemmas = row.possibleLemmas?.map(lemmaText).join(', ');
     final base = row.base;
-    return InkWell(
-      onTap: onTap,
-      child: _TableLine(
-        layout: layout,
-        rank: Text('${count.format(rank)}.', style: numberStyle?.copyWith(color: muted)),
-        main: layout.lemmaUnderForm && lemmas != null
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(_rowLabel(row), style: textTheme.bodyLarge),
-                  Text(lemmas, style: textTheme.bodySmall?.copyWith(color: muted)),
-                ],
-              )
-            : Text(_rowLabel(row), style: textTheme.bodyLarge),
-        lemma: layout.lemmaColumn
-            ? Text(lemmas ?? '—', style: textTheme.bodyMedium?.copyWith(color: muted))
-            : null,
-        frequency: Text(formats.frequency.format(frequency), style: numberStyle),
-        single: layout.singleColumn
-            ? Text(
-                base is LemmaFrequencyRow ? count.format(base.singleCandidateOccurrences) : '—',
-                style: numberStyle,
-              )
-            : null,
-        count: Text(count.format(row.occurrences), style: numberStyle),
+    final anyCandidate = formats.coverage(coverage, row.occurrences);
+    final certainCoverage = this.certainCoverage;
+    final certain = certainCoverage == null
+        ? null
+        : formats.coverage(certainCoverage, row.occurrences);
+    final line = _TableLine(
+      layout: layout,
+      rank: Text('${count.format(rank)}.', style: numberStyle?.copyWith(color: muted)),
+      main: layout.lemmaUnderForm && lemmas != null
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_rowLabel(row), style: textTheme.bodyLarge),
+                Text(lemmas, style: textTheme.bodySmall?.copyWith(color: muted)),
+              ],
+            )
+          : Text(_rowLabel(row), style: textTheme.bodyLarge),
+      lemma: layout.lemmaColumn
+          ? Text(lemmas ?? '—', style: textTheme.bodyMedium?.copyWith(color: muted))
+          : null,
+      coverage: Text(
+        layout.certainInCoverageColumn && certain != null ? certain : anyCandidate,
+        style: numberStyle,
       ),
+      certain: layout.certainColumn && certain != null ? Text(certain, style: numberStyle) : null,
+      single: layout.singleColumn
+          ? Text(
+              base is LemmaFrequencyRow ? count.format(base.singleCandidateOccurrences) : '—',
+              style: numberStyle,
+            )
+          : null,
+      count: Text(count.format(row.occurrences), style: numberStyle),
     );
+    final tappable = InkWell(onTap: onTap, child: line);
+    // Touch detects long-presses
+    // A mouse hovers, with a delay so moving over the table doesn't pop one up on every row
+    return layout.coverageTooltip && certain != null
+        ? Tooltip(
+            message: 'Certain: $certain · Any candidate: $anyCandidate',
+            triggerMode: TooltipTriggerMode.longPress,
+            waitDuration: const Duration(milliseconds: 500),
+            child: tappable,
+          )
+        : tappable;
   }
 
   //
@@ -924,16 +1006,17 @@ class _PointerWhenFullyVisibleState extends State<_PointerWhenFullyVisible> {
   //
 }
 
-/// Lays out one table line. The header and every row use it, so the columns always line up.
+/// One line for the header and every row, so the columns line up.
 ///
-/// Cells share the first text baseline; omit [lemma] or [single] to hide that column
+/// Cells share the first baseline; a null [lemma], [certain] or [single] hides that column
 class _TableLine extends StatelessWidget {
   const _TableLine({
     required this.layout,
     required this.rank,
     required this.main,
     required this.lemma,
-    required this.frequency,
+    required this.coverage,
+    required this.certain,
     required this.single,
     required this.count,
     this.verticalPadding = rowPadding,
@@ -946,7 +1029,8 @@ class _TableLine extends StatelessWidget {
   /// FORM, or LEMMA when grouping by lemma
   final Widget main;
   final Widget? lemma;
-  final Widget frequency;
+  final Widget coverage;
+  final Widget? certain;
   final Widget? single;
   final Widget count;
   final double verticalPadding;
@@ -959,6 +1043,7 @@ class _TableLine extends StatelessWidget {
   @override
   Widget build(context) {
     final lemma = this.lemma;
+    final certain = this.certain;
     final single = this.single;
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(
@@ -974,7 +1059,9 @@ class _TableLine extends StatelessWidget {
           _fixed(layout.rankWidth, AlignmentDirectional.centerStart, rank),
           Expanded(child: main),
           if (lemma != null) ...[SizedBox(width: layout.columnSpacing), Expanded(child: lemma)],
-          _fixed(layout.frequencyWidth, AlignmentDirectional.centerEnd, frequency),
+          _fixed(layout.coverageWidth, AlignmentDirectional.centerEnd, coverage),
+          if (certain != null)
+            _fixed(layout.coverageWidth, AlignmentDirectional.centerEnd, certain),
           if (single != null) _fixed(layout.singleWidth, AlignmentDirectional.centerEnd, single),
           _fixed(layout.countWidth + countOverhang, AlignmentDirectional.centerEnd, count),
         ],

@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../../external/provider_ext.dart';
+import 'text_coverage_api.dart' show TextCoverage, textCoverageProvider;
 import 'word_frequency_api.dart';
 
 part 'enriched_word_frequency_api.g.dart';
@@ -20,8 +21,17 @@ Future<EnrichedFrequencyReport> enrichedFrequencyReport(
   log.info(() => '@riverpod - using $filter');
   ref.cacheFor(const Duration(minutes: 5));
   final report = await ref.watch(frequencyReportProvider(filter).future);
+  final textCoverage = await ref.watch(
+    textCoverageProvider(filter.workIds, filter.coverageBasis).future,
+  );
+  final certainBasis = filter.certainCoverageBasis;
+  final certainCoverage = certainBasis == null
+      ? null
+      : await ref.watch(textCoverageProvider(filter.workIds, certainBasis).future);
   return EnrichedFrequencyReport(
     base: report,
+    textCoverage: textCoverage,
+    certainCoverage: certainCoverage,
     rows: EnrichedFrequencyRows(
       report.rows.map(
         (r) => EnrichedFrequencyRow(
@@ -79,18 +89,25 @@ class EnrichedFrequencyRow {
 class EnrichedFrequencyReport {
   const EnrichedFrequencyReport({
     required this.base,
+    required this.textCoverage,
+    required this.certainCoverage,
     required this.rows,
   });
 
   final FrequencyReport base;
+
+  /// Coverage for the full work selection, independent of pagination.
+  final TextCoverage textCoverage;
+
+  /// Lower bound for lemma reports.
+  /// Null for form reports.
+  final TextCoverage? certainCoverage;
   final EnrichedFrequencyRows rows;
 
   int get totalForms => base.totalForms;
   int get totalTokens => base.totalTokens;
   int get totalLemmas => base.totalLemmas;
   int get offset => base.offset;
-
-  double relativeFrequency(int occ) => base.relativeFrequency(occ);
 
   /// Distinct candidate lemmas among [rows]
   int get representedLemmas =>

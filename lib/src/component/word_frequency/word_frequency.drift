@@ -1,5 +1,6 @@
 import 'package:latin_reader/src/component/word_frequency/word_frequency_api.dart';
 import 'package:latin_reader/src/component/word_frequency/resolved_freq_morph_form_api.dart';
+import 'package:latin_reader/src/component/word_frequency/text_coverage_api.dart';
 
 -- Occurrence counts for each work, plain form, and macronized spelling
 CREATE TABLE "ScopedFormFreq"(
@@ -76,6 +77,28 @@ CREATE TABLE "ScopedFreqTotals"(
     "multipleCandidateTokens" INTEGER NOT NULL CHECK( multipleCandidateTokens >= 0 ),
     PRIMARY KEY( workId ),
     CHECK( totalTokens = noCandidateTokens + singleCandidateTokens + multipleCandidateTokens )
+)
+STRICT,
+WITHOUT ROWID;
+
+-- Identical display forms can have different candidate sets, so group by lookup.
+CREATE TABLE "ScopedLookupFreq"(
+    "workId" TEXT NOT NULL,
+    "lookupForm" TEXT NOT NULL,
+    "alsoLowercase" BOOLEAN NOT NULL, -- properNounState = 2
+    "occurrences" INTEGER NOT NULL CHECK( occurrences > 0 ),
+    PRIMARY KEY( workId, lookupForm, alsoLowercase )
+)
+STRICT,
+WITHOUT ROWID;
+
+-- no rows for a lookup means it has no candidate lemma
+CREATE TABLE "ScopedLookupLemmas"(
+    "workId" TEXT NOT NULL,
+    "lookupForm" TEXT NOT NULL,
+    "alsoLowercase" BOOLEAN NOT NULL,
+    "dictionaryRef" TEXT NOT NULL,
+    PRIMARY KEY( workId, lookupForm, alsoLowercase, dictionaryRef )
 )
 STRICT,
 WITHOUT ROWID;
@@ -193,6 +216,98 @@ getTotalForms: SELECT COUNT( DISTINCT form ) AS totalForms FROM ScopedFormFreq W
 getTotalMacronForms: SELECT COUNT( DISTINCT macronForm ) AS totalMacronForms FROM ScopedFormFreq WHERE workId IN ?;
 
 getTotalLemmas: SELECT COUNT( DISTINCT dictionaryRef ) AS totalLemmas FROM ScopedLemmaFreq WHERE workId IN ?;
+
+-- Group equal counts before accumulating coverage, so ties share a step
+getFormCoverageSteps WITH TextCoverageStep:
+    WITH Forms AS ( SELECT SUM( occurrences ) AS occurrences
+                        FROM ScopedFormFreq
+                        WHERE workId IN :workIds
+                        GROUP BY form ),
+         Steps AS ( SELECT occurrences AS minOccurrences,
+                           SUM( occurrences ) AS units
+                        FROM Forms
+                        GROUP BY occurrences )
+        SELECT minOccurrences,
+               SUM( units ) OVER( ORDER BY minOccurrences DESC ) AS coveredUnits
+            FROM Steps
+            ORDER BY minOccurrences DESC;
+
+getMacronFormCoverageSteps WITH TextCoverageStep:
+    WITH Forms AS ( SELECT SUM( occurrences ) AS occurrences
+                        FROM ScopedFormFreq
+                        WHERE workId IN :workIds
+                        GROUP BY macronForm ),
+         Steps AS ( SELECT occurrences AS minOccurrences,
+                           SUM( occurrences ) AS units
+                        FROM Forms
+                        GROUP BY occurrences )
+        SELECT minOccurrences,
+               SUM( units ) OVER( ORDER BY minOccurrences DESC ) AS coveredUnits
+            FROM Steps
+            ORDER BY minOccurrences DESC;
+
+-- Attribute each lookup's units once, at its most frequent candidate's count
+-- Lookups without candidates remain uncovered
+getAnyCandidateLemmaCoverageSteps WITH TextCoverageStep:
+    WITH Lemmas AS ( SELECT dictionaryRef,
+                            SUM( possibleOccurrences ) AS occurrences
+                         FROM ScopedLemmaFreq
+                         WHERE workId IN :workIds
+                         GROUP BY dictionaryRef ),
+         LookupMaxCounts AS ( SELECT ScopedLookupLemmas.workId,
+                                     ScopedLookupLemmas.lookupForm,
+                                     ScopedLookupLemmas.alsoLowercase,
+                                     MAX( Lemmas.occurrences ) AS occurrences
+                                  FROM ScopedLookupLemmas
+                                  INNER JOIN Lemmas
+                                      ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef
+                                  WHERE ScopedLookupLemmas.workId IN :workIds
+                                  GROUP BY ScopedLookupLemmas.workId,
+                                           ScopedLookupLemmas.lookupForm,
+                                           ScopedLookupLemmas.alsoLowercase ),
+         Steps AS ( SELECT LookupMaxCounts.occurrences AS minOccurrences,
+                           SUM( ScopedLookupFreq.occurrences ) AS units
+                        FROM LookupMaxCounts
+                        INNER JOIN ScopedLookupFreq
+                            ON ScopedLookupFreq.workId = LookupMaxCounts.workId
+                               AND ScopedLookupFreq.lookupForm = LookupMaxCounts.lookupForm
+                               AND ScopedLookupFreq.alsoLowercase = LookupMaxCounts.alsoLowercase
+                        GROUP BY LookupMaxCounts.occurrences )
+        SELECT minOccurrences,
+               SUM( units ) OVER( ORDER BY minOccurrences DESC ) AS coveredUnits
+            FROM Steps
+            ORDER BY minOccurrences DESC;
+
+-- The least frequent candidate sets the threshold where all candidates are included
+getAllCandidateLemmasCoverageSteps WITH TextCoverageStep:
+    WITH Lemmas AS ( SELECT dictionaryRef,
+                            SUM( possibleOccurrences ) AS occurrences
+                         FROM ScopedLemmaFreq
+                         WHERE workId IN :workIds
+                         GROUP BY dictionaryRef ),
+         LookupMinCounts AS ( SELECT ScopedLookupLemmas.workId,
+                                     ScopedLookupLemmas.lookupForm,
+                                     ScopedLookupLemmas.alsoLowercase,
+                                     MIN( Lemmas.occurrences ) AS occurrences
+                                  FROM ScopedLookupLemmas
+                                  INNER JOIN Lemmas
+                                      ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef
+                                  WHERE ScopedLookupLemmas.workId IN :workIds
+                                  GROUP BY ScopedLookupLemmas.workId,
+                                           ScopedLookupLemmas.lookupForm,
+                                           ScopedLookupLemmas.alsoLowercase ),
+         Steps AS ( SELECT LookupMinCounts.occurrences AS minOccurrences,
+                           SUM( ScopedLookupFreq.occurrences ) AS units
+                        FROM LookupMinCounts
+                        INNER JOIN ScopedLookupFreq
+                            ON ScopedLookupFreq.workId = LookupMinCounts.workId
+                               AND ScopedLookupFreq.lookupForm = LookupMinCounts.lookupForm
+                               AND ScopedLookupFreq.alsoLowercase = LookupMinCounts.alsoLowercase
+                        GROUP BY LookupMinCounts.occurrences )
+        SELECT minOccurrences,
+               SUM( units ) OVER( ORDER BY minOccurrences DESC ) AS coveredUnits
+            FROM Steps
+            ORDER BY minOccurrences DESC;
 
 -- Morphological matches for a plain form in the selected works.
 -- DISTINCT removes matches repeated across works or macronized spellings.
