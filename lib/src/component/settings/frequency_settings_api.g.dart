@@ -7,7 +7,7 @@ part of 'frequency_settings_api.dart';
 // **************************************************************************
 
 String _$frequencyViewSettingsNotifierHash() =>
-    r'b6e24ad11443443df1b19fa2fe433269abfb2293';
+    r'd9e2bc1c47efdda5bad59d48ae8e20fb45112bff';
 
 /// Deliberately separate from [FrequencyFilterSettingsNotifier]
 ///

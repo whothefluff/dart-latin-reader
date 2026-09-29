@@ -6,6 +6,7 @@ import '../../../component/settings/frequency_settings_api.dart'
         FormTapAction,
         FrequencySettings,
         FrequencyViewSettingsNotifier,
+        NarrowLemmaCoverage,
         frequencyViewSettingsNotifierProvider;
 import '../../widget/page_scaffold.dart';
 import '../../widget/responsive_coordinate_grid.dart';
@@ -69,6 +70,7 @@ class _ReportSettingsSection extends StatelessWidget {
     groups: [
       _summaryGroup(),
       _formTapGroup(),
+      _narrowLemmaCoverageGroup(),
     ],
   );
 
@@ -89,7 +91,11 @@ class _ReportSettingsSection extends StatelessWidget {
 
   SettingsGroup _formTapGroup() => SettingsGroup(
     rows: [
-      _FormTapChoice(
+      _ChipChoice(
+        title: 'Tapping a Form Opens',
+        subtitle: 'Lemma rows never navigate to morphology',
+        values: FormTapAction.values,
+        label: _formTapLabel,
         current: settings.formTapAction,
         onChanged: (action) => notifier.updateSettings(
           settings.copyWith(formTapAction: action),
@@ -97,18 +103,54 @@ class _ReportSettingsSection extends StatelessWidget {
       ),
     ],
   );
+
+  SettingsGroup _narrowLemmaCoverageGroup() => SettingsGroup(
+    rows: [
+      _ChipChoice(
+        title: 'Lemma Coverage on Small Screens',
+        subtitle: 'Larger screens show both. On small screens, long-press a row for the other',
+        values: NarrowLemmaCoverage.values,
+        label: _narrowLemmaCoverageLabel,
+        current: settings.narrowLemmaCoverage,
+        onChanged: (coverage) => notifier.updateSettings(
+          settings.copyWith(narrowLemmaCoverage: coverage),
+        ),
+      ),
+    ],
+  );
+
+  static String _formTapLabel(FormTapAction action) => switch (action) {
+    FormTapAction.ask => 'Ask',
+    FormTapAction.openMorphology => 'Morphology',
+    FormTapAction.openDictionary => 'Dictionary',
+    FormTapAction.openConcordance => 'Concordance',
+  };
+
+  static String _narrowLemmaCoverageLabel(NarrowLemmaCoverage coverage) => switch (coverage) {
+    NarrowLemmaCoverage.anyCandidate => 'Any Candidate',
+    NarrowLemmaCoverage.certain => 'Certain',
+  };
   //
 }
 
-/// Title, subtitle and one chip per [FormTapAction]; the chips wrap on narrow screens
-class _FormTapChoice extends StatelessWidget {
-  const _FormTapChoice({
+/// Title, subtitle and one chip per value.
+/// The chips wrap on narrow screens.
+class _ChipChoice<T> extends StatelessWidget {
+  const _ChipChoice({
+    required this.title,
+    required this.subtitle,
+    required this.values,
+    required this.label,
     required this.current,
     required this.onChanged,
   });
 
-  final FormTapAction current;
-  final ValueChanged<FormTapAction> onChanged;
+  final String title;
+  final String subtitle;
+  final List<T> values;
+  final String Function(T value) label;
+  final T current;
+  final ValueChanged<T> onChanged;
 
   @override
   Widget build(context) {
@@ -119,9 +161,9 @@ class _FormTapChoice extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Tapping a Form Opens', style: theme.textTheme.bodyLarge),
+          Text(title, style: theme.textTheme.bodyLarge),
           Text(
-            'Lemma rows never navigate to morphology',
+            subtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -130,29 +172,22 @@ class _FormTapChoice extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _actionChips(),
+            children: _chips(),
           ),
         ],
       ),
     );
   }
 
-  List<ChoiceChip> _actionChips() => FormTapAction.values
+  List<ChoiceChip> _chips() => values
       .map(
-        (action) => ChoiceChip(
-          label: Text(_label(action)),
-          selected: action == current,
-          onSelected: (_) => onChanged(action),
+        (value) => ChoiceChip(
+          label: Text(label(value)),
+          selected: value == current,
+          onSelected: (_) => onChanged(value),
         ),
       )
       .toList();
-
-  static String _label(FormTapAction action) => switch (action) {
-    FormTapAction.ask => 'Ask',
-    FormTapAction.openMorphology => 'Morphology',
-    FormTapAction.openDictionary => 'Dictionary',
-    FormTapAction.openConcordance => 'Concordance',
-  };
 
   //
 }

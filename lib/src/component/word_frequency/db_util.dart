@@ -202,6 +202,79 @@ final operations = [
       ''');
     },
   ),
+  (
+    id: 'ScopedLookupFreq',
+    delete: (AppDb db) async {
+      await db.delete(db.scopedLookupFreq).go();
+    },
+    insert: (AppDb db) async {
+      //`IS 2` maps an unknown proper-noun state to false
+      await db.customStatement('''
+        INSERT INTO ScopedLookupFreq( workId, lookupForm, alsoLowercase, occurrences )
+            $_countUnits
+                SELECT workId,
+                       lookupForm,
+                       properNounState IS 2,
+                       COUNT( * )
+                    FROM CountUnits
+                    GROUP BY workId, lookupForm, properNounState IS 2
+      ''');
+    },
+  ),
+  (
+    id: 'ScopedLookupLemmas',
+    delete: (AppDb db) async {
+      await db.delete(db.scopedLookupLemmas).go();
+    },
+    insert: (AppDb db) async {
+      // several analyses can point to the same lemma
+      await db.customStatement('''
+        INSERT INTO ScopedLookupLemmas( workId, lookupForm, alsoLowercase, dictionaryRef )
+            $_countUnits
+                SELECT DISTINCT u.workId,
+                                u.lookupForm,
+                                u.properNounState IS 2,
+                                md.dictionaryRef
+                    FROM CountUnits AS u
+                    INNER JOIN MorphologicalDetails AS md
+                        ON md.form = u.lookupForm
+                           OR ( u.properNounState = 2 AND md.form = LOWER( u.lookupForm ) )
+      ''');
+    },
+  ),
 ];
 
-const List<DbOracle> oracles = [];
+const List<DbOracle> oracles = [
+  (
+    id: 'ScopedLookupFreq_MatchesTotals',
+    sql: '''
+      SELECT t.workId,
+             t.totalTokens,
+             k.totalTokens AS lookupTotalTokens,
+             t.noCandidateTokens,
+             k.noCandidateTokens AS lookupNoCandidateTokens,
+             t.singleCandidateTokens,
+             k.singleCandidateTokens AS lookupSingleCandidateTokens
+          FROM ScopedFreqTotals AS t
+          LEFT JOIN ( SELECT l.workId,
+                             SUM( l.occurrences ) AS totalTokens,
+                             SUM( CASE WHEN c.candidates IS NULL THEN l.occurrences ELSE 0 END ) AS noCandidateTokens,
+                             SUM( CASE WHEN c.candidates = 1 THEN l.occurrences ELSE 0 END ) AS singleCandidateTokens
+                          FROM ScopedLookupFreq AS l
+                          LEFT JOIN ( SELECT workId,
+                                             lookupForm,
+                                             alsoLowercase,
+                                             COUNT( * ) AS candidates
+                                          FROM ScopedLookupLemmas
+                                          GROUP BY workId, lookupForm, alsoLowercase ) AS c
+                              ON c.workId = l.workId
+                                 AND c.lookupForm = l.lookupForm
+                                 AND c.alsoLowercase = l.alsoLowercase
+                          GROUP BY l.workId ) AS k
+              ON k.workId = t.workId
+          WHERE k.totalTokens IS NOT t.totalTokens
+                OR k.noCandidateTokens IS NOT t.noCandidateTokens
+                OR k.singleCandidateTokens IS NOT t.singleCandidateTokens''',
+    severity: DbOracleSeverity.error,
+  ),
+];

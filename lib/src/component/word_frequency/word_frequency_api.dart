@@ -10,6 +10,7 @@ import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import 'resolved_freq_morph_form_api.dart' show WorkIds;
+import 'text_coverage_api.dart' show CoverageBasis;
 import 'word_frequency.drift.dart';
 
 part 'word_frequency_api.g.dart';
@@ -167,6 +168,16 @@ class FrequencyFilter {
   final bool ascending;
   final bool groupByLemma;
   final bool showMacrons;
+
+  CoverageBasis get coverageBasis => switch (this) {
+    FrequencyFilter(groupByLemma: true) => CoverageBasis.anyCandidateLemma,
+    FrequencyFilter(showMacrons: true) => CoverageBasis.macronForm,
+    FrequencyFilter() => CoverageBasis.form,
+  };
+
+  /// Null for form reports, whose coverage is exact.
+  CoverageBasis? get certainCoverageBasis =>
+      groupByLemma ? CoverageBasis.allCandidateLemmas : null;
 
   FrequencyFilter copyWith({
     WorkIds? workIds,
@@ -331,12 +342,6 @@ class FrequencyReport {
   final int offset;
 
   int get totalTokens => coverage.totalTokens;
-
-  // TODO(whothefluff): FREQ is COUNT times a constant, so it adds nothing within a report.
-  //  Replace it with something like a cumulative text coverage.
-  //  The page's FREQ. column changes with it
-  double relativeFrequency(int occurrences) =>
-      totalTokens > 0 ? occurrences / totalTokens * 1000 : 0;
 
   @override
   String toString() =>

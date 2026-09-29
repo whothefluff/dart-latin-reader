@@ -6,8 +6,10 @@ import 'package:latin_reader/src/component/word_frequency/word_frequency.drift.d
 import 'package:drift/internal/modular.dart' as i2;
 import 'package:latin_reader/src/component/word_frequency/word_frequency_api.dart'
     as i3;
-import 'package:latin_reader/src/component/word_frequency/resolved_freq_morph_form_api.dart'
+import 'package:latin_reader/src/component/word_frequency/text_coverage_api.dart'
     as i4;
+import 'package:latin_reader/src/component/word_frequency/resolved_freq_morph_form_api.dart'
+    as i5;
 
 typedef $ScopedFormFreqCreateCompanionBuilder =
     i1.ScopedFormFreqCompanion Function({
@@ -1123,6 +1125,388 @@ typedef $ScopedFreqTotalsProcessedTableManager =
         >,
       ),
       i1.ScopedFreqTotal,
+      i0.PrefetchHooks Function()
+    >;
+typedef $ScopedLookupFreqCreateCompanionBuilder =
+    i1.ScopedLookupFreqCompanion Function({
+      required String workId,
+      required String lookupForm,
+      required bool alsoLowercase,
+      required int occurrences,
+    });
+typedef $ScopedLookupFreqUpdateCompanionBuilder =
+    i1.ScopedLookupFreqCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<String> lookupForm,
+      i0.Value<bool> alsoLowercase,
+      i0.Value<int> occurrences,
+    });
+
+class $ScopedLookupFreqFilterComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.ScopedLookupFreq> {
+  $ScopedLookupFreqFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnFilters<String> get workId => $composableBuilder(
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<bool> get alsoLowercase => $composableBuilder(
+    column: $table.alsoLowercase,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get occurrences => $composableBuilder(
+    column: $table.occurrences,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+}
+
+class $ScopedLookupFreqOrderingComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.ScopedLookupFreq> {
+  $ScopedLookupFreqOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnOrderings<String> get workId => $composableBuilder(
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<bool> get alsoLowercase => $composableBuilder(
+    column: $table.alsoLowercase,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get occurrences => $composableBuilder(
+    column: $table.occurrences,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+}
+
+class $ScopedLookupFreqAnnotationComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.ScopedLookupFreq> {
+  $ScopedLookupFreqAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.GeneratedColumn<String> get workId =>
+      $composableBuilder(column: $table.workId, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<bool> get alsoLowercase => $composableBuilder(
+    column: $table.alsoLowercase,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<int> get occurrences => $composableBuilder(
+    column: $table.occurrences,
+    builder: (column) => column,
+  );
+}
+
+class $ScopedLookupFreqTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.ScopedLookupFreq,
+          i1.ScopedLookupFreqData,
+          i1.$ScopedLookupFreqFilterComposer,
+          i1.$ScopedLookupFreqOrderingComposer,
+          i1.$ScopedLookupFreqAnnotationComposer,
+          $ScopedLookupFreqCreateCompanionBuilder,
+          $ScopedLookupFreqUpdateCompanionBuilder,
+          (
+            i1.ScopedLookupFreqData,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.ScopedLookupFreq,
+              i1.ScopedLookupFreqData
+            >,
+          ),
+          i1.ScopedLookupFreqData,
+          i0.PrefetchHooks Function()
+        > {
+  $ScopedLookupFreqTableManager(
+    i0.GeneratedDatabase db,
+    i1.ScopedLookupFreq table,
+  ) : super(
+        i0.TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              i1.$ScopedLookupFreqFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              i1.$ScopedLookupFreqOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              i1.$ScopedLookupFreqAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<String> lookupForm = const i0.Value.absent(),
+                i0.Value<bool> alsoLowercase = const i0.Value.absent(),
+                i0.Value<int> occurrences = const i0.Value.absent(),
+              }) => i1.ScopedLookupFreqCompanion(
+                workId: workId,
+                lookupForm: lookupForm,
+                alsoLowercase: alsoLowercase,
+                occurrences: occurrences,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required String lookupForm,
+                required bool alsoLowercase,
+                required int occurrences,
+              }) => i1.ScopedLookupFreqCompanion.insert(
+                workId: workId,
+                lookupForm: lookupForm,
+                alsoLowercase: alsoLowercase,
+                occurrences: occurrences,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $ScopedLookupFreqProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.ScopedLookupFreq,
+      i1.ScopedLookupFreqData,
+      i1.$ScopedLookupFreqFilterComposer,
+      i1.$ScopedLookupFreqOrderingComposer,
+      i1.$ScopedLookupFreqAnnotationComposer,
+      $ScopedLookupFreqCreateCompanionBuilder,
+      $ScopedLookupFreqUpdateCompanionBuilder,
+      (
+        i1.ScopedLookupFreqData,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.ScopedLookupFreq,
+          i1.ScopedLookupFreqData
+        >,
+      ),
+      i1.ScopedLookupFreqData,
+      i0.PrefetchHooks Function()
+    >;
+typedef $ScopedLookupLemmasCreateCompanionBuilder =
+    i1.ScopedLookupLemmasCompanion Function({
+      required String workId,
+      required String lookupForm,
+      required bool alsoLowercase,
+      required String dictionaryRef,
+    });
+typedef $ScopedLookupLemmasUpdateCompanionBuilder =
+    i1.ScopedLookupLemmasCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<String> lookupForm,
+      i0.Value<bool> alsoLowercase,
+      i0.Value<String> dictionaryRef,
+    });
+
+class $ScopedLookupLemmasFilterComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.ScopedLookupLemmas> {
+  $ScopedLookupLemmasFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnFilters<String> get workId => $composableBuilder(
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<bool> get alsoLowercase => $composableBuilder(
+    column: $table.alsoLowercase,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get dictionaryRef => $composableBuilder(
+    column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+}
+
+class $ScopedLookupLemmasOrderingComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.ScopedLookupLemmas> {
+  $ScopedLookupLemmasOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnOrderings<String> get workId => $composableBuilder(
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<bool> get alsoLowercase => $composableBuilder(
+    column: $table.alsoLowercase,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get dictionaryRef => $composableBuilder(
+    column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+}
+
+class $ScopedLookupLemmasAnnotationComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.ScopedLookupLemmas> {
+  $ScopedLookupLemmasAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.GeneratedColumn<String> get workId =>
+      $composableBuilder(column: $table.workId, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get lookupForm => $composableBuilder(
+    column: $table.lookupForm,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<bool> get alsoLowercase => $composableBuilder(
+    column: $table.alsoLowercase,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get dictionaryRef => $composableBuilder(
+    column: $table.dictionaryRef,
+    builder: (column) => column,
+  );
+}
+
+class $ScopedLookupLemmasTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.ScopedLookupLemmas,
+          i1.ScopedLookupLemma,
+          i1.$ScopedLookupLemmasFilterComposer,
+          i1.$ScopedLookupLemmasOrderingComposer,
+          i1.$ScopedLookupLemmasAnnotationComposer,
+          $ScopedLookupLemmasCreateCompanionBuilder,
+          $ScopedLookupLemmasUpdateCompanionBuilder,
+          (
+            i1.ScopedLookupLemma,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.ScopedLookupLemmas,
+              i1.ScopedLookupLemma
+            >,
+          ),
+          i1.ScopedLookupLemma,
+          i0.PrefetchHooks Function()
+        > {
+  $ScopedLookupLemmasTableManager(
+    i0.GeneratedDatabase db,
+    i1.ScopedLookupLemmas table,
+  ) : super(
+        i0.TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              i1.$ScopedLookupLemmasFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              i1.$ScopedLookupLemmasOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              i1.$ScopedLookupLemmasAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<String> lookupForm = const i0.Value.absent(),
+                i0.Value<bool> alsoLowercase = const i0.Value.absent(),
+                i0.Value<String> dictionaryRef = const i0.Value.absent(),
+              }) => i1.ScopedLookupLemmasCompanion(
+                workId: workId,
+                lookupForm: lookupForm,
+                alsoLowercase: alsoLowercase,
+                dictionaryRef: dictionaryRef,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required String lookupForm,
+                required bool alsoLowercase,
+                required String dictionaryRef,
+              }) => i1.ScopedLookupLemmasCompanion.insert(
+                workId: workId,
+                lookupForm: lookupForm,
+                alsoLowercase: alsoLowercase,
+                dictionaryRef: dictionaryRef,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $ScopedLookupLemmasProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.ScopedLookupLemmas,
+      i1.ScopedLookupLemma,
+      i1.$ScopedLookupLemmasFilterComposer,
+      i1.$ScopedLookupLemmasOrderingComposer,
+      i1.$ScopedLookupLemmasAnnotationComposer,
+      $ScopedLookupLemmasCreateCompanionBuilder,
+      $ScopedLookupLemmasUpdateCompanionBuilder,
+      (
+        i1.ScopedLookupLemma,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.ScopedLookupLemmas,
+          i1.ScopedLookupLemma
+        >,
+      ),
+      i1.ScopedLookupLemma,
       i0.PrefetchHooks Function()
     >;
 
@@ -3299,6 +3683,688 @@ class ScopedFreqTotalsCompanion extends i0.UpdateCompanion<i1.ScopedFreqTotal> {
   }
 }
 
+class ScopedLookupFreq extends i0.Table
+    with i0.TableInfo<ScopedLookupFreq, i1.ScopedLookupFreqData> {
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  ScopedLookupFreq(this.attachedDatabase, [this._alias]);
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _lookupFormMeta = const i0.VerificationMeta(
+    'lookupForm',
+  );
+  late final i0.GeneratedColumn<String> lookupForm = i0.GeneratedColumn<String>(
+    'lookupForm',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _alsoLowercaseMeta =
+      const i0.VerificationMeta('alsoLowercase');
+  late final i0.GeneratedColumn<bool> alsoLowercase = i0.GeneratedColumn<bool>(
+    'alsoLowercase',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.bool,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _occurrencesMeta = const i0.VerificationMeta(
+    'occurrences',
+  );
+  late final i0.GeneratedColumn<int> occurrences = i0.GeneratedColumn<int>(
+    'occurrences',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (occurrences > 0)',
+  );
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    lookupForm,
+    alsoLowercase,
+    occurrences,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ScopedLookupFreq';
+  @override
+  i0.VerificationContext validateIntegrity(
+    i0.Insertable<i1.ScopedLookupFreqData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = i0.VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('workId')) {
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_workIdMeta);
+    }
+    if (data.containsKey('lookupForm')) {
+      context.handle(
+        _lookupFormMeta,
+        lookupForm.isAcceptableOrUnknown(data['lookupForm']!, _lookupFormMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lookupFormMeta);
+    }
+    if (data.containsKey('alsoLowercase')) {
+      context.handle(
+        _alsoLowercaseMeta,
+        alsoLowercase.isAcceptableOrUnknown(
+          data['alsoLowercase']!,
+          _alsoLowercaseMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_alsoLowercaseMeta);
+    }
+    if (data.containsKey('occurrences')) {
+      context.handle(
+        _occurrencesMeta,
+        occurrences.isAcceptableOrUnknown(
+          data['occurrences']!,
+          _occurrencesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_occurrencesMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<i0.GeneratedColumn> get $primaryKey => {
+    workId,
+    lookupForm,
+    alsoLowercase,
+  };
+  @override
+  i1.ScopedLookupFreqData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.ScopedLookupFreqData(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      lookupForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}lookupForm'],
+      )!,
+      alsoLowercase: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.bool,
+        data['${effectivePrefix}alsoLowercase'],
+      )!,
+      occurrences: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}occurrences'],
+      )!,
+    );
+  }
+
+  @override
+  ScopedLookupFreq createAlias(String alias) {
+    return ScopedLookupFreq(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(workId, lookupForm, alsoLowercase)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class ScopedLookupFreqData extends i0.DataClass
+    implements i0.Insertable<i1.ScopedLookupFreqData> {
+  final String workId;
+  final String lookupForm;
+  final bool alsoLowercase;
+
+  /// properNounState = 2
+  final int occurrences;
+  const ScopedLookupFreqData({
+    required this.workId,
+    required this.lookupForm,
+    required this.alsoLowercase,
+    required this.occurrences,
+  });
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    map['workId'] = i0.Variable<String>(workId);
+    map['lookupForm'] = i0.Variable<String>(lookupForm);
+    map['alsoLowercase'] = i0.Variable<bool>(alsoLowercase);
+    map['occurrences'] = i0.Variable<int>(occurrences);
+    return map;
+  }
+
+  i1.ScopedLookupFreqCompanion toCompanion(bool nullToAbsent) {
+    return i1.ScopedLookupFreqCompanion(
+      workId: i0.Value(workId),
+      lookupForm: i0.Value(lookupForm),
+      alsoLowercase: i0.Value(alsoLowercase),
+      occurrences: i0.Value(occurrences),
+    );
+  }
+
+  factory ScopedLookupFreqData.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return ScopedLookupFreqData(
+      workId: serializer.fromJson<String>(json['workId']),
+      lookupForm: serializer.fromJson<String>(json['lookupForm']),
+      alsoLowercase: serializer.fromJson<bool>(json['alsoLowercase']),
+      occurrences: serializer.fromJson<int>(json['occurrences']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'lookupForm': serializer.toJson<String>(lookupForm),
+      'alsoLowercase': serializer.toJson<bool>(alsoLowercase),
+      'occurrences': serializer.toJson<int>(occurrences),
+    };
+  }
+
+  i1.ScopedLookupFreqData copyWith({
+    String? workId,
+    String? lookupForm,
+    bool? alsoLowercase,
+    int? occurrences,
+  }) => i1.ScopedLookupFreqData(
+    workId: workId ?? this.workId,
+    lookupForm: lookupForm ?? this.lookupForm,
+    alsoLowercase: alsoLowercase ?? this.alsoLowercase,
+    occurrences: occurrences ?? this.occurrences,
+  );
+  ScopedLookupFreqData copyWithCompanion(i1.ScopedLookupFreqCompanion data) {
+    return ScopedLookupFreqData(
+      workId: data.workId.present ? data.workId.value : this.workId,
+      lookupForm: data.lookupForm.present
+          ? data.lookupForm.value
+          : this.lookupForm,
+      alsoLowercase: data.alsoLowercase.present
+          ? data.alsoLowercase.value
+          : this.alsoLowercase,
+      occurrences: data.occurrences.present
+          ? data.occurrences.value
+          : this.occurrences,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScopedLookupFreqData(')
+          ..write('workId: $workId, ')
+          ..write('lookupForm: $lookupForm, ')
+          ..write('alsoLowercase: $alsoLowercase, ')
+          ..write('occurrences: $occurrences')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(workId, lookupForm, alsoLowercase, occurrences);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.ScopedLookupFreqData &&
+          other.workId == this.workId &&
+          other.lookupForm == this.lookupForm &&
+          other.alsoLowercase == this.alsoLowercase &&
+          other.occurrences == this.occurrences);
+}
+
+class ScopedLookupFreqCompanion
+    extends i0.UpdateCompanion<i1.ScopedLookupFreqData> {
+  final i0.Value<String> workId;
+  final i0.Value<String> lookupForm;
+  final i0.Value<bool> alsoLowercase;
+  final i0.Value<int> occurrences;
+  const ScopedLookupFreqCompanion({
+    this.workId = const i0.Value.absent(),
+    this.lookupForm = const i0.Value.absent(),
+    this.alsoLowercase = const i0.Value.absent(),
+    this.occurrences = const i0.Value.absent(),
+  });
+  ScopedLookupFreqCompanion.insert({
+    required String workId,
+    required String lookupForm,
+    required bool alsoLowercase,
+    required int occurrences,
+  }) : workId = i0.Value(workId),
+       lookupForm = i0.Value(lookupForm),
+       alsoLowercase = i0.Value(alsoLowercase),
+       occurrences = i0.Value(occurrences);
+  static i0.Insertable<i1.ScopedLookupFreqData> custom({
+    i0.Expression<String>? workId,
+    i0.Expression<String>? lookupForm,
+    i0.Expression<bool>? alsoLowercase,
+    i0.Expression<int>? occurrences,
+  }) {
+    return i0.RawValuesInsertable({
+      if (workId != null) 'workId': workId,
+      if (lookupForm != null) 'lookupForm': lookupForm,
+      if (alsoLowercase != null) 'alsoLowercase': alsoLowercase,
+      if (occurrences != null) 'occurrences': occurrences,
+    });
+  }
+
+  i1.ScopedLookupFreqCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<String>? lookupForm,
+    i0.Value<bool>? alsoLowercase,
+    i0.Value<int>? occurrences,
+  }) {
+    return i1.ScopedLookupFreqCompanion(
+      workId: workId ?? this.workId,
+      lookupForm: lookupForm ?? this.lookupForm,
+      alsoLowercase: alsoLowercase ?? this.alsoLowercase,
+      occurrences: occurrences ?? this.occurrences,
+    );
+  }
+
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    if (workId.present) {
+      map['workId'] = i0.Variable<String>(workId.value);
+    }
+    if (lookupForm.present) {
+      map['lookupForm'] = i0.Variable<String>(lookupForm.value);
+    }
+    if (alsoLowercase.present) {
+      map['alsoLowercase'] = i0.Variable<bool>(alsoLowercase.value);
+    }
+    if (occurrences.present) {
+      map['occurrences'] = i0.Variable<int>(occurrences.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScopedLookupFreqCompanion(')
+          ..write('workId: $workId, ')
+          ..write('lookupForm: $lookupForm, ')
+          ..write('alsoLowercase: $alsoLowercase, ')
+          ..write('occurrences: $occurrences')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class ScopedLookupLemmas extends i0.Table
+    with i0.TableInfo<ScopedLookupLemmas, i1.ScopedLookupLemma> {
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  ScopedLookupLemmas(this.attachedDatabase, [this._alias]);
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _lookupFormMeta = const i0.VerificationMeta(
+    'lookupForm',
+  );
+  late final i0.GeneratedColumn<String> lookupForm = i0.GeneratedColumn<String>(
+    'lookupForm',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _alsoLowercaseMeta =
+      const i0.VerificationMeta('alsoLowercase');
+  late final i0.GeneratedColumn<bool> alsoLowercase = i0.GeneratedColumn<bool>(
+    'alsoLowercase',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.bool,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _dictionaryRefMeta =
+      const i0.VerificationMeta('dictionaryRef');
+  late final i0.GeneratedColumn<String> dictionaryRef =
+      i0.GeneratedColumn<String>(
+        'dictionaryRef',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    lookupForm,
+    alsoLowercase,
+    dictionaryRef,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ScopedLookupLemmas';
+  @override
+  i0.VerificationContext validateIntegrity(
+    i0.Insertable<i1.ScopedLookupLemma> instance, {
+    bool isInserting = false,
+  }) {
+    final context = i0.VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('workId')) {
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_workIdMeta);
+    }
+    if (data.containsKey('lookupForm')) {
+      context.handle(
+        _lookupFormMeta,
+        lookupForm.isAcceptableOrUnknown(data['lookupForm']!, _lookupFormMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lookupFormMeta);
+    }
+    if (data.containsKey('alsoLowercase')) {
+      context.handle(
+        _alsoLowercaseMeta,
+        alsoLowercase.isAcceptableOrUnknown(
+          data['alsoLowercase']!,
+          _alsoLowercaseMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_alsoLowercaseMeta);
+    }
+    if (data.containsKey('dictionaryRef')) {
+      context.handle(
+        _dictionaryRefMeta,
+        dictionaryRef.isAcceptableOrUnknown(
+          data['dictionaryRef']!,
+          _dictionaryRefMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dictionaryRefMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<i0.GeneratedColumn> get $primaryKey => {
+    workId,
+    lookupForm,
+    alsoLowercase,
+    dictionaryRef,
+  };
+  @override
+  i1.ScopedLookupLemma map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.ScopedLookupLemma(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      lookupForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}lookupForm'],
+      )!,
+      alsoLowercase: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.bool,
+        data['${effectivePrefix}alsoLowercase'],
+      )!,
+      dictionaryRef: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}dictionaryRef'],
+      )!,
+    );
+  }
+
+  @override
+  ScopedLookupLemmas createAlias(String alias) {
+    return ScopedLookupLemmas(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(workId, lookupForm, alsoLowercase, dictionaryRef)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class ScopedLookupLemma extends i0.DataClass
+    implements i0.Insertable<i1.ScopedLookupLemma> {
+  final String workId;
+  final String lookupForm;
+  final bool alsoLowercase;
+  final String dictionaryRef;
+  const ScopedLookupLemma({
+    required this.workId,
+    required this.lookupForm,
+    required this.alsoLowercase,
+    required this.dictionaryRef,
+  });
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    map['workId'] = i0.Variable<String>(workId);
+    map['lookupForm'] = i0.Variable<String>(lookupForm);
+    map['alsoLowercase'] = i0.Variable<bool>(alsoLowercase);
+    map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
+    return map;
+  }
+
+  i1.ScopedLookupLemmasCompanion toCompanion(bool nullToAbsent) {
+    return i1.ScopedLookupLemmasCompanion(
+      workId: i0.Value(workId),
+      lookupForm: i0.Value(lookupForm),
+      alsoLowercase: i0.Value(alsoLowercase),
+      dictionaryRef: i0.Value(dictionaryRef),
+    );
+  }
+
+  factory ScopedLookupLemma.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return ScopedLookupLemma(
+      workId: serializer.fromJson<String>(json['workId']),
+      lookupForm: serializer.fromJson<String>(json['lookupForm']),
+      alsoLowercase: serializer.fromJson<bool>(json['alsoLowercase']),
+      dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'lookupForm': serializer.toJson<String>(lookupForm),
+      'alsoLowercase': serializer.toJson<bool>(alsoLowercase),
+      'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+    };
+  }
+
+  i1.ScopedLookupLemma copyWith({
+    String? workId,
+    String? lookupForm,
+    bool? alsoLowercase,
+    String? dictionaryRef,
+  }) => i1.ScopedLookupLemma(
+    workId: workId ?? this.workId,
+    lookupForm: lookupForm ?? this.lookupForm,
+    alsoLowercase: alsoLowercase ?? this.alsoLowercase,
+    dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+  );
+  ScopedLookupLemma copyWithCompanion(i1.ScopedLookupLemmasCompanion data) {
+    return ScopedLookupLemma(
+      workId: data.workId.present ? data.workId.value : this.workId,
+      lookupForm: data.lookupForm.present
+          ? data.lookupForm.value
+          : this.lookupForm,
+      alsoLowercase: data.alsoLowercase.present
+          ? data.alsoLowercase.value
+          : this.alsoLowercase,
+      dictionaryRef: data.dictionaryRef.present
+          ? data.dictionaryRef.value
+          : this.dictionaryRef,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScopedLookupLemma(')
+          ..write('workId: $workId, ')
+          ..write('lookupForm: $lookupForm, ')
+          ..write('alsoLowercase: $alsoLowercase, ')
+          ..write('dictionaryRef: $dictionaryRef')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(workId, lookupForm, alsoLowercase, dictionaryRef);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.ScopedLookupLemma &&
+          other.workId == this.workId &&
+          other.lookupForm == this.lookupForm &&
+          other.alsoLowercase == this.alsoLowercase &&
+          other.dictionaryRef == this.dictionaryRef);
+}
+
+class ScopedLookupLemmasCompanion
+    extends i0.UpdateCompanion<i1.ScopedLookupLemma> {
+  final i0.Value<String> workId;
+  final i0.Value<String> lookupForm;
+  final i0.Value<bool> alsoLowercase;
+  final i0.Value<String> dictionaryRef;
+  const ScopedLookupLemmasCompanion({
+    this.workId = const i0.Value.absent(),
+    this.lookupForm = const i0.Value.absent(),
+    this.alsoLowercase = const i0.Value.absent(),
+    this.dictionaryRef = const i0.Value.absent(),
+  });
+  ScopedLookupLemmasCompanion.insert({
+    required String workId,
+    required String lookupForm,
+    required bool alsoLowercase,
+    required String dictionaryRef,
+  }) : workId = i0.Value(workId),
+       lookupForm = i0.Value(lookupForm),
+       alsoLowercase = i0.Value(alsoLowercase),
+       dictionaryRef = i0.Value(dictionaryRef);
+  static i0.Insertable<i1.ScopedLookupLemma> custom({
+    i0.Expression<String>? workId,
+    i0.Expression<String>? lookupForm,
+    i0.Expression<bool>? alsoLowercase,
+    i0.Expression<String>? dictionaryRef,
+  }) {
+    return i0.RawValuesInsertable({
+      if (workId != null) 'workId': workId,
+      if (lookupForm != null) 'lookupForm': lookupForm,
+      if (alsoLowercase != null) 'alsoLowercase': alsoLowercase,
+      if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
+    });
+  }
+
+  i1.ScopedLookupLemmasCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<String>? lookupForm,
+    i0.Value<bool>? alsoLowercase,
+    i0.Value<String>? dictionaryRef,
+  }) {
+    return i1.ScopedLookupLemmasCompanion(
+      workId: workId ?? this.workId,
+      lookupForm: lookupForm ?? this.lookupForm,
+      alsoLowercase: alsoLowercase ?? this.alsoLowercase,
+      dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    );
+  }
+
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    if (workId.present) {
+      map['workId'] = i0.Variable<String>(workId.value);
+    }
+    if (lookupForm.present) {
+      map['lookupForm'] = i0.Variable<String>(lookupForm.value);
+    }
+    if (alsoLowercase.present) {
+      map['alsoLowercase'] = i0.Variable<bool>(alsoLowercase.value);
+    }
+    if (dictionaryRef.present) {
+      map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScopedLookupLemmasCompanion(')
+          ..write('workId: $workId, ')
+          ..write('lookupForm: $lookupForm, ')
+          ..write('alsoLowercase: $alsoLowercase, ')
+          ..write('dictionaryRef: $dictionaryRef')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class WordFrequencyDrift extends i2.ModularAccessor {
   WordFrequencyDrift(i0.GeneratedDatabase db) : super(db);
   i0.Selectable<i3.FormFrequencyRow> getFormFrequenciesDesc({
@@ -3510,7 +4576,79 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     ).map((i0.QueryRow row) => row.read<int>('totalLemmas'));
   }
 
-  i0.Selectable<i4.FrequencyMorphCandidate> getFormMorphIdentities({
+  i0.Selectable<i4.TextCoverageStep> getFormCoverageSteps({
+    required List<String> workIds,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
+    $arrayStartIndex += workIds.length;
+    return customSelect(
+      'WITH Forms AS (SELECT SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY form), Steps AS (SELECT occurrences AS minOccurrences, SUM(occurrences) AS units FROM Forms GROUP BY occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
+      variables: [for (var $ in workIds) i0.Variable<String>($)],
+      readsFrom: {scopedFormFreq},
+    ).map(
+      (i0.QueryRow row) => i4.TextCoverageStep(
+        minOccurrences: row.readNullable<int>('minOccurrences'),
+        coveredUnits: row.readNullable<int>('coveredUnits'),
+      ),
+    );
+  }
+
+  i0.Selectable<i4.TextCoverageStep> getMacronFormCoverageSteps({
+    required List<String> workIds,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
+    $arrayStartIndex += workIds.length;
+    return customSelect(
+      'WITH Forms AS (SELECT SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY macronForm), Steps AS (SELECT occurrences AS minOccurrences, SUM(occurrences) AS units FROM Forms GROUP BY occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
+      variables: [for (var $ in workIds) i0.Variable<String>($)],
+      readsFrom: {scopedFormFreq},
+    ).map(
+      (i0.QueryRow row) => i4.TextCoverageStep(
+        minOccurrences: row.readNullable<int>('minOccurrences'),
+        coveredUnits: row.readNullable<int>('coveredUnits'),
+      ),
+    );
+  }
+
+  i0.Selectable<i4.TextCoverageStep> getAnyCandidateLemmaCoverageSteps({
+    required List<String> workIds,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
+    $arrayStartIndex += workIds.length;
+    return customSelect(
+      'WITH Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef), LookupMaxCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, MAX(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase), Steps AS (SELECT LookupMaxCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMaxCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMaxCounts.workId AND ScopedLookupFreq.lookupForm = LookupMaxCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMaxCounts.alsoLowercase GROUP BY LookupMaxCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
+      variables: [for (var $ in workIds) i0.Variable<String>($)],
+      readsFrom: {scopedLemmaFreq, scopedLookupLemmas, scopedLookupFreq},
+    ).map(
+      (i0.QueryRow row) => i4.TextCoverageStep(
+        minOccurrences: row.readNullable<int>('minOccurrences'),
+        coveredUnits: row.readNullable<int>('coveredUnits'),
+      ),
+    );
+  }
+
+  i0.Selectable<i4.TextCoverageStep> getAllCandidateLemmasCoverageSteps({
+    required List<String> workIds,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
+    $arrayStartIndex += workIds.length;
+    return customSelect(
+      'WITH Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef), LookupMinCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, MIN(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase), Steps AS (SELECT LookupMinCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMinCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMinCounts.workId AND ScopedLookupFreq.lookupForm = LookupMinCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMinCounts.alsoLowercase GROUP BY LookupMinCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
+      variables: [for (var $ in workIds) i0.Variable<String>($)],
+      readsFrom: {scopedLemmaFreq, scopedLookupLemmas, scopedLookupFreq},
+    ).map(
+      (i0.QueryRow row) => i4.TextCoverageStep(
+        minOccurrences: row.readNullable<int>('minOccurrences'),
+        coveredUnits: row.readNullable<int>('coveredUnits'),
+      ),
+    );
+  }
+
+  i0.Selectable<i5.FrequencyMorphCandidate> getFormMorphIdentities({
     required List<String> workIds,
     required String form,
   }) {
@@ -3525,7 +4663,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       ],
       readsFrom: {resolvedFreqMorphForms},
     ).map(
-      (i0.QueryRow row) => i4.FrequencyMorphCandidate(
+      (i0.QueryRow row) => i5.FrequencyMorphCandidate(
         form: row.read<String>('form'),
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),
@@ -3534,7 +4672,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     );
   }
 
-  i0.Selectable<i4.FrequencyMorphCandidate> getMacronFormMorphIdentities({
+  i0.Selectable<i5.FrequencyMorphCandidate> getMacronFormMorphIdentities({
     required List<String> workIds,
     required String form,
     required String macronForm,
@@ -3551,7 +4689,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       ],
       readsFrom: {resolvedFreqMorphForms},
     ).map(
-      (i0.QueryRow row) => i4.FrequencyMorphCandidate(
+      (i0.QueryRow row) => i5.FrequencyMorphCandidate(
         form: row.read<String>('form'),
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),
@@ -3560,7 +4698,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     );
   }
 
-  i0.Selectable<i4.FrequencyMorphCandidate> getLemmaMorphIdentities({
+  i0.Selectable<i5.FrequencyMorphCandidate> getLemmaMorphIdentities({
     required List<String> workIds,
     required String dictionaryRef,
   }) {
@@ -3575,7 +4713,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       ],
       readsFrom: {resolvedFreqMorphForms},
     ).map(
-      (i0.QueryRow row) => i4.FrequencyMorphCandidate(
+      (i0.QueryRow row) => i5.FrequencyMorphCandidate(
         form: row.read<String>('form'),
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),
@@ -3596,6 +4734,12 @@ class WordFrequencyDrift extends i2.ModularAccessor {
   i1.ScopedFreqTotals get scopedFreqTotals => i2.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.ScopedFreqTotals>('ScopedFreqTotals');
+  i1.ScopedLookupLemmas get scopedLookupLemmas => i2.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.ScopedLookupLemmas>('ScopedLookupLemmas');
+  i1.ScopedLookupFreq get scopedLookupFreq => i2.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.ScopedLookupFreq>('ScopedLookupFreq');
   i1.ResolvedFreqMorphForms get resolvedFreqMorphForms =>
       i2.ReadDatabaseContainer(
         attachedDatabase,

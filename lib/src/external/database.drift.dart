@@ -46,6 +46,10 @@ abstract class $AppDb extends i0.GeneratedDatabase {
       i5.ScopedFormLemmaFreq(this);
   late final i5.ScopedLemmaFreq scopedLemmaFreq = i5.ScopedLemmaFreq(this);
   late final i5.ScopedFreqTotals scopedFreqTotals = i5.ScopedFreqTotals(this);
+  late final i5.ScopedLookupFreq scopedLookupFreq = i5.ScopedLookupFreq(this);
+  late final i5.ScopedLookupLemmas scopedLookupLemmas = i5.ScopedLookupLemmas(
+    this,
+  );
   late final i1.SearchableMorphDetInflections searchableMorphDetInflections =
       i1.SearchableMorphDetInflections(this);
   late final i1.MorphologyPeek morphologyPeek = i1.MorphologyPeek(this);
@@ -143,6 +147,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
     i5.scopedFormLemmaFreqMacronForm,
     scopedLemmaFreq,
     scopedFreqTotals,
+    scopedLookupFreq,
+    scopedLookupLemmas,
     i1.morphologicalDetailsDictRef,
     searchableMorphDetInflections,
     morphologyPeek,
@@ -214,6 +220,10 @@ class $AppDbManager {
       i5.$ScopedLemmaFreqTableManager(_db, _db.scopedLemmaFreq);
   i5.$ScopedFreqTotalsTableManager get scopedFreqTotals =>
       i5.$ScopedFreqTotalsTableManager(_db, _db.scopedFreqTotals);
+  i5.$ScopedLookupFreqTableManager get scopedLookupFreq =>
+      i5.$ScopedLookupFreqTableManager(_db, _db.scopedLookupFreq);
+  i5.$ScopedLookupLemmasTableManager get scopedLookupLemmas =>
+      i5.$ScopedLookupLemmasTableManager(_db, _db.scopedLookupLemmas);
   i1.$SearchableMorphDetInflectionsTableManager
   get searchableMorphDetInflections =>
       i1.$SearchableMorphDetInflectionsTableManager(
