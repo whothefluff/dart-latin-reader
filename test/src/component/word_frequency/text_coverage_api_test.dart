@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latin_reader/src/component/library/proper_noun_state.dart';
 import 'package:latin_reader/src/component/word_frequency/resolved_freq_morph_form_api.dart'
     show WorkIds;
 import 'package:latin_reader/src/component/word_frequency/text_coverage_api.dart';
@@ -136,6 +137,39 @@ void main() {
     test('a share outside 0 to 1 is a mistake', () {
       expect(() => _formsOfTenUnits().cutoffFor(1.5), throwsA(isA<AssertionError>()));
     });
+
+    for (final (share, cutoff) in [(0.1, 1), (0.11, 2), (0.5, 2), (0.51, 5), (1.0, 5)]) {
+      test('the rarest items making up $share of the units are counted $cutoff times or less', () {
+        expect(_formsOfTenUnits().rareCutoffFor(share), cutoff);
+      });
+    }
+
+    for (final k in [7, 14, 28, 55, 56]) {
+      test('a rare share reached exactly is enough ($k of 100 units)', () {
+        // k forms counted once, and one form counted 100 - k times
+        final coverage = TextCoverage(
+          steps: [
+            TextCoverageStep(minOccurrences: 100 - k, coveredUnits: 100 - k),
+            const TextCoverageStep(minOccurrences: 1, coveredUnits: 100),
+          ],
+          totalUnits: 100,
+        );
+
+        expect(coverage.rareCutoffFor(k / 100), 1);
+      });
+    }
+
+    test('units with no candidate lemma are never among the rarest', () {
+      final coverage = _lemmasOfTwelveUnits();
+
+      expect(coverage.rareCutoffFor(0.3), 1);
+      expect(coverage.rareCutoffFor(0.8), 6);
+      expect(coverage.rareCutoffFor(0.9), isNull);
+    });
+
+    test('a rare share outside 0 to 1 is a mistake', () {
+      expect(() => _formsOfTenUnits().rareCutoffFor(-0.1), throwsA(isA<AssertionError>()));
+    });
   });
 
   group('textCoverageProvider', () {
@@ -219,7 +253,7 @@ void main() {
       await corpus.addWord(fables, 'edit', times: 2);
       await corpus.addWord(fables, 'amat', times: 2);
       await corpus.addWord(fables, 'Xanthus');
-      await corpus.addWord(fables, 'Venere', properNounState: 2);
+      await corpus.addWord(fables, 'Venere', properNounState: ProperNounState.either);
       await corpus.addWord(fables, 'venit', times: 3);
       await corpus.addAnalysis('est', 'sum1');
       await corpus.addAnalysis('est', 'edo1');
@@ -244,7 +278,7 @@ void main() {
 
     test('units with no candidate lemma are never covered by lemmas', () async {
       await corpus.addWord(fables, 'amat', times: 2);
-      await corpus.addWord(fables, 'Xanthus', properNounState: 1);
+      await corpus.addWord(fables, 'Xanthus', properNounState: ProperNounState.proper);
       await corpus.addAnalysis('amat', 'amo1');
       await corpus.populate();
 
@@ -260,10 +294,10 @@ void main() {
     });
 
     test('a word read as either a name or a common word has the candidates of both', () async {
-      // Both Venere tokens share a display form; only properNounState = 2 also matches venio.
+      // Both Venere tokens share a display form; only the one read as either also matches venio.
       await corpus.addWord(fables, 'venit', times: 3);
-      await corpus.addWord(fables, 'Venere', properNounState: 2);
-      await corpus.addWord(fables, 'Venere', properNounState: 1);
+      await corpus.addWord(fables, 'Venere', properNounState: ProperNounState.either);
+      await corpus.addWord(fables, 'Venere', properNounState: ProperNounState.proper);
       await corpus.addAnalysis('venit', 'venio');
       await corpus.addAnalysis('Venere', 'Venus1');
       await corpus.addAnalysis('venere', 'venio');

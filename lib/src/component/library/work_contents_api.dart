@@ -11,6 +11,7 @@ import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import 'library.drift.dart';
+import 'proper_noun_state.dart';
 import 'subdivision_type.dart';
 
 part 'work_contents_api.g.dart';
@@ -98,12 +99,22 @@ class WorkContentsSegment {
     required this.uncertaintyBitMask,
     required this.typ,
     required this.depth,
+    required this.lookupForm,
+    required this.properNounState,
     required this.sourceReference,
   });
 
   /// Set bits mark uncertain characters, starting at bit 0.
   /// A value of -1 marks the whole word as uncertain.
   final int uncertaintyBitMask;
+
+  /// How the word is looked up in the analyses.
+  /// `null` for tokens that aren't counted words.
+  final String? lookupForm;
+
+  /// `null` when unknown
+  final ProperNounState? properNounState;
+
   final String macronizedWord;
   final String workId;
   final String? parent;

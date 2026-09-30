@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:latin_reader/src/component/library/proper_noun_state.dart';
 import 'package:latin_reader/src/component/word_frequency/db_util.dart' as frequency;
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
@@ -30,7 +31,7 @@ class FrequencyCorpus {
     String word, {
     int times = 1,
     String? macronizedWord,
-    int properNounState = 0,
+    ProperNounState properNounState = ProperNounState.common,
     String? enclitic,
   }) => Future.wait(
     List.generate(times, (_) => _nextIdx.update(workId, (i) => i + 1, ifAbsent: () => 0)).map(
@@ -41,7 +42,7 @@ class FrequencyCorpus {
                                   uncertaintyBitMask )
             VALUES ( ?, ?, ?, '1', ?, 1, 0, ?, ?, NULL, ?, 0 )
         ''',
-        [workId, idx, word, properNounState, idx, enclitic, macronizedWord ?? word],
+        [workId, idx, word, properNounState.code, idx, enclitic, macronizedWord ?? word],
       ),
     ),
   );

@@ -1,5 +1,6 @@
 import 'package:latin_reader/src/component/library/author_details_api.dart';
 import 'package:latin_reader/src/component/library/authors_api.dart';
+import 'package:latin_reader/src/component/library/proper_noun_state.dart';
 import 'package:latin_reader/src/component/library/subdivision_type.dart';
 import 'package:latin_reader/src/component/library/work_contents_api.dart';
 import 'package:latin_reader/src/component/library/work_details_api.dart';
@@ -50,7 +51,7 @@ CREATE TABLE "WorkContents"(
     "idx" INTEGER NOT NULL CHECK( idx >= 0 ),
     "word" TEXT NOT NULL,
     "sourceReference" TEXT NOT NULL CHECK( LENGTH( TRIM( sourceReference ) ) > 0 ),
-    "properNounState" INTEGER CHECK( properNounState IN (0, 1, 2) ), --NULL = unknown, 0 = no, 1 = yes, 2 = either/both
+    "properNounState" INTEGER MAPPED BY `const ProperNounStateConverter()` CHECK( properNounState IN (0, 1, 2) ), --NULL = unknown, 0 = no, 1 = yes, 2 = either/both
     "tokenType" INTEGER NOT NULL CHECK( tokenType BETWEEN 1 AND 6 ), -- 1 word, 2 abbrev, 3 roman numeral, 4 punct, 5 editorial, 6 other
     "sentenceIdx" INTEGER NOT NULL CHECK( sentenceIdx >= 0 ),
     "wordIdx" INTEGER CHECK( wordIdx >= 0 ), -- Increments only for tokenType <= 3
@@ -422,6 +423,8 @@ CREATE VIEW "library.WorkContents" AS
                                         WorkContents.macronizedWord,
                                         WorkContents.uncertaintyBitMask,
                                         WorkContents.sourceReference,
+                                        WorkContents.lookupForm,
+                                        WorkContents.properNounState,
                                         SubdivsHierarchy.node,
                                         SubdivsHierarchy.typ,
                                         SubdivsHierarchy.parent,
@@ -445,6 +448,8 @@ CREATE VIEW "library.WorkContents" AS
                uncertaintyBitMask,
                typ,
                depth,
+               lookupForm,
+               properNounState,
                sourceReference --( SELECT name FROM WorkContentSubdivisions AS aux WHERE aux.parent = ClosestSubdivision.parent AND aux.typ = 'TITL' LIMIT 1 ) AS title
             FROM ClosestSubdivision
             WHERE rn = 1

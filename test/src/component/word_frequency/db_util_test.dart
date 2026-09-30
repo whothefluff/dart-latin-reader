@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latin_reader/src/component/library/proper_noun_state.dart';
 import 'package:latin_reader/src/component/word_frequency/db_util.dart' as frequency;
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/db_oracle.dart';
@@ -23,9 +24,9 @@ void main() {
     await corpus.addWork(letters);
     await corpus.addWord(fables, 'est', times: 3);
     await corpus.addWord(fables, 'amat', times: 2);
-    await corpus.addWord(fables, 'Xanthus', properNounState: 1);
-    await corpus.addWord(fables, 'Venere', properNounState: 2);
-    await corpus.addWord(fables, 'Venere', properNounState: 1);
+    await corpus.addWord(fables, 'Xanthus', properNounState: ProperNounState.proper);
+    await corpus.addWord(fables, 'Venere', properNounState: ProperNounState.either);
+    await corpus.addWord(fables, 'Venere', properNounState: ProperNounState.proper);
     await corpus.addWord(fables, 'populusque', enclitic: 'que');
     await corpus.addWord(letters, 'est', macronizedWord: 'ēst');
     await corpus.addAnalysis('est', 'sum1');

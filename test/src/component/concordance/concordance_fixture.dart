@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:latin_reader/src/component/library/proper_noun_state.dart';
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
 
@@ -45,7 +46,7 @@ Future<void> token(
   int sentence = 0,
   int? position,
   int type = 1,
-  int proper = 0,
+  ProperNounState proper = ProperNounState.common,
   String? enclitic,
   String? expansion,
 }) => db.customStatement(
@@ -59,7 +60,7 @@ Future<void> token(
     idx,
     word,
     '1.${sentence + 1}',
-    if (type >= 4) null else proper,
+    if (type >= 4) null else proper.code,
     type,
     sentence,
     if (type >= 4) null else position ?? idx,

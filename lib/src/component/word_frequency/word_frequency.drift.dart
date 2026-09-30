@@ -8,8 +8,10 @@ import 'package:latin_reader/src/component/word_frequency/word_frequency_api.dar
     as i3;
 import 'package:latin_reader/src/component/word_frequency/text_coverage_api.dart'
     as i4;
-import 'package:latin_reader/src/component/word_frequency/resolved_freq_morph_form_api.dart'
+import 'package:latin_reader/src/component/word_frequency/lookup_frequency_api.dart'
     as i5;
+import 'package:latin_reader/src/component/word_frequency/resolved_freq_morph_form_api.dart'
+    as i6;
 
 typedef $ScopedFormFreqCreateCompanionBuilder =
     i1.ScopedFormFreqCompanion Function({
@@ -4648,7 +4650,35 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     );
   }
 
-  i0.Selectable<i5.FrequencyMorphCandidate> getFormMorphIdentities({
+  i0.Selectable<i5.LookupCount> getLookupBestCounts({
+    required List<String> workIds,
+    required List<String> lookupForms,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
+    $arrayStartIndex += workIds.length;
+    final expandedlookupForms = $expandVar(
+      $arrayStartIndex,
+      lookupForms.length,
+    );
+    $arrayStartIndex += lookupForms.length;
+    return customSelect(
+      'WITH Candidates AS (SELECT DISTINCT lookupForm, alsoLowercase, dictionaryRef FROM ScopedLookupLemmas WHERE workId IN ($expandedworkIds) AND lookupForm IN ($expandedlookupForms)), Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) AND dictionaryRef IN (SELECT dictionaryRef FROM Candidates) GROUP BY dictionaryRef) SELECT Candidates.lookupForm, Candidates.alsoLowercase, MAX(Lemmas.occurrences) AS occurrences FROM Candidates INNER JOIN Lemmas ON Lemmas.dictionaryRef = Candidates.dictionaryRef GROUP BY Candidates.lookupForm, Candidates.alsoLowercase',
+      variables: [
+        for (var $ in workIds) i0.Variable<String>($),
+        for (var $ in lookupForms) i0.Variable<String>($),
+      ],
+      readsFrom: {scopedLookupLemmas, scopedLemmaFreq},
+    ).map(
+      (i0.QueryRow row) => i5.LookupCount(
+        lookupForm: row.read<String>('lookupForm'),
+        alsoLowercase: row.read<bool>('alsoLowercase'),
+        occurrences: row.readNullable<int>('occurrences'),
+      ),
+    );
+  }
+
+  i0.Selectable<i6.FrequencyMorphCandidate> getFormMorphIdentities({
     required List<String> workIds,
     required String form,
   }) {
@@ -4663,7 +4693,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       ],
       readsFrom: {resolvedFreqMorphForms},
     ).map(
-      (i0.QueryRow row) => i5.FrequencyMorphCandidate(
+      (i0.QueryRow row) => i6.FrequencyMorphCandidate(
         form: row.read<String>('form'),
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),
@@ -4672,7 +4702,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     );
   }
 
-  i0.Selectable<i5.FrequencyMorphCandidate> getMacronFormMorphIdentities({
+  i0.Selectable<i6.FrequencyMorphCandidate> getMacronFormMorphIdentities({
     required List<String> workIds,
     required String form,
     required String macronForm,
@@ -4689,7 +4719,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       ],
       readsFrom: {resolvedFreqMorphForms},
     ).map(
-      (i0.QueryRow row) => i5.FrequencyMorphCandidate(
+      (i0.QueryRow row) => i6.FrequencyMorphCandidate(
         form: row.read<String>('form'),
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),
@@ -4698,7 +4728,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     );
   }
 
-  i0.Selectable<i5.FrequencyMorphCandidate> getLemmaMorphIdentities({
+  i0.Selectable<i6.FrequencyMorphCandidate> getLemmaMorphIdentities({
     required List<String> workIds,
     required String dictionaryRef,
   }) {
@@ -4713,7 +4743,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       ],
       readsFrom: {resolvedFreqMorphForms},
     ).map(
-      (i0.QueryRow row) => i5.FrequencyMorphCandidate(
+      (i0.QueryRow row) => i6.FrequencyMorphCandidate(
         form: row.read<String>('form'),
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),

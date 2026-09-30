@@ -152,6 +152,21 @@ class TextCoverage {
     return _steps.lastWhereOrNull((s) => _shareOf(s.coveredUnits) >= share)?.minOccurrences;
   }
 
+  /// Highest count among the rarest items that make up [share] (0–1), or null if unreachable.
+  int? rareCutoffFor(double share) {
+    assert(share >= 0 && share <= 1, 'A share goes from 0 to 1, not $share');
+    final coveredAll = unitsCovered(atLeast: 0);
+    return _steps
+        .mapIndexed(
+          (i, step) => (
+            count: step.minOccurrences,
+            units: coveredAll - (i + 1 < _steps.length ? _steps[i + 1].coveredUnits : 0),
+          ),
+        )
+        .firstWhereOrNull((rarest) => _shareOf(rarest.units) >= share)
+        ?.count;
+  }
+
   double _shareOf(int units) => totalUnits > 0 ? units / totalUnits : 0;
 
   @override

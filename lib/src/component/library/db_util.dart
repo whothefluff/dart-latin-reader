@@ -8,6 +8,7 @@ import '../../external/db_oracle.dart';
 import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'library.drift.dart';
+import 'proper_noun_state.dart';
 import 'subdivision_type.dart';
 
 const path = 'assets/preprocessed_data/';
@@ -110,7 +111,9 @@ final operations = [
                   idx: Value(row[1] as int),
                   word: Value(row[2].toString()),
                   sourceReference: Value(row[3].toString()),
-                  properNounState: intValue(row[4].toString()),
+                  properNounState: row[4].toString().isEmpty
+                      ? const Value.absent()
+                      : Value(ProperNounState.fromCode(row[4] as int)),
                   tokenType: Value(row[5] as int),
                   sentenceIdx: Value(row[6] as int),
                   wordIdx: intValue(row[7].toString()),

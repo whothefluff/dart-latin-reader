@@ -1,6 +1,7 @@
 import 'package:latin_reader/src/component/word_frequency/word_frequency_api.dart';
 import 'package:latin_reader/src/component/word_frequency/resolved_freq_morph_form_api.dart';
 import 'package:latin_reader/src/component/word_frequency/text_coverage_api.dart';
+import 'package:latin_reader/src/component/word_frequency/lookup_frequency_api.dart';
 
 -- Occurrence counts for each work, plain form, and macronized spelling
 CREATE TABLE "ScopedFormFreq"(
@@ -308,6 +309,29 @@ getAllCandidateLemmasCoverageSteps WITH TextCoverageStep:
                SUM( units ) OVER( ORDER BY minOccurrences DESC ) AS coveredUnits
             FROM Steps
             ORDER BY minOccurrences DESC;
+
+-- for each lookup, use the count of its most frequent candidate lemma in the selected works
+getLookupBestCounts WITH LookupCount:
+    WITH Candidates AS ( SELECT DISTINCT lookupForm,
+                                         alsoLowercase,
+                                         dictionaryRef
+                             FROM ScopedLookupLemmas
+                             WHERE workId IN :workIds
+                                   AND lookupForm IN :lookupForms ),
+         Lemmas AS ( SELECT dictionaryRef,
+                            SUM( possibleOccurrences ) AS occurrences
+                         FROM ScopedLemmaFreq
+                         WHERE workId IN :workIds
+                               AND dictionaryRef IN ( SELECT dictionaryRef FROM Candidates )
+                         GROUP BY dictionaryRef )
+        SELECT Candidates.lookupForm,
+               Candidates.alsoLowercase,
+               MAX( Lemmas.occurrences ) AS occurrences
+            FROM Candidates
+            INNER JOIN Lemmas
+                ON Lemmas.dictionaryRef = Candidates.dictionaryRef
+            GROUP BY Candidates.lookupForm,
+                     Candidates.alsoLowercase;
 
 -- Morphological matches for a plain form in the selected works.
 -- DISTINCT removes matches repeated across works or macronized spellings.

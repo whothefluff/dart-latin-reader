@@ -4,6 +4,7 @@ import 'package:latin_reader/src/component/concordance/concordance_query.dart';
 import 'package:latin_reader/src/component/concordance/grammar_values_api.dart' as grammar;
 import 'package:latin_reader/src/component/concordance/lemma_choices_api.dart' as lemmas;
 import 'package:latin_reader/src/component/library/catalog_api.dart' as catalog;
+import 'package:latin_reader/src/component/library/proper_noun_state.dart';
 import 'package:latin_reader/src/component/word_frequency/library_selection_api.dart';
 
 import 'concordance_fixture.dart';
@@ -47,7 +48,7 @@ void main() {
   });
 
   test('capitals beyond ASCII follow the exact case option', () async {
-    await token(db, 0, 'Apis', macron: 'Āpis', proper: 1);
+    await token(db, 0, 'Apis', macron: 'Āpis', proper: ProperNounState.proper);
     await token(db, 1, 'apis', macron: 'āpis');
     expect(await starts([const FormCriterion('ĀPIS')], macrons: true), [0, 1]);
     expect(await starts([const FormCriterion('ĀPIS', exactCase: true)], macrons: true), [0]);
@@ -55,7 +56,7 @@ void main() {
 
   test('a host, its enclitic and an expansion all find their own token', () async {
     await token(db, 0, 'populusque', enclitic: 'que');
-    await token(db, 1, 'M.', type: 2, proper: 1, expansion: 'Mārcus');
+    await token(db, 1, 'M.', type: 2, proper: ProperNounState.proper, expansion: 'Mārcus');
     await token(db, 2, 'XII', type: 3);
     expect(await starts([const FormCriterion('populus')]), [0]);
     expect(await starts([const FormCriterion('que')]), [0]);
@@ -138,8 +139,8 @@ void main() {
   });
 
   test('a name that may be a common word has the analyses of both', () async {
-    await token(db, 0, 'Venere', proper: 2);
-    await token(db, 1, 'Venere', proper: 1);
+    await token(db, 0, 'Venere', proper: ProperNounState.either);
+    await token(db, 1, 'Venere', proper: ProperNounState.proper);
     await token(db, 2, 'venere');
     await analysis(db, 'Venere', 'Venus');
     await analysis(db, 'venere', 'venio', pos: 'verb');

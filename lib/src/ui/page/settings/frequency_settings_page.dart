@@ -91,10 +91,10 @@ class _ReportSettingsSection extends StatelessWidget {
 
   SettingsGroup _formTapGroup() => SettingsGroup(
     rows: [
-      _ChipChoice(
+      ChipChoice(
         title: 'Tapping a Form Opens',
         subtitle: 'Lemma rows never navigate to morphology',
-        chips: _choiceChips(
+        chips: choiceChips(
           values: FormTapAction.values,
           current: settings.formTapAction,
           label: _formTapLabel,
@@ -108,12 +108,12 @@ class _ReportSettingsSection extends StatelessWidget {
 
   SettingsGroup _narrowLemmaCoverageGroup() => SettingsGroup(
     rows: [
-      _ChipChoice(
+      ChipChoice(
         title: 'Lemma Coverage on Small Screens',
         subtitle:
             'Larger screens show both. On small screens, long-press or hover over a row '
             'for the other',
-        chips: _choiceChips(
+        chips: choiceChips(
           values: NarrowLemmaCoverage.values,
           current: settings.narrowLemmaCoverage,
           label: _narrowLemmaCoverageLabel,
@@ -138,62 +138,3 @@ class _ReportSettingsSection extends StatelessWidget {
   };
   //
 }
-
-/// Title, subtitle and [chips].
-/// The chips wrap on narrow screens.
-class _ChipChoice extends StatelessWidget {
-  const _ChipChoice({
-    required this.title,
-    required this.subtitle,
-    required this.chips,
-  });
-
-  final String title;
-  final String subtitle;
-  final List<ChoiceChip> chips;
-
-  @override
-  Widget build(context) {
-    final theme = Theme.of(context);
-    return Padding(
-      // ListTile's start padding, so the text lines up with the switch's title above
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: theme.textTheme.bodyLarge),
-          Text(
-            subtitle,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: chips,
-          ),
-        ],
-      ),
-    );
-  }
-
-  //
-}
-
-/// One chip per value, with [current] selected
-List<ChoiceChip> _choiceChips<T>({
-  required List<T> values,
-  required T current,
-  required String Function(T value) label,
-  required ValueChanged<T> onChanged,
-}) => values
-    .map(
-      (value) => ChoiceChip(
-        label: Text(label(value)),
-        selected: value == current,
-        onSelected: (_) => onChanged(value),
-      ),
-    )
-    .toList();
