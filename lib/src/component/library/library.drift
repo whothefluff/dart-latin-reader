@@ -20,7 +20,7 @@ WITHOUT ROWID;
 CREATE TABLE "AuthorAbbreviations"(
     "authorId" TEXT NOT NULL,
     "id" INTEGER NOT NULL CHECK( id >= 0 ),
-    "val" TEXT NOT NULL,
+    "val" TEXT NOT NULL CHECK( val LIKE '%.' ),
     PRIMARY KEY( authorId, id ),
     FOREIGN KEY( authorId ) REFERENCES Authors( id  )
 ) 
@@ -39,7 +39,7 @@ WITHOUT ROWID;
 CREATE TABLE "WorkAbbreviations"(
     "workId" TEXT NOT NULL,
     "id" INTEGER NOT NULL CHECK( id >= 0 ),
-    "val" TEXT NOT NULL,
+    "val" TEXT NOT NULL CHECK( val LIKE '%.' ),
     PRIMARY KEY( workId, id ),
     FOREIGN KEY( workId ) REFERENCES Works( id )
 ) 
@@ -355,12 +355,15 @@ CREATE VIEW "library.Authors" AS
                Authors.name,
                Authors.about,
                Authors.image,
-               COALESCE( AuthorWorks.numberOfWorks, 0 ) AS numberOfWorks
+               COALESCE( AuthorWorks.numberOfWorks, 0 ) AS numberOfWorks,
+               ( SELECT GROUP_CONCAT( AuthorAbbreviations.val )
+                     FROM AuthorAbbreviations
+                     WHERE AuthorAbbreviations.authorId = Authors.id ) AS abbreviations
             FROM Authors
             LEFT JOIN AuthorWorks
                 ON Authors.id = AuthorWorks.authorId;
 
-getLibraryAuthors WITH Author: SELECT * FROM "library.Authors";
+getLibraryAuthors WITH Author.fromSql: SELECT * FROM "library.Authors";
 
 CREATE VIEW "library.AuthorDetails" AS 
     WITH Aux AS ( SELECT Authors.id,
@@ -511,7 +514,13 @@ CREATE VIEW "library.Catalog" AS
     SELECT Works.id AS workId,
            Works.name AS workName,
            Authors.id AS authorId,
-           Authors.name AS authorName
+           Authors.name AS authorName,
+           ( SELECT GROUP_CONCAT( WorkAbbreviations.val )
+                 FROM WorkAbbreviations
+                 WHERE WorkAbbreviations.workId = Works.id ) AS workAbbreviations,
+           ( SELECT GROUP_CONCAT( AuthorAbbreviations.val )
+                 FROM AuthorAbbreviations
+                 WHERE AuthorAbbreviations.authorId = Authors.id ) AS authorAbbreviations
         FROM Works
         LEFT OUTER JOIN AuthorsAndWorks 
             ON Works.id = AuthorsAndWorks.workId

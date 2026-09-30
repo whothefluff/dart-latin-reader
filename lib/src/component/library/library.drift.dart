@@ -2527,7 +2527,7 @@ class AuthorAbbreviations extends i0.Table
     false,
     type: i0.DriftSqlType.string,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
+    $customConstraints: 'NOT NULL CHECK (val LIKE \'%.\')',
   );
   @override
   List<i0.GeneratedColumn> get $columns => [authorId, id, val];
@@ -3043,7 +3043,7 @@ class WorkAbbreviations extends i0.Table
     false,
     type: i0.DriftSqlType.string,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
+    $customConstraints: 'NOT NULL CHECK (val LIKE \'%.\')',
   );
   @override
   List<i0.GeneratedColumn> get $columns => [workId, id, val];
@@ -6725,12 +6725,14 @@ class LibraryAuthor extends i0.DataClass {
   final String about;
   final i2.Uint8List image;
   final int numberOfWorks;
+  final String? abbreviations;
   const LibraryAuthor({
     required this.id,
     required this.name,
     required this.about,
     required this.image,
     required this.numberOfWorks,
+    this.abbreviations,
   });
   factory LibraryAuthor.fromJson(
     Map<String, dynamic> json, {
@@ -6743,6 +6745,7 @@ class LibraryAuthor extends i0.DataClass {
       about: serializer.fromJson<String>(json['about']),
       image: serializer.fromJson<i2.Uint8List>(json['image']),
       numberOfWorks: serializer.fromJson<int>(json['numberOfWorks']),
+      abbreviations: serializer.fromJson<String?>(json['abbreviations']),
     );
   }
   @override
@@ -6754,6 +6757,7 @@ class LibraryAuthor extends i0.DataClass {
       'about': serializer.toJson<String>(about),
       'image': serializer.toJson<i2.Uint8List>(image),
       'numberOfWorks': serializer.toJson<int>(numberOfWorks),
+      'abbreviations': serializer.toJson<String?>(abbreviations),
     };
   }
 
@@ -6763,12 +6767,16 @@ class LibraryAuthor extends i0.DataClass {
     String? about,
     i2.Uint8List? image,
     int? numberOfWorks,
+    i0.Value<String?> abbreviations = const i0.Value.absent(),
   }) => i1.LibraryAuthor(
     id: id ?? this.id,
     name: name ?? this.name,
     about: about ?? this.about,
     image: image ?? this.image,
     numberOfWorks: numberOfWorks ?? this.numberOfWorks,
+    abbreviations: abbreviations.present
+        ? abbreviations.value
+        : this.abbreviations,
   );
   @override
   String toString() {
@@ -6777,7 +6785,8 @@ class LibraryAuthor extends i0.DataClass {
           ..write('name: $name, ')
           ..write('about: $about, ')
           ..write('image: $image, ')
-          ..write('numberOfWorks: $numberOfWorks')
+          ..write('numberOfWorks: $numberOfWorks, ')
+          ..write('abbreviations: $abbreviations')
           ..write(')'))
         .toString();
   }
@@ -6789,6 +6798,7 @@ class LibraryAuthor extends i0.DataClass {
     about,
     i0.$driftBlobEquality.hash(image),
     numberOfWorks,
+    abbreviations,
   );
   @override
   bool operator ==(Object other) =>
@@ -6798,7 +6808,8 @@ class LibraryAuthor extends i0.DataClass {
           other.name == this.name &&
           other.about == this.about &&
           i0.$driftBlobEquality.equals(other.image, this.image) &&
-          other.numberOfWorks == this.numberOfWorks);
+          other.numberOfWorks == this.numberOfWorks &&
+          other.abbreviations == this.abbreviations);
 }
 
 class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
@@ -6814,6 +6825,7 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
     about,
     image,
     numberOfWorks,
+    abbreviations,
   ];
   @override
   String get aliasedName => _alias ?? entityName;
@@ -6822,7 +6834,7 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.Authors" AS WITH AuthorWorks AS (SELECT authorId, COUNT(workId) AS numberOfWorks FROM AuthorsAndWorks GROUP BY authorId) SELECT Authors.id, Authors.name, Authors.about, Authors.image, COALESCE(AuthorWorks.numberOfWorks, 0) AS numberOfWorks FROM Authors LEFT JOIN AuthorWorks ON Authors.id = AuthorWorks.authorId',
+        'CREATE VIEW "library.Authors" AS WITH AuthorWorks AS (SELECT authorId, COUNT(workId) AS numberOfWorks FROM AuthorsAndWorks GROUP BY authorId) SELECT Authors.id, Authors.name, Authors.about, Authors.image, COALESCE(AuthorWorks.numberOfWorks, 0) AS numberOfWorks, (SELECT GROUP_CONCAT(AuthorAbbreviations.val) FROM AuthorAbbreviations WHERE AuthorAbbreviations.authorId = Authors.id) AS abbreviations FROM Authors LEFT JOIN AuthorWorks ON Authors.id = AuthorWorks.authorId',
   };
   @override
   LibraryAuthors get asDslTable => this;
@@ -6850,6 +6862,10 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
         i0.DriftSqlType.int,
         data['${effectivePrefix}numberOfWorks'],
       )!,
+      abbreviations: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}abbreviations'],
+      ),
     );
   }
 
@@ -6884,6 +6900,13 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
     false,
     type: i0.DriftSqlType.int,
   );
+  late final i0.GeneratedColumn<String> abbreviations =
+      i0.GeneratedColumn<String>(
+        'abbreviations',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
   @override
   LibraryAuthors createAlias(String alias) {
     return LibraryAuthors(attachedDatabase, alias);
@@ -6892,7 +6915,11 @@ class LibraryAuthors extends i0.ViewInfo<i1.LibraryAuthors, i1.LibraryAuthor>
   @override
   i0.Query? get query => null;
   @override
-  Set<String> get readTables => const {'AuthorsAndWorks', 'Authors'};
+  Set<String> get readTables => const {
+    'AuthorsAndWorks',
+    'Authors',
+    'AuthorAbbreviations',
+  };
 }
 
 class LibraryAuthorDetail extends i0.DataClass {
@@ -8112,11 +8139,15 @@ class LibraryCatalogData extends i0.DataClass {
   final String workName;
   final String? authorId;
   final String? authorName;
+  final String? workAbbreviations;
+  final String? authorAbbreviations;
   const LibraryCatalogData({
     required this.workId,
     required this.workName,
     this.authorId,
     this.authorName,
+    this.workAbbreviations,
+    this.authorAbbreviations,
   });
   factory LibraryCatalogData.fromJson(
     Map<String, dynamic> json, {
@@ -8128,6 +8159,12 @@ class LibraryCatalogData extends i0.DataClass {
       workName: serializer.fromJson<String>(json['workName']),
       authorId: serializer.fromJson<String?>(json['authorId']),
       authorName: serializer.fromJson<String?>(json['authorName']),
+      workAbbreviations: serializer.fromJson<String?>(
+        json['workAbbreviations'],
+      ),
+      authorAbbreviations: serializer.fromJson<String?>(
+        json['authorAbbreviations'],
+      ),
     );
   }
   @override
@@ -8138,6 +8175,8 @@ class LibraryCatalogData extends i0.DataClass {
       'workName': serializer.toJson<String>(workName),
       'authorId': serializer.toJson<String?>(authorId),
       'authorName': serializer.toJson<String?>(authorName),
+      'workAbbreviations': serializer.toJson<String?>(workAbbreviations),
+      'authorAbbreviations': serializer.toJson<String?>(authorAbbreviations),
     };
   }
 
@@ -8146,11 +8185,19 @@ class LibraryCatalogData extends i0.DataClass {
     String? workName,
     i0.Value<String?> authorId = const i0.Value.absent(),
     i0.Value<String?> authorName = const i0.Value.absent(),
+    i0.Value<String?> workAbbreviations = const i0.Value.absent(),
+    i0.Value<String?> authorAbbreviations = const i0.Value.absent(),
   }) => i1.LibraryCatalogData(
     workId: workId ?? this.workId,
     workName: workName ?? this.workName,
     authorId: authorId.present ? authorId.value : this.authorId,
     authorName: authorName.present ? authorName.value : this.authorName,
+    workAbbreviations: workAbbreviations.present
+        ? workAbbreviations.value
+        : this.workAbbreviations,
+    authorAbbreviations: authorAbbreviations.present
+        ? authorAbbreviations.value
+        : this.authorAbbreviations,
   );
   @override
   String toString() {
@@ -8158,13 +8205,22 @@ class LibraryCatalogData extends i0.DataClass {
           ..write('workId: $workId, ')
           ..write('workName: $workName, ')
           ..write('authorId: $authorId, ')
-          ..write('authorName: $authorName')
+          ..write('authorName: $authorName, ')
+          ..write('workAbbreviations: $workAbbreviations, ')
+          ..write('authorAbbreviations: $authorAbbreviations')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(workId, workName, authorId, authorName);
+  int get hashCode => Object.hash(
+    workId,
+    workName,
+    authorId,
+    authorName,
+    workAbbreviations,
+    authorAbbreviations,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -8172,7 +8228,9 @@ class LibraryCatalogData extends i0.DataClass {
           other.workId == this.workId &&
           other.workName == this.workName &&
           other.authorId == this.authorId &&
-          other.authorName == this.authorName);
+          other.authorName == this.authorName &&
+          other.workAbbreviations == this.workAbbreviations &&
+          other.authorAbbreviations == this.authorAbbreviations);
 }
 
 class LibraryCatalog
@@ -8188,6 +8246,8 @@ class LibraryCatalog
     workName,
     authorId,
     authorName,
+    workAbbreviations,
+    authorAbbreviations,
   ];
   @override
   String get aliasedName => _alias ?? entityName;
@@ -8196,7 +8256,7 @@ class LibraryCatalog
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.Catalog" AS SELECT Works.id AS workId, Works.name AS workName, Authors.id AS authorId, Authors.name AS authorName FROM Works LEFT OUTER JOIN AuthorsAndWorks ON Works.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id ORDER BY Authors.name, Works.name',
+        'CREATE VIEW "library.Catalog" AS SELECT Works.id AS workId, Works.name AS workName, Authors.id AS authorId, Authors.name AS authorName, (SELECT GROUP_CONCAT(WorkAbbreviations.val) FROM WorkAbbreviations WHERE WorkAbbreviations.workId = Works.id) AS workAbbreviations, (SELECT GROUP_CONCAT(AuthorAbbreviations.val) FROM AuthorAbbreviations WHERE AuthorAbbreviations.authorId = Authors.id) AS authorAbbreviations FROM Works LEFT OUTER JOIN AuthorsAndWorks ON Works.id = AuthorsAndWorks.workId LEFT OUTER JOIN Authors ON AuthorsAndWorks.authorId = Authors.id ORDER BY Authors.name, Works.name',
   };
   @override
   LibraryCatalog get asDslTable => this;
@@ -8219,6 +8279,14 @@ class LibraryCatalog
       authorName: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}authorName'],
+      ),
+      workAbbreviations: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workAbbreviations'],
+      ),
+      authorAbbreviations: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}authorAbbreviations'],
       ),
     );
   }
@@ -8247,6 +8315,20 @@ class LibraryCatalog
     true,
     type: i0.DriftSqlType.string,
   );
+  late final i0.GeneratedColumn<String> workAbbreviations =
+      i0.GeneratedColumn<String>(
+        'workAbbreviations',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
+  late final i0.GeneratedColumn<String> authorAbbreviations =
+      i0.GeneratedColumn<String>(
+        'authorAbbreviations',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
   @override
   LibraryCatalog createAlias(String alias) {
     return LibraryCatalog(attachedDatabase, alias);
@@ -8255,7 +8337,13 @@ class LibraryCatalog
   @override
   i0.Query? get query => null;
   @override
-  Set<String> get readTables => const {'Works', 'AuthorsAndWorks', 'Authors'};
+  Set<String> get readTables => const {
+    'Works',
+    'AuthorsAndWorks',
+    'Authors',
+    'WorkAbbreviations',
+    'AuthorAbbreviations',
+  };
 }
 
 class LibraryDrift extends i5.ModularAccessor {
@@ -8264,14 +8352,15 @@ class LibraryDrift extends i5.ModularAccessor {
     return customSelect(
       'SELECT * FROM "library.Authors"',
       variables: [],
-      readsFrom: {authorsAndWorks, authors},
+      readsFrom: {authorsAndWorks, authors, authorAbbreviations},
     ).map(
-      (i0.QueryRow row) => i6.Author(
+      (i0.QueryRow row) => i6.Author.fromSql(
         id: row.read<String>('id'),
         name: row.read<String>('name'),
         about: row.read<String>('about'),
         image: row.read<i2.Uint8List>('image'),
         numberOfWorks: row.read<int>('numberOfWorks'),
+        abbreviations: row.readNullable<String>('abbreviations'),
       ),
     );
   }
@@ -8377,7 +8466,13 @@ class LibraryDrift extends i5.ModularAccessor {
     return customSelect(
       'SELECT * FROM "library.Catalog"',
       variables: [],
-      readsFrom: {works, authorsAndWorks, authors},
+      readsFrom: {
+        works,
+        authorsAndWorks,
+        authors,
+        workAbbreviations,
+        authorAbbreviations,
+      },
     ).asyncMap(libraryCatalog.mapFromRow);
   }
 
@@ -8390,6 +8485,9 @@ class LibraryDrift extends i5.ModularAccessor {
   i1.Authors get authors => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.Authors>('Authors');
+  i1.AuthorAbbreviations get authorAbbreviations => i5.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.AuthorAbbreviations>('AuthorAbbreviations');
   i1.LibraryAuthorDetails get libraryAuthorDetails => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthorDetails>('library.AuthorDetails');
@@ -8417,4 +8515,7 @@ class LibraryDrift extends i5.ModularAccessor {
   i1.LibraryCatalog get libraryCatalog => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryCatalog>('library.Catalog');
+  i1.WorkAbbreviations get workAbbreviations => i5.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.WorkAbbreviations>('WorkAbbreviations');
 }

@@ -7,8 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
+import '../../core/contains_text.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'abbreviations.dart';
 import 'library.drift.dart';
 
 part 'catalog_api.g.dart';
@@ -41,20 +43,23 @@ class LibraryRepository implements ILibraryRepository {
           (e) => CatalogAuthor(
             id: e.key!,
             name: e.value.first.authorName!,
-            works: UnmodifiableListView(
-              e.value.map((r) => CatalogWork(id: r.workId, name: r.workName)),
-            ),
+            abbreviations: abbreviationsOf(e.value.first.authorAbbreviations),
+            works: UnmodifiableListView(e.value.map(_workOf)),
           ),
         )
         .sortedBy((a) => a.name);
-    final anonymous = rows
-        .where((r) => r.authorId == null)
-        .map((r) => CatalogWork(id: r.workId, name: r.workName));
+    final anonymous = rows.where((r) => r.authorId == null).map(_workOf);
     return LibraryCatalog(
       authors: UnmodifiableListView(authors),
       anonymousWorks: UnmodifiableListView(anonymous),
     );
   }
+
+  CatalogWork _workOf(LibraryCatalogData row) => CatalogWork(
+    id: row.workId,
+    name: row.workName,
+    abbreviations: abbreviationsOf(row.workAbbreviations),
+  );
 
   //
 }
@@ -92,10 +97,15 @@ class CatalogWork {
   const CatalogWork({
     required this.id,
     required this.name,
+    this.abbreviations = const [],
   });
 
   final String id;
   final String name;
+  final List<String> abbreviations;
+
+  /// Whether [text] is part of the title or of an abbreviation, whatever the case
+  bool matches(String text) => containsText([name, ...abbreviations], text);
 
   @override
   String toString() => 'CatalogWork{name: $name}';
@@ -115,11 +125,16 @@ class CatalogAuthor {
     required this.id,
     required this.name,
     required this.works,
+    this.abbreviations = const [],
   });
 
   final String id;
   final String name;
   final UnmodifiableListView<CatalogWork> works;
+  final List<String> abbreviations;
+
+  /// Whether [text] is part of the name or of an abbreviation, whatever the case
+  bool matches(String text) => containsText([name, ...abbreviations], text);
 
   @override
   String toString() => 'CatalogAuthor{name: $name, works: ${works.length}}';

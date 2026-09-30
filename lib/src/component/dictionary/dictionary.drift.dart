@@ -1175,6 +1175,189 @@ typedef $LnsRefResolutionsProcessedTableManager =
       i1.LnsRefResolution,
       i0.PrefetchHooks Function()
     >;
+typedef $SearchableDictionaryEntriesCreateCompanionBuilder =
+    i1.SearchableDictionaryEntriesCompanion Function({
+      i0.Value<String?> headword,
+      i0.Value<String?> dictionary,
+      i0.Value<String?> idx,
+      i0.Value<int> rowid,
+    });
+typedef $SearchableDictionaryEntriesUpdateCompanionBuilder =
+    i1.SearchableDictionaryEntriesCompanion Function({
+      i0.Value<String?> headword,
+      i0.Value<String?> dictionary,
+      i0.Value<String?> idx,
+      i0.Value<int> rowid,
+    });
+
+class $SearchableDictionaryEntriesFilterComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.SearchableDictionaryEntries> {
+  $SearchableDictionaryEntriesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnFilters<String> get headword => $composableBuilder(
+    column: $table.headword,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get dictionary => $composableBuilder(
+    column: $table.dictionary,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get idx => $composableBuilder(
+    column: $table.idx,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+}
+
+class $SearchableDictionaryEntriesOrderingComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.SearchableDictionaryEntries> {
+  $SearchableDictionaryEntriesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnOrderings<String> get headword => $composableBuilder(
+    column: $table.headword,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get dictionary => $composableBuilder(
+    column: $table.dictionary,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get idx => $composableBuilder(
+    column: $table.idx,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+}
+
+class $SearchableDictionaryEntriesAnnotationComposer
+    extends i0.Composer<i0.GeneratedDatabase, i1.SearchableDictionaryEntries> {
+  $SearchableDictionaryEntriesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.GeneratedColumn<String> get headword =>
+      $composableBuilder(column: $table.headword, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get dictionary => $composableBuilder(
+    column: $table.dictionary,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get idx =>
+      $composableBuilder(column: $table.idx, builder: (column) => column);
+}
+
+class $SearchableDictionaryEntriesTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.SearchableDictionaryEntries,
+          i1.SearchableDictionaryEntry,
+          i1.$SearchableDictionaryEntriesFilterComposer,
+          i1.$SearchableDictionaryEntriesOrderingComposer,
+          i1.$SearchableDictionaryEntriesAnnotationComposer,
+          $SearchableDictionaryEntriesCreateCompanionBuilder,
+          $SearchableDictionaryEntriesUpdateCompanionBuilder,
+          (
+            i1.SearchableDictionaryEntry,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.SearchableDictionaryEntries,
+              i1.SearchableDictionaryEntry
+            >,
+          ),
+          i1.SearchableDictionaryEntry,
+          i0.PrefetchHooks Function()
+        > {
+  $SearchableDictionaryEntriesTableManager(
+    i0.GeneratedDatabase db,
+    i1.SearchableDictionaryEntries table,
+  ) : super(
+        i0.TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              i1.$SearchableDictionaryEntriesFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              i1.$SearchableDictionaryEntriesOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              i1.$SearchableDictionaryEntriesAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String?> headword = const i0.Value.absent(),
+                i0.Value<String?> dictionary = const i0.Value.absent(),
+                i0.Value<String?> idx = const i0.Value.absent(),
+                i0.Value<int> rowid = const i0.Value.absent(),
+              }) => i1.SearchableDictionaryEntriesCompanion(
+                headword: headword,
+                dictionary: dictionary,
+                idx: idx,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                i0.Value<String?> headword = const i0.Value.absent(),
+                i0.Value<String?> dictionary = const i0.Value.absent(),
+                i0.Value<String?> idx = const i0.Value.absent(),
+                i0.Value<int> rowid = const i0.Value.absent(),
+              }) => i1.SearchableDictionaryEntriesCompanion.insert(
+                headword: headword,
+                dictionary: dictionary,
+                idx: idx,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $SearchableDictionaryEntriesProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.SearchableDictionaryEntries,
+      i1.SearchableDictionaryEntry,
+      i1.$SearchableDictionaryEntriesFilterComposer,
+      i1.$SearchableDictionaryEntriesOrderingComposer,
+      i1.$SearchableDictionaryEntriesAnnotationComposer,
+      $SearchableDictionaryEntriesCreateCompanionBuilder,
+      $SearchableDictionaryEntriesUpdateCompanionBuilder,
+      (
+        i1.SearchableDictionaryEntry,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.SearchableDictionaryEntries,
+          i1.SearchableDictionaryEntry
+        >,
+      ),
+      i1.SearchableDictionaryEntry,
+      i0.PrefetchHooks Function()
+    >;
 
 class Dictionaries extends i0.Table
     with i0.TableInfo<Dictionaries, i1.Dictionary> {
@@ -3763,7 +3946,7 @@ class DictionaryDictionaryEntries
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, COALESCE(SenseCounts.numberOfSenses, 0) AS numberOfSenses FROM DictionaryEntries LEFT OUTER JOIN (SELECT dictionary, lemma, COUNT(*) AS numberOfSenses FROM DictEntrySenses WHERE lvl BETWEEN \'000\' AND \'999\' GROUP BY dictionary, lemma) AS SenseCounts ON DictionaryEntries.dictionary = SenseCounts.dictionary AND DictionaryEntries.lemma = SenseCounts.lemma ORDER BY DictionaryEntries.dictionary, DictionaryEntries.idx',
+        'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, COALESCE((SELECT COUNT(*) FROM DictEntrySenses WHERE DictEntrySenses.dictionary = DictionaryEntries.dictionary AND DictEntrySenses.lemma = DictionaryEntries.lemma AND DictEntrySenses.lvl BETWEEN \'000\' AND \'999\'), 0) AS numberOfSenses FROM DictionaryEntries ORDER BY DictionaryEntries.dictionary, DictionaryEntries.idx',
   };
   @override
   DictionaryDictionaryEntries get asDslTable => this;
@@ -3847,6 +4030,293 @@ class DictionaryDictionaryEntries
   i0.Query? get query => null;
   @override
   Set<String> get readTables => const {'DictionaryEntries', 'DictEntrySenses'};
+}
+
+class SearchableDictionaryEntries extends i0.Table
+    with
+        i0.TableInfo<SearchableDictionaryEntries, i1.SearchableDictionaryEntry>,
+        i0.VirtualTableInfo<
+          SearchableDictionaryEntries,
+          i1.SearchableDictionaryEntry
+        > {
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SearchableDictionaryEntries(this.attachedDatabase, [this._alias]);
+  static const i0.VerificationMeta _headwordMeta = const i0.VerificationMeta(
+    'headword',
+  );
+  late final i0.GeneratedColumn<String> headword = i0.GeneratedColumn<String>(
+    'headword',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const i0.VerificationMeta _dictionaryMeta = const i0.VerificationMeta(
+    'dictionary',
+  );
+  late final i0.GeneratedColumn<String> dictionary = i0.GeneratedColumn<String>(
+    'dictionary',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
+  late final i0.GeneratedColumn<String> idx = i0.GeneratedColumn<String>(
+    'idx',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<i0.GeneratedColumn> get $columns => [headword, dictionary, idx];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'SearchableDictionaryEntries';
+  @override
+  i0.VerificationContext validateIntegrity(
+    i0.Insertable<i1.SearchableDictionaryEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = i0.VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('headword')) {
+      context.handle(
+        _headwordMeta,
+        headword.isAcceptableOrUnknown(data['headword']!, _headwordMeta),
+      );
+    }
+    if (data.containsKey('dictionary')) {
+      context.handle(
+        _dictionaryMeta,
+        dictionary.isAcceptableOrUnknown(data['dictionary']!, _dictionaryMeta),
+      );
+    }
+    if (data.containsKey('idx')) {
+      context.handle(
+        _idxMeta,
+        idx.isAcceptableOrUnknown(data['idx']!, _idxMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<i0.GeneratedColumn> get $primaryKey => const {};
+  @override
+  i1.SearchableDictionaryEntry map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.SearchableDictionaryEntry(
+      headword: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}headword'],
+      ),
+      dictionary: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}dictionary'],
+      ),
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}idx'],
+      ),
+    );
+  }
+
+  @override
+  SearchableDictionaryEntries createAlias(String alias) {
+    return SearchableDictionaryEntries(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+  @override
+  String get moduleAndArgs =>
+      'fts5(headword, dictionary UNINDEXED, idx UNINDEXED, tokenize = "trigram remove_diacritics 0 case_sensitive 0")';
+}
+
+class SearchableDictionaryEntry extends i0.DataClass
+    implements i0.Insertable<i1.SearchableDictionaryEntry> {
+  final String? headword;
+  final String? dictionary;
+  final String? idx;
+  const SearchableDictionaryEntry({this.headword, this.dictionary, this.idx});
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    if (!nullToAbsent || headword != null) {
+      map['headword'] = i0.Variable<String>(headword);
+    }
+    if (!nullToAbsent || dictionary != null) {
+      map['dictionary'] = i0.Variable<String>(dictionary);
+    }
+    if (!nullToAbsent || idx != null) {
+      map['idx'] = i0.Variable<String>(idx);
+    }
+    return map;
+  }
+
+  i1.SearchableDictionaryEntriesCompanion toCompanion(bool nullToAbsent) {
+    return i1.SearchableDictionaryEntriesCompanion(
+      headword: headword == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(headword),
+      dictionary: dictionary == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(dictionary),
+      idx: idx == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(idx),
+    );
+  }
+
+  factory SearchableDictionaryEntry.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return SearchableDictionaryEntry(
+      headword: serializer.fromJson<String?>(json['headword']),
+      dictionary: serializer.fromJson<String?>(json['dictionary']),
+      idx: serializer.fromJson<String?>(json['idx']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'headword': serializer.toJson<String?>(headword),
+      'dictionary': serializer.toJson<String?>(dictionary),
+      'idx': serializer.toJson<String?>(idx),
+    };
+  }
+
+  i1.SearchableDictionaryEntry copyWith({
+    i0.Value<String?> headword = const i0.Value.absent(),
+    i0.Value<String?> dictionary = const i0.Value.absent(),
+    i0.Value<String?> idx = const i0.Value.absent(),
+  }) => i1.SearchableDictionaryEntry(
+    headword: headword.present ? headword.value : this.headword,
+    dictionary: dictionary.present ? dictionary.value : this.dictionary,
+    idx: idx.present ? idx.value : this.idx,
+  );
+  SearchableDictionaryEntry copyWithCompanion(
+    i1.SearchableDictionaryEntriesCompanion data,
+  ) {
+    return SearchableDictionaryEntry(
+      headword: data.headword.present ? data.headword.value : this.headword,
+      dictionary: data.dictionary.present
+          ? data.dictionary.value
+          : this.dictionary,
+      idx: data.idx.present ? data.idx.value : this.idx,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SearchableDictionaryEntry(')
+          ..write('headword: $headword, ')
+          ..write('dictionary: $dictionary, ')
+          ..write('idx: $idx')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(headword, dictionary, idx);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.SearchableDictionaryEntry &&
+          other.headword == this.headword &&
+          other.dictionary == this.dictionary &&
+          other.idx == this.idx);
+}
+
+class SearchableDictionaryEntriesCompanion
+    extends i0.UpdateCompanion<i1.SearchableDictionaryEntry> {
+  final i0.Value<String?> headword;
+  final i0.Value<String?> dictionary;
+  final i0.Value<String?> idx;
+  final i0.Value<int> rowid;
+  const SearchableDictionaryEntriesCompanion({
+    this.headword = const i0.Value.absent(),
+    this.dictionary = const i0.Value.absent(),
+    this.idx = const i0.Value.absent(),
+    this.rowid = const i0.Value.absent(),
+  });
+  SearchableDictionaryEntriesCompanion.insert({
+    this.headword = const i0.Value.absent(),
+    this.dictionary = const i0.Value.absent(),
+    this.idx = const i0.Value.absent(),
+    this.rowid = const i0.Value.absent(),
+  });
+  static i0.Insertable<i1.SearchableDictionaryEntry> custom({
+    i0.Expression<String>? headword,
+    i0.Expression<String>? dictionary,
+    i0.Expression<String>? idx,
+    i0.Expression<int>? rowid,
+  }) {
+    return i0.RawValuesInsertable({
+      if (headword != null) 'headword': headword,
+      if (dictionary != null) 'dictionary': dictionary,
+      if (idx != null) 'idx': idx,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  i1.SearchableDictionaryEntriesCompanion copyWith({
+    i0.Value<String?>? headword,
+    i0.Value<String?>? dictionary,
+    i0.Value<String?>? idx,
+    i0.Value<int>? rowid,
+  }) {
+    return i1.SearchableDictionaryEntriesCompanion(
+      headword: headword ?? this.headword,
+      dictionary: dictionary ?? this.dictionary,
+      idx: idx ?? this.idx,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    if (headword.present) {
+      map['headword'] = i0.Variable<String>(headword.value);
+    }
+    if (dictionary.present) {
+      map['dictionary'] = i0.Variable<String>(dictionary.value);
+    }
+    if (idx.present) {
+      map['idx'] = i0.Variable<String>(idx.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = i0.Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SearchableDictionaryEntriesCompanion(')
+          ..write('headword: $headword, ')
+          ..write('dictionary: $dictionary, ')
+          ..write('idx: $idx, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
 }
 
 class DictionaryResolvedLnsRef extends i0.DataClass {
@@ -4116,6 +4586,60 @@ class DictionaryDrift extends i2.ModularAccessor {
     );
   }
 
+  Future<int> fillSearchableDictionaryEntries() {
+    return customInsert(
+      'INSERT INTO SearchableDictionaryEntries (headword, dictionary, idx) SELECT RTRIM("REPLACE"("REPLACE"(lemma, \'j\', \'i\'), \'J\', \'I\'), \'0123456789\'), dictionary, idx FROM DictionaryEntries',
+      variables: [],
+      updates: {searchableDictionaryEntries},
+    );
+  }
+
+  i0.Selectable<i4.Entry> searchDictionaryEntriesWithFts({
+    required String term,
+    required String dictionary,
+  }) {
+    return customSelect(
+      'SELECT Entries.* FROM SearchableDictionaryEntries AS Search INNER JOIN "dictionary.DictionaryEntries" AS Entries ON Search.dictionary = Entries.dictionary AND Search.idx = Entries.idx WHERE Search.headword MATCH "REPLACE"("REPLACE"(?1, \'j\', \'i\'), \'J\', \'I\') AND Entries.dictionary = ?2 ORDER BY BM25(SearchableDictionaryEntries), Entries.dictionary, Entries.idx',
+      variables: [i0.Variable<String>(term), i0.Variable<String>(dictionary)],
+      readsFrom: {
+        searchableDictionaryEntries,
+        dictionaryEntries,
+        dictEntrySenses,
+      },
+    ).map(
+      (i0.QueryRow row) => i4.Entry(
+        dictionary: row.read<String>('dictionary'),
+        lemma: row.read<String>('lemma'),
+        inflection: row.readNullable<String>('inflection'),
+        partOfSpeech: row.readNullable<String>('partOfSpeech'),
+        numberOfSenses: row.read<int>('numberOfSenses'),
+      ),
+    );
+  }
+
+  i0.Selectable<i4.Entry> searchDictionaryEntriesWithLike({
+    required String term,
+    required String dictionary,
+  }) {
+    return customSelect(
+      'SELECT Entries.* FROM SearchableDictionaryEntries AS Search INNER JOIN "dictionary.DictionaryEntries" AS Entries ON Search.dictionary = Entries.dictionary AND Search.idx = Entries.idx WHERE Search.headword LIKE "REPLACE"("REPLACE"(?1, \'j\', \'i\'), \'J\', \'I\') AND Entries.dictionary = ?2 ORDER BY Entries.dictionary, Entries.idx',
+      variables: [i0.Variable<String>(term), i0.Variable<String>(dictionary)],
+      readsFrom: {
+        searchableDictionaryEntries,
+        dictionaryEntries,
+        dictEntrySenses,
+      },
+    ).map(
+      (i0.QueryRow row) => i4.Entry(
+        dictionary: row.read<String>('dictionary'),
+        lemma: row.read<String>('lemma'),
+        inflection: row.readNullable<String>('inflection'),
+        partOfSpeech: row.readNullable<String>('partOfSpeech'),
+        numberOfSenses: row.read<int>('numberOfSenses'),
+      ),
+    );
+  }
+
   i0.Selectable<i1.DictionaryResolvedLnsRef> getBasicLnsInfo(
     List<String> var1,
   ) {
@@ -4160,6 +4684,12 @@ class DictionaryDrift extends i2.ModularAccessor {
   i1.DictEntrySenseQuotes get dictEntrySenseQuotes => i2.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.DictEntrySenseQuotes>('DictEntrySenseQuotes');
+  i1.SearchableDictionaryEntries get searchableDictionaryEntries =>
+      i2.ReadDatabaseContainer(
+        attachedDatabase,
+      ).resultSet<i1.SearchableDictionaryEntries>(
+        'SearchableDictionaryEntries',
+      );
   i1.DictionaryResolvedLnsRefs get dictionaryResolvedLnsRefs =>
       i2.ReadDatabaseContainer(
         attachedDatabase,

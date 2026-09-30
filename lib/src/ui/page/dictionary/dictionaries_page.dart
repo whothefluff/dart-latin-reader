@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' as int;
 
 import '../../../component/dictionary/dictionaries_api.dart';
+import '../../../core/contains_text.dart';
 import '../../router/config.dart';
 import '../../widget/page_scaffold.dart';
+import '../../widget/search_results.dart';
 import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -23,7 +25,27 @@ class DictionariesPage extends ConsumerWidget {
       onSettingsPressed: () async {
         await const SettingsRoute(tab: SettingsTab.dictionaries).push<void>(context);
       },
-      searchSuggestionsBuilder: (context, controller) async => [],
+      searchHintText: 'Search dictionaries...',
+      searchSuggestionsBuilder: (_, controller) {
+        final text = controller.text.trim();
+        return [
+          if (text.isNotEmpty)
+            SearchResults(
+              provider: dictionariesProvider,
+              tiles: (all) => all
+                  .where((dictionary) => containsText([dictionary.name], text))
+                  .map(
+                    (dictionary) => ListTile(
+                      title: Text(dictionary.name),
+                      onTap: () async {
+                        controller.closeView(controller.text);
+                        await DictionaryEntriesRoute(dictionary.id).push<void>(context);
+                      },
+                    ),
+                  ),
+            ),
+        ];
+      },
     ),
     body: dictionariesList(ref),
   );

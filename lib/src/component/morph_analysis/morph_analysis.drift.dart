@@ -2771,6 +2771,14 @@ class MorphologyAnalyses extends i0.ViewInfo<i1.MorphologyAnalyses, i2.Analysis>
 
 class MorphAnalysisDrift extends i3.ModularAccessor {
   MorphAnalysisDrift(i0.GeneratedDatabase db) : super(db);
+  Future<int> fillSearchableMorphDetInflections() {
+    return customInsert(
+      'INSERT INTO SearchableMorphDetInflections (form, macronizedForm, item, cnt) SELECT form, macronizedForm, item, cnt FROM MorphologicalDetailInflections',
+      variables: [],
+      updates: {searchableMorphDetInflections},
+    );
+  }
+
   i0.Selectable<i4.Result> searchMorphologicalDataWithFts(String var1) {
     return customSelect(
       'SELECT Peek.*, Search.macronizedForm FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.form MATCH ?1 ORDER BY BM25(SearchableMorphDetInflections), Peek.form, Peek.item, Peek.cnt',
@@ -2905,15 +2913,15 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
       ).resultSet<i1.SearchableMorphDetInflections>(
         'SearchableMorphDetInflections',
       );
-  i1.MorphologyPeek get morphologyPeek => i3.ReadDatabaseContainer(
-    attachedDatabase,
-  ).resultSet<i1.MorphologyPeek>('morphology.Peek');
   i1.MorphologicalDetailInflections get morphologicalDetailInflections =>
       i3.ReadDatabaseContainer(
         attachedDatabase,
       ).resultSet<i1.MorphologicalDetailInflections>(
         'MorphologicalDetailInflections',
       );
+  i1.MorphologyPeek get morphologyPeek => i3.ReadDatabaseContainer(
+    attachedDatabase,
+  ).resultSet<i1.MorphologyPeek>('morphology.Peek');
   i1.MorphologicalDetails get morphologicalDetails => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.MorphologicalDetails>('MorphologicalDetails');

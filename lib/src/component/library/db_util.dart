@@ -93,6 +93,31 @@ final operations = [
     },
   ),
   (
+    id: 'WorkAbbreviations',
+    delete: (AppDb db) async {
+      await db.delete(db.workAbbreviations).go();
+    },
+    insert: (AppDb db) async {
+      final csvData = await rootBundle.loadString('${path}work_abbreviations.csv');
+      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
+      await db.batch(
+        (b) => b.insertAll(
+          db.workAbbreviations,
+          rows
+              .skip(1)
+              .map(
+                (row) => WorkAbbreviationsCompanion(
+                  workId: Value(row[0].toString()),
+                  id: Value(row[1] as int),
+                  val: Value(row[2].toString()),
+                ),
+              ),
+          mode: InsertMode.insertOrRollback,
+        ),
+      );
+    },
+  ),
+  (
     id: 'WorkContents',
     delete: (AppDb db) async {
       await db.delete(db.workContents).go();

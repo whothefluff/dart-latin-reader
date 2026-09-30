@@ -148,5 +148,147 @@ class _DictionaryEntriesProviderElement
   String get dictionary => (origin as DictionaryEntriesProvider).dictionary;
 }
 
+String _$dictionaryEntriesSearchHash() =>
+    r'e49a923aa1746aaae8bdba63e80666239ed12f1b';
+
+/// See also [dictionaryEntriesSearch].
+@ProviderFor(dictionaryEntriesSearch)
+const dictionaryEntriesSearchProvider = DictionaryEntriesSearchFamily();
+
+/// See also [dictionaryEntriesSearch].
+class DictionaryEntriesSearchFamily
+    extends Family<AsyncValue<DictionaryEntries>> {
+  /// See also [dictionaryEntriesSearch].
+  const DictionaryEntriesSearchFamily();
+
+  /// See also [dictionaryEntriesSearch].
+  DictionaryEntriesSearchProvider call(String dictionary, String headword) {
+    return DictionaryEntriesSearchProvider(dictionary, headword);
+  }
+
+  @override
+  DictionaryEntriesSearchProvider getProviderOverride(
+    covariant DictionaryEntriesSearchProvider provider,
+  ) {
+    return call(provider.dictionary, provider.headword);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'dictionaryEntriesSearchProvider';
+}
+
+/// See also [dictionaryEntriesSearch].
+class DictionaryEntriesSearchProvider
+    extends AutoDisposeFutureProvider<DictionaryEntries> {
+  /// See also [dictionaryEntriesSearch].
+  DictionaryEntriesSearchProvider(String dictionary, String headword)
+    : this._internal(
+        (ref) => dictionaryEntriesSearch(
+          ref as DictionaryEntriesSearchRef,
+          dictionary,
+          headword,
+        ),
+        from: dictionaryEntriesSearchProvider,
+        name: r'dictionaryEntriesSearchProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$dictionaryEntriesSearchHash,
+        dependencies: DictionaryEntriesSearchFamily._dependencies,
+        allTransitiveDependencies:
+            DictionaryEntriesSearchFamily._allTransitiveDependencies,
+        dictionary: dictionary,
+        headword: headword,
+      );
+
+  DictionaryEntriesSearchProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.dictionary,
+    required this.headword,
+  }) : super.internal();
+
+  final String dictionary;
+  final String headword;
+
+  @override
+  Override overrideWith(
+    FutureOr<DictionaryEntries> Function(DictionaryEntriesSearchRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: DictionaryEntriesSearchProvider._internal(
+        (ref) => create(ref as DictionaryEntriesSearchRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        dictionary: dictionary,
+        headword: headword,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<DictionaryEntries> createElement() {
+    return _DictionaryEntriesSearchProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is DictionaryEntriesSearchProvider &&
+        other.dictionary == dictionary &&
+        other.headword == headword;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, dictionary.hashCode);
+    hash = _SystemHash.combine(hash, headword.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin DictionaryEntriesSearchRef
+    on AutoDisposeFutureProviderRef<DictionaryEntries> {
+  /// The parameter `dictionary` of this provider.
+  String get dictionary;
+
+  /// The parameter `headword` of this provider.
+  String get headword;
+}
+
+class _DictionaryEntriesSearchProviderElement
+    extends AutoDisposeFutureProviderElement<DictionaryEntries>
+    with DictionaryEntriesSearchRef {
+  _DictionaryEntriesSearchProviderElement(super.provider);
+
+  @override
+  String get dictionary =>
+      (origin as DictionaryEntriesSearchProvider).dictionary;
+  @override
+  String get headword => (origin as DictionaryEntriesSearchProvider).headword;
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

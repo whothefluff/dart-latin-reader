@@ -135,6 +135,19 @@ final operations = [
     },
   ),
   (
+    id: 'SearchableDictionaryEntries',
+    delete: (AppDb db) async {
+      await db.delete(db.searchableDictionaryEntries).go();
+    },
+    insert: (AppDb db) async {
+      await db.dictionaryDrift.fillSearchableDictionaryEntries();
+      await db.customInsert('''
+        INSERT INTO SearchableDictionaryEntries( SearchableDictionaryEntries )
+          VALUES('optimize')
+        ''');
+    },
+  ),
+  (
     id: 'LnsRefResolutions',
     delete: (AppDb db) async {
       await db.delete(db.lnsRefResolutions).go();

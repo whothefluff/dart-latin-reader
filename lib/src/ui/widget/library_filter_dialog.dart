@@ -36,17 +36,13 @@ class _LibraryFilterDialogState extends State<LibraryFilterDialog> {
 
   @override
   Widget build(context) {
-    final q = _query.trim().toLowerCase();
+    final q = _query.trim();
     final authors = q.isEmpty
         ? widget.catalog.authors
-        : widget.catalog.authors.where(
-            (a) =>
-                a.name.toLowerCase().contains(q) ||
-                a.works.any((w) => w.name.toLowerCase().contains(q)),
-          );
+        : widget.catalog.authors.where((a) => a.matches(q) || a.works.any((w) => w.matches(q)));
     final anonymous = q.isEmpty
         ? widget.catalog.anonymousWorks
-        : widget.catalog.anonymousWorks.where((w) => w.name.toLowerCase().contains(q));
+        : widget.catalog.anonymousWorks.where((w) => w.matches(q));
     return Dialog(
       child: SizedBox(
         width: 420,
@@ -108,11 +104,11 @@ class _LibraryFilterDialogState extends State<LibraryFilterDialog> {
 
   /// Works shown under [author] for [query].
   ///
-  /// An author-name match returns all his works, otherwise only matching works
+  /// An author match returns all his works, otherwise only matching works
   List<CatalogWork> _visibleWorks(CatalogAuthor author, String query) =>
-      query.isEmpty || author.name.toLowerCase().contains(query)
+      query.isEmpty || author.matches(query)
       ? author.works
-      : author.works.where((w) => w.name.toLowerCase().contains(query)).toList();
+      : author.works.where((w) => w.matches(query)).toList();
 
   //
 }
