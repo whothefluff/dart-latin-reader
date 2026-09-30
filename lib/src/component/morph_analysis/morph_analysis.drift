@@ -69,6 +69,14 @@ CREATE VIRTUAL TABLE SearchableMorphDetInflections USING fts5(
     tokenize = "trigram remove_diacritics 0 case_sensitive 0"
 );
 
+fillSearchableMorphDetInflections:
+    INSERT INTO SearchableMorphDetInflections( form, macronizedForm, item, cnt )
+        SELECT form,
+               macronizedForm,
+               item,
+               cnt
+            FROM MorphologicalDetailInflections;
+
 CREATE VIEW "morphology.Peek" AS
     WITH InflectionData AS ( SELECT Infl.form,
                                     IIF( Infl.verbForm IS NULL, Infl.partOfSpeech, NULL ) AS partOfSpeech,

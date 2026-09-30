@@ -69,6 +69,8 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   );
   late final i3.DictionaryDictionaryEntries dictionaryDictionaryEntries =
       i3.DictionaryDictionaryEntries(this);
+  late final i3.SearchableDictionaryEntries searchableDictionaryEntries =
+      i3.SearchableDictionaryEntries(this);
   late final i4.Authors authors = i4.Authors(this);
   late final i4.AuthorAbbreviations authorAbbreviations =
       i4.AuthorAbbreviations(this);
@@ -159,6 +161,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
     dictionaryDictionaries,
     dictionaryLewisAndShortDictionary,
     dictionaryDictionaryEntries,
+    searchableDictionaryEntries,
     authors,
     authorAbbreviations,
     workAbbreviations,
@@ -236,6 +239,11 @@ class $AppDbManager {
       i3.$DictEntrySensesTableManager(_db, _db.dictEntrySenses);
   i3.$DictEntrySenseQuotesTableManager get dictEntrySenseQuotes =>
       i3.$DictEntrySenseQuotesTableManager(_db, _db.dictEntrySenseQuotes);
+  i3.$SearchableDictionaryEntriesTableManager get searchableDictionaryEntries =>
+      i3.$SearchableDictionaryEntriesTableManager(
+        _db,
+        _db.searchableDictionaryEntries,
+      );
   i4.$AuthorsTableManager get authors =>
       i4.$AuthorsTableManager(_db, _db.authors);
   i4.$AuthorAbbreviationsTableManager get authorAbbreviations =>

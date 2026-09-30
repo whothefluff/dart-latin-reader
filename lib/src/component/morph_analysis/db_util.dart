@@ -84,27 +84,7 @@ final operations = [
       await db.delete(db.searchableMorphDetInflections).go();
     },
     insert: (AppDb db) async {
-      final inflTab = db.morphologicalDetailInflections;
-      final allInflections = db.selectOnly(inflTab)
-        ..addColumns([
-          inflTab.form,
-          inflTab.item,
-          inflTab.cnt,
-          inflTab.macronizedForm,
-        ]);
-      final searchTab = db.searchableMorphDetInflections;
-      await db
-          .into(searchTab)
-          .insertFromSelect(
-            allInflections,
-            columns: {
-              searchTab.form: inflTab.form,
-              searchTab.item: inflTab.item,
-              searchTab.cnt: inflTab.cnt,
-              searchTab.macronizedForm: inflTab.macronizedForm,
-            },
-            mode: InsertMode.insertOrRollback,
-          );
+      await db.morphAnalysisDrift.fillSearchableMorphDetInflections();
       await db.customInsert('''
         INSERT INTO SearchableMorphDetInflections( SearchableMorphDetInflections )
           VALUES('optimize')

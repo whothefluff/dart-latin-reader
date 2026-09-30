@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
+import '../../core/search_term.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 
@@ -24,6 +25,19 @@ Future<DictionaryEntries> dictionaryEntries(Ref ref, String dictionary) async {
   return GetEntriesUseCase(repo, dictionary).invoke();
 }
 
+@riverpod
+Future<DictionaryEntries> dictionaryEntriesSearch(
+  Ref ref,
+  String dictionary,
+  String headword,
+) async {
+  log.info(() => '@riverpod - using $headword in $dictionary');
+  ref.cacheFor(const Duration(minutes: 2));
+  final db = await ref.watch(dbProvider.future);
+  final repo = DictionaryRepository(db);
+  return SearchEntriesUseCase(repo, dictionary, headword).invoke();
+}
+
 class DictionaryRepository implements IDictionaryRepository {
   DictionaryRepository(
     this._db,
@@ -38,6 +52,16 @@ class DictionaryRepository implements IDictionaryRepository {
     return DictionaryEntries(dbData);
   }
 
+  @override
+  Future<DictionaryEntries> getEntriesMatching(String dictionary, SearchTerm term) async {
+    log.fine(() => 'reading entries of "$dictionary" whose headword matches ${term.query} from db');
+    final drift = _db.dictionaryDrift;
+    final query = term.useLike
+        ? drift.searchDictionaryEntriesWithLike(term: term.query, dictionary: dictionary)
+        : drift.searchDictionaryEntriesWithFts(term: term.query, dictionary: dictionary);
+    return DictionaryEntries(await query.get());
+  }
+
   //
 }
 
@@ -46,6 +70,8 @@ class DictionaryRepository implements IDictionaryRepository {
 abstract interface class IDictionaryRepository {
   //
   Future<DictionaryEntries> getEntriesOf(String dictionary);
+
+  Future<DictionaryEntries> getEntriesMatching(String dictionary, SearchTerm term);
   //
 }
 
@@ -63,9 +89,38 @@ class GetEntriesUseCase implements IGetEntriesUseCase {
   //
 }
 
+class SearchEntriesUseCase implements ISearchEntriesUseCase {
+  SearchEntriesUseCase(
+    this._repository,
+    this._dictionary,
+    this._headword,
+  );
+
+  final IDictionaryRepository _repository;
+  final String _dictionary;
+  final String _headword;
+
+  @override
+  Future<DictionaryEntries> invoke() async {
+    // headwords are written without macrons
+    final term = SearchTerm(_headword).withoutMacrons;
+    return term.isEmpty
+        ? DictionaryEntries(const [])
+        : await _repository.getEntriesMatching(_dictionary, term);
+  }
+
+  //
+}
+
 //domain
 
 abstract interface class IGetEntriesUseCase {
+  //
+  Future<DictionaryEntries> invoke();
+  //
+}
+
+abstract interface class ISearchEntriesUseCase {
   //
   Future<DictionaryEntries> invoke();
   //

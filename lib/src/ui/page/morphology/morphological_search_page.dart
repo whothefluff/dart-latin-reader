@@ -9,7 +9,7 @@ import '../../router/config.dart';
 import '../../widget/keyboard_closing_search_bar.dart';
 import '../../widget/lemma_text.dart';
 import '../../widget/page_scaffold.dart';
-import '../../widget/show_error.dart';
+import '../../widget/search_results.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
 import 'common.dart';
 
@@ -81,47 +81,31 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                       onPressed: () => const MorphologicalSearchRoute().go(context),
                     ),
                 ],
-                suggestionsBuilder: (context, controller) async {
-                  final searchTerm = controller.text.trim();
-                  final provider = enrichedMorphologicalSearchProvider(searchTerm);
-                  late final List<Widget> suggestions;
-                  try {
-                    final results = await ref.read(provider.future);
-                    final groupedRes = results.groupListsBy(consolidatedForm());
-                    suggestions = [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const ClampingScrollPhysics(),
-                        itemCount: groupedRes.length,
-                        itemBuilder: (context, index) {
-                          final result = groupedRes.keys.toList()[index];
-                          final details = [
-                            result.pos,
-                            result.add,
-                          ].where((e) => e != null).join(' • ');
-                          return ListTile(
-                            title: Text.rich(
-                              TextSpan(
-                                text: '${result.title} ',
-                                children: [
-                                  TextSpan(text: lemmaText(result.dictRef), style: dictRefStyle),
-                                ],
-                              ),
-                            ),
-                            subtitle: Text(details),
-                            onTap: () => _handleResultSelected(
-                              EnrichedResults(groupedRes[result]!),
-                            ),
-                          );
-                        },
-                      ),
-                    ];
-                  } on Exception catch (e, stack) {
-                    log.catching(e);
-                    suggestions = [showError(ref, provider)(e, stack)];
-                  }
-                  return suggestions;
-                },
+                viewBuilder: searchResultsView,
+                suggestionsBuilder: (_, controller) => [
+                  SearchResults(
+                    provider: enrichedMorphologicalSearchProvider(controller.text.trim()),
+                    tiles: (found) => found.groupListsBy(consolidatedForm()).entries.map((group) {
+                      final result = group.key;
+                      final details = [
+                        result.pos,
+                        result.add,
+                      ].where((e) => e != null).join(' • ');
+                      return ListTile(
+                        title: Text.rich(
+                          TextSpan(
+                            text: '${result.title} ',
+                            children: [
+                              TextSpan(text: lemmaText(result.dictRef), style: dictRefStyle),
+                            ],
+                          ),
+                        ),
+                        subtitle: Text(details),
+                        onTap: () => _handleResultSelected(EnrichedResults(group.value)),
+                      );
+                    }),
+                  ),
+                ],
               ),
             ),
           ],

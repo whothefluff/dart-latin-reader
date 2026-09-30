@@ -8,8 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
+import '../../core/contains_text.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'abbreviations.dart';
 import 'library.drift.dart';
 
 part 'authors_api.g.dart';
@@ -86,13 +88,34 @@ class Author {
     required this.about,
     required this.image,
     required this.numberOfWorks,
+    this.abbreviations = const [],
   });
+
+  Author.fromSql({
+    required String id,
+    required String name,
+    required String about,
+    required Uint8List image,
+    required int numberOfWorks,
+    required String? abbreviations,
+  }) : this(
+         id: id,
+         name: name,
+         about: about,
+         image: image,
+         numberOfWorks: numberOfWorks,
+         abbreviations: abbreviationsOf(abbreviations),
+       );
 
   final String id;
   final String name;
   final String about;
   final Uint8List image;
   final int numberOfWorks;
+  final List<String> abbreviations;
+
+  /// Whether [text] is part of the name or of an abbreviation, whatever the case
+  bool matches(String text) => containsText([name, ...abbreviations], text);
 
   @override
   String toString() => 'Author{name: $name}';

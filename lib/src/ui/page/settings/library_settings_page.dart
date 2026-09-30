@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../component/settings/reader_settings_api.dart';
 import '../../../component/word_frequency/lookup_frequency_api.dart' show FrequencyScope;
 import '../../../core/bundled_fonts.dart';
+import '../../../core/contains_text.dart';
 import '../../../core/latin_ext_fonts.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/responsive_coordinate_grid.dart';
@@ -389,7 +390,7 @@ class _FontPickerState extends State<_FontPicker> {
       } else if (query.length < _minQueryLength) {
         results = [];
       } else {
-        results = _safeLatinExtFonts.where((font) => font.toLowerCase().contains(query)).toList();
+        results = _safeLatinExtFonts.where((font) => containsText([font], query)).toList();
       }
       return [_buildListView(results, query, controller)];
     },

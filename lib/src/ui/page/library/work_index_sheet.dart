@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_index_api.dart';
+import '../../../core/contains_text.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -156,9 +157,6 @@ class _WorkIndexTree extends StatefulWidget {
 class _WorkIndexTreeState extends State<_WorkIndexTree> {
   //
   static const _listPadding = 8.0;
-  static const _macronized = 'āēīōūȳ';
-  static const _plain = 'aeiouy';
-  static final _macronPattern = RegExp('[$_macronized]');
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   late final WorkIndexEntry? _current = widget.index.currentAt(widget.currentIndex);
@@ -363,13 +361,12 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
 
   // References intentionally do not participate in search or tree structure.
   Iterable<WorkIndexEntry> get _matches => widget.index.entries.where(
-    (entry) =>
-        _normalize(entry.label).contains(_query) || _normalize(_typeLabel(entry)).contains(_query),
+    (entry) => containsText([entry.label, _typeLabel(entry)], _query),
   );
 
   void _search(String text) {
     setState(() {
-      _query = _normalize(text.trim());
+      _query = text.trim();
     });
     _scrollToTop();
   }
@@ -432,10 +429,5 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
     SubdivisionType.paragraph => 'Paragraph ${entry.cnt + 1}',
     SubdivisionType.title => 'Title',
   };
-
-  static String _normalize(String value) => value.toLowerCase().replaceAllMapped(
-    _macronPattern,
-    (match) => _plain[_macronized.indexOf(match[0]!)],
-  );
   //
 }

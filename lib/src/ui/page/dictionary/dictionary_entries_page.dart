@@ -7,6 +7,7 @@ import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
 import '../../widget/lemma_text.dart';
 import '../../widget/page_scaffold.dart';
+import '../../widget/search_results.dart';
 import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
@@ -38,9 +39,27 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
       onSettingsPressed: () async {
         await const SettingsRoute(tab: SettingsTab.dictionaries).push<void>(context);
       },
-      searchSuggestionsBuilder: (context, controller) async => [],
+      searchHintText: 'Search entries (e.g., amo, am*, "do")...',
+      searchSuggestionsBuilder: (_, controller) => [
+        SearchResults(
+          provider: dictionaryEntriesSearchProvider(widget.dictionary, controller.text.trim()),
+          tiles: (entries) => entries.map((entry) => _foundEntry(controller, entry)),
+        ),
+      ],
     ),
     body: entriesList(ref, context),
+  );
+
+  ListTile _foundEntry(SearchController controller, Entry entry) => ListTile(
+    title: _entryTitle(
+      entry,
+      Theme.of(context).listTileTheme.titleTextStyle,
+      subtitleTextStyle(context),
+    ),
+    onTap: () async {
+      controller.closeView(controller.text);
+      await DictionaryEntryRoute(entry.dictionary, entry.lemma).push<void>(context);
+    },
   );
 
   Widget entriesList(WidgetRef ref, BuildContext context) => ref
@@ -128,7 +147,7 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
         itemCount: widget.data.length,
         prototypeItem: ListTile(
           key: widget.prototypeKey,
-          title: tileTitle(widget.data.first, titleStyle, subtitleStyle),
+          title: _entryTitle(widget.data.first, titleStyle, subtitleStyle),
         ),
         addAutomaticKeepAlives: false,
         itemBuilder: (context, index) => tile(context, index, titleStyle, subtitleStyle),
@@ -136,33 +155,35 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
     );
   }
 
-  Text tileTitle(Entry entry, TextStyle? titleStyle, TextStyle subtitleStyle) => Text.rich(
-    TextSpan(
-      children: [
-        TextSpan(
-          text: lemmaText(entry.lemma),
-          style: titleStyle,
-        ),
-        const TextSpan(text: ' '),
-        TextSpan(
-          text: entry.inflection,
-          style: subtitleStyle,
-        ),
-      ],
-    ),
-  );
-
   ListTile tile(BuildContext context, int index, TextStyle? titleStyle, TextStyle subtitleStyle) {
     final entry = widget.data[index];
     return ListTile(
-      title: tileTitle(entry, titleStyle, subtitleStyle),
+      title: _entryTitle(entry, titleStyle, subtitleStyle),
       onTap: () async {
         await DictionaryEntryRoute(widget.dictId, entry.lemma).push<void>(context);
       },
     );
   }
+
   //
 }
+
+/// The lemma followed by its inflection
+Text _entryTitle(Entry entry, TextStyle? titleStyle, TextStyle subtitleStyle) => Text.rich(
+  TextSpan(
+    children: [
+      TextSpan(
+        text: lemmaText(entry.lemma),
+        style: titleStyle,
+      ),
+      const TextSpan(text: ' '),
+      TextSpan(
+        text: entry.inflection,
+        style: subtitleStyle,
+      ),
+    ],
+  ),
+);
 
 class AlphabetNavigation extends ConsumerStatefulWidget {
   const AlphabetNavigation({

@@ -99,16 +99,13 @@ getLewisAndShortDictionary WITH Dictionary: SELECT * FROM "dictionary.LewisAndSh
 
 CREATE VIEW "dictionary.DictionaryEntries" AS
     SELECT DictionaryEntries.*,
-           COALESCE( SenseCounts.numberOfSenses, 0 ) AS numberOfSenses
+           COALESCE( ( SELECT COUNT( * )  -- COALESCE is only for Drift's nullability analysis
+                           FROM DictEntrySenses
+                           WHERE DictEntrySenses.dictionary = DictionaryEntries.dictionary
+                                 AND DictEntrySenses.lemma = DictionaryEntries.lemma
+                                 AND DictEntrySenses.lvl BETWEEN '000' AND '999' ),
+                     0 ) AS numberOfSenses
         FROM DictionaryEntries
-        LEFT OUTER JOIN ( SELECT dictionary, 
-                                 lemma,
-                                 COUNT(*) AS numberOfSenses 
-                              FROM DictEntrySenses 
-                              WHERE lvl BETWEEN '000' AND '999'
-                              GROUP BY dictionary, lemma ) AS SenseCounts
-            ON DictionaryEntries.dictionary = SenseCounts.dictionary
-               AND DictionaryEntries.lemma = SenseCounts.lemma
         ORDER BY DictionaryEntries.dictionary, DictionaryEntries.idx;
 
 getDictionaryEntries WITH Entry: SELECT * FROM "dictionary.DictionaryEntries" WHERE dictionary = ?;
@@ -129,29 +126,43 @@ getDictionaryEntrySenses WITH EntrySense: SELECT prettyLevel,
                                               WHERE dictionary = ? AND lemma = ?
                                               ORDER BY dictionary, lemma, lvl;
 
--- CREATE VIRTUAL TABLE SearchableDictionaryEntries USING fts5(
---     lemma,
---     dictionary UNINDEXED
--- );
+-- headword is the lemma without its homograph number and with i instead of j: 
+-- L&S writes 'jam', the texts 'iam'
+CREATE VIRTUAL TABLE SearchableDictionaryEntries USING fts5(
+    headword,
+    dictionary UNINDEXED,
+    idx UNINDEXED,
+    tokenize = "trigram remove_diacritics 0 case_sensitive 0"
+);
 
--- INSERT INTO SearchableDictionaryEntries 
---     SELECT lemma, 
---            dictionary 
---         FROM DictionaryEntries;
+fillSearchableDictionaryEntries:
+    INSERT INTO SearchableDictionaryEntries( headword, dictionary, idx )
+        SELECT RTRIM( "REPLACE"( "REPLACE"( lemma, 'j', 'i' ), 'J', 'I' ), '0123456789' ),
+               dictionary,
+               idx
+            FROM DictionaryEntries;
 
--- INSERT INTO SearchableDictionaryEntries( SearchableDictionaryEntries ) 
---     VALUES('optimize');
+searchDictionaryEntriesWithFts(:term AS TEXT) WITH Entry:
+    SELECT Entries.*
+        FROM SearchableDictionaryEntries AS Search
+        INNER JOIN "dictionary.DictionaryEntries" AS Entries
+            ON Search.dictionary = Entries.dictionary
+               AND Search.idx = Entries.idx
+        --the typed text also gets i instead of j, to match headword
+        WHERE Search.headword MATCH "REPLACE"( "REPLACE"( :term, 'j', 'i' ), 'J', 'I' )
+              AND Entries.dictionary = :dictionary
+        ORDER BY BM25( SearchableDictionaryEntries ), Entries.dictionary, Entries.idx;
 
--- searchEntries: SELECT dictionary, lemma FROM SearchableDictionaryEntries(?);
-
--- searchDictionaryEntries:
---     SELECT DictionaryEntries.dictionary, 
---            DictionaryEntries.lemma
---         FROM SearchableDictionaryEntries(?)
---         INNER JOIN DictionaryEntries 
---             ON SearchableDictionaryEntries.lemma = DictionaryEntries.lemma 
---                AND SearchableDictionaryEntries.dictionary = DictionaryEntries.dictionary
---                AND DictionaryEntries.dictionary = ?;
+searchDictionaryEntriesWithLike(:term AS TEXT) WITH Entry:
+    SELECT Entries.*
+        FROM SearchableDictionaryEntries AS Search
+        INNER JOIN "dictionary.DictionaryEntries" AS Entries
+            ON Search.dictionary = Entries.dictionary
+               AND Search.idx = Entries.idx
+        -- the typed text also gets i instead of j, to match headword
+        WHERE Search.headword LIKE "REPLACE"( "REPLACE"( :term, 'j', 'i' ), 'J', 'I' )
+              AND Entries.dictionary = :dictionary
+        ORDER BY Entries.dictionary, Entries.idx;
 
 CREATE VIEW "dictionary.ResolvedLnsRefs" AS
     SELECT LnsRefResolutions.dictionaryRef,

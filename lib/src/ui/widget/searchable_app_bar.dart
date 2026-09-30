@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'keyboard_closing_search_bar.dart';
+import 'search_results.dart';
 
 class SearchableAppBar extends AppBar {
   SearchableAppBar({
     super.key,
     this.onFilterPressed,
+    this.searchHintText,
     required this.searchSuggestionsBuilder,
     required this.onSortPressed,
     required this.onSettingsPressed,
@@ -19,7 +21,11 @@ class SearchableAppBar extends AppBar {
          title: Row(
            children: [
              Expanded(
-               child: KeyboardClosingSearchBar(suggestionsBuilder: searchSuggestionsBuilder),
+               child: KeyboardClosingSearchBar(
+                 barHintText: searchHintText,
+                 viewBuilder: searchResultsView,
+                 suggestionsBuilder: searchSuggestionsBuilder,
+               ),
              ),
            ],
          ),
@@ -32,8 +38,10 @@ class SearchableAppBar extends AppBar {
        );
 
   final VoidCallback? onFilterPressed;
+  final String? searchHintText;
   final VoidCallback onSortPressed;
   final VoidCallback onSettingsPressed;
+
   final FutureOr<Iterable<Widget>> Function(BuildContext, SearchController)
   searchSuggestionsBuilder;
   //
