@@ -56,7 +56,7 @@ class AuthorDetailsPage extends ConsumerWidget {
             ],
           ),
           onTap: () async {
-            await WorkDetailsRoute(work.id).push<void>(context);
+            await AuthorWorkDetailsRoute(authorDetails.id, work.id).push<void>(context);
           },
         ),
       );

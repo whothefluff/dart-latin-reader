@@ -11,6 +11,7 @@ class SearchableAppBar extends AppBar {
     required this.searchSuggestionsBuilder,
     required this.onSortPressed,
     required this.onSettingsPressed,
+    List<Widget> extraActions = const [],
   }) : super(
          leading: onFilterPressed != null
              ? IconButton(icon: const Icon(Icons.filter_list), onPressed: onFilterPressed)
@@ -23,6 +24,7 @@ class SearchableAppBar extends AppBar {
            ],
          ),
          actions: [
+           ...extraActions,
            IconButton(icon: const Icon(Icons.sort), onPressed: onSortPressed),
            const VerticalDivider(),
            IconButton(icon: const Icon(Icons.settings), onPressed: onSettingsPressed),

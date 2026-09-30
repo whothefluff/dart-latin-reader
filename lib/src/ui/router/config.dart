@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../component/concordance/concordance_query.dart';
 import '../../component/morph_analysis/morphological_details_api.dart';
+import '../../component/settings/library_settings_api.dart';
 import '../page/concordance/concordance_page.dart';
 import '../page/dictionary/dictionaries_page.dart';
 import '../page/dictionary/dictionary_entries_page.dart';
@@ -11,6 +13,7 @@ import '../page/library/author_details_page.dart';
 import '../page/library/authors_page.dart';
 import '../page/library/text_page.dart';
 import '../page/library/work_details_page.dart';
+import '../page/library/works_page.dart';
 import '../page/morphology/morphological_data_page.dart';
 import '../page/morphology/morphological_search_page.dart';
 import '../page/settings/settings_shell_page.dart';
@@ -90,20 +93,22 @@ class SettingsRoute extends GoRouteData with _$SettingsRoute {
   branches: <TypedStatefulShellBranch>[
     TypedStatefulShellBranch<LibraryBranch>(
       routes: <TypedRoute<RouteData>>[
-        TypedGoRoute<LibraryRoute>(
-          path: '/library',
+        //not nested under /library: go_router puts a nested route's parent page under it
+        TypedGoRoute<LibraryRoute>(path: '/library'),
+        TypedGoRoute<AuthorsRoute>(
+          path: '/library/authors',
           routes: [
-            TypedGoRoute<AuthorsRoute>(
-              path: 'authors',
-              routes: [TypedGoRoute<AuthorDetailsRoute>(path: ':authorId')],
+            TypedGoRoute<AuthorDetailsRoute>(
+              path: ':authorId',
+              routes: [TypedGoRoute<AuthorWorkDetailsRoute>(path: 'works/:workId')],
             ),
-            TypedGoRoute<WorksRoute>(
-              path: 'works',
-              routes: [TypedGoRoute<WorkDetailsRoute>(path: ':workId')],
-            ),
-            TypedGoRoute<ReaderRoute>(path: 'reader/:workId'),
           ],
         ),
+        TypedGoRoute<WorksRoute>(
+          path: '/library/works',
+          routes: [TypedGoRoute<WorkDetailsRoute>(path: ':workId')],
+        ),
+        TypedGoRoute<ReaderRoute>(path: '/library/reader/:workId'),
       ],
     ),
     TypedStatefulShellBranch<DictionariesBranch>(
@@ -168,17 +173,29 @@ class ConcordanceBranch extends StatefulShellBranchData {
   const ConcordanceBranch();
 }
 
+/// Redirects to the authors or works list, whichever the user chose last.
+///
+/// It has no page
 class LibraryRoute extends GoRouteData with _$LibraryRoute {
   const LibraryRoute();
 
-  /// overriding redirect doesn't do shit to avoid the exception
   @override
-  Widget build(context, state) => const AuthorsRoute().build(context, state);
+  Future<String?> redirect(context, state) async {
+    final settings = await ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(librarySettingsNotifierProvider.future);
+    return libraryListRoute(settings.view).location;
+  }
 
-  @override
-  String? redirect(context, state) => state.fullPath == '/library' ? '/library/authors' : null;
   //
 }
+
+/// The route to the authors list or the works list, depending on [view]
+GoRouteData libraryListRoute(LibraryView view) => switch (view) {
+  LibraryView.authors => const AuthorsRoute(),
+  LibraryView.works => const WorksRoute(),
+};
 
 class AuthorsRoute extends GoRouteData with _$AuthorsRoute {
   const AuthorsRoute();
@@ -200,14 +217,30 @@ class AuthorDetailsRoute extends GoRouteData with _$AuthorDetailsRoute {
   //
 }
 
+/// Work details opened from the author details page
+class AuthorWorkDetailsRoute extends GoRouteData with _$AuthorWorkDetailsRoute {
+  const AuthorWorkDetailsRoute(
+    this.authorId,
+    this.workId,
+  );
+
+  final String authorId;
+  final String workId;
+
+  @override
+  Widget build(context, state) => WorkDetailsPage(workId, underAuthor: authorId);
+  //
+}
+
 class WorksRoute extends GoRouteData with _$WorksRoute {
   const WorksRoute();
 
   @override
-  Widget build(context, state) => const Icon(Icons.error);
+  Widget build(context, state) => const WorksPage();
   //
 }
 
+/// Work details opened from anywhere except the author details page.
 class WorkDetailsRoute extends GoRouteData with _$WorkDetailsRoute {
   const WorkDetailsRoute(
     this.workId,

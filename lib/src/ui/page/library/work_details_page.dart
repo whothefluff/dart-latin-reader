@@ -12,9 +12,13 @@ class WorkDetailsPage extends ConsumerWidget {
   const WorkDetailsPage(
     this.workId, {
     super.key,
+    this.underAuthor,
   });
 
   final String workId;
+
+  /// The author's ID, **if** this page was opened from that author's details page
+  final String? underAuthor;
 
   @override
   Widget build(context, ref) {
@@ -35,6 +39,7 @@ class WorkDetailsPage extends ConsumerWidget {
               numberOfWords: workDetails.numberOfWords,
               authorId: workDetails.authorId,
               authorName: workDetails.authorName,
+              underAuthor: underAuthor,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -68,6 +73,7 @@ class BookThingy extends StatelessWidget {
     required this.numberOfWords,
     required this.authorId,
     required this.authorName,
+    required this.underAuthor,
   });
 
   final String id;
@@ -75,6 +81,7 @@ class BookThingy extends StatelessWidget {
   final int numberOfWords;
   final String? authorId;
   final String? authorName;
+  final String? underAuthor;
   static const boxConstraints = BoxConstraints(maxWidth: 200, maxHeight: 400);
 
   @override
@@ -95,6 +102,7 @@ class BookThingy extends StatelessWidget {
           workId: id,
           authorId: authorId,
           numberOfWords: numberOfWords,
+          underAuthor: underAuthor,
         ),
       ),
     );
@@ -182,11 +190,16 @@ class Details extends StatelessWidget {
     required this.workId,
     required this.authorId,
     required this.numberOfWords,
+    required this.underAuthor,
   });
 
   final String workId;
   final String? authorId;
   final int numberOfWords;
+
+  /// If this is the work's author, 'Go to author' goes back to their page
+  /// instead of opening a new one
+  final String? underAuthor;
 
   @override
   Widget build(context) => ConstrainedBox(
@@ -219,12 +232,18 @@ class Details extends StatelessWidget {
     child: const Text('Read'),
   );
 
-  TextButton? _toAuthorButton(BuildContext context) => authorId != null
-      ? TextButton(
-          // TODO(whothefluff): push('/author/id'), if prev stack is different author
-          onPressed: () => context.pop(),
-          child: const Text('Go to author'),
-        )
-      : null;
+  TextButton? _toAuthorButton(BuildContext context) => switch (authorId) {
+    final authorId? => TextButton(
+      onPressed: () async {
+        if (authorId == underAuthor) {
+          context.pop();
+        } else {
+          await AuthorDetailsRoute(authorId).push<void>(context);
+        }
+      },
+      child: const Text('Go to author'),
+    ),
+    null => null,
+  };
   //
 }

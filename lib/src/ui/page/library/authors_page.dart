@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/library/authors_api.dart';
+import '../../../component/settings/library_settings_api.dart';
 import '../../router/config.dart';
 import '../../widget/page_scaffold.dart';
-import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
+import 'common.dart';
 
 class AuthorsPage extends ConsumerWidget {
   const AuthorsPage({
@@ -15,15 +16,7 @@ class AuthorsPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) => SafeBodyScaffold(
-    // TODO(whothefluff): add fts5 encompasing Authors.name, AuthorAbbreviations.val, Works.name, WorkAbbreviations.val
-    appBar: SearchableAppBar(
-      onFilterPressed: () {},
-      onSortPressed: () {},
-      onSettingsPressed: () async {
-        await const SettingsRoute().push<void>(context);
-      },
-      searchSuggestionsBuilder: (context, controller) async => [],
-    ),
+    appBar: libraryListAppBar(context, ref, shown: LibraryView.authors),
     body: authorsGrid(ref),
   );
 
