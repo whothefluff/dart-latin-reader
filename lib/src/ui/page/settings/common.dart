@@ -131,3 +131,63 @@ class SettingsGroup extends StatelessWidget {
   );
   //
 }
+
+/// Title, subtitle and [chips].
+/// The chips wrap on narrow screens.
+class ChipChoice extends StatelessWidget {
+  const ChipChoice({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.chips,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<ChoiceChip> chips;
+
+  @override
+  Widget build(context) {
+    final theme = Theme.of(context);
+    return Padding(
+      // ListTile's start padding, so the text lines up with the switch's title above
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: theme.textTheme.bodyLarge),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: chips,
+          ),
+        ],
+      ),
+    );
+  }
+
+  //
+}
+
+/// One chip per value, with [current] selected
+List<ChoiceChip> choiceChips<T>({
+  required List<T> values,
+  required T current,
+  required String Function(T value) label,
+  required ValueChanged<T> onChanged,
+}) => values
+    .map(
+      (value) => ChoiceChip(
+        label: Text(label(value)),
+        selected: value == current,
+        onSelected: (_) => onChanged(value),
+      ),
+    )
+    .toList();

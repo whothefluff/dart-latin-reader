@@ -3,13 +3,15 @@
 import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/component/library/library.drift.dart' as i1;
 import 'dart:typed_data' as i2;
-import 'package:latin_reader/src/component/library/subdivision_type.dart' as i3;
-import 'package:drift/internal/modular.dart' as i4;
-import 'package:latin_reader/src/component/library/authors_api.dart' as i5;
-import 'package:latin_reader/src/component/library/work_details_api.dart' as i6;
+import 'package:latin_reader/src/component/library/proper_noun_state.dart'
+    as i3;
+import 'package:latin_reader/src/component/library/subdivision_type.dart' as i4;
+import 'package:drift/internal/modular.dart' as i5;
+import 'package:latin_reader/src/component/library/authors_api.dart' as i6;
+import 'package:latin_reader/src/component/library/work_details_api.dart' as i7;
 import 'package:latin_reader/src/component/library/work_contents_api.dart'
-    as i7;
-import 'package:latin_reader/src/component/library/work_index_api.dart' as i8;
+    as i8;
+import 'package:latin_reader/src/component/library/work_index_api.dart' as i9;
 
 typedef $AuthorsCreateCompanionBuilder =
     i1.AuthorsCompanion Function({
@@ -665,7 +667,7 @@ typedef $WorkContentsCreateCompanionBuilder =
       required int idx,
       required String word,
       required String sourceReference,
-      i0.Value<int?> properNounState,
+      i0.Value<i3.ProperNounState?> properNounState,
       required int tokenType,
       required int sentenceIdx,
       i0.Value<int?> wordIdx,
@@ -681,7 +683,7 @@ typedef $WorkContentsUpdateCompanionBuilder =
       i0.Value<int> idx,
       i0.Value<String> word,
       i0.Value<String> sourceReference,
-      i0.Value<int?> properNounState,
+      i0.Value<i3.ProperNounState?> properNounState,
       i0.Value<int> tokenType,
       i0.Value<int> sentenceIdx,
       i0.Value<int?> wordIdx,
@@ -721,9 +723,14 @@ class $WorkContentsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<int> get properNounState => $composableBuilder(
+  i0.ColumnWithTypeConverterFilters<
+    i3.ProperNounState?,
+    i3.ProperNounState,
+    int
+  >
+  get properNounState => $composableBuilder(
     column: $table.properNounState,
-    builder: (column) => i0.ColumnFilters(column),
+    builder: (column) => i0.ColumnWithTypeConverterFilters(column),
   );
 
   i0.ColumnFilters<int> get tokenType => $composableBuilder(
@@ -975,7 +982,8 @@ class $WorkContentsAnnotationComposer
     builder: (column) => column,
   );
 
-  i0.GeneratedColumn<int> get properNounState => $composableBuilder(
+  i0.GeneratedColumnWithTypeConverter<i3.ProperNounState?, int>
+  get properNounState => $composableBuilder(
     column: $table.properNounState,
     builder: (column) => column,
   );
@@ -1103,7 +1111,8 @@ class $WorkContentsTableManager
                 i0.Value<int> idx = const i0.Value.absent(),
                 i0.Value<String> word = const i0.Value.absent(),
                 i0.Value<String> sourceReference = const i0.Value.absent(),
-                i0.Value<int?> properNounState = const i0.Value.absent(),
+                i0.Value<i3.ProperNounState?> properNounState =
+                    const i0.Value.absent(),
                 i0.Value<int> tokenType = const i0.Value.absent(),
                 i0.Value<int> sentenceIdx = const i0.Value.absent(),
                 i0.Value<int?> wordIdx = const i0.Value.absent(),
@@ -1133,7 +1142,8 @@ class $WorkContentsTableManager
                 required int idx,
                 required String word,
                 required String sourceReference,
-                i0.Value<int?> properNounState = const i0.Value.absent(),
+                i0.Value<i3.ProperNounState?> properNounState =
+                    const i0.Value.absent(),
                 required int tokenType,
                 required int sentenceIdx,
                 i0.Value<int?> wordIdx = const i0.Value.absent(),
@@ -1190,7 +1200,7 @@ typedef $WorkContentSubdivisionsCreateCompanionBuilder =
     i1.WorkContentSubdivisionsCompanion Function({
       required String workId,
       required String node,
-      required i3.SubdivisionType typ,
+      required i4.SubdivisionType typ,
       required int cnt,
       required String name,
       i0.Value<String?> parent,
@@ -1201,7 +1211,7 @@ typedef $WorkContentSubdivisionsUpdateCompanionBuilder =
     i1.WorkContentSubdivisionsCompanion Function({
       i0.Value<String> workId,
       i0.Value<String> node,
-      i0.Value<i3.SubdivisionType> typ,
+      i0.Value<i4.SubdivisionType> typ,
       i0.Value<int> cnt,
       i0.Value<String> name,
       i0.Value<String?> parent,
@@ -1229,8 +1239,8 @@ class $WorkContentSubdivisionsFilterComposer
   );
 
   i0.ColumnWithTypeConverterFilters<
-    i3.SubdivisionType,
-    i3.SubdivisionType,
+    i4.SubdivisionType,
+    i4.SubdivisionType,
     String
   >
   get typ => $composableBuilder(
@@ -1329,7 +1339,7 @@ class $WorkContentSubdivisionsAnnotationComposer
   i0.GeneratedColumn<String> get node =>
       $composableBuilder(column: $table.node, builder: (column) => column);
 
-  i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String> get typ =>
+  i0.GeneratedColumnWithTypeConverter<i4.SubdivisionType, String> get typ =>
       $composableBuilder(column: $table.typ, builder: (column) => column);
 
   i0.GeneratedColumn<int> get cnt =>
@@ -1390,7 +1400,7 @@ class $WorkContentSubdivisionsTableManager
               ({
                 i0.Value<String> workId = const i0.Value.absent(),
                 i0.Value<String> node = const i0.Value.absent(),
-                i0.Value<i3.SubdivisionType> typ = const i0.Value.absent(),
+                i0.Value<i4.SubdivisionType> typ = const i0.Value.absent(),
                 i0.Value<int> cnt = const i0.Value.absent(),
                 i0.Value<String> name = const i0.Value.absent(),
                 i0.Value<String?> parent = const i0.Value.absent(),
@@ -1410,7 +1420,7 @@ class $WorkContentSubdivisionsTableManager
               ({
                 required String workId,
                 required String node,
-                required i3.SubdivisionType typ,
+                required i4.SubdivisionType typ,
                 required int cnt,
                 required String name,
                 i0.Value<String?> parent = const i0.Value.absent(),
@@ -3311,16 +3321,18 @@ class WorkContents extends i0.Table
         $customConstraints:
             'NOT NULL CHECK (LENGTH(TRIM(sourceReference)) > 0)',
       );
-  static const i0.VerificationMeta _properNounStateMeta =
-      const i0.VerificationMeta('properNounState');
-  late final i0.GeneratedColumn<int> properNounState = i0.GeneratedColumn<int>(
-    'properNounState',
-    aliasedName,
-    true,
-    type: i0.DriftSqlType.int,
-    requiredDuringInsert: false,
-    $customConstraints: 'CHECK (properNounState IN (0, 1, 2))',
-  );
+  late final i0.GeneratedColumnWithTypeConverter<i3.ProperNounState?, int>
+  properNounState =
+      i0.GeneratedColumn<int>(
+        'properNounState',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.int,
+        requiredDuringInsert: false,
+        $customConstraints: 'CHECK (properNounState IN (0, 1, 2))',
+      ).withConverter<i3.ProperNounState?>(
+        i1.WorkContents.$converterproperNounStaten,
+      );
   static const i0.VerificationMeta _tokenTypeMeta = const i0.VerificationMeta(
     'tokenType',
   );
@@ -3682,15 +3694,6 @@ class WorkContents extends i0.Table
     } else if (isInserting) {
       context.missing(_sourceReferenceMeta);
     }
-    if (data.containsKey('properNounState')) {
-      context.handle(
-        _properNounStateMeta,
-        properNounState.isAcceptableOrUnknown(
-          data['properNounState']!,
-          _properNounStateMeta,
-        ),
-      );
-    }
     if (data.containsKey('tokenType')) {
       context.handle(
         _tokenTypeMeta,
@@ -3874,9 +3877,11 @@ class WorkContents extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}sourceReference'],
       )!,
-      properNounState: attachedDatabase.typeMapping.read(
-        i0.DriftSqlType.int,
-        data['${effectivePrefix}properNounState'],
+      properNounState: i1.WorkContents.$converterproperNounStaten.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.int,
+          data['${effectivePrefix}properNounState'],
+        ),
       ),
       tokenType: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
@@ -3962,6 +3967,12 @@ class WorkContents extends i0.Table
     return WorkContents(attachedDatabase, alias);
   }
 
+  static i0.TypeConverter<i3.ProperNounState, int> $converterproperNounState =
+      const i3.ProperNounStateConverter();
+  static i0.TypeConverter<i3.ProperNounState?, int?>
+  $converterproperNounStaten = i0.NullAwareTypeConverter.wrap(
+    $converterproperNounState,
+  );
   @override
   bool get withoutRowId => true;
   @override
@@ -3987,7 +3998,7 @@ class WorkContent extends i0.DataClass
   final int idx;
   final String word;
   final String sourceReference;
-  final int? properNounState;
+  final i3.ProperNounState? properNounState;
 
   ///NULL = unknown, 0 = no, 1 = yes, 2 = either/both
   final int tokenType;
@@ -4054,7 +4065,9 @@ class WorkContent extends i0.DataClass
     map['word'] = i0.Variable<String>(word);
     map['sourceReference'] = i0.Variable<String>(sourceReference);
     if (!nullToAbsent || properNounState != null) {
-      map['properNounState'] = i0.Variable<int>(properNounState);
+      map['properNounState'] = i0.Variable<int>(
+        i1.WorkContents.$converterproperNounStaten.toSql(properNounState),
+      );
     }
     map['tokenType'] = i0.Variable<int>(tokenType);
     map['sentenceIdx'] = i0.Variable<int>(sentenceIdx);
@@ -4109,7 +4122,9 @@ class WorkContent extends i0.DataClass
       idx: serializer.fromJson<int>(json['idx']),
       word: serializer.fromJson<String>(json['word']),
       sourceReference: serializer.fromJson<String>(json['sourceReference']),
-      properNounState: serializer.fromJson<int?>(json['properNounState']),
+      properNounState: serializer.fromJson<i3.ProperNounState?>(
+        json['properNounState'],
+      ),
       tokenType: serializer.fromJson<int>(json['tokenType']),
       sentenceIdx: serializer.fromJson<int>(json['sentenceIdx']),
       wordIdx: serializer.fromJson<int?>(json['wordIdx']),
@@ -4147,7 +4162,9 @@ class WorkContent extends i0.DataClass
       'idx': serializer.toJson<int>(idx),
       'word': serializer.toJson<String>(word),
       'sourceReference': serializer.toJson<String>(sourceReference),
-      'properNounState': serializer.toJson<int?>(properNounState),
+      'properNounState': serializer.toJson<i3.ProperNounState?>(
+        properNounState,
+      ),
       'tokenType': serializer.toJson<int>(tokenType),
       'sentenceIdx': serializer.toJson<int>(sentenceIdx),
       'wordIdx': serializer.toJson<int?>(wordIdx),
@@ -4177,7 +4194,7 @@ class WorkContent extends i0.DataClass
     int? idx,
     String? word,
     String? sourceReference,
-    i0.Value<int?> properNounState = const i0.Value.absent(),
+    i0.Value<i3.ProperNounState?> properNounState = const i0.Value.absent(),
     int? tokenType,
     int? sentenceIdx,
     i0.Value<int?> wordIdx = const i0.Value.absent(),
@@ -4332,7 +4349,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
   final i0.Value<int> idx;
   final i0.Value<String> word;
   final i0.Value<String> sourceReference;
-  final i0.Value<int?> properNounState;
+  final i0.Value<i3.ProperNounState?> properNounState;
   final i0.Value<int> tokenType;
   final i0.Value<int> sentenceIdx;
   final i0.Value<int?> wordIdx;
@@ -4415,7 +4432,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     i0.Value<int>? idx,
     i0.Value<String>? word,
     i0.Value<String>? sourceReference,
-    i0.Value<int?>? properNounState,
+    i0.Value<i3.ProperNounState?>? properNounState,
     i0.Value<int>? tokenType,
     i0.Value<int>? sentenceIdx,
     i0.Value<int?>? wordIdx,
@@ -4458,7 +4475,9 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
       map['sourceReference'] = i0.Variable<String>(sourceReference.value);
     }
     if (properNounState.present) {
-      map['properNounState'] = i0.Variable<int>(properNounState.value);
+      map['properNounState'] = i0.Variable<int>(
+        i1.WorkContents.$converterproperNounStaten.toSql(properNounState.value),
+      );
     }
     if (tokenType.present) {
       map['tokenType'] = i0.Variable<int>(tokenType.value);
@@ -4554,7 +4573,7 @@ class WorkContentSubdivisions extends i0.Table
     $customConstraints:
         'NOT NULL CHECK (node LIKE \'________-____-____-____-____________\')',
   );
-  late final i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String>
+  late final i0.GeneratedColumnWithTypeConverter<i4.SubdivisionType, String>
   typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
@@ -4563,7 +4582,7 @@ class WorkContentSubdivisions extends i0.Table
     requiredDuringInsert: true,
     $customConstraints:
         'NOT NULL CHECK (typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'TITL\', \'PARA\'))',
-  ).withConverter<i3.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
+  ).withConverter<i4.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   static const i0.VerificationMeta _cntMeta = const i0.VerificationMeta('cnt');
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
     'cnt',
@@ -4749,8 +4768,8 @@ class WorkContentSubdivisions extends i0.Table
     return WorkContentSubdivisions(attachedDatabase, alias);
   }
 
-  static i0.TypeConverter<i3.SubdivisionType, String> $convertertyp =
-      const i3.SubdivisionTypeConverter();
+  static i0.TypeConverter<i4.SubdivisionType, String> $convertertyp =
+      const i4.SubdivisionTypeConverter();
   @override
   bool get withoutRowId => true;
   @override
@@ -4773,7 +4792,7 @@ class WorkContentSubdivision extends i0.DataClass
     implements i0.Insertable<i1.WorkContentSubdivision> {
   final String workId;
   final String node;
-  final i3.SubdivisionType typ;
+  final i4.SubdivisionType typ;
   final int cnt;
   final String name;
   final String? parent;
@@ -4832,7 +4851,7 @@ class WorkContentSubdivision extends i0.DataClass
     return WorkContentSubdivision(
       workId: serializer.fromJson<String>(json['workId']),
       node: serializer.fromJson<String>(json['node']),
-      typ: serializer.fromJson<i3.SubdivisionType>(json['typ']),
+      typ: serializer.fromJson<i4.SubdivisionType>(json['typ']),
       cnt: serializer.fromJson<int>(json['cnt']),
       name: serializer.fromJson<String>(json['name']),
       parent: serializer.fromJson<String?>(json['parent']),
@@ -4846,7 +4865,7 @@ class WorkContentSubdivision extends i0.DataClass
     return <String, dynamic>{
       'workId': serializer.toJson<String>(workId),
       'node': serializer.toJson<String>(node),
-      'typ': serializer.toJson<i3.SubdivisionType>(typ),
+      'typ': serializer.toJson<i4.SubdivisionType>(typ),
       'cnt': serializer.toJson<int>(cnt),
       'name': serializer.toJson<String>(name),
       'parent': serializer.toJson<String?>(parent),
@@ -4858,7 +4877,7 @@ class WorkContentSubdivision extends i0.DataClass
   i1.WorkContentSubdivision copyWith({
     String? workId,
     String? node,
-    i3.SubdivisionType? typ,
+    i4.SubdivisionType? typ,
     int? cnt,
     String? name,
     i0.Value<String?> parent = const i0.Value.absent(),
@@ -4925,7 +4944,7 @@ class WorkContentSubdivisionsCompanion
     extends i0.UpdateCompanion<i1.WorkContentSubdivision> {
   final i0.Value<String> workId;
   final i0.Value<String> node;
-  final i0.Value<i3.SubdivisionType> typ;
+  final i0.Value<i4.SubdivisionType> typ;
   final i0.Value<int> cnt;
   final i0.Value<String> name;
   final i0.Value<String?> parent;
@@ -4944,7 +4963,7 @@ class WorkContentSubdivisionsCompanion
   WorkContentSubdivisionsCompanion.insert({
     required String workId,
     required String node,
-    required i3.SubdivisionType typ,
+    required i4.SubdivisionType typ,
     required int cnt,
     required String name,
     this.parent = const i0.Value.absent(),
@@ -4982,7 +5001,7 @@ class WorkContentSubdivisionsCompanion
   i1.WorkContentSubdivisionsCompanion copyWith({
     i0.Value<String>? workId,
     i0.Value<String>? node,
-    i0.Value<i3.SubdivisionType>? typ,
+    i0.Value<i4.SubdivisionType>? typ,
     i0.Value<int>? cnt,
     i0.Value<String>? name,
     i0.Value<String?>? parent,
@@ -6437,7 +6456,7 @@ class LibraryStagingResolvedMacronizations
 class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
   final String workId;
   final String node;
-  final i3.SubdivisionType typ;
+  final i4.SubdivisionType typ;
   final int cnt;
   final String name;
   final String? parent;
@@ -6463,7 +6482,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     return LibraryWorkContentSubdivisionsHierarchyData(
       workId: serializer.fromJson<String>(json['workId']),
       node: serializer.fromJson<String>(json['node']),
-      typ: serializer.fromJson<i3.SubdivisionType>(json['typ']),
+      typ: serializer.fromJson<i4.SubdivisionType>(json['typ']),
       cnt: serializer.fromJson<int>(json['cnt']),
       name: serializer.fromJson<String>(json['name']),
       parent: serializer.fromJson<String?>(json['parent']),
@@ -6478,7 +6497,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     return <String, dynamic>{
       'workId': serializer.toJson<String>(workId),
       'node': serializer.toJson<String>(node),
-      'typ': serializer.toJson<i3.SubdivisionType>(typ),
+      'typ': serializer.toJson<i4.SubdivisionType>(typ),
       'cnt': serializer.toJson<int>(cnt),
       'name': serializer.toJson<String>(name),
       'parent': serializer.toJson<String?>(parent),
@@ -6491,7 +6510,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
   i1.LibraryWorkContentSubdivisionsHierarchyData copyWith({
     String? workId,
     String? node,
-    i3.SubdivisionType? typ,
+    i4.SubdivisionType? typ,
     int? cnt,
     String? name,
     i0.Value<String?> parent = const i0.Value.absent(),
@@ -6646,13 +6665,13 @@ class LibraryWorkContentSubdivisionsHierarchy
     false,
     type: i0.DriftSqlType.string,
   );
-  late final i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String>
+  late final i0.GeneratedColumnWithTypeConverter<i4.SubdivisionType, String>
   typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  ).withConverter<i3.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
+  ).withConverter<i4.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
     'cnt',
     aliasedName,
@@ -7327,8 +7346,10 @@ class LibraryWorkContent extends i0.DataClass {
   final String word;
   final String macronizedWord;
   final int uncertaintyBitMask;
-  final i3.SubdivisionType typ;
+  final i4.SubdivisionType typ;
   final int depth;
+  final String? lookupForm;
+  final i3.ProperNounState? properNounState;
   final String sourceReference;
   const LibraryWorkContent({
     required this.workId,
@@ -7340,6 +7361,8 @@ class LibraryWorkContent extends i0.DataClass {
     required this.uncertaintyBitMask,
     required this.typ,
     required this.depth,
+    this.lookupForm,
+    this.properNounState,
     required this.sourceReference,
   });
   factory LibraryWorkContent.fromJson(
@@ -7355,8 +7378,12 @@ class LibraryWorkContent extends i0.DataClass {
       word: serializer.fromJson<String>(json['word']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
       uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
-      typ: serializer.fromJson<i3.SubdivisionType>(json['typ']),
+      typ: serializer.fromJson<i4.SubdivisionType>(json['typ']),
       depth: serializer.fromJson<int>(json['depth']),
+      lookupForm: serializer.fromJson<String?>(json['lookupForm']),
+      properNounState: serializer.fromJson<i3.ProperNounState?>(
+        json['properNounState'],
+      ),
       sourceReference: serializer.fromJson<String>(json['sourceReference']),
     );
   }
@@ -7371,8 +7398,12 @@ class LibraryWorkContent extends i0.DataClass {
       'word': serializer.toJson<String>(word),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
       'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
-      'typ': serializer.toJson<i3.SubdivisionType>(typ),
+      'typ': serializer.toJson<i4.SubdivisionType>(typ),
       'depth': serializer.toJson<int>(depth),
+      'lookupForm': serializer.toJson<String?>(lookupForm),
+      'properNounState': serializer.toJson<i3.ProperNounState?>(
+        properNounState,
+      ),
       'sourceReference': serializer.toJson<String>(sourceReference),
     };
   }
@@ -7385,8 +7416,10 @@ class LibraryWorkContent extends i0.DataClass {
     String? word,
     String? macronizedWord,
     int? uncertaintyBitMask,
-    i3.SubdivisionType? typ,
+    i4.SubdivisionType? typ,
     int? depth,
+    i0.Value<String?> lookupForm = const i0.Value.absent(),
+    i0.Value<i3.ProperNounState?> properNounState = const i0.Value.absent(),
     String? sourceReference,
   }) => i1.LibraryWorkContent(
     workId: workId ?? this.workId,
@@ -7398,6 +7431,10 @@ class LibraryWorkContent extends i0.DataClass {
     uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     typ: typ ?? this.typ,
     depth: depth ?? this.depth,
+    lookupForm: lookupForm.present ? lookupForm.value : this.lookupForm,
+    properNounState: properNounState.present
+        ? properNounState.value
+        : this.properNounState,
     sourceReference: sourceReference ?? this.sourceReference,
   );
   @override
@@ -7412,6 +7449,8 @@ class LibraryWorkContent extends i0.DataClass {
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
           ..write('typ: $typ, ')
           ..write('depth: $depth, ')
+          ..write('lookupForm: $lookupForm, ')
+          ..write('properNounState: $properNounState, ')
           ..write('sourceReference: $sourceReference')
           ..write(')'))
         .toString();
@@ -7428,6 +7467,8 @@ class LibraryWorkContent extends i0.DataClass {
     uncertaintyBitMask,
     typ,
     depth,
+    lookupForm,
+    properNounState,
     sourceReference,
   );
   @override
@@ -7443,6 +7484,8 @@ class LibraryWorkContent extends i0.DataClass {
           other.uncertaintyBitMask == this.uncertaintyBitMask &&
           other.typ == this.typ &&
           other.depth == this.depth &&
+          other.lookupForm == this.lookupForm &&
+          other.properNounState == this.properNounState &&
           other.sourceReference == this.sourceReference);
 }
 
@@ -7464,6 +7507,8 @@ class LibraryWorkContents
     uncertaintyBitMask,
     typ,
     depth,
+    lookupForm,
+    properNounState,
     sourceReference,
   ];
   @override
@@ -7473,7 +7518,7 @@ class LibraryWorkContents
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.properNounState, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, lookupForm, properNounState, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
   };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -7519,6 +7564,16 @@ class LibraryWorkContents
         i0.DriftSqlType.int,
         data['${effectivePrefix}depth'],
       )!,
+      lookupForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}lookupForm'],
+      ),
+      properNounState: i1.WorkContents.$converterproperNounStaten.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.int,
+          data['${effectivePrefix}properNounState'],
+        ),
+      ),
       sourceReference: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}sourceReference'],
@@ -7570,19 +7625,35 @@ class LibraryWorkContents
         false,
         type: i0.DriftSqlType.int,
       );
-  late final i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String>
+  late final i0.GeneratedColumnWithTypeConverter<i4.SubdivisionType, String>
   typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  ).withConverter<i3.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
+  ).withConverter<i4.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   late final i0.GeneratedColumn<int> depth = i0.GeneratedColumn<int>(
     'depth',
     aliasedName,
     false,
     type: i0.DriftSqlType.int,
   );
+  late final i0.GeneratedColumn<String> lookupForm = i0.GeneratedColumn<String>(
+    'lookupForm',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumnWithTypeConverter<i3.ProperNounState?, int>
+  properNounState =
+      i0.GeneratedColumn<int>(
+        'properNounState',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.int,
+      ).withConverter<i3.ProperNounState?>(
+        i1.WorkContents.$converterproperNounStaten,
+      );
   late final i0.GeneratedColumn<String> sourceReference =
       i0.GeneratedColumn<String>(
         'sourceReference',
@@ -7737,7 +7808,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   final String? parent;
   final String node;
   final int depth;
-  final i3.SubdivisionType typ;
+  final i4.SubdivisionType typ;
   final int cnt;
   final int fromIndex;
   final int toIndex;
@@ -7767,7 +7838,7 @@ class LibraryWorkIndexe extends i0.DataClass {
       parent: serializer.fromJson<String?>(json['parent']),
       node: serializer.fromJson<String>(json['node']),
       depth: serializer.fromJson<int>(json['depth']),
-      typ: serializer.fromJson<i3.SubdivisionType>(json['typ']),
+      typ: serializer.fromJson<i4.SubdivisionType>(json['typ']),
       cnt: serializer.fromJson<int>(json['cnt']),
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
@@ -7784,7 +7855,7 @@ class LibraryWorkIndexe extends i0.DataClass {
       'parent': serializer.toJson<String?>(parent),
       'node': serializer.toJson<String>(node),
       'depth': serializer.toJson<int>(depth),
-      'typ': serializer.toJson<i3.SubdivisionType>(typ),
+      'typ': serializer.toJson<i4.SubdivisionType>(typ),
       'cnt': serializer.toJson<int>(cnt),
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
@@ -7799,7 +7870,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     i0.Value<String?> parent = const i0.Value.absent(),
     String? node,
     int? depth,
-    i3.SubdivisionType? typ,
+    i4.SubdivisionType? typ,
     int? cnt,
     int? fromIndex,
     int? toIndex,
@@ -7977,13 +8048,13 @@ class LibraryWorkIndexes
     false,
     type: i0.DriftSqlType.int,
   );
-  late final i0.GeneratedColumnWithTypeConverter<i3.SubdivisionType, String>
+  late final i0.GeneratedColumnWithTypeConverter<i4.SubdivisionType, String>
   typ = i0.GeneratedColumn<String>(
     'typ',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  ).withConverter<i3.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
+  ).withConverter<i4.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
     'cnt',
     aliasedName,
@@ -8187,15 +8258,15 @@ class LibraryCatalog
   Set<String> get readTables => const {'Works', 'AuthorsAndWorks', 'Authors'};
 }
 
-class LibraryDrift extends i4.ModularAccessor {
+class LibraryDrift extends i5.ModularAccessor {
   LibraryDrift(i0.GeneratedDatabase db) : super(db);
-  i0.Selectable<i5.Author> getLibraryAuthors() {
+  i0.Selectable<i6.Author> getLibraryAuthors() {
     return customSelect(
       'SELECT * FROM "library.Authors"',
       variables: [],
       readsFrom: {authorsAndWorks, authors},
     ).map(
-      (i0.QueryRow row) => i5.Author(
+      (i0.QueryRow row) => i6.Author(
         id: row.read<String>('id'),
         name: row.read<String>('name'),
         about: row.read<String>('about'),
@@ -8213,13 +8284,13 @@ class LibraryDrift extends i4.ModularAccessor {
     ).asyncMap(libraryAuthorDetails.mapFromRow);
   }
 
-  i0.Selectable<i6.WorkDetails> getLibraryWorkDetails(String var1) {
+  i0.Selectable<i7.WorkDetails> getLibraryWorkDetails(String var1) {
     return customSelect(
       'SELECT * FROM "library.WorkDetails" WHERE id = ?1',
       variables: [i0.Variable<String>(var1)],
       readsFrom: {works, workContents, authorsAndWorks, authors},
     ).map(
-      (i0.QueryRow row) => i6.WorkDetails(
+      (i0.QueryRow row) => i7.WorkDetails(
         id: row.read<String>('id'),
         name: row.read<String>('name'),
         about: row.read<String>('about'),
@@ -8231,7 +8302,7 @@ class LibraryDrift extends i4.ModularAccessor {
     );
   }
 
-  i0.Selectable<i7.WorkContentsSegment> getLibraryWorkContentsPartial(
+  i0.Selectable<i8.WorkContentsSegment> getLibraryWorkContentsPartial(
     String var1,
     int var2,
     int var3,
@@ -8245,7 +8316,7 @@ class LibraryDrift extends i4.ModularAccessor {
       ],
       readsFrom: {workContents, workContentSubdivisions},
     ).map(
-      (i0.QueryRow row) => i7.WorkContentsSegment(
+      (i0.QueryRow row) => i8.WorkContentsSegment(
         workId: row.read<String>('workId'),
         parent: row.readNullable<String>('parent'),
         node: row.read<String>('node'),
@@ -8257,6 +8328,11 @@ class LibraryDrift extends i4.ModularAccessor {
           row.read<String>('typ'),
         ),
         depth: row.read<int>('depth'),
+        lookupForm: row.readNullable<String>('lookupForm'),
+        properNounState: i0.NullAwareTypeConverter.wrapFromSql(
+          i1.WorkContents.$converterproperNounState,
+          row.readNullable<int>('properNounState'),
+        ),
         sourceReference: row.read<String>('sourceReference'),
       ),
     );
@@ -8273,13 +8349,13 @@ class LibraryDrift extends i4.ModularAccessor {
     ).map((i0.QueryRow row) => row.read<int>('startIdx'));
   }
 
-  i0.Selectable<i8.WorkIndexEntry> getLibraryWorkIndexes(String var1) {
+  i0.Selectable<i9.WorkIndexEntry> getLibraryWorkIndexes(String var1) {
     return customSelect(
       'SELECT * FROM "library.WorkIndexes" WHERE workId = ?1',
       variables: [i0.Variable<String>(var1)],
       readsFrom: {workContentSubdivisions, workContents},
     ).map(
-      (i0.QueryRow row) => i8.WorkIndexEntry(
+      (i0.QueryRow row) => i9.WorkIndexEntry(
         workId: row.read<String>('workId'),
         node: row.read<String>('node'),
         parent: row.readNullable<String>('parent'),
@@ -8305,40 +8381,40 @@ class LibraryDrift extends i4.ModularAccessor {
     ).asyncMap(libraryCatalog.mapFromRow);
   }
 
-  i1.LibraryAuthors get libraryAuthors => i4.ReadDatabaseContainer(
+  i1.LibraryAuthors get libraryAuthors => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthors>('library.Authors');
-  i1.AuthorsAndWorks get authorsAndWorks => i4.ReadDatabaseContainer(
+  i1.AuthorsAndWorks get authorsAndWorks => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.AuthorsAndWorks>('AuthorsAndWorks');
-  i1.Authors get authors => i4.ReadDatabaseContainer(
+  i1.Authors get authors => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.Authors>('Authors');
-  i1.LibraryAuthorDetails get libraryAuthorDetails => i4.ReadDatabaseContainer(
+  i1.LibraryAuthorDetails get libraryAuthorDetails => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryAuthorDetails>('library.AuthorDetails');
   i1.Works get works =>
-      i4.ReadDatabaseContainer(attachedDatabase).resultSet<i1.Works>('Works');
-  i1.WorkContents get workContents => i4.ReadDatabaseContainer(
+      i5.ReadDatabaseContainer(attachedDatabase).resultSet<i1.Works>('Works');
+  i1.WorkContents get workContents => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.WorkContents>('WorkContents');
-  i1.LibraryWorkDetails get libraryWorkDetails => i4.ReadDatabaseContainer(
+  i1.LibraryWorkDetails get libraryWorkDetails => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryWorkDetails>('library.WorkDetails');
-  i1.LibraryWorkContents get libraryWorkContents => i4.ReadDatabaseContainer(
+  i1.LibraryWorkContents get libraryWorkContents => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryWorkContents>('library.WorkContents');
   i1.WorkContentSubdivisions get workContentSubdivisions =>
-      i4.ReadDatabaseContainer(
+      i5.ReadDatabaseContainer(
         attachedDatabase,
       ).resultSet<i1.WorkContentSubdivisions>('WorkContentSubdivisions');
-  i1.LibraryReadingStarts get libraryReadingStarts => i4.ReadDatabaseContainer(
+  i1.LibraryReadingStarts get libraryReadingStarts => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryReadingStarts>('library.ReadingStarts');
-  i1.LibraryWorkIndexes get libraryWorkIndexes => i4.ReadDatabaseContainer(
+  i1.LibraryWorkIndexes get libraryWorkIndexes => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryWorkIndexes>('library.WorkIndexes');
-  i1.LibraryCatalog get libraryCatalog => i4.ReadDatabaseContainer(
+  i1.LibraryCatalog get libraryCatalog => i5.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.LibraryCatalog>('library.Catalog');
 }

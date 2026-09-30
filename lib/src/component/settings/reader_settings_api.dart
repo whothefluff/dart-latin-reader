@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../../external/settings.dart';
+import '../word_frequency/lookup_frequency_api.dart' show FrequencyScope;
 
 part 'reader_settings_api.g.dart';
 
@@ -18,6 +19,16 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
   static const _lineHeight = '${_prefix}lineHeight';
   static const _letterSpacing = '${_prefix}letterSpacing';
   static const _wordSpacing = '${_prefix}wordSpacing';
+  static const _markCommonWords = '${_prefix}markCommonWords';
+  static const _commonWordsPercent = '${_prefix}commonWordsPercent';
+  static const _markUncommonWords = '${_prefix}markUncommonWords';
+  static const _uncommonWordsPercent = '${_prefix}uncommonWordsPercent';
+  static const _frequencyScope = '${_prefix}frequencyScope';
+
+  /// Stored by name.
+  /// A renamed value falls back to the default.
+  static final Map<String, FrequencyScope> _frequencyScopesByName = FrequencyScope.values
+      .asNameMap();
 
   @override
   Future<ReaderSettings> build() async {
@@ -29,6 +40,11 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
     final savedLineHeight = await repo.get(_lineHeight, PrefDouble.hint);
     final savedLetterSpacing = await repo.get(_letterSpacing, PrefDouble.hint);
     final savedWordSpacing = await repo.get(_wordSpacing, PrefDouble.hint);
+    final savedMarkCommonWords = await repo.get(_markCommonWords, PrefBool.hint);
+    final savedCommonWordsPercent = await repo.get(_commonWordsPercent, PrefInt.hint);
+    final savedMarkUncommonWords = await repo.get(_markUncommonWords, PrefBool.hint);
+    final savedUncommonWordsPercent = await repo.get(_uncommonWordsPercent, PrefInt.hint);
+    final savedFrequencyScope = await repo.get(_frequencyScope, PrefString.hint);
     final settings = ReaderSettings(
       showMacrons: savedShowMacrons?.value ?? ReaderSettings._defaultShowMacrons,
       fontFamily: savedFontFamily?.value,
@@ -36,6 +52,15 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
       lineHeight: savedLineHeight?.value ?? ReaderSettings._defaultLineHeight,
       letterSpacing: savedLetterSpacing?.value ?? ReaderSettings._defaultLetterSpacing,
       wordSpacing: savedWordSpacing?.value ?? ReaderSettings._defaultWordSpacing,
+      markCommonWords: savedMarkCommonWords?.value ?? ReaderSettings._defaultMarkCommonWords,
+      commonWordsPercent:
+          savedCommonWordsPercent?.value ?? ReaderSettings._defaultCommonWordsPercent,
+      markUncommonWords: savedMarkUncommonWords?.value ?? ReaderSettings._defaultMarkUncommonWords,
+      uncommonWordsPercent:
+          savedUncommonWordsPercent?.value ?? ReaderSettings._defaultUncommonWordsPercent,
+      frequencyScope:
+          _frequencyScopesByName[savedFrequencyScope?.value] ??
+          ReaderSettings._defaultFrequencyScope,
     );
     return log.exit(r: settings)!;
   }
@@ -55,6 +80,11 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
         await repo.set(_lineHeight, PrefDouble(newSettings.lineHeight));
         await repo.set(_letterSpacing, PrefDouble(newSettings.letterSpacing));
         await repo.set(_wordSpacing, PrefDouble(newSettings.wordSpacing));
+        await repo.set(_markCommonWords, PrefBool(newSettings.markCommonWords));
+        await repo.set(_commonWordsPercent, PrefInt(newSettings.commonWordsPercent));
+        await repo.set(_markUncommonWords, PrefBool(newSettings.markUncommonWords));
+        await repo.set(_uncommonWordsPercent, PrefInt(newSettings.uncommonWordsPercent));
+        await repo.set(_frequencyScope, PrefString(newSettings.frequencyScope.name));
       } on Exception catch (e, st) {
         log
           ..catching(e, stackTrace: st)
@@ -89,15 +119,33 @@ class ReaderSettings {
     this.lineHeight = _defaultLineHeight,
     this.letterSpacing = _defaultLetterSpacing,
     this.wordSpacing = _defaultWordSpacing,
+    this.markCommonWords = _defaultMarkCommonWords,
+    this.commonWordsPercent = _defaultCommonWordsPercent,
+    this.markUncommonWords = _defaultMarkUncommonWords,
+    this.uncommonWordsPercent = _defaultUncommonWordsPercent,
+    this.frequencyScope = _defaultFrequencyScope,
   });
 
   /// The font family to use in the reader, or null to use the system default.
   final String? fontFamily;
+
+  final bool markUncommonWords;
+
+  /// The share of the text the uncommon words make up, from their rarest lemma up
+  final int uncommonWordsPercent;
+
+  /// The share of the text the common words make up, from their most frequent lemma down
+  final int commonWordsPercent;
+
+  /// The works a word is common or uncommon in
+  final FrequencyScope frequencyScope;
+
   final bool showMacrons;
   final double fontSize;
   final double lineHeight;
   final double letterSpacing;
   final double wordSpacing;
+  final bool markCommonWords;
   static const _unset = Object();
   static const bool _defaultShowMacrons = true;
   static const String? _defaultFontFamily = null;
@@ -105,6 +153,11 @@ class ReaderSettings {
   static const double _defaultLineHeight = 1.5;
   static const double _defaultLetterSpacing = 0.0;
   static const double _defaultWordSpacing = 0.0;
+  static const bool _defaultMarkCommonWords = false;
+  static const int _defaultCommonWordsPercent = 25;
+  static const bool _defaultMarkUncommonWords = true;
+  static const int _defaultUncommonWordsPercent = 5;
+  static const FrequencyScope _defaultFrequencyScope = FrequencyScope.library;
 
   /// Returns a copy with the given fields replaced.
   ///
@@ -118,6 +171,11 @@ class ReaderSettings {
     double? lineHeight,
     double? letterSpacing,
     double? wordSpacing,
+    bool? markCommonWords,
+    int? commonWordsPercent,
+    bool? markUncommonWords,
+    int? uncommonWordsPercent,
+    FrequencyScope? frequencyScope,
   }) => ReaderSettings(
     showMacrons: showMacrons ?? this.showMacrons,
     fontFamily: fontFamily == _unset ? this.fontFamily : fontFamily as String?,
@@ -125,7 +183,15 @@ class ReaderSettings {
     lineHeight: lineHeight ?? this.lineHeight,
     letterSpacing: letterSpacing ?? this.letterSpacing,
     wordSpacing: wordSpacing ?? this.wordSpacing,
+    markCommonWords: markCommonWords ?? this.markCommonWords,
+    commonWordsPercent: commonWordsPercent ?? this.commonWordsPercent,
+    markUncommonWords: markUncommonWords ?? this.markUncommonWords,
+    uncommonWordsPercent: uncommonWordsPercent ?? this.uncommonWordsPercent,
+    frequencyScope: frequencyScope ?? this.frequencyScope,
   );
+
+  /// `true` when the reader uses the words' frequencies in any way
+  bool get marksFrequencies => markCommonWords || markUncommonWords;
 
   @override
   String toString() =>
@@ -135,7 +201,12 @@ class ReaderSettings {
       'fontSize: $fontSize, '
       'lineHeight: $lineHeight, '
       'letterSpacing: $letterSpacing, '
-      'wordSpacing: $wordSpacing}';
+      'wordSpacing: $wordSpacing, '
+      'markCommonWords: $markCommonWords, '
+      'commonWordsPercent: $commonWordsPercent, '
+      'markUncommonWords: $markUncommonWords, '
+      'uncommonWordsPercent: $uncommonWordsPercent, '
+      'frequencyScope: $frequencyScope}';
 
   @override
   bool operator ==(Object other) =>
@@ -146,10 +217,26 @@ class ReaderSettings {
           other.fontSize == fontSize &&
           other.lineHeight == lineHeight &&
           other.letterSpacing == letterSpacing &&
-          other.wordSpacing == wordSpacing);
+          other.wordSpacing == wordSpacing &&
+          other.markCommonWords == markCommonWords &&
+          other.commonWordsPercent == commonWordsPercent &&
+          other.markUncommonWords == markUncommonWords &&
+          other.uncommonWordsPercent == uncommonWordsPercent &&
+          other.frequencyScope == frequencyScope);
 
   @override
-  int get hashCode =>
-      Object.hash(showMacrons, fontFamily, fontSize, lineHeight, letterSpacing, wordSpacing);
+  int get hashCode => Object.hash(
+    showMacrons,
+    fontFamily,
+    fontSize,
+    lineHeight,
+    letterSpacing,
+    wordSpacing,
+    markCommonWords,
+    commonWordsPercent,
+    markUncommonWords,
+    uncommonWordsPercent,
+    frequencyScope,
+  );
   //
 }

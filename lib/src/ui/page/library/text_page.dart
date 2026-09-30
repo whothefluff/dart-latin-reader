@@ -15,6 +15,7 @@ import '../../../component/library/work_details_api.dart';
 import '../../../component/morph_analysis/enriched_morph_search_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../../component/settings/reader_settings_api.dart';
+import '../../../component/word_frequency/lookup_frequency_api.dart';
 import '../../app.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold.dart';
@@ -138,19 +139,49 @@ class TextPageState extends ConsumerState<TextPage> {
   Widget _contents() {
     final segmentsProvider = ref.watch(workContentsProvider(widget.workId, _fromIndex, _toIndex));
     return segmentsProvider.when(
-      data: _buildResponsiveContent,
+      data: _withFrequencies,
       loading: showLoading,
       error: showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex)),
     );
   }
 
-  Widget _buildResponsiveContent(WorkContentsSegments segments) => LayoutBuilder(
+  /// Waits for the frequencies only while common or uncommon words are marked
+  Widget _withFrequencies(WorkContentsSegments segments) {
+    final (:marks, :scope) = ref.watch(
+      readerSettingsNotifierProvider.select(
+        (value) => (
+          marks: value.valueOrNull?.marksFrequencies ?? false,
+          scope: value.valueOrNull?.frequencyScope ?? const ReaderSettings().frequencyScope,
+        ),
+      ),
+    );
+    final provider = lookupFrequenciesProvider(
+      widget.workId,
+      scope,
+      LookupForms(segments.map((segment) => segment.lookupForm).nonNulls),
+    );
+    return marks
+        ? ref
+              .watch(provider)
+              .when(
+                data: (frequencies) => _buildResponsiveContent(segments, frequencies),
+                loading: showLoading,
+                error: showError(ref, provider),
+              )
+        : _buildResponsiveContent(segments, null);
+  }
+
+  Widget _buildResponsiveContent(
+    WorkContentsSegments segments,
+    LookupFrequencies? frequencies,
+  ) => LayoutBuilder(
     builder: (context, pageConstraints) {
       //keep the generation that produced these segments (so stale callbacks can be ignored)
       final generation = _contentGeneration;
       return _StyledWordList(
         key: ValueKey((widget.workId, generation)), // Recreate selection state after explicit nav
         segments: segments,
+        frequencies: frequencies,
         highlights: widget.highlights,
         onNavigateNext: _loadNextPage,
         onNavigatePrevious: _loadPreviousPage,
@@ -364,6 +395,7 @@ class _TextRenderer {
     this.workSegments,
     this.readerSettings,
     this.highlights,
+    this.bands,
   );
 
   final ThemeData theme;
@@ -373,7 +405,13 @@ class _TextRenderer {
   /// Token indices to mark
   final List<int> highlights;
 
+  /// `null` unless common or uncommon words are marked
+  final FrequencyBands? bands;
+
   static const _empty = '';
+
+  /// Keeps faded text above 4.5:1 contrast on the page, in both themes
+  static const _uncommonAlpha = 0.65;
 
   /// Should be used to open every page no matter what preceded its first segment
   static const String _pageStartBreak = _lineTerminator;
@@ -452,7 +490,7 @@ class _TextRenderer {
         text: _getLineBreak(prevStyle, currStyle, prevNode, currNode),
         style: finalStyle,
         children: [
-          ..._wordSpans(segment),
+          ..._wordSpans(segment, finalStyle.color ?? theme.colorScheme.onSurface),
           TextSpan(text: _getSpace(i, segment)),
         ],
       );
@@ -468,8 +506,8 @@ class _TextRenderer {
     ];
   }
 
-  /// Letter spans for [segment], inside a marked span when it's highlighted
-  List<TextSpan> _wordSpans(WorkContentsSegment segment) {
+  /// Letter spans for [segment], colored by frequency and inside a marked span when highlighted
+  List<TextSpan> _wordSpans(WorkContentsSegment segment, Color textColor) {
     final word = readerSettings.showMacrons ? segment.macronizedWord : segment.word;
     final mask = readerSettings.showMacrons ? segment.uncertaintyBitMask : 0;
     final uncertainStyle = TextStyle(
@@ -487,14 +525,41 @@ class _TextRenderer {
               style: isUncertain ? uncertainStyle : null,
             );
           }).toList();
-    //backgrounddoes not affect pagination
+    final isHighlighted = highlights.contains(segment.idx);
+    //color and background do not affect pagination
     final highlightStyle = TextStyle(
       backgroundColor: theme.colorScheme.tertiaryContainer,
       color: theme.colorScheme.onTertiaryContainer,
     );
-    return highlights.contains(segment.idx)
-        ? [TextSpan(style: highlightStyle, children: letters)]
-        : letters;
+    final frequencyColor = _frequencyColor(
+      segment,
+      isHighlighted ? theme.colorScheme.onTertiaryContainer : textColor,
+    );
+    final colored = frequencyColor == null
+        ? letters
+        : [
+            TextSpan(
+              style: TextStyle(color: frequencyColor),
+              children: letters,
+            ),
+          ];
+    return isHighlighted ? [TextSpan(style: highlightStyle, children: colored)] : colored;
+  }
+
+  /// Primary for common words, a faded [textColor] for uncommon ones, null for the rest
+  Color? _frequencyColor(WorkContentsSegment segment, Color textColor) =>
+      switch (_bandOf(segment)) {
+        FrequencyBand.common => theme.colorScheme.primary,
+        FrequencyBand.uncommon => textColor.withValues(alpha: _uncommonAlpha),
+        null => null,
+      };
+
+  FrequencyBand? _bandOf(WorkContentsSegment segment) {
+    final lookupForm = segment.lookupForm;
+    final bands = this.bands;
+    return lookupForm == null || bands == null
+        ? null
+        : bands.bandOf(Lookup.of(lookupForm, segment.properNounState));
   }
 
   //
@@ -841,6 +906,7 @@ class _StyledWordList extends ConsumerStatefulWidget {
   const _StyledWordList({
     super.key,
     required this.segments,
+    required this.frequencies,
     required this.highlights,
     required this.onNavigateNext,
     required this.onNavigatePrevious,
@@ -850,6 +916,8 @@ class _StyledWordList extends ConsumerStatefulWidget {
     required this.geometry,
   });
 
+  /// `null` unless common or uncommon words are marked
+  final LookupFrequencies? frequencies;
   final WorkContentsSegments segments;
   final List<int> highlights;
   final VoidCallback onNavigateNext;
@@ -1130,6 +1198,12 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
       segments,
       settings,
       widget.highlights,
+      widget.frequencies?.bandsFor(
+        commonPercent: settings.commonWordsPercent,
+        uncommonPercent: settings.uncommonWordsPercent,
+        markCommon: settings.markCommonWords,
+        markUncommon: settings.markUncommonWords,
+      ),
     ).createSpans();
     final visible = _VisibleSegmentRange.build(
       allSpans,
