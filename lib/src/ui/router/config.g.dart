@@ -47,37 +47,42 @@ RouteBase get $mainRoute => StatefulShellRouteData.$route(
           path: '/library',
 
           factory: _$LibraryRoute._fromState,
+        ),
+        GoRouteData.$route(
+          path: '/library/authors',
+
+          factory: _$AuthorsRoute._fromState,
           routes: [
             GoRouteData.$route(
-              path: 'authors',
+              path: ':authorId',
 
-              factory: _$AuthorsRoute._fromState,
+              factory: _$AuthorDetailsRoute._fromState,
               routes: [
                 GoRouteData.$route(
-                  path: ':authorId',
+                  path: 'works/:workId',
 
-                  factory: _$AuthorDetailsRoute._fromState,
+                  factory: _$AuthorWorkDetailsRoute._fromState,
                 ),
               ],
-            ),
-            GoRouteData.$route(
-              path: 'works',
-
-              factory: _$WorksRoute._fromState,
-              routes: [
-                GoRouteData.$route(
-                  path: ':workId',
-
-                  factory: _$WorkDetailsRoute._fromState,
-                ),
-              ],
-            ),
-            GoRouteData.$route(
-              path: 'reader/:workId',
-
-              factory: _$ReaderRoute._fromState,
             ),
           ],
+        ),
+        GoRouteData.$route(
+          path: '/library/works',
+
+          factory: _$WorksRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: ':workId',
+
+              factory: _$WorkDetailsRoute._fromState,
+            ),
+          ],
+        ),
+        GoRouteData.$route(
+          path: '/library/reader/:workId',
+
+          factory: _$ReaderRoute._fromState,
         ),
       ],
     ),
@@ -199,6 +204,34 @@ mixin _$AuthorDetailsRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
     '/library/authors/${Uri.encodeComponent(_self.authorId)}',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin _$AuthorWorkDetailsRoute on GoRouteData {
+  static AuthorWorkDetailsRoute _fromState(GoRouterState state) =>
+      AuthorWorkDetailsRoute(
+        state.pathParameters['authorId']!,
+        state.pathParameters['workId']!,
+      );
+
+  AuthorWorkDetailsRoute get _self => this as AuthorWorkDetailsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/library/authors/${Uri.encodeComponent(_self.authorId)}/works/${Uri.encodeComponent(_self.workId)}',
   );
 
   @override
