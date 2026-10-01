@@ -30,6 +30,8 @@ void main() {
         final filter = FrequencyFilter(
           workIds: WorkIds(const []),
           pageSize: 50,
+          offset: 0,
+          ascending: false,
           groupByLemma: groupByLemma,
           showMacrons: showMacrons,
         );
