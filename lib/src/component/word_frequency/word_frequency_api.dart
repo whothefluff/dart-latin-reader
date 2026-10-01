@@ -156,10 +156,10 @@ class FrequencyFilter {
   const FrequencyFilter({
     required this.workIds,
     required this.pageSize,
-    this.offset = 0,
-    this.ascending = false,
-    this.groupByLemma = false,
-    this.showMacrons = true,
+    required this.offset,
+    required this.ascending,
+    required this.groupByLemma,
+    required this.showMacrons,
   });
 
   final WorkIds workIds;
@@ -176,8 +176,7 @@ class FrequencyFilter {
   };
 
   /// Null for form reports, whose coverage is exact.
-  CoverageBasis? get certainCoverageBasis =>
-      groupByLemma ? CoverageBasis.allCandidateLemmas : null;
+  CoverageBasis? get certainCoverageBasis => groupByLemma ? CoverageBasis.allCandidateLemmas : null;
 
   FrequencyFilter copyWith({
     WorkIds? workIds,

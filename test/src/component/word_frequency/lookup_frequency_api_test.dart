@@ -84,7 +84,12 @@ void main() {
 
   group('FrequencyBands', () {
     test('common words are the most frequent, uncommon the rarest', () {
-      final bands = _formsOfTenUnits().bandsFor(commonPercent: 50, uncommonPercent: 10);
+      final bands = _formsOfTenUnits().bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 10,
+        markCommon: true,
+        markUncommon: true,
+      );
       Lookup form(String lookupForm) => Lookup(lookupForm: lookupForm, alsoLowercase: false);
 
       expect(bands.bandOf(form('et')), FrequencyBand.common);
@@ -93,7 +98,12 @@ void main() {
     });
 
     test('common wins where the two bands overlap', () {
-      final bands = _formsOfTenUnits().bandsFor(commonPercent: 100, uncommonPercent: 100);
+      final bands = _formsOfTenUnits().bandsFor(
+        commonPercent: 100,
+        uncommonPercent: 100,
+        markCommon: true,
+        markUncommon: true,
+      );
 
       expect(
         bands.bandOf(const Lookup(lookupForm: 'sed', alsoLowercase: false)),
@@ -102,7 +112,12 @@ void main() {
     });
 
     test('a lookup with no counted candidate lemma is in neither band', () {
-      final bands = _formsOfTenUnits().bandsFor(commonPercent: 50, uncommonPercent: 30);
+      final bands = _formsOfTenUnits().bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 30,
+        markCommon: true,
+        markUncommon: true,
+      );
 
       expect(bands.bandOf(const Lookup(lookupForm: 'xyzzy', alsoLowercase: false)), isNull);
       expect(bands.bandOf(const Lookup(lookupForm: 'et', alsoLowercase: true)), isNull);
@@ -119,11 +134,17 @@ void main() {
 
     test('a band left out takes no words from the other', () {
       // at 60% and 30%, in and non fall in both bands, and common wins
-      final both = _formsOfTenUnits().bandsFor(commonPercent: 60, uncommonPercent: 30);
+      final both = _formsOfTenUnits().bandsFor(
+        commonPercent: 60,
+        uncommonPercent: 30,
+        markCommon: true,
+        markUncommon: true,
+      );
       final uncommonOnly = _formsOfTenUnits().bandsFor(
         commonPercent: 60,
         uncommonPercent: 30,
         markCommon: false,
+        markUncommon: true,
       );
       const inForm = Lookup(lookupForm: 'in', alsoLowercase: false);
 
@@ -166,11 +187,25 @@ void main() {
 
       // edit (3) is as frequent as anything in the fables, and the rarest with the letters
       expect(
-        work.bandsFor(commonPercent: 50, uncommonPercent: 20).bandOf(edit),
+        work
+            .bandsFor(
+              commonPercent: 50,
+              uncommonPercent: 20,
+              markCommon: true,
+              markUncommon: true,
+            )
+            .bandOf(edit),
         FrequencyBand.common,
       );
       expect(
-        author.bandsFor(commonPercent: 50, uncommonPercent: 20).bandOf(edit),
+        author
+            .bandsFor(
+              commonPercent: 50,
+              uncommonPercent: 20,
+              markCommon: true,
+              markUncommon: true,
+            )
+            .bandOf(edit),
         FrequencyBand.uncommon,
       );
     });
@@ -191,7 +226,12 @@ void main() {
         FrequencyScope.work,
         ['venit', 'Venere'],
       );
-      final bands = frequencies.bandsFor(commonPercent: 80, uncommonPercent: 20);
+      final bands = frequencies.bandsFor(
+        commonPercent: 80,
+        uncommonPercent: 20,
+        markCommon: true,
+        markUncommon: true,
+      );
 
       expect(bands.bandOf(const Lookup.of('Venere', ProperNounState.either)), FrequencyBand.common);
       expect(
@@ -212,7 +252,12 @@ void main() {
         FrequencyScope.work,
         ['amat', 'Xanthus'],
       );
-      final bands = frequencies.bandsFor(commonPercent: 50, uncommonPercent: 30);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 30,
+        markCommon: true,
+        markUncommon: true,
+      );
 
       expect(bands.bandOf(const Lookup.of('amat', ProperNounState.common)), FrequencyBand.common);
       expect(bands.bandOf(const Lookup.of('Xanthus', ProperNounState.proper)), isNull);

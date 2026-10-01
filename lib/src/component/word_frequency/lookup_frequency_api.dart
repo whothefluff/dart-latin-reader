@@ -212,8 +212,8 @@ class LookupFrequencies {
   FrequencyBands bandsFor({
     required int commonPercent,
     required int uncommonPercent,
-    bool markCommon = true,
-    bool markUncommon = true,
+    required bool markCommon,
+    required bool markUncommon,
   }) => FrequencyBands._(
     _counts,
     commonCutoff: markCommon ? coverage.cutoffFor(commonPercent / 100) : null,
