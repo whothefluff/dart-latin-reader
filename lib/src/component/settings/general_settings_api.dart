@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:flutter/material.dart' show ThemeMode;
+import 'package:flutter/material.dart' show Color, ThemeMode;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
@@ -17,6 +17,7 @@ part 'general_settings_api.g.dart';
 class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
   //
   static const _theme = 'app.themeMode';
+  static const _accentColor = 'app.accentColor';
   static final Map<String, ThemeMode> _themeModesByName = ThemeMode.values.asNameMap();
 
   /// Loads the User's preferred ThemeMode and other global settings
@@ -26,7 +27,11 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
     log.entry<void>();
     final repo = ref.watch(settingsRepositoryProvider);
     final savedTheme = (await repo.get(_theme, PrefString.hint))?.value;
-    final settings = GeneralSettings(themeMode: _themeModesByName[savedTheme] ?? ThemeMode.system);
+    final savedAccentColor = await repo.get(_accentColor, PrefInt.hint);
+    final settings = GeneralSettings(
+      themeMode: _themeModesByName[savedTheme] ?? ThemeMode.system,
+      accentColor: savedAccentColor != null ? Color(savedAccentColor.value) : null,
+    );
     return log.exit(r: settings)!;
   }
 
@@ -39,9 +44,9 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
       state = AsyncData(newSettings);
       // Persist (with rollback on failure)
       try {
-        await ref
-            .read(settingsRepositoryProvider)
-            .set(_theme, PrefString(newSettings.themeMode.name));
+        final repo = ref.read(settingsRepositoryProvider);
+        await repo.set(_theme, PrefString(newSettings.themeMode.name));
+        await repo.set(_accentColor, _accentColorValue(newSettings));
       } on Exception catch (e, st) {
         log
           ..catching(e, stackTrace: st)
@@ -54,6 +59,9 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
     log.exit<void>();
   }
 
+  PrefInt? _accentColorValue(GeneralSettings newSettings) =>
+      newSettings.accentColor != null ? PrefInt(newSettings.accentColor!.toARGB32()) : null;
+
   //
 }
 
@@ -64,21 +72,38 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
 class GeneralSettings {
   const GeneralSettings({
     this.themeMode = ThemeMode.system,
+    this.accentColor,
   });
 
   final ThemeMode themeMode;
 
-  GeneralSettings copyWith({ThemeMode? themeMode}) => GeneralSettings(
+  /// The color the app's color scheme is generated from, or `null` for Material's baseline scheme
+  final Color? accentColor;
+  static const _unset = Object();
+
+  /// Returns a copy with the given fields replaced.
+  ///
+  /// [accentColor] uses a sentinel default so that null can be passed explicitly
+  /// to reset the color to the baseline scheme, distinguishing it from "not
+  /// provided".
+  GeneralSettings copyWith({
+    ThemeMode? themeMode,
+    Object? accentColor = _unset,
+  }) => GeneralSettings(
     themeMode: themeMode ?? this.themeMode,
+    accentColor: accentColor == _unset ? this.accentColor : accentColor as Color?,
   );
   @override
-  String toString() => 'GeneralSettings{themeMode: $themeMode}';
+  String toString() => 'GeneralSettings{themeMode: $themeMode, accentColor: $accentColor}';
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is GeneralSettings && other.themeMode == themeMode);
+      identical(this, other) ||
+      (other is GeneralSettings &&
+          other.themeMode == themeMode &&
+          other.accentColor == accentColor);
 
   @override
-  int get hashCode => themeMode.hashCode;
+  int get hashCode => Object.hash(themeMode, accentColor);
   //
 }
