@@ -154,7 +154,8 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
   Widget build(context) {
     final catalog = ref.watch(libraryCatalogProvider).valueOrNull;
     final settings =
-        ref.watch(concordanceSettingsNotifierProvider).valueOrNull ?? const ConcordanceSettings();
+        ref.watch(concordanceSettingsNotifierProvider).valueOrNull ??
+        const ConcordanceSettings.defaults();
     final pageSize = _pageSize ?? settings.pageSize;
     final count = NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
     final query = _query;
@@ -310,7 +311,7 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
     _part = null;
     _titles = ConcordanceTitles.included;
     _sort = ConcordanceSort.textOrder;
-    _pageSize = const ConcordanceSettings().pageSize;
+    _pageSize = const ConcordanceSettings.defaults().pageSize;
   });
 
   /// Keeps a page size picked here, then searches. The size is set before

@@ -88,10 +88,17 @@ enum NarrowLemmaCoverage { anyCandidate, certain }
 @immutable
 class FrequencySettings {
   const FrequencySettings({
-    this.showSummary = _defaultShowSummary,
-    this.formTapAction = _defaultFormTapAction,
-    this.narrowLemmaCoverage = _defaultNarrowLemmaCoverage,
+    required this.showSummary,
+    required this.formTapAction,
+    required this.narrowLemmaCoverage,
   });
+
+  const FrequencySettings.defaults()
+    : this(
+        showSummary: _defaultShowSummary,
+        formTapAction: _defaultFormTapAction,
+        narrowLemmaCoverage: _defaultNarrowLemmaCoverage,
+      );
 
   /// Whether the notes between the filters and the table are shown
   final bool showSummary;

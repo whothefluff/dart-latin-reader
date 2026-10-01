@@ -29,8 +29,10 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
     final savedTheme = (await repo.get(_theme, PrefString.hint))?.value;
     final savedAccentColor = await repo.get(_accentColor, PrefInt.hint);
     final settings = GeneralSettings(
-      themeMode: _themeModesByName[savedTheme] ?? ThemeMode.system,
-      accentColor: savedAccentColor != null ? Color(savedAccentColor.value) : null,
+      themeMode: _themeModesByName[savedTheme] ?? GeneralSettings._defaultThemeMode,
+      accentColor: savedAccentColor != null
+          ? Color(savedAccentColor.value)
+          : GeneralSettings._defaultAccentColor,
     );
     return log.exit(r: settings)!;
   }
@@ -71,15 +73,23 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
 @immutable
 class GeneralSettings {
   const GeneralSettings({
-    this.themeMode = ThemeMode.system,
-    this.accentColor,
+    required this.themeMode,
+    required this.accentColor,
   });
+
+  const GeneralSettings.defaults()
+    : this(
+        themeMode: _defaultThemeMode,
+        accentColor: _defaultAccentColor,
+      );
 
   final ThemeMode themeMode;
 
   /// The color the app's color scheme is generated from, or `null` for Material's baseline scheme
   final Color? accentColor;
   static const _unset = Object();
+  static const ThemeMode _defaultThemeMode = ThemeMode.system;
+  static const Color? _defaultAccentColor = null;
 
   /// Returns a copy with the given fields replaced.
   ///

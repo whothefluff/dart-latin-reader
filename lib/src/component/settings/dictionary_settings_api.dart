@@ -53,14 +53,16 @@ class DictionarySettingsNotifier extends _$DictionarySettingsNotifier {
 //domain
 
 /// Holds the settings for the dictionary
-///
-/// All fields have defaults and can be reset to them by omitting the parameter
-/// in [copyWith].
 @immutable
 class DictionarySettings {
   const DictionarySettings({
-    this.openFirstSense = _defaultOpenFirstSense,
+    required this.openFirstSense,
   });
+
+  const DictionarySettings.defaults()
+    : this(
+        openFirstSense: _defaultOpenFirstSense,
+      );
 
   /// Whether an entry with several senses starts with the first one open
   final bool openFirstSense;

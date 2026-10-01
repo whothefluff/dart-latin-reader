@@ -53,7 +53,8 @@ class DictionaryEntryPage extends ConsumerWidget {
 
   _Senses _senses(WidgetRef ref, List<EntrySense> senses) {
     final settings =
-        ref.watch(dictionarySettingsNotifierProvider).valueOrNull ?? const DictionarySettings();
+        ref.watch(dictionarySettingsNotifierProvider).valueOrNull ??
+        const DictionarySettings.defaults();
     return _Senses(
       _groupSenses(senses),
       // The settings can load after the senses, and a new value has to start them over

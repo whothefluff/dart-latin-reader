@@ -304,7 +304,7 @@ class _HitList extends ConsumerWidget {
     final catalog = ref.watch(libraryCatalogProvider).valueOrNull;
     final labels = catalog == null ? const <String, String>{} : workLabels(catalog);
     final showMacrons =
-        (ref.watch(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings())
+        (ref.watch(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings.defaults())
             .showMacrons;
     final count = NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
     final wide = Breakpoints.mediumAndUp.isActive(context);

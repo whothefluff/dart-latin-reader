@@ -80,7 +80,8 @@ class _WordFrequencyBody extends ConsumerWidget {
   Widget build(context, ref) {
     final reportAsync = ref.watch(enrichedFrequencyReportProvider(filter));
     final view =
-        ref.watch(frequencyViewSettingsNotifierProvider).valueOrNull ?? const FrequencySettings();
+        ref.watch(frequencyViewSettingsNotifierProvider).valueOrNull ??
+        const FrequencySettings.defaults();
     final layout = _Layout.of(
       context,
       groupByLemma: filter.groupByLemma,
@@ -117,10 +118,10 @@ class _FilterSummaryBar extends ConsumerWidget {
     final selection = ref.watch(librarySelectionNotifierProvider);
     final settings =
         ref.watch(frequencyFilterSettingsNotifierProvider).valueOrNull ??
-        const FrequencyFilterSettings();
+        const FrequencyFilterSettings.defaults();
     final catalog = ref.watch(libraryCatalogProvider).valueOrNull;
     final count = _Formats(Localizations.localeOf(context)).count;
-    final atDefaults = selection.isEmpty && settings == const FrequencyFilterSettings();
+    final atDefaults = selection.isEmpty && settings == const FrequencyFilterSettings.defaults();
     return InkWell(
       //null while the catalog is loading, as the sheet cannot offer works yet
       onTap: catalog == null ? null : () => _edit(context, ref, catalog, selection, settings),
@@ -181,7 +182,7 @@ class _FilterSummaryBar extends ConsumerWidget {
         .updateSelection(const LibrarySelection.empty());
     await ref
         .read(frequencyFilterSettingsNotifierProvider.notifier)
-        .updateSettings(const FrequencyFilterSettings());
+        .updateSettings(const FrequencyFilterSettings.defaults());
   }
 
   //
@@ -240,7 +241,7 @@ class _FilterSheetState extends State<_FilterSheet> {
   @override
   Widget build(context) {
     final count = _Formats(Localizations.localeOf(context)).count;
-    final atDefaults = _selection.isEmpty && _settings == const FrequencyFilterSettings();
+    final atDefaults = _selection.isEmpty && _settings == const FrequencyFilterSettings.defaults();
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
@@ -332,7 +333,7 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   void _reset() => setState(() {
     _selection = const LibrarySelection.empty();
-    _settings = const FrequencyFilterSettings();
+    _settings = const FrequencyFilterSettings.defaults();
   });
 
   //
@@ -477,7 +478,8 @@ class _ReportView extends ConsumerWidget {
   Widget build(context, ref) {
     final offsetNotifier = ref.read(frequencyOffsetNotifierProvider.notifier);
     final view =
-        ref.watch(frequencyViewSettingsNotifierProvider).valueOrNull ?? const FrequencySettings();
+        ref.watch(frequencyViewSettingsNotifierProvider).valueOrNull ??
+        const FrequencySettings.defaults();
     final total = filter.groupByLemma ? report.totalLemmas : report.totalForms;
     final hasNextPage = filter.offset + report.rows.length < total;
     final formats = _Formats(Localizations.localeOf(context));
@@ -1096,7 +1098,8 @@ Future<void> _onRowTapped(
   EnrichedFrequencyRow row,
 ) async {
   final view =
-      ref.read(frequencyViewSettingsNotifierProvider).valueOrNull ?? const FrequencySettings();
+      ref.read(frequencyViewSettingsNotifierProvider).valueOrNull ??
+      const FrequencySettings.defaults();
   var choice = switch (view.formTapAction) {
     FormTapAction.ask => null,
     //lemma rows fall back to the dictionary (their citation form may have no stored analysis)

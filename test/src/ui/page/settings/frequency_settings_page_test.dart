@@ -7,7 +7,7 @@ import 'package:latin_reader/src/ui/page/settings/frequency_settings_page.dart';
 class _InMemoryView extends FrequencyViewSettingsNotifier {
   //
   @override
-  Future<FrequencySettings> build() async => const FrequencySettings();
+  Future<FrequencySettings> build() async => _anyCandidate;
 
   @override
   Future<void> updateSettings(FrequencySettings newSettings) async {
@@ -16,6 +16,13 @@ class _InMemoryView extends FrequencyViewSettingsNotifier {
 
   //
 }
+
+/// Set explicitly so the tests don't depend on the defaults
+const _anyCandidate = FrequencySettings(
+  showSummary: true,
+  formTapAction: FormTapAction.ask,
+  narrowLemmaCoverage: NarrowLemmaCoverage.anyCandidate,
+);
 
 // keep ProviderScope directly inside pumpWidget for riverpod_lint
 Future<ProviderContainer> _pumpPage(WidgetTester tester) async {
@@ -70,7 +77,7 @@ void main() {
 
       expect(
         container.read(frequencyViewSettingsNotifierProvider).value,
-        const FrequencySettings(narrowLemmaCoverage: NarrowLemmaCoverage.certain),
+        _anyCandidate.copyWith(narrowLemmaCoverage: NarrowLemmaCoverage.certain),
       );
     });
   });
