@@ -151,7 +151,8 @@ class TextPageState extends ConsumerState<TextPage> {
       readerSettingsNotifierProvider.select(
         (value) => (
           marks: value.valueOrNull?.marksFrequencies ?? false,
-          scope: value.valueOrNull?.frequencyScope ?? const ReaderSettings().frequencyScope,
+          scope:
+              value.valueOrNull?.frequencyScope ?? const ReaderSettings.defaults().frequencyScope,
         ),
       ),
     );
@@ -947,7 +948,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
   Widget build(context) {
     _rebuildOnScreenSizeChange(context);
     final readerSettings =
-        ref.watch(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings();
+        ref.watch(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings.defaults();
     final geometry = widget.geometry;
     return ReaderGestures(
       geometry: geometry,
@@ -1019,7 +1020,8 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
 
   void _preloadWordLookups(String word) {
     ref.read(enrichedMorphologicalSearchProvider('"$word"'));
-    final settings = ref.read(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings();
+    final settings =
+        ref.read(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings.defaults();
     final plainWord = _getAlternativeLookupWord(word, settings.showMacrons);
     if (plainWord != null) {
       ref.read(enrichedMorphologicalSearchProvider('"$plainWord"'));
@@ -1052,7 +1054,8 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
   ) {
     final selectedWord = _getSelectedWord(value.selection, value.text);
     final settings =
-        menuRef.watch(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings();
+        menuRef.watch(readerSettingsNotifierProvider).valueOrNull ??
+        const ReaderSettings.defaults();
     final comparison = _watchMacronLookupComparison(menuRef, selectedWord, settings.showMacrons);
     return comparison.pending
         ? const SizedBox.shrink()

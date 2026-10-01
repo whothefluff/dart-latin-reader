@@ -65,8 +65,13 @@ enum LibraryView {
 @immutable
 class LibrarySettings {
   const LibrarySettings({
-    this.view = _defaultView,
+    required this.view,
   });
+
+  const LibrarySettings.defaults()
+    : this(
+        view: _defaultView,
+      );
 
   /// Current library view.
   ///

@@ -60,7 +60,7 @@ class _ReaderSettingsSection extends StatelessWidget {
 
   final ReaderSettings settings;
   final ReaderSettingsNotifier notifier;
-  static const _defaults = ReaderSettings();
+  static const _defaults = ReaderSettings.defaults();
   static const double _fontSizeMin = 12.0;
   static const double _fontSizeMax = 40.0;
   static const double _fontSizeStep = 1.0;

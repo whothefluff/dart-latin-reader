@@ -10,10 +10,10 @@ import 'package:latin_reader/src/ui/page/concordance/query_editor.dart';
 
 const _oneWord = 'One word only. For a phrase, add a word after it';
 
-/// The default settings, without the platform storage behind them
-class _DefaultSettings extends ConcordanceSettingsNotifier {
+/// Saved settings, without the platform storage behind them
+class _SavedSettings extends ConcordanceSettingsNotifier {
   @override
-  Future<ConcordanceSettings> build() async => const ConcordanceSettings();
+  Future<ConcordanceSettings> build() async => const ConcordanceSettings(pageSize: 25);
   //
 }
 
@@ -29,7 +29,7 @@ void main() {
               anonymousWorks: UnmodifiableListView([]),
             ),
           ),
-          concordanceSettingsNotifierProvider.overrideWith(_DefaultSettings.new),
+          concordanceSettingsNotifierProvider.overrideWith(_SavedSettings.new),
         ],
         child: MaterialApp(
           home: Scaffold(

@@ -25,6 +25,16 @@ class _InMemoryReader extends ReaderSettingsNotifier {
 
 /// Set explicitly so the tests don't depend on the defaults
 const _marking = ReaderSettings(
+  showMacrons: true,
+  fontFamily: null,
+  fontSize: 20.0,
+  lineHeight: 1.5,
+  letterSpacing: 0.0,
+  wordSpacing: 0.0,
+  markCommonWords: false,
+  commonWordsPercent: 25,
+  markUncommonWords: true,
+  uncommonWordsPercent: 5,
   frequencyScope: FrequencyScope.work,
 );
 

@@ -65,17 +65,22 @@ class FrequencyFilterSettingsNotifier extends _$FrequencyFilterSettingsNotifier 
 //domain
 
 /// Holds the word frequency report's filters
-///
-/// All fields have defaults and can be reset to them by omitting the parameter
-/// in [copyWith].
 @immutable
 class FrequencyFilterSettings {
   const FrequencyFilterSettings({
-    this.pageSize = _defaultPageSize,
-    this.ascending = _defaultAscending,
-    this.groupByLemma = _defaultGroupByLemma,
-    this.showMacrons = _defaultShowMacrons,
+    required this.pageSize,
+    required this.ascending,
+    required this.groupByLemma,
+    required this.showMacrons,
   });
+
+  const FrequencyFilterSettings.defaults()
+    : this(
+        pageSize: _defaultPageSize,
+        ascending: _defaultAscending,
+        groupByLemma: _defaultGroupByLemma,
+        showMacrons: _defaultShowMacrons,
+      );
 
   final int pageSize;
   final bool ascending;

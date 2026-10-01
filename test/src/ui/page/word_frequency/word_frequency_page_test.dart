@@ -37,7 +37,7 @@ Future<void> _pumpPage(
   WidgetTester tester,
   AppDb db,
   FrequencyFilterSettings filters, {
-  FrequencySettings view = const FrequencySettings(),
+  required FrequencySettings view,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -63,7 +63,28 @@ Finder _row(String label) => find.ancestor(of: find.text(label), matching: find.
 
 Finder _cell(Finder row, String text) => find.descendant(of: row, matching: find.text(text));
 
-const _byLemma = FrequencyFilterSettings(groupByLemma: true);
+/// Set explicitly so the tests don't depend on the defaults
+const _byForm = FrequencyFilterSettings(
+  pageSize: 50,
+  ascending: false,
+  groupByLemma: false,
+  showMacrons: true,
+);
+
+/// Set explicitly so the tests don't depend on the defaults
+const _byLemma = FrequencyFilterSettings(
+  pageSize: 50,
+  ascending: false,
+  groupByLemma: true,
+  showMacrons: true,
+);
+
+/// Set explicitly so the tests don't depend on the defaults
+const _anyCandidateView = FrequencySettings(
+  showSummary: true,
+  formTapAction: FormTapAction.ask,
+  narrowLemmaCoverage: NarrowLemmaCoverage.anyCandidate,
+);
 
 void main() {
   late FrequencyCorpus corpus;
@@ -83,26 +104,31 @@ void main() {
     });
 
     testWidgets('the coverage column is headed COVER.', (tester) async {
-      await _pumpPage(tester, corpus.db, const FrequencyFilterSettings());
+      await _pumpPage(tester, corpus.db, _byForm, view: _anyCandidateView);
 
       expect(find.text('COVER.'), findsOneWidget);
     });
 
     testWidgets('there is no CERT., since each unit has exactly one form', (tester) async {
-      await _pumpPage(tester, corpus.db, const FrequencyFilterSettings());
+      await _pumpPage(tester, corpus.db, _byForm, view: _anyCandidateView);
 
       expect(find.text('CERT.'), findsNothing);
     });
 
     testWidgets('each row shows its coverage, rounded down', (tester) async {
-      await _pumpPage(tester, corpus.db, const FrequencyFilterSettings());
+      await _pumpPage(tester, corpus.db, _byForm, view: _anyCandidateView);
 
       expect(_cell(_row('et'), '66.6%'), findsOneWidget);
       expect(_cell(_row('in'), '100.0%'), findsOneWidget);
     });
 
     testWidgets('reversing the order leaves each row its coverage', (tester) async {
-      await _pumpPage(tester, corpus.db, const FrequencyFilterSettings(ascending: true));
+      await _pumpPage(
+        tester,
+        corpus.db,
+        _byForm.copyWith(ascending: true),
+        view: _anyCandidateView,
+      );
 
       expect(_cell(_row('in'), '100.0%'), findsOneWidget);
       expect(_cell(_row('et'), '66.6%'), findsOneWidget);
@@ -124,27 +150,27 @@ void main() {
 
     group('with room for both', () {
       testWidgets('COVER. and CERT. each have a column', (tester) async {
-        await _pumpPage(tester, corpus.db, _byLemma);
+        await _pumpPage(tester, corpus.db, _byLemma, view: _anyCandidateView);
 
         expect(find.text('COVER.'), findsOneWidget);
         expect(find.text('CERT.'), findsOneWidget);
       });
 
       testWidgets('a lemma adds only the units no more frequent lemma covers', (tester) async {
-        await _pumpPage(tester, corpus.db, _byLemma);
+        await _pumpPage(tester, corpus.db, _byLemma, view: _anyCandidateView);
 
         expect(_cell(_row('sum¹'), '83.3%'), findsOneWidget);
         expect(_cell(_row('edo¹'), '100.0%'), findsNWidgets(2));
       });
 
       testWidgets('certain coverage waits for every candidate lemma', (tester) async {
-        await _pumpPage(tester, corpus.db, _byLemma);
+        await _pumpPage(tester, corpus.db, _byLemma, view: _anyCandidateView);
 
         expect(_cell(_row('sum¹'), '33.3%'), findsOneWidget);
       });
 
       testWidgets('a long press shows nothing the columns do not', (tester) async {
-        await _pumpPage(tester, corpus.db, _byLemma);
+        await _pumpPage(tester, corpus.db, _byLemma, view: _anyCandidateView);
 
         await tester.longPress(_row('sum¹'));
         await tester.pumpAndSettle();
@@ -154,10 +180,10 @@ void main() {
     });
 
     group('on a phone', () {
-      testWidgets('any-candidate coverage is shown by default, alone', (tester) async {
+      testWidgets('any-candidate coverage is shown alone', (tester) async {
         _usePhone(tester);
 
-        await _pumpPage(tester, corpus.db, _byLemma);
+        await _pumpPage(tester, corpus.db, _byLemma, view: _anyCandidateView);
 
         expect(find.text('COVER.'), findsOneWidget);
         expect(find.text('CERT.'), findsNothing);
@@ -172,7 +198,7 @@ void main() {
           tester,
           corpus.db,
           _byLemma,
-          view: const FrequencySettings(narrowLemmaCoverage: NarrowLemmaCoverage.certain),
+          view: _anyCandidateView.copyWith(narrowLemmaCoverage: NarrowLemmaCoverage.certain),
         );
 
         expect(find.text('CERT.'), findsOneWidget);
@@ -190,7 +216,7 @@ void main() {
             tester,
             corpus.db,
             _byLemma,
-            view: FrequencySettings(narrowLemmaCoverage: shown),
+            view: _anyCandidateView.copyWith(narrowLemmaCoverage: shown),
           );
 
           await tester.longPress(_row('sum¹'));

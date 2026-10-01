@@ -106,25 +106,36 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
 //domain
 
 /// Holds the settings for the reader.
-///
-/// All fields have defaults and can be reset to them by omitting the parameter
-/// in [copyWith]. [fontFamily] is the exception: null means "use the system
-/// default font" and can be restored by passing null explicitly via [copyWith].
 @immutable
 class ReaderSettings {
   const ReaderSettings({
-    this.showMacrons = _defaultShowMacrons,
-    this.fontFamily = _defaultFontFamily,
-    this.fontSize = _defaultFontSize,
-    this.lineHeight = _defaultLineHeight,
-    this.letterSpacing = _defaultLetterSpacing,
-    this.wordSpacing = _defaultWordSpacing,
-    this.markCommonWords = _defaultMarkCommonWords,
-    this.commonWordsPercent = _defaultCommonWordsPercent,
-    this.markUncommonWords = _defaultMarkUncommonWords,
-    this.uncommonWordsPercent = _defaultUncommonWordsPercent,
-    this.frequencyScope = _defaultFrequencyScope,
+    required this.showMacrons,
+    required this.fontFamily,
+    required this.fontSize,
+    required this.lineHeight,
+    required this.letterSpacing,
+    required this.wordSpacing,
+    required this.markCommonWords,
+    required this.commonWordsPercent,
+    required this.markUncommonWords,
+    required this.uncommonWordsPercent,
+    required this.frequencyScope,
   });
+
+  const ReaderSettings.defaults()
+    : this(
+        showMacrons: _defaultShowMacrons,
+        fontFamily: _defaultFontFamily,
+        fontSize: _defaultFontSize,
+        lineHeight: _defaultLineHeight,
+        letterSpacing: _defaultLetterSpacing,
+        wordSpacing: _defaultWordSpacing,
+        markCommonWords: _defaultMarkCommonWords,
+        commonWordsPercent: _defaultCommonWordsPercent,
+        markUncommonWords: _defaultMarkUncommonWords,
+        uncommonWordsPercent: _defaultUncommonWordsPercent,
+        frequencyScope: _defaultFrequencyScope,
+      );
 
   /// The font family to use in the reader, or null to use the system default.
   final String? fontFamily;

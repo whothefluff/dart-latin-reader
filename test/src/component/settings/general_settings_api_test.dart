@@ -62,7 +62,7 @@ void main() {
         'app.themeMode': const PrefString('dark'),
         'app.accentColor': const PrefInt(0xFF009688),
       });
-      const baseline = GeneralSettings(themeMode: ThemeMode.dark);
+      const baseline = GeneralSettings(themeMode: ThemeMode.dark, accentColor: null);
 
       await _save(repository, baseline);
 

@@ -56,8 +56,13 @@ class ConcordanceSettingsNotifier extends _$ConcordanceSettingsNotifier {
 @immutable
 class ConcordanceSettings {
   const ConcordanceSettings({
-    this.pageSize = _defaultPageSize,
+    required this.pageSize,
   });
+
+  const ConcordanceSettings.defaults()
+    : this(
+        pageSize: _defaultPageSize,
+      );
 
   /// Hits per page
   final int pageSize;
