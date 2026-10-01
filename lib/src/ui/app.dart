@@ -12,6 +12,11 @@ import 'widget/show_loading.dart';
 
 final customAdaptiveScaffoldKey = GlobalKey<CustomAdaptiveScaffoldState>();
 
+/// The app's theme, with its color scheme generated from [accentColor], or Material's baseline
+/// scheme when that is `null`
+ThemeData appTheme(Color? accentColor, Brightness brightness) =>
+    ThemeData(colorSchemeSeed: accentColor, brightness: brightness);
+
 class App extends ConsumerStatefulWidget {
   const App({
     super.key,
@@ -62,8 +67,8 @@ class AppState extends ConsumerState<App> {
             Locale('es'),
           ],
           onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-          theme: ThemeData(),
-          darkTheme: ThemeData.dark(),
+          theme: appTheme(settings.accentColor, Brightness.light),
+          darkTheme: appTheme(settings.accentColor, Brightness.dark),
           themeMode: settings.themeMode,
         ),
         error: (error, stack) => MaterialApp(
