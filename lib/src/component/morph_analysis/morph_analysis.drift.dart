@@ -1148,15 +1148,16 @@ class MorphologicalDetailInflections extends i0.Table
   );
   static const i0.VerificationMeta _partOfSpeechMeta =
       const i0.VerificationMeta('partOfSpeech');
-  late final i0.GeneratedColumn<String> partOfSpeech =
-      i0.GeneratedColumn<String>(
-        'partOfSpeech',
-        aliasedName,
-        false,
-        type: i0.DriftSqlType.string,
-        requiredDuringInsert: true,
-        $customConstraints: 'NOT NULL',
-      );
+  late final i0.GeneratedColumn<String>
+  partOfSpeech = i0.GeneratedColumn<String>(
+    'partOfSpeech',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (partOfSpeech IN (\'adjective\', \'adverb\', \'conjunction\', \'interjection\', \'irregular\', \'noun\', \'numeral\', \'preposition\', \'pronoun\', \'verb\'))',
+  );
   static const i0.VerificationMeta _stemMeta = const i0.VerificationMeta(
     'stem',
   );
@@ -2439,7 +2440,7 @@ class MorphologyPeek
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "morphology.Peek" AS WITH InflectionData AS (SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(IIF(Infl.verbForm IS NULL AND Infl.segmentsInfo IN (\'irregular\', \'indeclinable\'), Infl.segmentsInfo, NULL), Infl.verbForm) AS additional, Infl.item, Infl.cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adjective\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, IIF(Infl.suffix IS NOT NULL, \'-\' || Infl.suffix || \' suffix\', NULL) AS additional, Infl.item, Infl.cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'adverb\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'conjunction\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'interjection\' UNION ALL SELECT Infl.form, IIF(Infl.verbForm IS NULL, Infl.partOfSpeech, NULL) AS partOfSpeech, MorphologicalDetails.dictionaryRef, COALESCE(Infl.verbForm, Infl.declension || \' declension\') AS additional, Infl.item, Infl.cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'noun\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'preposition\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, NULL AS additional, Infl.item, Infl.cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'pronoun\' UNION ALL SELECT Infl.form, Infl.partOfSpeech, MorphologicalDetails.dictionaryRef, Infl.segmentsInfo AS additional, Infl.item, Infl.cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item WHERE Infl.partOfSpeech = \'verb\') SELECT form, partOfSpeech, dictionaryRef, additional, item, cnt FROM InflectionData ORDER BY form, item, cnt',
+        'CREATE VIEW "morphology.Peek" AS SELECT Infl.form AS form, CASE WHEN Infl.partOfSpeech IN (\'adjective\', \'noun\') AND Infl.verbForm IS NOT NULL THEN NULL ELSE Infl.partOfSpeech END AS partOfSpeech, MorphologicalDetails.dictionaryRef AS dictionaryRef, CASE Infl.partOfSpeech WHEN \'adjective\' THEN COALESCE(IIF(Infl.verbForm IS NULL AND Infl.segmentsInfo IN (\'irregular\', \'indeclinable\'), Infl.segmentsInfo, NULL), Infl.verbForm) WHEN \'adverb\' THEN IIF(Infl.suffix IS NOT NULL, \'-\' || Infl.suffix || \' suffix\', NULL) WHEN \'conjunction\' THEN NULL WHEN \'interjection\' THEN NULL WHEN \'irregular\' THEN Infl.segmentsInfo WHEN \'noun\' THEN COALESCE(Infl.verbForm, Infl.declension || \' declension\') WHEN \'numeral\' THEN NULL WHEN \'preposition\' THEN NULL WHEN \'pronoun\' THEN NULL WHEN \'verb\' THEN Infl.segmentsInfo END AS additional, Infl.item AS item, Infl.cnt AS cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item ORDER BY Infl.form, Infl.item, Infl.cnt',
   };
   @override
   MorphologyPeek get asDslTable => this;

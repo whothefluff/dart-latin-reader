@@ -39,6 +39,26 @@ Future<AppDb> _roses() async {
   return db;
 }
 
+/// tres, a numeral, and nequam, which Morpheus tags as irregular
+Future<AppDb> _numeralAndIrregular() async {
+  final db = _EmptyDb();
+  addTearDown(db.close);
+  await db.customStatement(
+    "INSERT INTO MorphologicalDetails VALUES ( 'tres', 0, 'tres' ), ( 'nequam', 0, 'nequam' )",
+  );
+  await db.customStatement(
+    '''
+    INSERT INTO MorphologicalDetailInflections( form, item, cnt, partOfSpeech, stem )
+        VALUES ( 'tres', 0, 0, 'numeral', 'trēs' ),
+               ( 'nequam', 0, 0, 'irregular', 'nēquam' )
+    ''',
+  );
+  await morp_util.operations
+      .singleWhere((operation) => operation.id == 'SearchableMorphDetInflections')
+      .insert(db);
+  return db;
+}
+
 /// The analyses [text] finds, as form and count
 Future<List<(String, int)>> _found(AppDb db, String text) async {
   final container = ProviderContainer(overrides: [dbProvider.overrideWith((_) => db)]);
@@ -75,6 +95,12 @@ void main() {
 
     test('empty text searches nothing', () async {
       expect(await _found(await _roses(), '  '), isEmpty);
+    });
+
+    test('numerals and irregular words are found like any other part of speech', () async {
+      final db = await _numeralAndIrregular();
+      expect(await _found(db, '"tres"'), [('tres', 0)]);
+      expect(await _found(db, '"nequam"'), [('nequam', 0)]);
     });
   });
 }
