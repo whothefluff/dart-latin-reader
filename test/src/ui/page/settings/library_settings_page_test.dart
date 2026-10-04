@@ -61,7 +61,29 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _drag(WidgetTester tester, Finder finder, Offset offset) async {
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.drag(finder, offset);
+  await tester.pumpAndSettle();
+}
+
 void main() {
+  group('Typography', () {
+    testWidgets('dragging word spacing to its maximum saves only that', (tester) async {
+      final container = await _pumpPage(tester);
+      final row = find.ancestor(of: find.text('Word Spacing'), matching: find.byType(Column)).first;
+      final slider = find.descendant(of: row, matching: find.byType(Slider));
+
+      await _drag(tester, slider, const Offset(1000, 0));
+
+      expect(
+        container.read(readerSettingsNotifierProvider).value,
+        _marking.copyWith(wordSpacing: 10.0),
+      );
+    });
+  });
+
   group('Word Frequency', () {
     testWidgets('marking common words saves only that', (tester) async {
       final container = await _pumpPage(tester);
