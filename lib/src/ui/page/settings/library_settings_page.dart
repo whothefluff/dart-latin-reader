@@ -73,6 +73,10 @@ class _ReaderSettingsSection extends StatelessWidget {
   static const double _letterSpaceMax = 5.0;
   static const double _letterSpaceStep = 0.1;
   static const int _letterSpaceDivisions = (_letterSpaceMax - _letterSpaceMin) ~/ _letterSpaceStep;
+  static const double _wordSpaceMin = 0.0;
+  static const double _wordSpaceMax = 10.0;
+  static const double _wordSpaceStep = 0.5;
+  static const int _wordSpaceDivisions = (_wordSpaceMax - _wordSpaceMin) ~/ _wordSpaceStep;
   static const double _commonPercentMin = 10;
   static const double _commonPercentMax = 60;
   static const double _uncommonPercentMin = 5;
@@ -117,6 +121,7 @@ class _ReaderSettingsSection extends StatelessWidget {
       _fontSizeSlider(),
       _lineHeightSlider(),
       _letterSpaceSlider(),
+      _wordSpaceSlider(),
       const SizedBox(height: 12),
     ],
   );
@@ -311,7 +316,7 @@ class _ReaderSettingsSection extends StatelessWidget {
 
   _LabeledSliderRow _lineHeightSlider() => _LabeledSliderRow(
     label: 'Line Height',
-    icon: Icons.height,
+    icon: Icons.format_line_spacing,
     value: settings.lineHeight.clamp(_lineHeightMin, _lineHeightMax),
     defaultValue: _defaults.lineHeight,
     min: _lineHeightMin,
@@ -328,7 +333,7 @@ class _ReaderSettingsSection extends StatelessWidget {
 
   _LabeledSliderRow _letterSpaceSlider() => _LabeledSliderRow(
     label: 'Letter Spacing',
-    icon: Icons.space_bar,
+    icon: Icons.text_rotation_none,
     value: settings.letterSpacing.clamp(_letterSpaceMin, _letterSpaceMax),
     defaultValue: _defaults.letterSpacing,
     min: _letterSpaceMin,
@@ -340,6 +345,23 @@ class _ReaderSettingsSection extends StatelessWidget {
     ),
     onReset: () => notifier.updateSettings(
       settings.copyWith(letterSpacing: _defaults.letterSpacing),
+    ),
+  );
+
+  _LabeledSliderRow _wordSpaceSlider() => _LabeledSliderRow(
+    label: 'Word Spacing',
+    icon: Icons.space_bar,
+    value: settings.wordSpacing.clamp(_wordSpaceMin, _wordSpaceMax),
+    defaultValue: _defaults.wordSpacing,
+    min: _wordSpaceMin,
+    max: _wordSpaceMax,
+    divisions: _wordSpaceDivisions,
+    divisionLabelFormatter: (v) => v.toStringAsFixed(1),
+    onChangeEnd: (val) => notifier.updateSettings(
+      settings.copyWith(wordSpacing: val),
+    ),
+    onReset: () => notifier.updateSettings(
+      settings.copyWith(wordSpacing: _defaults.wordSpacing),
     ),
   );
   //
