@@ -31,12 +31,16 @@ void main() {
     List<ConcordanceCriterion> slots, {
     bool macrons = false,
     List<int?> distances = const [],
-  }) async => (await repository.getHits(
-    ConcordanceQuery(slots: slots, matchMacrons: macrons, distances: distances),
-    [work],
-    0,
-    100,
-  )).hits.map((hit) => hit.firstIdx).toList();
+  }) async {
+    await populateConcordanceTables(db);
+    final page = await repository.getHits(
+      ConcordanceQuery(slots: slots, matchMacrons: macrons, distances: distances),
+      [work],
+      0,
+      100,
+    );
+    return page.hits.map((hit) => hit.firstIdx).toList();
+  }
 
   test('with macrons on, a vowel typed without one only matches a vowel without one', () async {
     await token(db, 0, 'rosa');
@@ -118,6 +122,7 @@ void main() {
     await analysis(db, 'rosas', 'rosa');
     await resolution(db, 'rosa', 'rosa1');
     await resolution(db, 'flos-rosa', 'rosa1');
+    await populateConcordanceTables(db);
     final choices = await lemmas.SearchLemmaChoicesUseCase(
       lemmas.ConcordanceRepository(db.concordanceDrift),
       'flos-',
@@ -136,6 +141,18 @@ void main() {
     expect(await starts([_lemma('people')]), [1]);
     expect(await starts([_lemma('tree')]), [0]);
     expect(await starts([_lemma('que')]), [1]);
+  });
+
+  test('a lemma is not found where a vowel it needs long is certainly short', () async {
+    await token(db, 0, 'est');
+    await token(db, 1, 'est', uncertaintyBitMask: 1); // the e
+    await analysis(db, 'est', 'sum1', pos: 'verb', person: '3rd');
+    await analysis(db, 'est', 'edo1', item: 1, pos: 'verb', person: '3rd', macronizedForm: 'ēst');
+    expect(await starts([_lemma('sum1')]), [0, 1]);
+    expect(await starts([_lemma('edo1')]), [1]);
+    final thirdPerson = GrammarFilter(const {GrammarFeature.person: '3rd'});
+    expect(await starts([GrammarCriterion(thirdPerson, lemma: _lemma('edo1').lemma)]), [1]);
+    expect(await starts([GrammarCriterion(thirdPerson)]), [0, 1]);
   });
 
   test('a name that may be a common word has the analyses of both', () async {
@@ -200,6 +217,7 @@ void main() {
 
   test('a combined gender matches each of its genders, as offered per part of speech', () async {
     await token(db, 0, 'felix');
+    await token(db, 1, 'videt');
     await analysis(db, 'felix', 'felix', pos: 'adjective', gender: 'masculine/feminine/neuter');
     await analysis(db, 'videt', 'video', pos: 'verb', verbForm: 'indicative');
     expect(

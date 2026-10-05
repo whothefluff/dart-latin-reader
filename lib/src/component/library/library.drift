@@ -158,12 +158,17 @@ CREATE TABLE "WorkContents"(
            OR ( LENGTH( enclitic ) > 0
                 AND LENGTH( enclitic ) < LENGTH( word )
                 AND LOWER( SUBSTR( word, LENGTH( word ) - LENGTH( enclitic ) + 1 ) ) = LOWER( enclitic ) ) ),
-    CHECK( enclitic IS NULL OR tokenType = 1 )
+    CHECK( enclitic IS NULL OR tokenType = 1 ),
+    CHECK( expansion IS NULL OR macronizedWord = '' OR uncertaintyBitMask = 0 ), -- '' only until resolved
+    CHECK( enclitic IS NULL
+           OR macronizedWord = ''
+           OR ( ( uncertaintyBitMask >> ( LENGTH( word ) - LENGTH( enclitic ) ) ) = 0 -- certain
+                AND LOWER( SUBSTR( macronizedWord, LENGTH( macronizedWord ) - LENGTH( enclitic ) + 1 ) ) = LOWER( enclitic ) ) ) -- no macrons
 )
 STRICT,
 WITHOUT ROWID;
 
--- Corpus search (concordance): a criterion seeks the counted words by lookupForm...
+-- Corpus search (concordance): a spelled word is sought by lookupForm...
 CREATE INDEX "WorkContents_LookupForm"
     ON WorkContents( lookupForm )
     WHERE lookupForm IS NOT NULL;
@@ -427,6 +432,7 @@ CREATE VIEW "library.WorkContents" AS
                                         WorkContents.uncertaintyBitMask,
                                         WorkContents.sourceReference,
                                         WorkContents.lookupForm,
+                                        WorkContents.macronLookupForm,
                                         WorkContents.properNounState,
                                         SubdivsHierarchy.node,
                                         SubdivsHierarchy.typ,
@@ -452,6 +458,7 @@ CREATE VIEW "library.WorkContents" AS
                typ,
                depth,
                lookupForm,
+               macronLookupForm,
                properNounState,
                sourceReference --( SELECT name FROM WorkContentSubdivisions AS aux WHERE aux.parent = ClosestSubdivision.parent AND aux.typ = 'TITL' LIMIT 1 ) AS title
             FROM ClosestSubdivision

@@ -1134,6 +1134,8 @@ typedef $ScopedLookupFreqCreateCompanionBuilder =
       required String workId,
       required String lookupForm,
       required bool alsoLowercase,
+      required String macronLookupForm,
+      required int uncertaintyBitMask,
       required int occurrences,
     });
 typedef $ScopedLookupFreqUpdateCompanionBuilder =
@@ -1141,6 +1143,8 @@ typedef $ScopedLookupFreqUpdateCompanionBuilder =
       i0.Value<String> workId,
       i0.Value<String> lookupForm,
       i0.Value<bool> alsoLowercase,
+      i0.Value<String> macronLookupForm,
+      i0.Value<int> uncertaintyBitMask,
       i0.Value<int> occurrences,
     });
 
@@ -1165,6 +1169,16 @@ class $ScopedLookupFreqFilterComposer
 
   i0.ColumnFilters<bool> get alsoLowercase => $composableBuilder(
     column: $table.alsoLowercase,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -1198,6 +1212,16 @@ class $ScopedLookupFreqOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<int> get occurrences => $composableBuilder(
     column: $table.occurrences,
     builder: (column) => i0.ColumnOrderings(column),
@@ -1223,6 +1247,16 @@ class $ScopedLookupFreqAnnotationComposer
 
   i0.GeneratedColumn<bool> get alsoLowercase => $composableBuilder(
     column: $table.alsoLowercase,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
     builder: (column) => column,
   );
 
@@ -1272,11 +1306,15 @@ class $ScopedLookupFreqTableManager
                 i0.Value<String> workId = const i0.Value.absent(),
                 i0.Value<String> lookupForm = const i0.Value.absent(),
                 i0.Value<bool> alsoLowercase = const i0.Value.absent(),
+                i0.Value<String> macronLookupForm = const i0.Value.absent(),
+                i0.Value<int> uncertaintyBitMask = const i0.Value.absent(),
                 i0.Value<int> occurrences = const i0.Value.absent(),
               }) => i1.ScopedLookupFreqCompanion(
                 workId: workId,
                 lookupForm: lookupForm,
                 alsoLowercase: alsoLowercase,
+                macronLookupForm: macronLookupForm,
+                uncertaintyBitMask: uncertaintyBitMask,
                 occurrences: occurrences,
               ),
           createCompanionCallback:
@@ -1284,11 +1322,15 @@ class $ScopedLookupFreqTableManager
                 required String workId,
                 required String lookupForm,
                 required bool alsoLowercase,
+                required String macronLookupForm,
+                required int uncertaintyBitMask,
                 required int occurrences,
               }) => i1.ScopedLookupFreqCompanion.insert(
                 workId: workId,
                 lookupForm: lookupForm,
                 alsoLowercase: alsoLowercase,
+                macronLookupForm: macronLookupForm,
+                uncertaintyBitMask: uncertaintyBitMask,
                 occurrences: occurrences,
               ),
           withReferenceMapper: (p0) => p0
@@ -1325,6 +1367,8 @@ typedef $ScopedLookupLemmasCreateCompanionBuilder =
       required String workId,
       required String lookupForm,
       required bool alsoLowercase,
+      required String macronLookupForm,
+      required int uncertaintyBitMask,
       required String dictionaryRef,
     });
 typedef $ScopedLookupLemmasUpdateCompanionBuilder =
@@ -1332,6 +1376,8 @@ typedef $ScopedLookupLemmasUpdateCompanionBuilder =
       i0.Value<String> workId,
       i0.Value<String> lookupForm,
       i0.Value<bool> alsoLowercase,
+      i0.Value<String> macronLookupForm,
+      i0.Value<int> uncertaintyBitMask,
       i0.Value<String> dictionaryRef,
     });
 
@@ -1356,6 +1402,16 @@ class $ScopedLookupLemmasFilterComposer
 
   i0.ColumnFilters<bool> get alsoLowercase => $composableBuilder(
     column: $table.alsoLowercase,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -1389,6 +1445,16 @@ class $ScopedLookupLemmasOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<String> get dictionaryRef => $composableBuilder(
     column: $table.dictionaryRef,
     builder: (column) => i0.ColumnOrderings(column),
@@ -1414,6 +1480,16 @@ class $ScopedLookupLemmasAnnotationComposer
 
   i0.GeneratedColumn<bool> get alsoLowercase => $composableBuilder(
     column: $table.alsoLowercase,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get macronLookupForm => $composableBuilder(
+    column: $table.macronLookupForm,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<int> get uncertaintyBitMask => $composableBuilder(
+    column: $table.uncertaintyBitMask,
     builder: (column) => column,
   );
 
@@ -1463,11 +1539,15 @@ class $ScopedLookupLemmasTableManager
                 i0.Value<String> workId = const i0.Value.absent(),
                 i0.Value<String> lookupForm = const i0.Value.absent(),
                 i0.Value<bool> alsoLowercase = const i0.Value.absent(),
+                i0.Value<String> macronLookupForm = const i0.Value.absent(),
+                i0.Value<int> uncertaintyBitMask = const i0.Value.absent(),
                 i0.Value<String> dictionaryRef = const i0.Value.absent(),
               }) => i1.ScopedLookupLemmasCompanion(
                 workId: workId,
                 lookupForm: lookupForm,
                 alsoLowercase: alsoLowercase,
+                macronLookupForm: macronLookupForm,
+                uncertaintyBitMask: uncertaintyBitMask,
                 dictionaryRef: dictionaryRef,
               ),
           createCompanionCallback:
@@ -1475,11 +1555,15 @@ class $ScopedLookupLemmasTableManager
                 required String workId,
                 required String lookupForm,
                 required bool alsoLowercase,
+                required String macronLookupForm,
+                required int uncertaintyBitMask,
                 required String dictionaryRef,
               }) => i1.ScopedLookupLemmasCompanion.insert(
                 workId: workId,
                 lookupForm: lookupForm,
                 alsoLowercase: alsoLowercase,
+                macronLookupForm: macronLookupForm,
+                uncertaintyBitMask: uncertaintyBitMask,
                 dictionaryRef: dictionaryRef,
               ),
           withReferenceMapper: (p0) => p0
@@ -3723,6 +3807,28 @@ class ScopedLookupFreq extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
+  static const i0.VerificationMeta _macronLookupFormMeta =
+      const i0.VerificationMeta('macronLookupForm');
+  late final i0.GeneratedColumn<String> macronLookupForm =
+      i0.GeneratedColumn<String>(
+        'macronLookupForm',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
+  static const i0.VerificationMeta _uncertaintyBitMaskMeta =
+      const i0.VerificationMeta('uncertaintyBitMask');
+  late final i0.GeneratedColumn<int> uncertaintyBitMask =
+      i0.GeneratedColumn<int>(
+        'uncertaintyBitMask',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.int,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
   static const i0.VerificationMeta _occurrencesMeta = const i0.VerificationMeta(
     'occurrences',
   );
@@ -3739,6 +3845,8 @@ class ScopedLookupFreq extends i0.Table
     workId,
     lookupForm,
     alsoLowercase,
+    macronLookupForm,
+    uncertaintyBitMask,
     occurrences,
   ];
   @override
@@ -3780,6 +3888,28 @@ class ScopedLookupFreq extends i0.Table
     } else if (isInserting) {
       context.missing(_alsoLowercaseMeta);
     }
+    if (data.containsKey('macronLookupForm')) {
+      context.handle(
+        _macronLookupFormMeta,
+        macronLookupForm.isAcceptableOrUnknown(
+          data['macronLookupForm']!,
+          _macronLookupFormMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_macronLookupFormMeta);
+    }
+    if (data.containsKey('uncertaintyBitMask')) {
+      context.handle(
+        _uncertaintyBitMaskMeta,
+        uncertaintyBitMask.isAcceptableOrUnknown(
+          data['uncertaintyBitMask']!,
+          _uncertaintyBitMaskMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_uncertaintyBitMaskMeta);
+    }
     if (data.containsKey('occurrences')) {
       context.handle(
         _occurrencesMeta,
@@ -3799,6 +3929,8 @@ class ScopedLookupFreq extends i0.Table
     workId,
     lookupForm,
     alsoLowercase,
+    macronLookupForm,
+    uncertaintyBitMask,
   };
   @override
   i1.ScopedLookupFreqData map(
@@ -3819,6 +3951,14 @@ class ScopedLookupFreq extends i0.Table
         i0.DriftSqlType.bool,
         data['${effectivePrefix}alsoLowercase'],
       )!,
+      macronLookupForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronLookupForm'],
+      )!,
+      uncertaintyBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}uncertaintyBitMask'],
+      )!,
       occurrences: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}occurrences'],
@@ -3837,7 +3977,7 @@ class ScopedLookupFreq extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(workId, lookupForm, alsoLowercase)',
+    'PRIMARY KEY(workId, lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -3850,11 +3990,15 @@ class ScopedLookupFreqData extends i0.DataClass
   final bool alsoLowercase;
 
   /// properNounState = 2
+  final String macronLookupForm;
+  final int uncertaintyBitMask;
   final int occurrences;
   const ScopedLookupFreqData({
     required this.workId,
     required this.lookupForm,
     required this.alsoLowercase,
+    required this.macronLookupForm,
+    required this.uncertaintyBitMask,
     required this.occurrences,
   });
   @override
@@ -3863,6 +4007,8 @@ class ScopedLookupFreqData extends i0.DataClass
     map['workId'] = i0.Variable<String>(workId);
     map['lookupForm'] = i0.Variable<String>(lookupForm);
     map['alsoLowercase'] = i0.Variable<bool>(alsoLowercase);
+    map['macronLookupForm'] = i0.Variable<String>(macronLookupForm);
+    map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
     map['occurrences'] = i0.Variable<int>(occurrences);
     return map;
   }
@@ -3872,6 +4018,8 @@ class ScopedLookupFreqData extends i0.DataClass
       workId: i0.Value(workId),
       lookupForm: i0.Value(lookupForm),
       alsoLowercase: i0.Value(alsoLowercase),
+      macronLookupForm: i0.Value(macronLookupForm),
+      uncertaintyBitMask: i0.Value(uncertaintyBitMask),
       occurrences: i0.Value(occurrences),
     );
   }
@@ -3885,6 +4033,8 @@ class ScopedLookupFreqData extends i0.DataClass
       workId: serializer.fromJson<String>(json['workId']),
       lookupForm: serializer.fromJson<String>(json['lookupForm']),
       alsoLowercase: serializer.fromJson<bool>(json['alsoLowercase']),
+      macronLookupForm: serializer.fromJson<String>(json['macronLookupForm']),
+      uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
       occurrences: serializer.fromJson<int>(json['occurrences']),
     );
   }
@@ -3895,6 +4045,8 @@ class ScopedLookupFreqData extends i0.DataClass
       'workId': serializer.toJson<String>(workId),
       'lookupForm': serializer.toJson<String>(lookupForm),
       'alsoLowercase': serializer.toJson<bool>(alsoLowercase),
+      'macronLookupForm': serializer.toJson<String>(macronLookupForm),
+      'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
       'occurrences': serializer.toJson<int>(occurrences),
     };
   }
@@ -3903,11 +4055,15 @@ class ScopedLookupFreqData extends i0.DataClass
     String? workId,
     String? lookupForm,
     bool? alsoLowercase,
+    String? macronLookupForm,
+    int? uncertaintyBitMask,
     int? occurrences,
   }) => i1.ScopedLookupFreqData(
     workId: workId ?? this.workId,
     lookupForm: lookupForm ?? this.lookupForm,
     alsoLowercase: alsoLowercase ?? this.alsoLowercase,
+    macronLookupForm: macronLookupForm ?? this.macronLookupForm,
+    uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     occurrences: occurrences ?? this.occurrences,
   );
   ScopedLookupFreqData copyWithCompanion(i1.ScopedLookupFreqCompanion data) {
@@ -3919,6 +4075,12 @@ class ScopedLookupFreqData extends i0.DataClass
       alsoLowercase: data.alsoLowercase.present
           ? data.alsoLowercase.value
           : this.alsoLowercase,
+      macronLookupForm: data.macronLookupForm.present
+          ? data.macronLookupForm.value
+          : this.macronLookupForm,
+      uncertaintyBitMask: data.uncertaintyBitMask.present
+          ? data.uncertaintyBitMask.value
+          : this.uncertaintyBitMask,
       occurrences: data.occurrences.present
           ? data.occurrences.value
           : this.occurrences,
@@ -3931,14 +4093,22 @@ class ScopedLookupFreqData extends i0.DataClass
           ..write('workId: $workId, ')
           ..write('lookupForm: $lookupForm, ')
           ..write('alsoLowercase: $alsoLowercase, ')
+          ..write('macronLookupForm: $macronLookupForm, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
           ..write('occurrences: $occurrences')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(workId, lookupForm, alsoLowercase, occurrences);
+  int get hashCode => Object.hash(
+    workId,
+    lookupForm,
+    alsoLowercase,
+    macronLookupForm,
+    uncertaintyBitMask,
+    occurrences,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3946,6 +4116,8 @@ class ScopedLookupFreqData extends i0.DataClass
           other.workId == this.workId &&
           other.lookupForm == this.lookupForm &&
           other.alsoLowercase == this.alsoLowercase &&
+          other.macronLookupForm == this.macronLookupForm &&
+          other.uncertaintyBitMask == this.uncertaintyBitMask &&
           other.occurrences == this.occurrences);
 }
 
@@ -3954,32 +4126,44 @@ class ScopedLookupFreqCompanion
   final i0.Value<String> workId;
   final i0.Value<String> lookupForm;
   final i0.Value<bool> alsoLowercase;
+  final i0.Value<String> macronLookupForm;
+  final i0.Value<int> uncertaintyBitMask;
   final i0.Value<int> occurrences;
   const ScopedLookupFreqCompanion({
     this.workId = const i0.Value.absent(),
     this.lookupForm = const i0.Value.absent(),
     this.alsoLowercase = const i0.Value.absent(),
+    this.macronLookupForm = const i0.Value.absent(),
+    this.uncertaintyBitMask = const i0.Value.absent(),
     this.occurrences = const i0.Value.absent(),
   });
   ScopedLookupFreqCompanion.insert({
     required String workId,
     required String lookupForm,
     required bool alsoLowercase,
+    required String macronLookupForm,
+    required int uncertaintyBitMask,
     required int occurrences,
   }) : workId = i0.Value(workId),
        lookupForm = i0.Value(lookupForm),
        alsoLowercase = i0.Value(alsoLowercase),
+       macronLookupForm = i0.Value(macronLookupForm),
+       uncertaintyBitMask = i0.Value(uncertaintyBitMask),
        occurrences = i0.Value(occurrences);
   static i0.Insertable<i1.ScopedLookupFreqData> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? lookupForm,
     i0.Expression<bool>? alsoLowercase,
+    i0.Expression<String>? macronLookupForm,
+    i0.Expression<int>? uncertaintyBitMask,
     i0.Expression<int>? occurrences,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
       if (lookupForm != null) 'lookupForm': lookupForm,
       if (alsoLowercase != null) 'alsoLowercase': alsoLowercase,
+      if (macronLookupForm != null) 'macronLookupForm': macronLookupForm,
+      if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
       if (occurrences != null) 'occurrences': occurrences,
     });
   }
@@ -3988,12 +4172,16 @@ class ScopedLookupFreqCompanion
     i0.Value<String>? workId,
     i0.Value<String>? lookupForm,
     i0.Value<bool>? alsoLowercase,
+    i0.Value<String>? macronLookupForm,
+    i0.Value<int>? uncertaintyBitMask,
     i0.Value<int>? occurrences,
   }) {
     return i1.ScopedLookupFreqCompanion(
       workId: workId ?? this.workId,
       lookupForm: lookupForm ?? this.lookupForm,
       alsoLowercase: alsoLowercase ?? this.alsoLowercase,
+      macronLookupForm: macronLookupForm ?? this.macronLookupForm,
+      uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
       occurrences: occurrences ?? this.occurrences,
     );
   }
@@ -4010,6 +4198,12 @@ class ScopedLookupFreqCompanion
     if (alsoLowercase.present) {
       map['alsoLowercase'] = i0.Variable<bool>(alsoLowercase.value);
     }
+    if (macronLookupForm.present) {
+      map['macronLookupForm'] = i0.Variable<String>(macronLookupForm.value);
+    }
+    if (uncertaintyBitMask.present) {
+      map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask.value);
+    }
     if (occurrences.present) {
       map['occurrences'] = i0.Variable<int>(occurrences.value);
     }
@@ -4022,6 +4216,8 @@ class ScopedLookupFreqCompanion
           ..write('workId: $workId, ')
           ..write('lookupForm: $lookupForm, ')
           ..write('alsoLowercase: $alsoLowercase, ')
+          ..write('macronLookupForm: $macronLookupForm, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
           ..write('occurrences: $occurrences')
           ..write(')'))
         .toString();
@@ -4066,6 +4262,28 @@ class ScopedLookupLemmas extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
+  static const i0.VerificationMeta _macronLookupFormMeta =
+      const i0.VerificationMeta('macronLookupForm');
+  late final i0.GeneratedColumn<String> macronLookupForm =
+      i0.GeneratedColumn<String>(
+        'macronLookupForm',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
+  static const i0.VerificationMeta _uncertaintyBitMaskMeta =
+      const i0.VerificationMeta('uncertaintyBitMask');
+  late final i0.GeneratedColumn<int> uncertaintyBitMask =
+      i0.GeneratedColumn<int>(
+        'uncertaintyBitMask',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.int,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
   static const i0.VerificationMeta _dictionaryRefMeta =
       const i0.VerificationMeta('dictionaryRef');
   late final i0.GeneratedColumn<String> dictionaryRef =
@@ -4082,6 +4300,8 @@ class ScopedLookupLemmas extends i0.Table
     workId,
     lookupForm,
     alsoLowercase,
+    macronLookupForm,
+    uncertaintyBitMask,
     dictionaryRef,
   ];
   @override
@@ -4123,6 +4343,28 @@ class ScopedLookupLemmas extends i0.Table
     } else if (isInserting) {
       context.missing(_alsoLowercaseMeta);
     }
+    if (data.containsKey('macronLookupForm')) {
+      context.handle(
+        _macronLookupFormMeta,
+        macronLookupForm.isAcceptableOrUnknown(
+          data['macronLookupForm']!,
+          _macronLookupFormMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_macronLookupFormMeta);
+    }
+    if (data.containsKey('uncertaintyBitMask')) {
+      context.handle(
+        _uncertaintyBitMaskMeta,
+        uncertaintyBitMask.isAcceptableOrUnknown(
+          data['uncertaintyBitMask']!,
+          _uncertaintyBitMaskMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_uncertaintyBitMaskMeta);
+    }
     if (data.containsKey('dictionaryRef')) {
       context.handle(
         _dictionaryRefMeta,
@@ -4142,6 +4384,8 @@ class ScopedLookupLemmas extends i0.Table
     workId,
     lookupForm,
     alsoLowercase,
+    macronLookupForm,
+    uncertaintyBitMask,
     dictionaryRef,
   };
   @override
@@ -4159,6 +4403,14 @@ class ScopedLookupLemmas extends i0.Table
       alsoLowercase: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.bool,
         data['${effectivePrefix}alsoLowercase'],
+      )!,
+      macronLookupForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronLookupForm'],
+      )!,
+      uncertaintyBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}uncertaintyBitMask'],
       )!,
       dictionaryRef: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -4178,7 +4430,7 @@ class ScopedLookupLemmas extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(workId, lookupForm, alsoLowercase, dictionaryRef)',
+    'PRIMARY KEY(workId, lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -4189,11 +4441,15 @@ class ScopedLookupLemma extends i0.DataClass
   final String workId;
   final String lookupForm;
   final bool alsoLowercase;
+  final String macronLookupForm;
+  final int uncertaintyBitMask;
   final String dictionaryRef;
   const ScopedLookupLemma({
     required this.workId,
     required this.lookupForm,
     required this.alsoLowercase,
+    required this.macronLookupForm,
+    required this.uncertaintyBitMask,
     required this.dictionaryRef,
   });
   @override
@@ -4202,6 +4458,8 @@ class ScopedLookupLemma extends i0.DataClass
     map['workId'] = i0.Variable<String>(workId);
     map['lookupForm'] = i0.Variable<String>(lookupForm);
     map['alsoLowercase'] = i0.Variable<bool>(alsoLowercase);
+    map['macronLookupForm'] = i0.Variable<String>(macronLookupForm);
+    map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
     map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
     return map;
   }
@@ -4211,6 +4469,8 @@ class ScopedLookupLemma extends i0.DataClass
       workId: i0.Value(workId),
       lookupForm: i0.Value(lookupForm),
       alsoLowercase: i0.Value(alsoLowercase),
+      macronLookupForm: i0.Value(macronLookupForm),
+      uncertaintyBitMask: i0.Value(uncertaintyBitMask),
       dictionaryRef: i0.Value(dictionaryRef),
     );
   }
@@ -4224,6 +4484,8 @@ class ScopedLookupLemma extends i0.DataClass
       workId: serializer.fromJson<String>(json['workId']),
       lookupForm: serializer.fromJson<String>(json['lookupForm']),
       alsoLowercase: serializer.fromJson<bool>(json['alsoLowercase']),
+      macronLookupForm: serializer.fromJson<String>(json['macronLookupForm']),
+      uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
     );
   }
@@ -4234,6 +4496,8 @@ class ScopedLookupLemma extends i0.DataClass
       'workId': serializer.toJson<String>(workId),
       'lookupForm': serializer.toJson<String>(lookupForm),
       'alsoLowercase': serializer.toJson<bool>(alsoLowercase),
+      'macronLookupForm': serializer.toJson<String>(macronLookupForm),
+      'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
     };
   }
@@ -4242,11 +4506,15 @@ class ScopedLookupLemma extends i0.DataClass
     String? workId,
     String? lookupForm,
     bool? alsoLowercase,
+    String? macronLookupForm,
+    int? uncertaintyBitMask,
     String? dictionaryRef,
   }) => i1.ScopedLookupLemma(
     workId: workId ?? this.workId,
     lookupForm: lookupForm ?? this.lookupForm,
     alsoLowercase: alsoLowercase ?? this.alsoLowercase,
+    macronLookupForm: macronLookupForm ?? this.macronLookupForm,
+    uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
   );
   ScopedLookupLemma copyWithCompanion(i1.ScopedLookupLemmasCompanion data) {
@@ -4258,6 +4526,12 @@ class ScopedLookupLemma extends i0.DataClass
       alsoLowercase: data.alsoLowercase.present
           ? data.alsoLowercase.value
           : this.alsoLowercase,
+      macronLookupForm: data.macronLookupForm.present
+          ? data.macronLookupForm.value
+          : this.macronLookupForm,
+      uncertaintyBitMask: data.uncertaintyBitMask.present
+          ? data.uncertaintyBitMask.value
+          : this.uncertaintyBitMask,
       dictionaryRef: data.dictionaryRef.present
           ? data.dictionaryRef.value
           : this.dictionaryRef,
@@ -4270,14 +4544,22 @@ class ScopedLookupLemma extends i0.DataClass
           ..write('workId: $workId, ')
           ..write('lookupForm: $lookupForm, ')
           ..write('alsoLowercase: $alsoLowercase, ')
+          ..write('macronLookupForm: $macronLookupForm, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
           ..write('dictionaryRef: $dictionaryRef')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(workId, lookupForm, alsoLowercase, dictionaryRef);
+  int get hashCode => Object.hash(
+    workId,
+    lookupForm,
+    alsoLowercase,
+    macronLookupForm,
+    uncertaintyBitMask,
+    dictionaryRef,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4285,6 +4567,8 @@ class ScopedLookupLemma extends i0.DataClass
           other.workId == this.workId &&
           other.lookupForm == this.lookupForm &&
           other.alsoLowercase == this.alsoLowercase &&
+          other.macronLookupForm == this.macronLookupForm &&
+          other.uncertaintyBitMask == this.uncertaintyBitMask &&
           other.dictionaryRef == this.dictionaryRef);
 }
 
@@ -4293,32 +4577,44 @@ class ScopedLookupLemmasCompanion
   final i0.Value<String> workId;
   final i0.Value<String> lookupForm;
   final i0.Value<bool> alsoLowercase;
+  final i0.Value<String> macronLookupForm;
+  final i0.Value<int> uncertaintyBitMask;
   final i0.Value<String> dictionaryRef;
   const ScopedLookupLemmasCompanion({
     this.workId = const i0.Value.absent(),
     this.lookupForm = const i0.Value.absent(),
     this.alsoLowercase = const i0.Value.absent(),
+    this.macronLookupForm = const i0.Value.absent(),
+    this.uncertaintyBitMask = const i0.Value.absent(),
     this.dictionaryRef = const i0.Value.absent(),
   });
   ScopedLookupLemmasCompanion.insert({
     required String workId,
     required String lookupForm,
     required bool alsoLowercase,
+    required String macronLookupForm,
+    required int uncertaintyBitMask,
     required String dictionaryRef,
   }) : workId = i0.Value(workId),
        lookupForm = i0.Value(lookupForm),
        alsoLowercase = i0.Value(alsoLowercase),
+       macronLookupForm = i0.Value(macronLookupForm),
+       uncertaintyBitMask = i0.Value(uncertaintyBitMask),
        dictionaryRef = i0.Value(dictionaryRef);
   static i0.Insertable<i1.ScopedLookupLemma> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? lookupForm,
     i0.Expression<bool>? alsoLowercase,
+    i0.Expression<String>? macronLookupForm,
+    i0.Expression<int>? uncertaintyBitMask,
     i0.Expression<String>? dictionaryRef,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
       if (lookupForm != null) 'lookupForm': lookupForm,
       if (alsoLowercase != null) 'alsoLowercase': alsoLowercase,
+      if (macronLookupForm != null) 'macronLookupForm': macronLookupForm,
+      if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
       if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
     });
   }
@@ -4327,12 +4623,16 @@ class ScopedLookupLemmasCompanion
     i0.Value<String>? workId,
     i0.Value<String>? lookupForm,
     i0.Value<bool>? alsoLowercase,
+    i0.Value<String>? macronLookupForm,
+    i0.Value<int>? uncertaintyBitMask,
     i0.Value<String>? dictionaryRef,
   }) {
     return i1.ScopedLookupLemmasCompanion(
       workId: workId ?? this.workId,
       lookupForm: lookupForm ?? this.lookupForm,
       alsoLowercase: alsoLowercase ?? this.alsoLowercase,
+      macronLookupForm: macronLookupForm ?? this.macronLookupForm,
+      uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
       dictionaryRef: dictionaryRef ?? this.dictionaryRef,
     );
   }
@@ -4349,6 +4649,12 @@ class ScopedLookupLemmasCompanion
     if (alsoLowercase.present) {
       map['alsoLowercase'] = i0.Variable<bool>(alsoLowercase.value);
     }
+    if (macronLookupForm.present) {
+      map['macronLookupForm'] = i0.Variable<String>(macronLookupForm.value);
+    }
+    if (uncertaintyBitMask.present) {
+      map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask.value);
+    }
     if (dictionaryRef.present) {
       map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
     }
@@ -4361,6 +4667,8 @@ class ScopedLookupLemmasCompanion
           ..write('workId: $workId, ')
           ..write('lookupForm: $lookupForm, ')
           ..write('alsoLowercase: $alsoLowercase, ')
+          ..write('macronLookupForm: $macronLookupForm, ')
+          ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
           ..write('dictionaryRef: $dictionaryRef')
           ..write(')'))
         .toString();
@@ -4621,7 +4929,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'WITH Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef), LookupMaxCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, MAX(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase), Steps AS (SELECT LookupMaxCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMaxCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMaxCounts.workId AND ScopedLookupFreq.lookupForm = LookupMaxCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMaxCounts.alsoLowercase GROUP BY LookupMaxCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
+      'WITH Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef), LookupMaxCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask, MAX(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask), Steps AS (SELECT LookupMaxCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMaxCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMaxCounts.workId AND ScopedLookupFreq.lookupForm = LookupMaxCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMaxCounts.alsoLowercase AND ScopedLookupFreq.macronLookupForm = LookupMaxCounts.macronLookupForm AND ScopedLookupFreq.uncertaintyBitMask = LookupMaxCounts.uncertaintyBitMask GROUP BY LookupMaxCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
       variables: [for (var $ in workIds) i0.Variable<String>($)],
       readsFrom: {scopedLemmaFreq, scopedLookupLemmas, scopedLookupFreq},
     ).map(
@@ -4639,7 +4947,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'WITH Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef), LookupMinCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, MIN(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase), Steps AS (SELECT LookupMinCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMinCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMinCounts.workId AND ScopedLookupFreq.lookupForm = LookupMinCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMinCounts.alsoLowercase GROUP BY LookupMinCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
+      'WITH Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef), LookupMinCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask, MIN(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask), Steps AS (SELECT LookupMinCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMinCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMinCounts.workId AND ScopedLookupFreq.lookupForm = LookupMinCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMinCounts.alsoLowercase AND ScopedLookupFreq.macronLookupForm = LookupMinCounts.macronLookupForm AND ScopedLookupFreq.uncertaintyBitMask = LookupMinCounts.uncertaintyBitMask GROUP BY LookupMinCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
       variables: [for (var $ in workIds) i0.Variable<String>($)],
       readsFrom: {scopedLemmaFreq, scopedLookupLemmas, scopedLookupFreq},
     ).map(
@@ -4663,7 +4971,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     );
     $arrayStartIndex += lookupForms.length;
     return customSelect(
-      'WITH Candidates AS (SELECT DISTINCT lookupForm, alsoLowercase, dictionaryRef FROM ScopedLookupLemmas WHERE workId IN ($expandedworkIds) AND lookupForm IN ($expandedlookupForms)), Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) AND dictionaryRef IN (SELECT dictionaryRef FROM Candidates) GROUP BY dictionaryRef) SELECT Candidates.lookupForm, Candidates.alsoLowercase, MAX(Lemmas.occurrences) AS occurrences FROM Candidates INNER JOIN Lemmas ON Lemmas.dictionaryRef = Candidates.dictionaryRef GROUP BY Candidates.lookupForm, Candidates.alsoLowercase',
+      'WITH Candidates AS (SELECT DISTINCT lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef FROM ScopedLookupLemmas WHERE workId IN ($expandedworkIds) AND lookupForm IN ($expandedlookupForms)), Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) AND dictionaryRef IN (SELECT dictionaryRef FROM Candidates) GROUP BY dictionaryRef) SELECT Candidates.lookupForm, Candidates.alsoLowercase, Candidates.macronLookupForm, Candidates.uncertaintyBitMask, MAX(Lemmas.occurrences) AS occurrences FROM Candidates INNER JOIN Lemmas ON Lemmas.dictionaryRef = Candidates.dictionaryRef GROUP BY Candidates.lookupForm, Candidates.alsoLowercase, Candidates.macronLookupForm, Candidates.uncertaintyBitMask',
       variables: [
         for (var $ in workIds) i0.Variable<String>($),
         for (var $ in lookupForms) i0.Variable<String>($),
@@ -4673,6 +4981,8 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       (i0.QueryRow row) => i5.LookupCount(
         lookupForm: row.read<String>('lookupForm'),
         alsoLowercase: row.read<bool>('alsoLowercase'),
+        macronLookupForm: row.read<String>('macronLookupForm'),
+        uncertaintyBitMask: row.read<int>('uncertaintyBitMask'),
         occurrences: row.readNullable<int>('occurrences'),
       ),
     );

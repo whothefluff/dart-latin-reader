@@ -604,6 +604,224 @@ typedef $MorphologicalDetailInflectionsProcessedTableManager =
       i1.MorphologicalDetailInflection,
       i0.PrefetchHooks Function()
     >;
+typedef $CountableWordCandidateAnalysesCreateCompanionBuilder =
+    i1.CountableWordCandidateAnalysesCompanion Function({
+      required String workId,
+      required int idx,
+      required int componentOrdinal,
+      required String form,
+      required int item,
+    });
+typedef $CountableWordCandidateAnalysesUpdateCompanionBuilder =
+    i1.CountableWordCandidateAnalysesCompanion Function({
+      i0.Value<String> workId,
+      i0.Value<int> idx,
+      i0.Value<int> componentOrdinal,
+      i0.Value<String> form,
+      i0.Value<int> item,
+    });
+
+class $CountableWordCandidateAnalysesFilterComposer
+    extends
+        i0.Composer<i0.GeneratedDatabase, i1.CountableWordCandidateAnalyses> {
+  $CountableWordCandidateAnalysesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnFilters<String> get workId => $composableBuilder(
+    column: $table.workId,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get idx => $composableBuilder(
+    column: $table.idx,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get componentOrdinal => $composableBuilder(
+    column: $table.componentOrdinal,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get form => $composableBuilder(
+    column: $table.form,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get item => $composableBuilder(
+    column: $table.item,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+}
+
+class $CountableWordCandidateAnalysesOrderingComposer
+    extends
+        i0.Composer<i0.GeneratedDatabase, i1.CountableWordCandidateAnalyses> {
+  $CountableWordCandidateAnalysesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnOrderings<String> get workId => $composableBuilder(
+    column: $table.workId,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get idx => $composableBuilder(
+    column: $table.idx,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get componentOrdinal => $composableBuilder(
+    column: $table.componentOrdinal,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get form => $composableBuilder(
+    column: $table.form,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<int> get item => $composableBuilder(
+    column: $table.item,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+}
+
+class $CountableWordCandidateAnalysesAnnotationComposer
+    extends
+        i0.Composer<i0.GeneratedDatabase, i1.CountableWordCandidateAnalyses> {
+  $CountableWordCandidateAnalysesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.GeneratedColumn<String> get workId =>
+      $composableBuilder(column: $table.workId, builder: (column) => column);
+
+  i0.GeneratedColumn<int> get idx =>
+      $composableBuilder(column: $table.idx, builder: (column) => column);
+
+  i0.GeneratedColumn<int> get componentOrdinal => $composableBuilder(
+    column: $table.componentOrdinal,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get form =>
+      $composableBuilder(column: $table.form, builder: (column) => column);
+
+  i0.GeneratedColumn<int> get item =>
+      $composableBuilder(column: $table.item, builder: (column) => column);
+}
+
+class $CountableWordCandidateAnalysesTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.CountableWordCandidateAnalyses,
+          i1.CountableWordCandidateAnalyse,
+          i1.$CountableWordCandidateAnalysesFilterComposer,
+          i1.$CountableWordCandidateAnalysesOrderingComposer,
+          i1.$CountableWordCandidateAnalysesAnnotationComposer,
+          $CountableWordCandidateAnalysesCreateCompanionBuilder,
+          $CountableWordCandidateAnalysesUpdateCompanionBuilder,
+          (
+            i1.CountableWordCandidateAnalyse,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.CountableWordCandidateAnalyses,
+              i1.CountableWordCandidateAnalyse
+            >,
+          ),
+          i1.CountableWordCandidateAnalyse,
+          i0.PrefetchHooks Function()
+        > {
+  $CountableWordCandidateAnalysesTableManager(
+    i0.GeneratedDatabase db,
+    i1.CountableWordCandidateAnalyses table,
+  ) : super(
+        i0.TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              i1.$CountableWordCandidateAnalysesFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              i1.$CountableWordCandidateAnalysesOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              i1.$CountableWordCandidateAnalysesAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> workId = const i0.Value.absent(),
+                i0.Value<int> idx = const i0.Value.absent(),
+                i0.Value<int> componentOrdinal = const i0.Value.absent(),
+                i0.Value<String> form = const i0.Value.absent(),
+                i0.Value<int> item = const i0.Value.absent(),
+              }) => i1.CountableWordCandidateAnalysesCompanion(
+                workId: workId,
+                idx: idx,
+                componentOrdinal: componentOrdinal,
+                form: form,
+                item: item,
+              ),
+          createCompanionCallback:
+              ({
+                required String workId,
+                required int idx,
+                required int componentOrdinal,
+                required String form,
+                required int item,
+              }) => i1.CountableWordCandidateAnalysesCompanion.insert(
+                workId: workId,
+                idx: idx,
+                componentOrdinal: componentOrdinal,
+                form: form,
+                item: item,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $CountableWordCandidateAnalysesProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.CountableWordCandidateAnalyses,
+      i1.CountableWordCandidateAnalyse,
+      i1.$CountableWordCandidateAnalysesFilterComposer,
+      i1.$CountableWordCandidateAnalysesOrderingComposer,
+      i1.$CountableWordCandidateAnalysesAnnotationComposer,
+      $CountableWordCandidateAnalysesCreateCompanionBuilder,
+      $CountableWordCandidateAnalysesUpdateCompanionBuilder,
+      (
+        i1.CountableWordCandidateAnalyse,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.CountableWordCandidateAnalyses,
+          i1.CountableWordCandidateAnalyse
+        >,
+      ),
+      i1.CountableWordCandidateAnalyse,
+      i0.PrefetchHooks Function()
+    >;
 typedef $SearchableMorphDetInflectionsCreateCompanionBuilder =
     i1.SearchableMorphDetInflectionsCompanion Function({
       i0.Value<String?> form,
@@ -1083,11 +1301,6 @@ class MorphologicalDetailsCompanion
         .toString();
   }
 }
-
-i0.Index get morphologicalDetailsDictRef => i0.Index(
-  'MorphologicalDetails_DictRef',
-  'CREATE INDEX MorphologicalDetails_DictRef ON MorphologicalDetails (dictionaryRef)',
-);
 
 class MorphologicalDetailInflections extends i0.Table
     with
@@ -1981,6 +2194,395 @@ class MorphologicalDetailInflectionsCompanion
           ..write('tense: $tense, ')
           ..write('voice: $voice, ')
           ..write('person: $person')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class CountableWordCandidateAnalyses extends i0.Table
+    with
+        i0.TableInfo<
+          CountableWordCandidateAnalyses,
+          i1.CountableWordCandidateAnalyse
+        > {
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  CountableWordCandidateAnalyses(this.attachedDatabase, [this._alias]);
+  static const i0.VerificationMeta _workIdMeta = const i0.VerificationMeta(
+    'workId',
+  );
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _idxMeta = const i0.VerificationMeta('idx');
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _componentOrdinalMeta =
+      const i0.VerificationMeta('componentOrdinal');
+  late final i0.GeneratedColumn<int> componentOrdinal = i0.GeneratedColumn<int>(
+    'componentOrdinal',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (componentOrdinal IN (0, 1))',
+  );
+  static const i0.VerificationMeta _formMeta = const i0.VerificationMeta(
+    'form',
+  );
+  late final i0.GeneratedColumn<String> form = i0.GeneratedColumn<String>(
+    'form',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const i0.VerificationMeta _itemMeta = const i0.VerificationMeta(
+    'item',
+  );
+  late final i0.GeneratedColumn<int> item = i0.GeneratedColumn<int>(
+    'item',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    workId,
+    idx,
+    componentOrdinal,
+    form,
+    item,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'CountableWordCandidateAnalyses';
+  @override
+  i0.VerificationContext validateIntegrity(
+    i0.Insertable<i1.CountableWordCandidateAnalyse> instance, {
+    bool isInserting = false,
+  }) {
+    final context = i0.VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('workId')) {
+      context.handle(
+        _workIdMeta,
+        workId.isAcceptableOrUnknown(data['workId']!, _workIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_workIdMeta);
+    }
+    if (data.containsKey('idx')) {
+      context.handle(
+        _idxMeta,
+        idx.isAcceptableOrUnknown(data['idx']!, _idxMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_idxMeta);
+    }
+    if (data.containsKey('componentOrdinal')) {
+      context.handle(
+        _componentOrdinalMeta,
+        componentOrdinal.isAcceptableOrUnknown(
+          data['componentOrdinal']!,
+          _componentOrdinalMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_componentOrdinalMeta);
+    }
+    if (data.containsKey('form')) {
+      context.handle(
+        _formMeta,
+        form.isAcceptableOrUnknown(data['form']!, _formMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_formMeta);
+    }
+    if (data.containsKey('item')) {
+      context.handle(
+        _itemMeta,
+        item.isAcceptableOrUnknown(data['item']!, _itemMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<i0.GeneratedColumn> get $primaryKey => {
+    workId,
+    idx,
+    componentOrdinal,
+    form,
+    item,
+  };
+  @override
+  i1.CountableWordCandidateAnalyse map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.CountableWordCandidateAnalyse(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      componentOrdinal: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}componentOrdinal'],
+      )!,
+      form: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}form'],
+      )!,
+      item: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}item'],
+      )!,
+    );
+  }
+
+  @override
+  CountableWordCandidateAnalyses createAlias(String alias) {
+    return CountableWordCandidateAnalyses(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(workId, idx, componentOrdinal, form, item)',
+    'FOREIGN KEY(form, item)REFERENCES MorphologicalDetails(form, item)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class CountableWordCandidateAnalyse extends i0.DataClass
+    implements i0.Insertable<i1.CountableWordCandidateAnalyse> {
+  final String workId;
+  final int idx;
+  final int componentOrdinal;
+
+  /// 1 is the enclitic
+  final String form;
+  final int item;
+  const CountableWordCandidateAnalyse({
+    required this.workId,
+    required this.idx,
+    required this.componentOrdinal,
+    required this.form,
+    required this.item,
+  });
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    map['workId'] = i0.Variable<String>(workId);
+    map['idx'] = i0.Variable<int>(idx);
+    map['componentOrdinal'] = i0.Variable<int>(componentOrdinal);
+    map['form'] = i0.Variable<String>(form);
+    map['item'] = i0.Variable<int>(item);
+    return map;
+  }
+
+  i1.CountableWordCandidateAnalysesCompanion toCompanion(bool nullToAbsent) {
+    return i1.CountableWordCandidateAnalysesCompanion(
+      workId: i0.Value(workId),
+      idx: i0.Value(idx),
+      componentOrdinal: i0.Value(componentOrdinal),
+      form: i0.Value(form),
+      item: i0.Value(item),
+    );
+  }
+
+  factory CountableWordCandidateAnalyse.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return CountableWordCandidateAnalyse(
+      workId: serializer.fromJson<String>(json['workId']),
+      idx: serializer.fromJson<int>(json['idx']),
+      componentOrdinal: serializer.fromJson<int>(json['componentOrdinal']),
+      form: serializer.fromJson<String>(json['form']),
+      item: serializer.fromJson<int>(json['item']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'idx': serializer.toJson<int>(idx),
+      'componentOrdinal': serializer.toJson<int>(componentOrdinal),
+      'form': serializer.toJson<String>(form),
+      'item': serializer.toJson<int>(item),
+    };
+  }
+
+  i1.CountableWordCandidateAnalyse copyWith({
+    String? workId,
+    int? idx,
+    int? componentOrdinal,
+    String? form,
+    int? item,
+  }) => i1.CountableWordCandidateAnalyse(
+    workId: workId ?? this.workId,
+    idx: idx ?? this.idx,
+    componentOrdinal: componentOrdinal ?? this.componentOrdinal,
+    form: form ?? this.form,
+    item: item ?? this.item,
+  );
+  CountableWordCandidateAnalyse copyWithCompanion(
+    i1.CountableWordCandidateAnalysesCompanion data,
+  ) {
+    return CountableWordCandidateAnalyse(
+      workId: data.workId.present ? data.workId.value : this.workId,
+      idx: data.idx.present ? data.idx.value : this.idx,
+      componentOrdinal: data.componentOrdinal.present
+          ? data.componentOrdinal.value
+          : this.componentOrdinal,
+      form: data.form.present ? data.form.value : this.form,
+      item: data.item.present ? data.item.value : this.item,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CountableWordCandidateAnalyse(')
+          ..write('workId: $workId, ')
+          ..write('idx: $idx, ')
+          ..write('componentOrdinal: $componentOrdinal, ')
+          ..write('form: $form, ')
+          ..write('item: $item')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(workId, idx, componentOrdinal, form, item);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.CountableWordCandidateAnalyse &&
+          other.workId == this.workId &&
+          other.idx == this.idx &&
+          other.componentOrdinal == this.componentOrdinal &&
+          other.form == this.form &&
+          other.item == this.item);
+}
+
+class CountableWordCandidateAnalysesCompanion
+    extends i0.UpdateCompanion<i1.CountableWordCandidateAnalyse> {
+  final i0.Value<String> workId;
+  final i0.Value<int> idx;
+  final i0.Value<int> componentOrdinal;
+  final i0.Value<String> form;
+  final i0.Value<int> item;
+  const CountableWordCandidateAnalysesCompanion({
+    this.workId = const i0.Value.absent(),
+    this.idx = const i0.Value.absent(),
+    this.componentOrdinal = const i0.Value.absent(),
+    this.form = const i0.Value.absent(),
+    this.item = const i0.Value.absent(),
+  });
+  CountableWordCandidateAnalysesCompanion.insert({
+    required String workId,
+    required int idx,
+    required int componentOrdinal,
+    required String form,
+    required int item,
+  }) : workId = i0.Value(workId),
+       idx = i0.Value(idx),
+       componentOrdinal = i0.Value(componentOrdinal),
+       form = i0.Value(form),
+       item = i0.Value(item);
+  static i0.Insertable<i1.CountableWordCandidateAnalyse> custom({
+    i0.Expression<String>? workId,
+    i0.Expression<int>? idx,
+    i0.Expression<int>? componentOrdinal,
+    i0.Expression<String>? form,
+    i0.Expression<int>? item,
+  }) {
+    return i0.RawValuesInsertable({
+      if (workId != null) 'workId': workId,
+      if (idx != null) 'idx': idx,
+      if (componentOrdinal != null) 'componentOrdinal': componentOrdinal,
+      if (form != null) 'form': form,
+      if (item != null) 'item': item,
+    });
+  }
+
+  i1.CountableWordCandidateAnalysesCompanion copyWith({
+    i0.Value<String>? workId,
+    i0.Value<int>? idx,
+    i0.Value<int>? componentOrdinal,
+    i0.Value<String>? form,
+    i0.Value<int>? item,
+  }) {
+    return i1.CountableWordCandidateAnalysesCompanion(
+      workId: workId ?? this.workId,
+      idx: idx ?? this.idx,
+      componentOrdinal: componentOrdinal ?? this.componentOrdinal,
+      form: form ?? this.form,
+      item: item ?? this.item,
+    );
+  }
+
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    if (workId.present) {
+      map['workId'] = i0.Variable<String>(workId.value);
+    }
+    if (idx.present) {
+      map['idx'] = i0.Variable<int>(idx.value);
+    }
+    if (componentOrdinal.present) {
+      map['componentOrdinal'] = i0.Variable<int>(componentOrdinal.value);
+    }
+    if (form.present) {
+      map['form'] = i0.Variable<String>(form.value);
+    }
+    if (item.present) {
+      map['item'] = i0.Variable<int>(item.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CountableWordCandidateAnalysesCompanion(')
+          ..write('workId: $workId, ')
+          ..write('idx: $idx, ')
+          ..write('componentOrdinal: $componentOrdinal, ')
+          ..write('form: $form, ')
+          ..write('item: $item')
           ..write(')'))
         .toString();
   }

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:latin_reader/src/component/library/proper_noun_state.dart';
+import 'package:latin_reader/src/component/morph_analysis/db_util.dart' as morphology;
 import 'package:latin_reader/src/component/word_frequency/db_util.dart' as frequency;
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
@@ -16,7 +17,7 @@ class _EmptyDb extends AppDb {
   //
 }
 
-/// An in-memory corpus populated by the production frequency statements.
+/// An in-memory corpus populated by the production statements.
 class FrequencyCorpus {
   FrequencyCorpus() : db = _EmptyDb();
 
@@ -31,8 +32,10 @@ class FrequencyCorpus {
     String word, {
     int times = 1,
     String? macronizedWord,
+    int uncertaintyBitMask = 0,
     ProperNounState properNounState = ProperNounState.common,
     String? enclitic,
+    String? expansion,
   }) => Future.wait(
     List.generate(times, (_) => _nextIdx.update(workId, (i) => i + 1, ifAbsent: () => 0)).map(
       (idx) => db.customStatement(
@@ -40,26 +43,56 @@ class FrequencyCorpus {
         INSERT INTO WorkContents( workId, idx, word, sourceReference, properNounState, tokenType,
                                   sentenceIdx, wordIdx, enclitic, expansion, macronizedWord,
                                   uncertaintyBitMask )
-            VALUES ( ?, ?, ?, '1', ?, 1, 0, ?, ?, NULL, ?, 0 )
+            VALUES ( ?, ?, ?, '1', ?, ?, 0, ?, ?, ?, ?, ? )
         ''',
-        [workId, idx, word, properNounState.code, idx, enclitic, macronizedWord ?? word],
+        [
+          workId,
+          idx,
+          word,
+          properNounState.code,
+          // tokenType: a word, or an abbreviation when it has an expansion
+          if (expansion == null) 1 else 2,
+          idx,
+          enclitic,
+          expansion,
+          macronizedWord ?? word,
+          uncertaintyBitMask,
+        ],
       ),
     ),
   );
 
-  Future<void> addAnalysis(String form, String dictionaryRef) => db.customStatement(
-    '''
-    INSERT INTO MorphologicalDetails( form, item, dictionaryRef )
-        SELECT ?, COUNT( * ), ? FROM MorphologicalDetails WHERE form = ?
-    ''',
-    [form, dictionaryRef, form],
-  );
+  /// An analysis of [form] as [dictionaryRef], spelled [macronizedForm] when given
+  Future<void> addAnalysis(String form, String dictionaryRef, {String? macronizedForm}) async {
+    await db.customStatement(
+      '''
+      INSERT INTO MorphologicalDetails( form, item, dictionaryRef )
+          SELECT ?, COUNT( * ), ? FROM MorphologicalDetails WHERE form = ?
+      ''',
+      [form, dictionaryRef, form],
+    );
+    if (macronizedForm != null) {
+      await db.customStatement(
+        '''
+        INSERT INTO MorphologicalDetailInflections( form, item, cnt, partOfSpeech, stem )
+            SELECT ?, MAX( item ), 0, 'noun', ? FROM MorphologicalDetails WHERE form = ?
+        ''',
+        [form, macronizedForm, form],
+      );
+    }
+  }
 
   Future<void> populate() => db.transaction(
-    () => frequency.operations.fold(
-      Future<void>.value(),
-      (previous, operation) => previous.then((_) => operation.insert(db)),
-    ),
+    () =>
+        [
+          morphology.operations.singleWhere(
+            (operation) => operation.id == 'CountableWordCandidateAnalyses',
+          ),
+          ...frequency.operations,
+        ].fold(
+          Future<void>.value(),
+          (previous, operation) => previous.then((_) => operation.insert(db)),
+        ),
   );
 
   Future<void> close() => db.close();

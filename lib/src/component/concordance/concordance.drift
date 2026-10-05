@@ -1,17 +1,58 @@
 import '../library/library.drift';
-import '../morph_analysis/morph_analysis.drift';
 import '../dictionary/dictionary.drift';
 import 'package:latin_reader/src/component/concordance/concordance_query.dart';
 import 'package:latin_reader/src/component/concordance/grammar_values_api.dart';
 
--- One row per analysis of a form, with what a lemma or grammar criterion filters by.
--- capitalizedForm is how a properNounState = 2 token writes a lowercase form: those tokens are
--- looked up both ways, exactly as frequency does it (ResolvedFreqMorphForms)
-CREATE VIEW "concordance.Analyses" AS
+CREATE TABLE "ConcordanceDetails"(
+    "form" TEXT NOT NULL,
+    "item" INTEGER NOT NULL,
+    "dictionaryRef" TEXT NOT NULL,
+    PRIMARY KEY( form, item )
+)
+STRICT,
+WITHOUT ROWID;
+
+-- Lemma criteria go from the lemma to its analyses
+CREATE INDEX "ConcordanceDetails_DictRef"
+    ON ConcordanceDetails( dictionaryRef );
+
+CREATE TABLE "ConcordanceDetailInflections"(
+    "form" TEXT NOT NULL,
+    "item" INTEGER NOT NULL,
+    "cnt" INTEGER NOT NULL,
+    "partOfSpeech" TEXT NOT NULL,
+    "gramCase" TEXT,
+    "number" TEXT,
+    "gender" TEXT,
+    "declension" TEXT,
+    "person" TEXT,
+    "verbForm" TEXT,
+    "tense" TEXT,
+    "voice" TEXT,
+    PRIMARY KEY( form, item, cnt ),
+    FOREIGN KEY( form, item ) REFERENCES ConcordanceDetails( form, item )
+)
+STRICT,
+WITHOUT ROWID;
+
+CREATE TABLE "ConcordanceCountableWordCandidateAnalyses"(
+    "workId" TEXT NOT NULL,
+    "idx" INTEGER NOT NULL,
+    "componentOrdinal" INTEGER NOT NULL CHECK( componentOrdinal IN (0, 1) ), -- 1 is the enclitic
+    "form" TEXT NOT NULL,
+    "item" INTEGER NOT NULL,
+    PRIMARY KEY( workId, idx, componentOrdinal, form, item ),
+    FOREIGN KEY( form, item ) REFERENCES ConcordanceDetails( form, item )
+)
+STRICT,
+WITHOUT ROWID;
+
+-- An analysed word in slot 1 goes from its analyses to their tokens
+CREATE INDEX "ConcordanceCountableWordCandidateAnalyses_Analysis"
+    ON ConcordanceCountableWordCandidateAnalyses( form, item );
+
+CREATE VIEW "concordance.AnalysesWithOptionalInflections" AS
     SELECT Details.form,
-           CASE WHEN Details.form = LOWER( Details.form )
-                THEN UPPER( SUBSTR( Details.form, 1, 1 ) ) || SUBSTR( Details.form, 2 )
-           END AS capitalizedForm,
            Details.item,
            Details.dictionaryRef,
            Infl.partOfSpeech,
@@ -23,8 +64,8 @@ CREATE VIEW "concordance.Analyses" AS
            Infl.verbForm,
            Infl.tense,
            Infl.voice
-        FROM MorphologicalDetails AS Details
-        LEFT OUTER JOIN MorphologicalDetailInflections AS Infl
+        FROM ConcordanceDetails AS Details
+        LEFT OUTER JOIN ConcordanceDetailInflections AS Infl
             ON Infl.form = Details.form
                AND Infl.item = Details.item;
 
@@ -35,7 +76,7 @@ CREATE VIEW "concordance.Lemmas" AS
                     Resolved.lemma AS lnsLemma,
                     Resolved.partOfSpeech AS lnsPartOfSpeech,
                     Resolved.inflection AS lnsInflection
-        FROM MorphologicalDetails AS Details
+        FROM ConcordanceDetails AS Details
         LEFT OUTER JOIN "dictionary.ResolvedLnsRefs" AS Resolved
             ON Resolved.dictionaryRef = Details.dictionaryRef;
 
@@ -61,54 +102,54 @@ CREATE VIEW "concordance.GrammarValues" AS
     SELECT partOfSpeech, 
            'partOfSpeech' AS feature, 
            partOfSpeech AS value
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
     UNION
     SELECT partOfSpeech, 
            'gramCase', 
            gramCase
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
         WHERE gramCase IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'number', 
            number
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
         WHERE number IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'gender', 
            gender
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
         WHERE gender IS NOT NULL
     UNION
     SELECT partOfSpeech,
            'declension',
            declension
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
         WHERE declension IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'person', 
            person
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
         WHERE person IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'verbForm', 
            verbForm
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
         WHERE verbForm IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'tense', 
            tense
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
         WHERE tense IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'voice', 
            voice
-        FROM MorphologicalDetailInflections
+        FROM ConcordanceDetailInflections
         WHERE voice IS NOT NULL;
 
 getConcordanceGrammarValues WITH GrammarValueRow.fromSql: SELECT partOfSpeech, 
@@ -134,15 +175,15 @@ getConcordanceGrammarValues WITH GrammarValueRow.fromSql: SELECT partOfSpeech,
 -- (both, or one to leave titles out or keep only them). :sortNeighbour is the word hits are
 -- sorted by, counted from the hit: 1 is the next one, -1 the previous one, 0 none (text order).
 --
--- A word is found as frequency counts it: by lookupForm, also capitalized when
--- properNounState = 2, by the enclitic, and, for a spelled word, as written with an enclitic
+-- A spelled word is found by lookupForm, by the enclitic, and as written with an enclitic
 -- (populusque, by the host's baseNormForm). The macron columns only add macrons to the same
--- letters, so they can only narrow what the plain ones find.
+-- letters, so they can only narrow what the plain ones find. A lemma or grammar word is found by
+-- its candidate analyses (ConcordanceCountableWordCandidateAnalyses).
 --
 -- SQLite has no estimate for the IN subqueries, so it gets some help: MATERIALIZED works out
--- each word's forms once, the unary + keeps it from reading the part's idx range instead of the
--- form indexes, and CROSS JOIN fixes the order (the first word leads, context is read for the
--- page only).
+-- each word's spellings and analyses once, the unary + keeps the first word from reading the
+-- part's idx range instead of the form indexes, and CROSS JOIN fixes the order (the first word
+-- leads, context is read for the page only).
 getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
     WITH WorkOrder AS ( SELECT CAST( Work.key AS INTEGER ) AS position,
                                Work.value AS workId
@@ -171,14 +212,14 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
          LemmaRefs AS MATERIALIZED ( SELECT Criteria.slot, 
                                             Ref.value AS dictionaryRef
                                          FROM Criteria, json_each( Criteria.lemma ) AS Ref ),
-         -- Every form an analysed word can have
+         -- Every analysis an analysed word can have
          -- A combined value (masculine/feminine/neuter) has each of its values, but a
          -- declension is one value (1st & 2nd isn't 1st)
-         Analysed AS MATERIALIZED ( SELECT Criteria.slot, 
-                                           Analyses.form, 
-                                           Analyses.capitalizedForm
+         Analysed AS MATERIALIZED ( SELECT Criteria.slot,
+                                           Analyses.form,
+                                           Analyses.item
                                         FROM Criteria
-                                        CROSS JOIN "concordance.Analyses" AS Analyses
+                                        CROSS JOIN "concordance.AnalysesWithOptionalInflections" AS Analyses
                                         WHERE Criteria.spellings IS NULL
                                               AND ( Criteria.lemma IS NULL
                                                     OR Analyses.dictionaryRef IN ( SELECT dictionaryRef
@@ -209,11 +250,35 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                                               AND ( Criteria.voice IS NULL
                                                     OR instr( '/' || Analyses.voice || '/',
                                                               '/' || Criteria.voice || '/' ) > 0 ) ),
-         -- What a token's lookupForm or enclitic can be: a spelling or an analysed form
-         Forms AS MATERIALIZED ( SELECT slot, form FROM Spellings
-                                 UNION ALL
-                                 SELECT slot, form FROM Analysed ),
-         Hits AS ( SELECT WorkOrder.position,
+         Slot1Matches AS ( SELECT WorkOrder.position,
+                                  Spelled.workId,
+                                  Spelled.idx
+                               FROM WorkOrder
+                               CROSS JOIN WorkContents AS Spelled
+                               WHERE Spelled.workId = WorkOrder.workId
+                                     AND +Spelled.idx BETWEEN :fromIdx AND :toIdx
+                                     AND ( Spelled.lookupForm IN ( SELECT form FROM Spellings WHERE slot = 1 )
+                                           OR Spelled.enclitic IN ( SELECT form FROM Spellings WHERE slot = 1 )
+                                           OR ( Spelled.enclitic IS NOT NULL
+                                                AND Spelled.baseNormForm IN ( SELECT form FROM Spellings WHERE slot = 1 ) ) )
+                                     AND ( NOT EXISTS ( SELECT * FROM MacronSpellings WHERE slot = 1 )
+                                           OR Spelled.macronLookupForm IN ( SELECT form FROM MacronSpellings WHERE slot = 1 )
+                                           OR Spelled.enclitic IN ( SELECT form FROM MacronSpellings WHERE slot = 1 )
+                                           OR ( Spelled.enclitic IS NOT NULL
+                                                AND Spelled.macronBaseNormForm IN ( SELECT form FROM MacronSpellings WHERE slot = 1 ) ) )
+                           UNION
+                           SELECT WorkOrder.position,
+                                  Candidate.workId,
+                                  Candidate.idx
+                               FROM WorkOrder
+                               CROSS JOIN Analysed
+                               CROSS JOIN ConcordanceCountableWordCandidateAnalyses AS Candidate
+                               WHERE Analysed.slot = 1
+                                     AND Candidate.form = Analysed.form
+                                     AND Candidate.item = Analysed.item
+                                     AND Candidate.workId = WorkOrder.workId
+                                     AND Candidate.idx BETWEEN :fromIdx AND :toIdx ),
+         Hits AS ( SELECT Slot1Matches.position,
                           t1.workId,
                           t1.sentenceIdx,
                           t1.sourceReference AS reference,
@@ -225,7 +290,7 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                           t1.idx AS slot1Idx,
                           t2.idx AS slot2Idx,
                           t3.idx AS slot3Idx
-                       FROM WorkOrder
+                       FROM Slot1Matches
                        CROSS JOIN WorkContents AS t1
                        LEFT OUTER JOIN WorkContents AS t2
                            ON EXISTS ( SELECT * FROM Criteria WHERE slot = 2 )
@@ -235,12 +300,15 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                               AND t2.isTitle = t1.isTitle
                               AND t2.wordIdx BETWEEN t1.wordIdx + 1 AND t1.wordIdx + ( SELECT distance FROM Criteria WHERE slot = 2 )
                               AND t2.idx BETWEEN :fromIdx AND :toIdx
-                              AND ( t2.lookupForm IN ( SELECT form FROM Forms WHERE slot = 2 )
-                                    OR t2.enclitic IN ( SELECT form FROM Forms WHERE slot = 2 )
+                              AND ( t2.lookupForm IN ( SELECT form FROM Spellings WHERE slot = 2 )
+                                    OR t2.enclitic IN ( SELECT form FROM Spellings WHERE slot = 2 )
                                     OR ( t2.enclitic IS NOT NULL
                                          AND t2.baseNormForm IN ( SELECT form FROM Spellings WHERE slot = 2 ) )
-                                    OR ( t2.properNounState = 2
-                                         AND t2.lookupForm IN ( SELECT capitalizedForm FROM Analysed WHERE slot = 2 ) ) )
+                                    OR EXISTS ( SELECT *
+                                                    FROM ConcordanceCountableWordCandidateAnalyses AS Candidate
+                                                    WHERE Candidate.workId = t2.workId
+                                                          AND Candidate.idx = t2.idx
+                                                          AND ( +Candidate.form, Candidate.item ) IN ( SELECT form, item FROM Analysed WHERE slot = 2 ) ) ) -- + looks the token up, not each analysis
                               AND ( NOT EXISTS ( SELECT * FROM MacronSpellings WHERE slot = 2 )
                                     OR t2.macronLookupForm IN ( SELECT form FROM MacronSpellings WHERE slot = 2 )
                                     OR t2.enclitic IN ( SELECT form FROM MacronSpellings WHERE slot = 2 )
@@ -253,31 +321,23 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                               AND t3.isTitle = t2.isTitle
                               AND t3.wordIdx BETWEEN t2.wordIdx + 1 AND t2.wordIdx + ( SELECT distance FROM Criteria WHERE slot = 3 )
                               AND t3.idx BETWEEN :fromIdx AND :toIdx
-                              AND ( t3.lookupForm IN ( SELECT form FROM Forms WHERE slot = 3 )
-                                    OR t3.enclitic IN ( SELECT form FROM Forms WHERE slot = 3 )
+                              AND ( t3.lookupForm IN ( SELECT form FROM Spellings WHERE slot = 3 )
+                                    OR t3.enclitic IN ( SELECT form FROM Spellings WHERE slot = 3 )
                                     OR ( t3.enclitic IS NOT NULL
                                          AND t3.baseNormForm IN ( SELECT form FROM Spellings WHERE slot = 3 ) )
-                                    OR ( t3.properNounState = 2
-                                         AND t3.lookupForm IN ( SELECT capitalizedForm FROM Analysed WHERE slot = 3 ) ) )
+                                    OR EXISTS ( SELECT *
+                                                    FROM ConcordanceCountableWordCandidateAnalyses AS Candidate
+                                                    WHERE Candidate.workId = t3.workId
+                                                          AND Candidate.idx = t3.idx
+                                                          AND ( +Candidate.form, Candidate.item ) IN ( SELECT form, item FROM Analysed WHERE slot = 3 ) ) ) -- + looks the token up, not each analysis
                               AND ( NOT EXISTS ( SELECT * FROM MacronSpellings WHERE slot = 3 )
                                     OR t3.macronLookupForm IN ( SELECT form FROM MacronSpellings WHERE slot = 3 )
                                     OR t3.enclitic IN ( SELECT form FROM MacronSpellings WHERE slot = 3 )
                                     OR ( t3.enclitic IS NOT NULL
                                          AND t3.macronBaseNormForm IN ( SELECT form FROM MacronSpellings WHERE slot = 3 ) ) )
-                       WHERE t1.workId = WorkOrder.workId
-                             AND +t1.idx BETWEEN :fromIdx AND :toIdx
+                       WHERE t1.workId = Slot1Matches.workId
+                             AND t1.idx = Slot1Matches.idx
                              AND t1.isTitle IN :isTitleValues
-                             AND ( t1.lookupForm IN ( SELECT form FROM Forms WHERE slot = 1 )
-                                   OR t1.enclitic IN ( SELECT form FROM Forms WHERE slot = 1 )
-                                   OR ( t1.enclitic IS NOT NULL
-                                        AND t1.baseNormForm IN ( SELECT form FROM Spellings WHERE slot = 1 ) )
-                                   OR ( t1.properNounState = 2
-                                        AND t1.lookupForm IN ( SELECT capitalizedForm FROM Analysed WHERE slot = 1 ) ) )
-                             AND ( NOT EXISTS ( SELECT * FROM MacronSpellings WHERE slot = 1 )
-                                   OR t1.macronLookupForm IN ( SELECT form FROM MacronSpellings WHERE slot = 1 )
-                                   OR t1.enclitic IN ( SELECT form FROM MacronSpellings WHERE slot = 1 )
-                                   OR ( t1.enclitic IS NOT NULL
-                                        AND t1.macronBaseNormForm IN ( SELECT form FROM MacronSpellings WHERE slot = 1 ) ) )
                              AND ( t2.idx IS NOT NULL 
                                    OR NOT EXISTS ( SELECT * FROM Criteria WHERE slot = 2 ) )
                              AND ( t3.idx IS NOT NULL 

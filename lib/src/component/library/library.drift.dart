@@ -3987,6 +3987,8 @@ class WorkContents extends i0.Table
     'CHECK(expansion IS NULL OR tokenType IN (2, 3))',
     'CHECK(enclitic IS NULL OR(LENGTH(enclitic) > 0 AND LENGTH(enclitic) < LENGTH(word) AND LOWER(SUBSTR(word, LENGTH(word) - LENGTH(enclitic) + 1)) = LOWER(enclitic)))',
     'CHECK(enclitic IS NULL OR tokenType = 1)',
+    'CHECK(expansion IS NULL OR macronizedWord = \'\' OR uncertaintyBitMask = 0)',
+    'CHECK(enclitic IS NULL OR macronizedWord = \'\' OR((uncertaintyBitMask >>(LENGTH(word) - LENGTH(enclitic)))= 0 AND LOWER(SUBSTR(macronizedWord, LENGTH(macronizedWord) - LENGTH(enclitic) + 1)) = LOWER(enclitic)))',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -7376,6 +7378,7 @@ class LibraryWorkContent extends i0.DataClass {
   final i4.SubdivisionType typ;
   final int depth;
   final String? lookupForm;
+  final String? macronLookupForm;
   final i3.ProperNounState? properNounState;
   final String sourceReference;
   const LibraryWorkContent({
@@ -7389,6 +7392,7 @@ class LibraryWorkContent extends i0.DataClass {
     required this.typ,
     required this.depth,
     this.lookupForm,
+    this.macronLookupForm,
     this.properNounState,
     required this.sourceReference,
   });
@@ -7408,6 +7412,7 @@ class LibraryWorkContent extends i0.DataClass {
       typ: serializer.fromJson<i4.SubdivisionType>(json['typ']),
       depth: serializer.fromJson<int>(json['depth']),
       lookupForm: serializer.fromJson<String?>(json['lookupForm']),
+      macronLookupForm: serializer.fromJson<String?>(json['macronLookupForm']),
       properNounState: serializer.fromJson<i3.ProperNounState?>(
         json['properNounState'],
       ),
@@ -7428,6 +7433,7 @@ class LibraryWorkContent extends i0.DataClass {
       'typ': serializer.toJson<i4.SubdivisionType>(typ),
       'depth': serializer.toJson<int>(depth),
       'lookupForm': serializer.toJson<String?>(lookupForm),
+      'macronLookupForm': serializer.toJson<String?>(macronLookupForm),
       'properNounState': serializer.toJson<i3.ProperNounState?>(
         properNounState,
       ),
@@ -7446,6 +7452,7 @@ class LibraryWorkContent extends i0.DataClass {
     i4.SubdivisionType? typ,
     int? depth,
     i0.Value<String?> lookupForm = const i0.Value.absent(),
+    i0.Value<String?> macronLookupForm = const i0.Value.absent(),
     i0.Value<i3.ProperNounState?> properNounState = const i0.Value.absent(),
     String? sourceReference,
   }) => i1.LibraryWorkContent(
@@ -7459,6 +7466,9 @@ class LibraryWorkContent extends i0.DataClass {
     typ: typ ?? this.typ,
     depth: depth ?? this.depth,
     lookupForm: lookupForm.present ? lookupForm.value : this.lookupForm,
+    macronLookupForm: macronLookupForm.present
+        ? macronLookupForm.value
+        : this.macronLookupForm,
     properNounState: properNounState.present
         ? properNounState.value
         : this.properNounState,
@@ -7477,6 +7487,7 @@ class LibraryWorkContent extends i0.DataClass {
           ..write('typ: $typ, ')
           ..write('depth: $depth, ')
           ..write('lookupForm: $lookupForm, ')
+          ..write('macronLookupForm: $macronLookupForm, ')
           ..write('properNounState: $properNounState, ')
           ..write('sourceReference: $sourceReference')
           ..write(')'))
@@ -7495,6 +7506,7 @@ class LibraryWorkContent extends i0.DataClass {
     typ,
     depth,
     lookupForm,
+    macronLookupForm,
     properNounState,
     sourceReference,
   );
@@ -7512,6 +7524,7 @@ class LibraryWorkContent extends i0.DataClass {
           other.typ == this.typ &&
           other.depth == this.depth &&
           other.lookupForm == this.lookupForm &&
+          other.macronLookupForm == this.macronLookupForm &&
           other.properNounState == this.properNounState &&
           other.sourceReference == this.sourceReference);
 }
@@ -7535,6 +7548,7 @@ class LibraryWorkContents
     typ,
     depth,
     lookupForm,
+    macronLookupForm,
     properNounState,
     sourceReference,
   ];
@@ -7545,7 +7559,7 @@ class LibraryWorkContents
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.properNounState, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, lookupForm, properNounState, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.properNounState, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, lookupForm, macronLookupForm, properNounState, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
   };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -7594,6 +7608,10 @@ class LibraryWorkContents
       lookupForm: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}lookupForm'],
+      ),
+      macronLookupForm: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronLookupForm'],
       ),
       properNounState: i1.WorkContents.$converterproperNounStaten.fromSql(
         attachedDatabase.typeMapping.read(
@@ -7671,6 +7689,13 @@ class LibraryWorkContents
     true,
     type: i0.DriftSqlType.string,
   );
+  late final i0.GeneratedColumn<String> macronLookupForm =
+      i0.GeneratedColumn<String>(
+        'macronLookupForm',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
   late final i0.GeneratedColumnWithTypeConverter<i3.ProperNounState?, int>
   properNounState =
       i0.GeneratedColumn<int>(
@@ -8418,6 +8443,7 @@ class LibraryDrift extends i5.ModularAccessor {
         ),
         depth: row.read<int>('depth'),
         lookupForm: row.readNullable<String>('lookupForm'),
+        macronLookupForm: row.readNullable<String>('macronLookupForm'),
         properNounState: i0.NullAwareTypeConverter.wrapFromSql(
           i1.WorkContents.$converterproperNounState,
           row.readNullable<int>('properNounState'),

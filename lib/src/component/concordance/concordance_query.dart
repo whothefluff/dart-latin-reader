@@ -328,7 +328,7 @@ class LemmaChoice {
 }
 
 /// A grammatical feature of an analysis. The name is its column in
-/// "concordance.Analyses"
+/// "concordance.AnalysesWithOptionalInflections"
 enum GrammarFeature {
   partOfSpeech,
   gramCase,

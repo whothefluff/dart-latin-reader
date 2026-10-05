@@ -29,26 +29,30 @@ class _SystemHash {
   }
 }
 
-/// Returns the most frequent candidate lemma's count for each form in [lookupForms],
+/// Returns the most frequent candidate lemma's count for every lookup of a form in [lookupForms],
 /// plus any-candidate text coverage for the works selected by [scope] and [workId].
+/// Keyed by plain forms, so the cache isn't split per macronized spelling.
 ///
 /// Copied from [lookupFrequencies].
 @ProviderFor(lookupFrequencies)
 const lookupFrequenciesProvider = LookupFrequenciesFamily();
 
-/// Returns the most frequent candidate lemma's count for each form in [lookupForms],
+/// Returns the most frequent candidate lemma's count for every lookup of a form in [lookupForms],
 /// plus any-candidate text coverage for the works selected by [scope] and [workId].
+/// Keyed by plain forms, so the cache isn't split per macronized spelling.
 ///
 /// Copied from [lookupFrequencies].
 class LookupFrequenciesFamily extends Family<AsyncValue<LookupFrequencies>> {
-  /// Returns the most frequent candidate lemma's count for each form in [lookupForms],
+  /// Returns the most frequent candidate lemma's count for every lookup of a form in [lookupForms],
   /// plus any-candidate text coverage for the works selected by [scope] and [workId].
+  /// Keyed by plain forms, so the cache isn't split per macronized spelling.
   ///
   /// Copied from [lookupFrequencies].
   const LookupFrequenciesFamily();
 
-  /// Returns the most frequent candidate lemma's count for each form in [lookupForms],
+  /// Returns the most frequent candidate lemma's count for every lookup of a form in [lookupForms],
   /// plus any-candidate text coverage for the works selected by [scope] and [workId].
+  /// Keyed by plain forms, so the cache isn't split per macronized spelling.
   ///
   /// Copied from [lookupFrequencies].
   LookupFrequenciesProvider call(
@@ -81,14 +85,16 @@ class LookupFrequenciesFamily extends Family<AsyncValue<LookupFrequencies>> {
   String? get name => r'lookupFrequenciesProvider';
 }
 
-/// Returns the most frequent candidate lemma's count for each form in [lookupForms],
+/// Returns the most frequent candidate lemma's count for every lookup of a form in [lookupForms],
 /// plus any-candidate text coverage for the works selected by [scope] and [workId].
+/// Keyed by plain forms, so the cache isn't split per macronized spelling.
 ///
 /// Copied from [lookupFrequencies].
 class LookupFrequenciesProvider
     extends AutoDisposeFutureProvider<LookupFrequencies> {
-  /// Returns the most frequent candidate lemma's count for each form in [lookupForms],
+  /// Returns the most frequent candidate lemma's count for every lookup of a form in [lookupForms],
   /// plus any-candidate text coverage for the works selected by [scope] and [workId].
+  /// Keyed by plain forms, so the cache isn't split per macronized spelling.
   ///
   /// Copied from [lookupFrequencies].
   LookupFrequenciesProvider(

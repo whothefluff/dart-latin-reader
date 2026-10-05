@@ -27,14 +27,24 @@ LibraryCatalog _catalog() => LibraryCatalog(
   anonymousWorks: UnmodifiableListView(const [CatalogWork(id: _anonymous, name: 'Anonymous')]),
 );
 
+/// The lookup of [form] as a common word written without macrons, every letter certain
+Lookup _common(String form) => Lookup(
+  lookupForm: form,
+  alsoLowercase: false,
+  macronized: (form: form, uncertaintyBitMask: 0),
+);
+
+LookupCount _countOf(String form, int occurrences) => LookupCount(
+  lookupForm: form,
+  alsoLowercase: false,
+  macronLookupForm: form,
+  uncertaintyBitMask: 0,
+  occurrences: occurrences,
+);
+
 /// Forms counted 5, 2, 2 and 1 times, each a lookup with one candidate lemma.
 LookupFrequencies _formsOfTenUnits() => LookupFrequencies(
-  counts: const [
-    LookupCount(lookupForm: 'et', alsoLowercase: false, occurrences: 5),
-    LookupCount(lookupForm: 'in', alsoLowercase: false, occurrences: 2),
-    LookupCount(lookupForm: 'non', alsoLowercase: false, occurrences: 2),
-    LookupCount(lookupForm: 'sed', alsoLowercase: false, occurrences: 1),
-  ],
+  counts: [_countOf('et', 5), _countOf('in', 2), _countOf('non', 2), _countOf('sed', 1)],
   coverage: TextCoverage(
     steps: const [
       TextCoverageStep(minOccurrences: 5, coveredUnits: 5),
@@ -90,11 +100,9 @@ void main() {
         markCommon: true,
         markUncommon: true,
       );
-      Lookup form(String lookupForm) => Lookup(lookupForm: lookupForm, alsoLowercase: false);
-
-      expect(bands.bandOf(form('et')), FrequencyBand.common);
-      expect(bands.bandOf(form('in')), isNull);
-      expect(bands.bandOf(form('sed')), FrequencyBand.uncommon);
+      expect(bands.bandOf(_common('et')), FrequencyBand.common);
+      expect(bands.bandOf(_common('in')), isNull);
+      expect(bands.bandOf(_common('sed')), FrequencyBand.uncommon);
     });
 
     test('common wins where the two bands overlap', () {
@@ -105,10 +113,7 @@ void main() {
         markUncommon: true,
       );
 
-      expect(
-        bands.bandOf(const Lookup(lookupForm: 'sed', alsoLowercase: false)),
-        FrequencyBand.common,
-      );
+      expect(bands.bandOf(_common('sed')), FrequencyBand.common);
     });
 
     test('a lookup with no counted candidate lemma is in neither band', () {
@@ -119,14 +124,27 @@ void main() {
         markUncommon: true,
       );
 
-      expect(bands.bandOf(const Lookup(lookupForm: 'xyzzy', alsoLowercase: false)), isNull);
-      expect(bands.bandOf(const Lookup(lookupForm: 'et', alsoLowercase: true)), isNull);
+      expect(bands.bandOf(_common('xyzzy')), isNull);
+      expect(
+        bands.bandOf(
+          const Lookup(
+            lookupForm: 'et',
+            alsoLowercase: true,
+            macronized: (form: 'et', uncertaintyBitMask: 0),
+          ),
+        ),
+        isNull,
+      );
     });
 
     test('only a name that may be a common word is looked up in lowercase too', () {
       expect(
         [ProperNounState.either, ProperNounState.proper, ProperNounState.common, null].map(
-          (state) => Lookup.of('Venere', state).alsoLowercase,
+          (state) => Lookup.of(
+            'Venere',
+            state,
+            macronized: (form: 'Venere', uncertaintyBitMask: 0),
+          ).alsoLowercase,
         ),
         [true, false, false, false],
       );
@@ -146,10 +164,8 @@ void main() {
         markCommon: false,
         markUncommon: true,
       );
-      const inForm = Lookup(lookupForm: 'in', alsoLowercase: false);
-
-      expect(both.bandOf(inForm), FrequencyBand.common);
-      expect(uncommonOnly.bandOf(inForm), FrequencyBand.uncommon);
+      expect(both.bandOf(_common('in')), FrequencyBand.common);
+      expect(uncommonOnly.bandOf(_common('in')), FrequencyBand.uncommon);
     });
   });
 
@@ -175,7 +191,7 @@ void main() {
       await corpus.addAnalysis('edit', 'edo1');
       await corpus.addAnalysis('sunt', 'sum1');
       await corpus.populate();
-      const edit = Lookup(lookupForm: 'edit', alsoLowercase: false);
+      final edit = _common('edit');
 
       final work = await _readFrequencies(corpus.db, fables, FrequencyScope.work, ['est', 'edit']);
       final author = await _readFrequencies(
@@ -233,9 +249,24 @@ void main() {
         markUncommon: true,
       );
 
-      expect(bands.bandOf(const Lookup.of('Venere', ProperNounState.either)), FrequencyBand.common);
       expect(
-        bands.bandOf(const Lookup.of('Venere', ProperNounState.proper)),
+        bands.bandOf(
+          const Lookup.of(
+            'Venere',
+            ProperNounState.either,
+            macronized: (form: 'Venere', uncertaintyBitMask: 0),
+          ),
+        ),
+        FrequencyBand.common,
+      );
+      expect(
+        bands.bandOf(
+          const Lookup.of(
+            'Venere',
+            ProperNounState.proper,
+            macronized: (form: 'Venere', uncertaintyBitMask: 0),
+          ),
+        ),
         FrequencyBand.uncommon,
       );
     });
@@ -259,8 +290,279 @@ void main() {
         markUncommon: true,
       );
 
-      expect(bands.bandOf(const Lookup.of('amat', ProperNounState.common)), FrequencyBand.common);
-      expect(bands.bandOf(const Lookup.of('Xanthus', ProperNounState.proper)), isNull);
+      expect(bands.bandOf(_common('amat')), FrequencyBand.common);
+      expect(
+        bands.bandOf(
+          const Lookup.of(
+            'Xanthus',
+            ProperNounState.proper,
+            macronized: (form: 'Xanthus', uncertaintyBitMask: 0),
+          ),
+        ),
+        isNull,
+      );
+    });
+
+    test('a lemma whose analyses all make a certain short vowel long is not a candidate', () async {
+      // est is sum1 (est) or edo1 (ēst), and its e is certainly short, so only edit counts for edo1
+      await corpus.addWord(fables, 'est', times: 4);
+      await corpus.addWord(fables, 'edit');
+      await corpus.addAnalysis('est', 'sum1', macronizedForm: 'est');
+      await corpus.addAnalysis('est', 'edo1', macronizedForm: 'ēst');
+      await corpus.addAnalysis('edit', 'edo1');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'est',
+        'edit',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 20,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(bands.bandOf(_common('edit')), FrequencyBand.uncommon);
+    });
+
+    test('an uncertain vowel rules no lemma out', () async {
+      // as above, but the e of est may be long, so edo1 counts est too
+      await corpus.addWord(fables, 'est', times: 4, uncertaintyBitMask: 1);
+      await corpus.addWord(fables, 'edit');
+      await corpus.addAnalysis('est', 'sum1', macronizedForm: 'est');
+      await corpus.addAnalysis('est', 'edo1', macronizedForm: 'ēst');
+      await corpus.addAnalysis('edit', 'edo1');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'est',
+        'edit',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 20,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(bands.bandOf(_common('edit')), FrequencyBand.common);
+    });
+
+    test('a lemma stays a candidate while one of its spellings fits the text', () async {
+      // venio is spelled venit and vēnit, veneo only vēnit: the certain short e rules out veneo
+      await corpus.addWord(fables, 'venit', times: 4);
+      await corpus.addWord(fables, 'veneunt', macronizedWord: 'vēneunt');
+      await corpus.addAnalysis('venit', 'venio', macronizedForm: 'venit');
+      await corpus.addAnalysis('venit', 'venio', macronizedForm: 'vēnit');
+      await corpus.addAnalysis('venit', 'veneo', macronizedForm: 'vēnit');
+      await corpus.addAnalysis('veneunt', 'veneo');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'venit',
+        'veneunt',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 20,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(bands.bandOf(_common('venit')), FrequencyBand.common);
+      expect(
+        bands.bandOf(
+          const Lookup.of(
+            'veneunt',
+            ProperNounState.common,
+            macronized: (form: 'vēneunt', uncertaintyBitMask: 0),
+          ),
+        ),
+        FrequencyBand.uncommon,
+      );
+    });
+
+    test('a lemma stays a candidate while one of its analyses has no spelling', () async {
+      // edo1's first analysis of est is spelled ēst, its second has no inflections to go by
+      await corpus.addWord(fables, 'est', times: 4);
+      await corpus.addWord(fables, 'edit');
+      await corpus.addAnalysis('est', 'sum1', macronizedForm: 'est');
+      await corpus.addAnalysis('est', 'edo1', macronizedForm: 'ēst');
+      await corpus.addAnalysis('est', 'edo1');
+      await corpus.addAnalysis('edit', 'edo1');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'est',
+        'edit',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 20,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(bands.bandOf(_common('edit')), FrequencyBand.common);
+    });
+
+    test('a long vowel in the text rules out no lemma whose analyses leave it unmarked', () async {
+      // the noun serpens doesn't mark the long e of serpēns, the participle (serpo) does
+      await corpus.addWord(fables, 'serpens', macronizedWord: 'serpēns');
+      await corpus.addWord(fables, 'serpentem', times: 3);
+      await corpus.addAnalysis('serpens', 'serpens', macronizedForm: 'serpens');
+      await corpus.addAnalysis('serpens', 'serpo', macronizedForm: 'serpēns');
+      await corpus.addAnalysis('serpentem', 'serpens');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'serpens',
+        'serpentem',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 25,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(
+        bands.bandOf(
+          const Lookup.of(
+            'serpens',
+            ProperNounState.common,
+            macronized: (form: 'serpēns', uncertaintyBitMask: 0),
+          ),
+        ),
+        FrequencyBand.common,
+      );
+    });
+
+    test('a word whose every candidate would be ruled out keeps them all', () async {
+      await corpus.addWord(fables, 'est');
+      await corpus.addWord(fables, 'sunt', times: 3);
+      await corpus.addAnalysis('est', 'sum1', macronizedForm: 'ēst');
+      await corpus.addAnalysis('est', 'edo1', macronizedForm: 'ēst');
+      await corpus.addAnalysis('sunt', 'sum1');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'est',
+        'sunt',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 25,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(bands.bandOf(_common('est')), FrequencyBand.common);
+    });
+
+    test('only macrons are compared, not the letters that carry them', () async {
+      // iam1 is spelled jam and iam2 jām: the certain short a rules out iam2, the j doesn't
+      await corpus.addWord(fables, 'iam');
+      await corpus.addWord(fables, 'ianum', times: 3);
+      await corpus.addAnalysis('iam', 'iam1', macronizedForm: 'jam');
+      await corpus.addAnalysis('iam', 'iam2', macronizedForm: 'jām');
+      await corpus.addAnalysis('ianum', 'iam2');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'iam',
+        'ianum',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 25,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(bands.bandOf(_common('iam')), FrequencyBand.uncommon);
+    });
+
+    test('an analysis spelled with a different number of letters rules nothing out', () async {
+      // the analyses of estque spell only est, so ēst doesn't rule out edo1
+      await corpus.addWord(fables, 'estque', times: 4, enclitic: 'que');
+      await corpus.addWord(fables, 'edit');
+      await corpus.addAnalysis('estque', 'sum1');
+      await corpus.addAnalysis('estque', 'edo1', macronizedForm: 'ēst');
+      await corpus.addAnalysis('edit', 'edo1');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'estque',
+        'edit',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 40,
+        uncommonPercent: 10,
+        markCommon: true,
+        markUncommon: false,
+      );
+
+      expect(bands.bandOf(_common('edit')), FrequencyBand.common);
+    });
+
+    test('an expansion rules out lemmas like a word, and the reader finds it', () async {
+      // Lucius2 is spelled Lūcīus, and an expansion's macrons are certain: Lūcius has a short i
+      await corpus.addWord(
+        fables,
+        'L.',
+        times: 4,
+        expansion: 'Lūcius',
+        properNounState: ProperNounState.proper,
+      );
+      await corpus.addWord(fables, 'Lucii', properNounState: ProperNounState.proper);
+      await corpus.addAnalysis('Lucius', 'Lucius1', macronizedForm: 'Lūcius');
+      await corpus.addAnalysis('Lucius', 'Lucius2', macronizedForm: 'Lūcīus');
+      await corpus.addAnalysis('Lucii', 'Lucius2');
+      await corpus.populate();
+      // the columns the reader builds its lookup from
+      final abbreviation = await corpus.db
+          .customSelect(
+            'SELECT DISTINCT lookupForm, macronLookupForm, uncertaintyBitMask '
+            "FROM WorkContents WHERE word = 'L.'",
+          )
+          .getSingle();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'Lucius',
+        'Lucii',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 20,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(
+        bands.bandOf(
+          Lookup.of(
+            abbreviation.read<String>('lookupForm'),
+            ProperNounState.proper,
+            macronized: (
+              form: abbreviation.read<String>('macronLookupForm'),
+              uncertaintyBitMask: abbreviation.read<int>('uncertaintyBitMask'),
+            ),
+          ),
+        ),
+        FrequencyBand.common,
+      );
+      expect(
+        bands.bandOf(
+          const Lookup.of(
+            'Lucii',
+            ProperNounState.proper,
+            macronized: (form: 'Lucii', uncertaintyBitMask: 0),
+          ),
+        ),
+        FrequencyBand.uncommon,
+      );
     });
   });
 }
