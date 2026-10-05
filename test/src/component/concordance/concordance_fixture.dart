@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:latin_reader/src/component/concordance/db_util.dart' as concordance;
 import 'package:latin_reader/src/component/library/proper_noun_state.dart';
+import 'package:latin_reader/src/component/morph_analysis/db_util.dart' as morphology;
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
 
@@ -43,6 +45,7 @@ Future<void> token(
   String word, {
   String workId = work,
   String? macron,
+  int uncertaintyBitMask = 0,
   int sentence = 0,
   int? position,
   int type = 1,
@@ -53,7 +56,7 @@ Future<void> token(
   '''
   INSERT INTO WorkContents(workId, idx, word, sourceReference, properNounState,
     tokenType, sentenceIdx, wordIdx, enclitic, expansion, macronizedWord, uncertaintyBitMask)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ''',
   [
     workId,
@@ -67,16 +70,19 @@ Future<void> token(
     enclitic,
     expansion,
     macron ?? word,
+    uncertaintyBitMask,
   ],
 );
 
-/// Analysis [item] of [form] as [reference], with inflection [count]
+/// Analysis [item] of [form] as [reference], with inflection [count], spelled [macronizedForm]
+/// (as [form] when absent)
 Future<void> analysis(
   AppDb db,
   String form,
   String reference, {
   int item = 0,
   int count = 0,
+  String? macronizedForm,
   String pos = 'noun',
   String? gender,
   String? number,
@@ -96,7 +102,19 @@ Future<void> analysis(
       gender, number, declension, gramCase, verbForm, person)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   ''',
-    [form, item, count, pos, form, gender, number, declension, gramCase, verbForm, person],
+    [
+      form,
+      item,
+      count,
+      pos,
+      macronizedForm ?? form,
+      gender,
+      number,
+      declension,
+      gramCase,
+      verbForm,
+      person,
+    ],
   );
 }
 
@@ -110,4 +128,19 @@ Future<void> resolution(AppDb db, String reference, String lemma) async {
   ''',
     [dictionary, lemma],
   );
+}
+
+/// Fills the tables the concordance reads. Rerun after inserting rows
+Future<void> populateConcordanceTables(AppDb db) async {
+  final steps = [
+    morphology.operations.singleWhere(
+      (operation) => operation.id == 'CountableWordCandidateAnalyses',
+    ),
+    ...concordance.operations,
+  ];
+  await steps.reversed.fold(
+    Future<void>.value(),
+    (previous, step) => previous.then((_) => step.delete(db)),
+  );
+  await steps.fold(Future<void>.value(), (previous, step) => previous.then((_) => step.insert(db)));
 }

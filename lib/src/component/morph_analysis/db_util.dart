@@ -91,6 +91,137 @@ final operations = [
         ''');
     },
   ),
+  (
+    id: 'CountableWordCandidateAnalyses',
+    delete: (AppDb db) async {
+      await db.delete(db.countableWordCandidateAnalyses).go();
+    },
+    insert: (AppDb db) async {
+      // A lemma stops being a candidate where the text has a vowel certainly short and every
+      // spelling of the lemma's analyses has it long
+      await db.customStatement('''
+        INSERT INTO CountableWordCandidateAnalyses( workId, idx, componentOrdinal, form, item )
+            WITH TokenComponents( ordinal ) AS ( VALUES (0), (1) ),
+                 CountableWords AS (
+                     SELECT WorkContents.workId,
+                            WorkContents.idx,
+                            TokenComponents.ordinal AS componentOrdinal,
+                            CASE TokenComponents.ordinal
+                                 WHEN 0 THEN WorkContents.lookupForm
+                                 ELSE WorkContents.enclitic
+                            END AS lookupForm,
+                            CASE TokenComponents.ordinal
+                                 WHEN 0 THEN WorkContents.properNounState
+                                 ELSE 0 -- a detached enclitic is never a proper noun
+                            END AS properNounState,
+                            CASE TokenComponents.ordinal
+                                 WHEN 0 THEN WorkContents.macronLookupForm
+                                 ELSE WorkContents.enclitic
+                            END AS macronLookupForm,
+                            CASE TokenComponents.ordinal
+                                 WHEN 0 THEN WorkContents.uncertaintyBitMask
+                                 ELSE 0
+                            END AS uncertaintyBitMask
+                         FROM WorkContents
+                         CROSS JOIN TokenComponents
+                         WHERE ( TokenComponents.ordinal = 0
+                                 AND WorkContents.lookupForm IS NOT NULL )
+                               OR ( TokenComponents.ordinal = 1
+                                    AND WorkContents.enclitic IS NOT NULL ) -- only ever on tokenType 1
+                 ),
+                 WordAnalyses AS (
+                     SELECT Word.workId,
+                            Word.idx,
+                            Word.componentOrdinal,
+                            Word.macronLookupForm,
+                            Word.uncertaintyBitMask,
+                            Details.form AS morphForm,
+                            Details.item AS morphItem,
+                            Details.dictionaryRef
+                         FROM CountableWords AS Word
+                         INNER JOIN MorphologicalDetails AS Details
+                             ON Details.form = Word.lookupForm
+                                OR ( Word.properNounState = 2 -- a name or a common word
+                                     AND Details.form = LOWER( Word.lookupForm ) )
+                 ),
+                 Letters( position ) AS (
+                     SELECT 1
+                     UNION ALL
+                     SELECT position + 1
+                         FROM Letters
+                         WHERE position < ( SELECT MAX( LENGTH( macronLookupForm ) )
+                                                FROM CountableWords )
+                 ),
+                 Spellings AS (
+                     SELECT a.workId,
+                            a.idx,
+                            a.componentOrdinal,
+                            a.dictionaryRef,
+                            Infl.form IS NOT NULL -- no inflections, nothing to contradict
+                            AND LENGTH( Infl.macronizedForm )
+                                = LENGTH( a.macronLookupForm ) -- else letters don't line up
+                            AND EXISTS (
+                                SELECT 1
+                                    FROM Letters
+                                    WHERE Letters.position <= LENGTH( a.macronLookupForm )
+                                          AND ( a.uncertaintyBitMask >> ( Letters.position - 1 ) )
+                                              & 1 = 0 -- certain
+                                          AND INSTR( 'aeiouyAEIOUY',
+                                                     SUBSTR( a.macronLookupForm,
+                                                             Letters.position,
+                                                             1 ) ) > 0 -- short in the text
+                                          AND INSTR( 'āēīōūȳĀĒĪŌŪȲ',
+                                                     SUBSTR( Infl.macronizedForm,
+                                                             Letters.position,
+                                                             1 ) ) > 0 ) -- long in the analysis
+                                AS contradictsText
+                         FROM WordAnalyses AS a
+                         LEFT OUTER JOIN MorphologicalDetailInflections AS Infl
+                             ON Infl.form = a.morphForm
+                                AND Infl.item = a.morphItem
+                 ),
+                 RuledOutLemmas AS (
+                     SELECT workId,
+                            idx,
+                            componentOrdinal,
+                            dictionaryRef
+                         FROM Spellings
+                         GROUP BY workId, idx, componentOrdinal, dictionaryRef
+                         HAVING MIN( contradictsText ) = 1
+                 ),
+                 WordsWithEveryLemmaRuledOut AS (
+                     SELECT a.workId,
+                            a.idx,
+                            a.componentOrdinal
+                         FROM WordAnalyses AS a
+                         LEFT JOIN RuledOutLemmas AS r
+                             ON r.workId = a.workId
+                                AND r.idx = a.idx
+                                AND r.componentOrdinal = a.componentOrdinal
+                                AND r.dictionaryRef = a.dictionaryRef
+                         GROUP BY a.workId, a.idx, a.componentOrdinal
+                         HAVING COUNT( r.dictionaryRef ) = COUNT( * )
+                 )
+                SELECT a.workId,
+                       a.idx,
+                       a.componentOrdinal,
+                       a.morphForm,
+                       a.morphItem
+                    FROM WordAnalyses AS a
+                    WHERE NOT EXISTS ( SELECT 1
+                                           FROM RuledOutLemmas AS r
+                                           WHERE r.workId = a.workId
+                                                 AND r.idx = a.idx
+                                                 AND r.componentOrdinal = a.componentOrdinal
+                                                 AND r.dictionaryRef = a.dictionaryRef )
+                          OR EXISTS ( SELECT 1 -- a word never loses every lemma
+                                          FROM WordsWithEveryLemmaRuledOut AS w
+                                          WHERE w.workId = a.workId
+                                                AND w.idx = a.idx
+                                                AND w.componentOrdinal = a.componentOrdinal )
+      ''');
+    },
+  ),
 ];
 
 Expression<T> replace<T extends Object>(Expression<T> val, Expression<T> sub, Expression<T> wit) =>

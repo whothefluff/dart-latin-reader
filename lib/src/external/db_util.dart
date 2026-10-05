@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../logger.dart';
+import '../component/concordance/db_util.dart' as conc_util;
 import '../component/dictionary/db_util.dart' as dict_util;
 import '../component/library/db_util.dart' as libr_util;
 import '../component/morph_analysis/db_util.dart' as morp_util;
@@ -50,6 +51,7 @@ Future<void> populateDatabaseFromCsv(AppDb db) async {
     ...morp_util.operations,
     ...dict_util.operations,
     ...freq_util.operations,
+    ...conc_util.operations,
   ];
   await db.transaction(() async {
     // Two passes, one transaction.
@@ -86,6 +88,7 @@ Future<void> _runOracles(AppDb db) async {
     ...dict_util.oracles,
     ...morp_util.oracles,
     ...freq_util.oracles,
+    ...conc_util.oracles,
   ];
   final checks = await oracles.fold(
     Future<List<_Result>>.value(const []),

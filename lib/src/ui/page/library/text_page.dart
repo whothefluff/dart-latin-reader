@@ -557,10 +557,17 @@ class _TextRenderer {
 
   FrequencyBand? _bandOf(WorkContentsSegment segment) {
     final lookupForm = segment.lookupForm;
+    final macronLookupForm = segment.macronLookupForm;
     final bands = this.bands;
-    return lookupForm == null || bands == null
+    return lookupForm == null || macronLookupForm == null || bands == null
         ? null
-        : bands.bandOf(Lookup.of(lookupForm, segment.properNounState));
+        : bands.bandOf(
+            Lookup.of(
+              lookupForm,
+              segment.properNounState,
+              macronized: (form: macronLookupForm, uncertaintyBitMask: segment.uncertaintyBitMask),
+            ),
+          );
   }
 
   //

@@ -83,12 +83,15 @@ STRICT,
 WITHOUT ROWID;
 
 -- Identical display forms can have different candidate sets, so group by lookup.
+-- Certain macrons can rule candidates out, so the lookup includes them.
 CREATE TABLE "ScopedLookupFreq"(
     "workId" TEXT NOT NULL,
     "lookupForm" TEXT NOT NULL,
     "alsoLowercase" BOOLEAN NOT NULL, -- properNounState = 2
+    "macronLookupForm" TEXT NOT NULL,
+    "uncertaintyBitMask" INTEGER NOT NULL,
     "occurrences" INTEGER NOT NULL CHECK( occurrences > 0 ),
-    PRIMARY KEY( workId, lookupForm, alsoLowercase )
+    PRIMARY KEY( workId, lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask )
 )
 STRICT,
 WITHOUT ROWID;
@@ -98,8 +101,10 @@ CREATE TABLE "ScopedLookupLemmas"(
     "workId" TEXT NOT NULL,
     "lookupForm" TEXT NOT NULL,
     "alsoLowercase" BOOLEAN NOT NULL,
+    "macronLookupForm" TEXT NOT NULL,
+    "uncertaintyBitMask" INTEGER NOT NULL,
     "dictionaryRef" TEXT NOT NULL,
-    PRIMARY KEY( workId, lookupForm, alsoLowercase, dictionaryRef )
+    PRIMARY KEY( workId, lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef )
 )
 STRICT,
 WITHOUT ROWID;
@@ -258,6 +263,8 @@ getAnyCandidateLemmaCoverageSteps WITH TextCoverageStep:
          LookupMaxCounts AS ( SELECT ScopedLookupLemmas.workId,
                                      ScopedLookupLemmas.lookupForm,
                                      ScopedLookupLemmas.alsoLowercase,
+                                     ScopedLookupLemmas.macronLookupForm,
+                                     ScopedLookupLemmas.uncertaintyBitMask,
                                      MAX( Lemmas.occurrences ) AS occurrences
                                   FROM ScopedLookupLemmas
                                   INNER JOIN Lemmas
@@ -265,7 +272,9 @@ getAnyCandidateLemmaCoverageSteps WITH TextCoverageStep:
                                   WHERE ScopedLookupLemmas.workId IN :workIds
                                   GROUP BY ScopedLookupLemmas.workId,
                                            ScopedLookupLemmas.lookupForm,
-                                           ScopedLookupLemmas.alsoLowercase ),
+                                           ScopedLookupLemmas.alsoLowercase,
+                                           ScopedLookupLemmas.macronLookupForm,
+                                           ScopedLookupLemmas.uncertaintyBitMask ),
          Steps AS ( SELECT LookupMaxCounts.occurrences AS minOccurrences,
                            SUM( ScopedLookupFreq.occurrences ) AS units
                         FROM LookupMaxCounts
@@ -273,6 +282,8 @@ getAnyCandidateLemmaCoverageSteps WITH TextCoverageStep:
                             ON ScopedLookupFreq.workId = LookupMaxCounts.workId
                                AND ScopedLookupFreq.lookupForm = LookupMaxCounts.lookupForm
                                AND ScopedLookupFreq.alsoLowercase = LookupMaxCounts.alsoLowercase
+                               AND ScopedLookupFreq.macronLookupForm = LookupMaxCounts.macronLookupForm
+                               AND ScopedLookupFreq.uncertaintyBitMask = LookupMaxCounts.uncertaintyBitMask
                         GROUP BY LookupMaxCounts.occurrences )
         SELECT minOccurrences,
                SUM( units ) OVER( ORDER BY minOccurrences DESC ) AS coveredUnits
@@ -289,6 +300,8 @@ getAllCandidateLemmasCoverageSteps WITH TextCoverageStep:
          LookupMinCounts AS ( SELECT ScopedLookupLemmas.workId,
                                      ScopedLookupLemmas.lookupForm,
                                      ScopedLookupLemmas.alsoLowercase,
+                                     ScopedLookupLemmas.macronLookupForm,
+                                     ScopedLookupLemmas.uncertaintyBitMask,
                                      MIN( Lemmas.occurrences ) AS occurrences
                                   FROM ScopedLookupLemmas
                                   INNER JOIN Lemmas
@@ -296,7 +309,9 @@ getAllCandidateLemmasCoverageSteps WITH TextCoverageStep:
                                   WHERE ScopedLookupLemmas.workId IN :workIds
                                   GROUP BY ScopedLookupLemmas.workId,
                                            ScopedLookupLemmas.lookupForm,
-                                           ScopedLookupLemmas.alsoLowercase ),
+                                           ScopedLookupLemmas.alsoLowercase,
+                                           ScopedLookupLemmas.macronLookupForm,
+                                           ScopedLookupLemmas.uncertaintyBitMask ),
          Steps AS ( SELECT LookupMinCounts.occurrences AS minOccurrences,
                            SUM( ScopedLookupFreq.occurrences ) AS units
                         FROM LookupMinCounts
@@ -304,6 +319,8 @@ getAllCandidateLemmasCoverageSteps WITH TextCoverageStep:
                             ON ScopedLookupFreq.workId = LookupMinCounts.workId
                                AND ScopedLookupFreq.lookupForm = LookupMinCounts.lookupForm
                                AND ScopedLookupFreq.alsoLowercase = LookupMinCounts.alsoLowercase
+                               AND ScopedLookupFreq.macronLookupForm = LookupMinCounts.macronLookupForm
+                               AND ScopedLookupFreq.uncertaintyBitMask = LookupMinCounts.uncertaintyBitMask
                         GROUP BY LookupMinCounts.occurrences )
         SELECT minOccurrences,
                SUM( units ) OVER( ORDER BY minOccurrences DESC ) AS coveredUnits
@@ -314,6 +331,8 @@ getAllCandidateLemmasCoverageSteps WITH TextCoverageStep:
 getLookupBestCounts WITH LookupCount:
     WITH Candidates AS ( SELECT DISTINCT lookupForm,
                                          alsoLowercase,
+                                         macronLookupForm,
+                                         uncertaintyBitMask,
                                          dictionaryRef
                              FROM ScopedLookupLemmas
                              WHERE workId IN :workIds
@@ -326,12 +345,16 @@ getLookupBestCounts WITH LookupCount:
                          GROUP BY dictionaryRef )
         SELECT Candidates.lookupForm,
                Candidates.alsoLowercase,
+               Candidates.macronLookupForm,
+               Candidates.uncertaintyBitMask,
                MAX( Lemmas.occurrences ) AS occurrences
             FROM Candidates
             INNER JOIN Lemmas
                 ON Lemmas.dictionaryRef = Candidates.dictionaryRef
             GROUP BY Candidates.lookupForm,
-                     Candidates.alsoLowercase;
+                     Candidates.alsoLowercase,
+                     Candidates.macronLookupForm,
+                     Candidates.uncertaintyBitMask;
 
 -- Morphological matches for a plain form in the selected works.
 -- DISTINCT removes matches repeated across works or macronized spellings.

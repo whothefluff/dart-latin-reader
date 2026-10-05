@@ -166,10 +166,11 @@ class _ReaderSettingsSection extends StatelessWidget {
             ),
             SizedBox(height: 12),
             Text(
-              'Inflected forms (ignoring macrons) are counted together under their lemma. If a '
-              'form has several possible lemmas, like \'est\' (sum "is" or edo "eats"), the most '
-              "frequent one is used. It's the same data the 'COVER.' column shows in the "
-              'frequency report when grouped by lemma.',
+              'Inflected forms are counted together under their lemma. If a form has several '
+              'possible lemmas, like \'est\' (sum "is" or edo "eats"), the most frequent one is '
+              'used. A lemma is left out where the text is certain a vowel is short and the '
+              "lemma needs it long: a certain short e in 'est' rules out edo ('ēst'). It's the "
+              "same data the 'COVER.' column shows in the frequency report when grouped by lemma.",
             ),
             SizedBox(height: 12),
             Text(

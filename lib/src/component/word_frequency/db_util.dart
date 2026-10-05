@@ -1,13 +1,14 @@
 import '../../external/database.dart';
 import '../../external/db_oracle.dart';
 
-/// CTE for every frequency population statement.
+/// CTEs for every frequency population statement.
 /// Here as raw SQL (and not as a declared view) to keep behavior and DDL
 /// isolated by feature branch
 ///
 /// `CountUnits` holds one row per counted unit: anything that is consider
 /// word-like + a separate unit for each detached enclitic.
 /// It's basically what frequency ultimately counts.
+/// `CandidateAnalyses` holds each unit's candidate analyses.
 ///
 /// `lookupForm` is the spelling used to find matches in `MorphologicalDetails`:
 /// - For the word itself, `WorkContents.lookupForm`: expansions by what they
@@ -15,8 +16,9 @@ import '../../external/db_oracle.dart';
 ///   It's NULL for tokens that aren't counted words, which is what excludes them.
 /// - Enclitics counted separately use their own spelling, such as `que`.
 ///
-/// The concordance matches tokens with the same columns, so both features agree
-/// on what a word is and on how it's looked up.
+/// `macronLookupForm` is the same spelling with its macrons, and
+/// `uncertaintyBitMask` says which of its letters are uncertain:
+/// the token's own mask, and 0 for an enclitic.
 ///
 /// The body is indented for the use site, not for this declaration(we make it
 /// so that `WITH` lands at column 12 and CTE names align at col 17
@@ -40,13 +42,35 @@ const _countUnits = '''WITH TokenComponents( ordinal ) AS ( VALUES (0), (1) ),
                             CASE TokenComponents.ordinal
                                  WHEN 0 THEN WorkContents.properNounState
                                  ELSE 0 -- a detached enclitic is never a proper noun
-                            END AS properNounState
+                            END AS properNounState,
+                            CASE TokenComponents.ordinal
+                                 WHEN 0 THEN WorkContents.macronLookupForm
+                                 ELSE WorkContents.enclitic
+                            END AS macronLookupForm,
+                            CASE TokenComponents.ordinal
+                                 WHEN 0 THEN WorkContents.uncertaintyBitMask
+                                 ELSE 0
+                            END AS uncertaintyBitMask
                          FROM WorkContents
                          CROSS JOIN TokenComponents
                          WHERE ( TokenComponents.ordinal = 0
                                  AND WorkContents.lookupForm IS NOT NULL )
                                OR ( TokenComponents.ordinal = 1
                                     AND WorkContents.enclitic IS NOT NULL ) -- only ever on tokenType 1
+                 ),
+                 CandidateAnalyses AS (
+                     SELECT Unit.*,
+                            Details.form AS morphForm,
+                            Details.item AS morphItem,
+                            Details.dictionaryRef
+                         FROM CountUnits AS Unit
+                         INNER JOIN CountableWordCandidateAnalyses AS Candidate
+                             ON Candidate.workId = Unit.workId
+                                AND Candidate.idx = Unit.sourceIdx
+                                AND Candidate.componentOrdinal = Unit.componentOrdinal
+                         INNER JOIN MorphologicalDetails AS Details
+                             ON Details.form = Candidate.form
+                                AND Details.item = Candidate.item
                  )''';
 
 // Type not important
@@ -76,22 +100,16 @@ final operations = [
       await db.delete(db.resolvedFreqMorphForms).go();
     },
     insert: (AppDb db) async {
-      // For properNounState = 2, look up both lookupForm and its lowercase form
-      // to include proper-noun and common-word analyses.
-      // Other states use lookupForm alone.
       await db.customStatement('''
         INSERT INTO ResolvedFreqMorphForms( workId, form, macronForm, morphForm, morphItem, dictionaryRef )
             $_countUnits
-                SELECT DISTINCT u.workId,
-                                u.form,
-                                u.macronForm,
-                                md.form,
-                                md.item,
-                                md.dictionaryRef
-                    FROM CountUnits AS u
-                    INNER JOIN MorphologicalDetails AS md
-                        ON md.form = u.lookupForm
-                           OR ( u.properNounState = 2 AND md.form = LOWER( u.lookupForm ) )
+                SELECT DISTINCT workId,
+                                form,
+                                macronForm,
+                                morphForm,
+                                morphItem,
+                                dictionaryRef
+                    FROM CandidateAnalyses
       ''');
     },
   ),
@@ -108,16 +126,13 @@ final operations = [
         INSERT INTO ScopedFormLemmaFreq( workId, form, macronForm, dictionaryRef,
                                          possibleOccurrences, singleCandidateOccurrences )
             $_countUnits,
-                 UnitLemmas AS ( SELECT DISTINCT u.workId,
-                                                 u.sourceIdx,
-                                                 u.componentOrdinal,
-                                                 u.form,
-                                                 u.macronForm,
-                                                 md.dictionaryRef
-                                     FROM CountUnits AS u
-                                     INNER JOIN MorphologicalDetails AS md
-                                         ON md.form = u.lookupForm
-                                            OR ( u.properNounState = 2 AND md.form = LOWER( u.lookupForm ) ) ),
+                 UnitLemmas AS ( SELECT DISTINCT workId,
+                                                 sourceIdx,
+                                                 componentOrdinal,
+                                                 form,
+                                                 macronForm,
+                                                 dictionaryRef
+                                     FROM CandidateAnalyses ),
                  Counted AS ( SELECT UnitLemmas.*,
                                      COUNT( * ) OVER ( PARTITION BY workId, sourceIdx, componentOrdinal ) AS candidateCount
                                   FROM UnitLemmas )
@@ -162,6 +177,7 @@ final operations = [
       // Each of those units contributes to only one lemma.
       // Subtract units with zero or one candidate from totalTokens to get
       // multipleCandidateTokens.
+      // Narrowing never removes all of a unit's candidates, so a unit without any has no analyses.
       await db.customStatement('''
         INSERT INTO ScopedFreqTotals( workId, totalForms, totalMacronForms, totalLemmas, totalTokens,
                                       noCandidateTokens, singleCandidateTokens, multipleCandidateTokens )
@@ -170,10 +186,10 @@ final operations = [
                                      COUNT( * ) AS noCandidateTokens
                                   FROM CountUnits AS u
                                   WHERE NOT EXISTS ( SELECT 1
-                                                         FROM MorphologicalDetails AS md
-                                                         WHERE md.form = u.lookupForm
-                                                               OR ( u.properNounState = 2
-                                                                    AND md.form = LOWER( u.lookupForm ) ) )
+                                                        FROM CountableWordCandidateAnalyses AS Candidate
+                                                        WHERE Candidate.workId = u.workId
+                                                              AND Candidate.idx = u.sourceIdx
+                                                              AND Candidate.componentOrdinal = u.componentOrdinal )
                                   GROUP BY u.workId ),
                  PerWork AS ( SELECT workId,
                                      COUNT( DISTINCT form ) AS totalForms,
@@ -210,14 +226,21 @@ final operations = [
     insert: (AppDb db) async {
       //`IS 2` maps an unknown proper-noun state to false
       await db.customStatement('''
-        INSERT INTO ScopedLookupFreq( workId, lookupForm, alsoLowercase, occurrences )
+        INSERT INTO ScopedLookupFreq( workId, lookupForm, alsoLowercase, macronLookupForm,
+                                      uncertaintyBitMask, occurrences )
             $_countUnits
                 SELECT workId,
                        lookupForm,
                        properNounState IS 2,
+                       macronLookupForm,
+                       uncertaintyBitMask,
                        COUNT( * )
                     FROM CountUnits
-                    GROUP BY workId, lookupForm, properNounState IS 2
+                    GROUP BY workId,
+                             lookupForm,
+                             properNounState IS 2,
+                             macronLookupForm,
+                             uncertaintyBitMask
       ''');
     },
   ),
@@ -229,16 +252,16 @@ final operations = [
     insert: (AppDb db) async {
       // several analyses can point to the same lemma
       await db.customStatement('''
-        INSERT INTO ScopedLookupLemmas( workId, lookupForm, alsoLowercase, dictionaryRef )
+        INSERT INTO ScopedLookupLemmas( workId, lookupForm, alsoLowercase, macronLookupForm,
+                                        uncertaintyBitMask, dictionaryRef )
             $_countUnits
-                SELECT DISTINCT u.workId,
-                                u.lookupForm,
-                                u.properNounState IS 2,
-                                md.dictionaryRef
-                    FROM CountUnits AS u
-                    INNER JOIN MorphologicalDetails AS md
-                        ON md.form = u.lookupForm
-                           OR ( u.properNounState = 2 AND md.form = LOWER( u.lookupForm ) )
+                SELECT DISTINCT workId,
+                                lookupForm,
+                                properNounState IS 2,
+                                macronLookupForm,
+                                uncertaintyBitMask,
+                                dictionaryRef
+                    FROM CandidateAnalyses
       ''');
     },
   ),
@@ -264,12 +287,20 @@ const List<DbOracle> oracles = [
                           LEFT JOIN ( SELECT workId,
                                              lookupForm,
                                              alsoLowercase,
+                                             macronLookupForm,
+                                             uncertaintyBitMask,
                                              COUNT( * ) AS candidates
                                           FROM ScopedLookupLemmas
-                                          GROUP BY workId, lookupForm, alsoLowercase ) AS c
+                                          GROUP BY workId,
+                                                   lookupForm,
+                                                   alsoLowercase,
+                                                   macronLookupForm,
+                                                   uncertaintyBitMask ) AS c
                               ON c.workId = l.workId
                                  AND c.lookupForm = l.lookupForm
                                  AND c.alsoLowercase = l.alsoLowercase
+                                 AND c.macronLookupForm = l.macronLookupForm
+                                 AND c.uncertaintyBitMask = l.uncertaintyBitMask
                           GROUP BY l.workId ) AS k
               ON k.workId = t.workId
           WHERE k.totalTokens IS NOT t.totalTokens

@@ -20,8 +20,9 @@ part 'lookup_frequency_api.g.dart';
 
 //infrastructure
 
-/// Returns the most frequent candidate lemma's count for each form in [lookupForms],
+/// Returns the most frequent candidate lemma's count for every lookup of a form in [lookupForms],
 /// plus any-candidate text coverage for the works selected by [scope] and [workId].
+/// Keyed by plain forms, so the cache isn't split per macronized spelling.
 @riverpod
 Future<LookupFrequencies> lookupFrequencies(
   Ref ref,
@@ -124,34 +125,53 @@ extension type const LookupForms._(ValueList<String> unm) implements ValueList<S
   ) : this._(ValueList(iter.toSet().sorted((a, b) => a.compareTo(b))));
 }
 
+/// A form as the text macronizes it.
+/// - `form`: the spelling, with its macrons
+/// - `uncertaintyBitMask`: a set bit for each letter of `form` whose macron is uncertain, starting
+///   at bit 0
+typedef MacronizedForm = ({String form, int uncertaintyBitMask});
+
 /// How a word is looked up in the analyses, which decides its candidate lemmas
 @immutable
 class Lookup {
   const Lookup({
     required this.lookupForm,
     required this.alsoLowercase,
+    required this.macronized,
   });
 
   /// Creates a lookup that also searches lowercase when [properNounState] is
   /// [ProperNounState.either].
   const Lookup.of(
     String lookupForm,
-    ProperNounState? properNounState,
-  ) : this(lookupForm: lookupForm, alsoLowercase: properNounState == ProperNounState.either);
+    ProperNounState? properNounState, {
+    required MacronizedForm macronized,
+  }) : this(
+         lookupForm: lookupForm,
+         alsoLowercase: properNounState == ProperNounState.either,
+         macronized: macronized,
+       );
 
   final String lookupForm;
   final bool alsoLowercase;
 
+  /// [lookupForm] as the text macronizes it
+  final MacronizedForm macronized;
+
   @override
-  String toString() => 'Lookup{lookupForm: $lookupForm, alsoLowercase: $alsoLowercase}';
+  String toString() =>
+      'Lookup{lookupForm: $lookupForm, alsoLowercase: $alsoLowercase, macronized: $macronized}';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Lookup && other.lookupForm == lookupForm && other.alsoLowercase == alsoLowercase);
+      (other is Lookup &&
+          other.lookupForm == lookupForm &&
+          other.alsoLowercase == alsoLowercase &&
+          other.macronized == macronized);
 
   @override
-  int get hashCode => Object.hash(lookupForm, alsoLowercase);
+  int get hashCode => Object.hash(lookupForm, alsoLowercase, macronized);
   //
 }
 
@@ -162,17 +182,21 @@ class LookupCount {
   const LookupCount({
     required this.lookupForm,
     required this.alsoLowercase,
+    required String macronLookupForm,
+    required int uncertaintyBitMask,
     required int? occurrences,
-  }) : occurrences = occurrences ?? 0;
+  }) : macronized = (form: macronLookupForm, uncertaintyBitMask: uncertaintyBitMask),
+       occurrences = occurrences ?? 0;
 
   final String lookupForm;
   final bool alsoLowercase;
+  final MacronizedForm macronized;
   final int occurrences;
 
   @override
   String toString() =>
       'LookupCount{lookupForm: $lookupForm, alsoLowercase: $alsoLowercase, '
-      'occurrences: $occurrences}';
+      'macronized: $macronized, occurrences: $occurrences}';
 
   @override
   bool operator ==(Object other) =>
@@ -180,10 +204,11 @@ class LookupCount {
       (other is LookupCount &&
           other.lookupForm == lookupForm &&
           other.alsoLowercase == alsoLowercase &&
+          other.macronized == macronized &&
           other.occurrences == occurrences);
 
   @override
-  int get hashCode => Object.hash(lookupForm, alsoLowercase, occurrences);
+  int get hashCode => Object.hash(lookupForm, alsoLowercase, macronized, occurrences);
   //
 }
 
@@ -197,7 +222,11 @@ class LookupFrequencies {
          Map.fromEntries(
            counts.map(
              (count) => MapEntry(
-               Lookup(lookupForm: count.lookupForm, alsoLowercase: count.alsoLowercase),
+               Lookup(
+                 lookupForm: count.lookupForm,
+                 alsoLowercase: count.alsoLowercase,
+                 macronized: count.macronized,
+               ),
                count.occurrences,
              ),
            ),

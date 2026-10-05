@@ -100,6 +100,7 @@ class WorkContentsSegment {
     required this.typ,
     required this.depth,
     required this.lookupForm,
+    required this.macronLookupForm,
     required this.properNounState,
     required this.sourceReference,
   });
@@ -111,6 +112,9 @@ class WorkContentsSegment {
   /// How the word is looked up in the analyses.
   /// `null` for tokens that aren't counted words.
   final String? lookupForm;
+
+  /// [lookupForm] but macronized
+  final String? macronLookupForm;
 
   /// `null` when unknown
   final ProperNounState? properNounState;
