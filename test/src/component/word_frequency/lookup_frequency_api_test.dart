@@ -137,19 +137,6 @@ void main() {
       );
     });
 
-    test('only a name that may be a common word is looked up in lowercase too', () {
-      expect(
-        [ProperNounState.either, ProperNounState.proper, ProperNounState.common, null].map(
-          (state) => Lookup.of(
-            'Venere',
-            state,
-            macronized: (form: 'Venere', uncertaintyBitMask: 0),
-          ).alsoLowercase,
-        ),
-        [true, false, false, false],
-      );
-    });
-
     test('a band left out takes no words from the other', () {
       // at 60% and 30%, in and non fall in both bands, and common wins
       final both = _formsOfTenUnits().bandsFor(

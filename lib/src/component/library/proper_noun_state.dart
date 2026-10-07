@@ -29,3 +29,9 @@ enum ProperNounState {
   /// The value stored in WorkContents.properNounState
   final int code;
 }
+
+/// Returns [form], plus its lowercase spelling when [state] is [ProperNounState.either].
+Set<String> spellingsToLookUp(String form, ProperNounState? state) => {
+  form,
+  if (state == ProperNounState.either) form.toLowerCase(),
+};

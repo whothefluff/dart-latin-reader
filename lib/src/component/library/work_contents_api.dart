@@ -101,6 +101,7 @@ class WorkContentsSegment {
     required this.depth,
     required this.lookupForm,
     required this.macronLookupForm,
+    required this.baseNormForm,
     required this.properNounState,
     required this.sourceReference,
   });
@@ -115,6 +116,9 @@ class WorkContentsSegment {
 
   /// [lookupForm] but macronized
   final String? macronLookupForm;
+
+  /// The word without its enclitic, or the expansion of an abbreviation, cased like [lookupForm]
+  final String? baseNormForm;
 
   /// `null` when unknown
   final ProperNounState? properNounState;

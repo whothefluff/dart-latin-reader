@@ -433,6 +433,7 @@ CREATE VIEW "library.WorkContents" AS
                                         WorkContents.sourceReference,
                                         WorkContents.lookupForm,
                                         WorkContents.macronLookupForm,
+                                        WorkContents.baseNormForm,
                                         WorkContents.properNounState,
                                         SubdivsHierarchy.node,
                                         SubdivsHierarchy.typ,
@@ -459,6 +460,7 @@ CREATE VIEW "library.WorkContents" AS
                depth,
                lookupForm,
                macronLookupForm,
+               baseNormForm,
                properNounState,
                sourceReference --( SELECT name FROM WorkContentSubdivisions AS aux WHERE aux.parent = ClosestSubdivision.parent AND aux.typ = 'TITL' LIMIT 1 ) AS title
             FROM ClosestSubdivision
