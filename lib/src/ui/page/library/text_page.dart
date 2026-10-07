@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
@@ -9,13 +10,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../logger.dart';
+import '../../../component/library/proper_noun_state.dart';
+import '../../../component/library/punctuation.dart';
 import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_contents_api.dart';
 import '../../../component/library/work_details_api.dart';
-import '../../../component/morph_analysis/enriched_morph_search_api.dart';
+import '../../../component/morph_analysis/enriched_morph_details_api.dart';
 import '../../../component/morph_analysis/morphological_details_api.dart';
 import '../../../component/settings/reader_settings_api.dart';
 import '../../../component/word_frequency/lookup_frequency_api.dart';
+import '../../../external/provider_ext.dart';
 import '../../app.dart';
 import '../../router/config.dart';
 import '../../widget/custom_adaptive_scaffold.dart';
@@ -27,7 +31,9 @@ import '../../widget/page_scaffold.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
+import 'page_segments.dart';
 import 'reader_input.dart';
+import 'selection_lookups.dart';
 import 'work_index_sheet.dart';
 
 /// Line terminator that will be stable across all platforms even after rendering
@@ -48,22 +54,11 @@ bool _isHeadingType(SubdivisionType type) => switch (type) {
 bool _isUnbreakableType(SubdivisionType type) =>
     type == SubdivisionType.verse || _isHeadingType(type);
 
-const _closingPunctSigns = ['.', ',', '!', '?', ':', ';', ')', ']'];
-const _openingPunctSigns = ['(', '['];
 const _blank = ' ';
 
 enum _PageFlow {
   previous,
   next,
-}
-
-String _withoutMacrons(String word) {
-  const macronized = 'āēīōūȳĀĒĪŌŪȲ';
-  const plain = 'aeiouyAEIOUY';
-  return word.replaceAllMapped(
-    RegExp('[$macronized]'),
-    (match) => plain[macronized.indexOf(match[0]!)],
-  );
 }
 
 class TextPage extends ConsumerStatefulWidget {
@@ -444,7 +439,7 @@ class _TextRenderer {
   String _getSpace(int index, WorkContentsSegment segment) {
     final nextIsPunctuation =
         index + 1 < workSegments.length &&
-        _closingPunctSigns.any((sign) => workSegments[index + 1].word.startsWith(sign));
+        closingPunctSigns.any(workSegments[index + 1].word.startsWith);
     final endsWithOpeningParenthesis = segment.word.endsWith('(');
     return nextIsPunctuation || endsWithOpeningParenthesis ? _empty : _blank;
   }
@@ -499,7 +494,7 @@ class _TextRenderer {
   }
 
   /// Spans for segments [first]..[last], as laid out on a page
-  static List<InlineSpan> pageSpans(List<TextSpan> spans, int first, int last) {
+  static List<TextSpan> pageSpans(List<TextSpan> spans, int first, int last) {
     final opening = spans[first];
     return [
       TextSpan(text: _pageStartBreak, style: opening.style, children: opening.children),
@@ -573,95 +568,31 @@ class _TextRenderer {
   //
 }
 
-class _TextSelector {
-  //
+/// Analysis keys and the enriched morphological analyses found for them.
+typedef _WordReadings = ({AnalysisKeys keys, EnrichedAnalyses analyses});
 
-  /// If the user selected exactly just a full word (with no other words or
-  /// symbols), this word will be returned stripped of whitespace
-  ///
-  /// Otherwise null
-  String? singleWord(TextSelection selection, String visibleText) {
-    // Ignore selected spaces at word boundary
-    final trimmedSelectedText = selection.textInside(visibleText).trim();
-    final isWordSelected =
-        trimmedSelectedText.isNotEmpty &&
-        _isFullWordSelected(trimmedSelectedText, visibleText, selection);
-    log.info(() => isWordSelected ? 'word "$trimmedSelectedText" selected' : 'no word selected');
-    return isWordSelected ? trimmedSelectedText : null;
-  }
-
-  bool _isFullWordSelected(
-    String trimmedSelectedText,
-    String visibleText,
-    TextSelection textSelection,
-  ) {
-    // Also handles selections starting with whitespace
-    final actualWordStart = visibleText.indexOf(trimmedSelectedText, textSelection.start);
-    final previousChar = actualWordStart > 0 ? visibleText[actualWordStart - 1] : null;
-    final startIsValid =
-        previousChar == null ||
-        previousChar == _blank ||
-        previousChar == _lineTerminator ||
-        _closingPunctSigns.contains(previousChar) ||
-        _openingPunctSigns.contains(previousChar);
-    final actualWordEnd = actualWordStart + trimmedSelectedText.length;
-    final nextChar = actualWordEnd < visibleText.length ? visibleText[actualWordEnd] : null;
-    final endIsValid =
-        nextChar == null ||
-        nextChar == _blank ||
-        _closingPunctSigns.contains(nextChar) ||
-        _openingPunctSigns.contains(nextChar); // Unlikely, but typos occur
-    final middleIsValid =
-        !trimmedSelectedText.contains(_blank) &&
-        !_closingPunctSigns.any(trimmedSelectedText.contains) &&
-        !_openingPunctSigns.any(trimmedSelectedText.contains);
-    return startIsValid && endIsValid && middleIsValid;
-  }
-
-  /*   /// Finds the first non-whitespace character that comes before the
-  /// [selectedWord], if any. Ignores the previous batch of visible text, which
-  /// is an obvious limitation
-  ///
-  /// This method assumes that the selection will contain only this one word
-  /// instance and nothing else
-  String? charBeforeWord(TextSelection selection, String visibleText, String selectedWord) {
-    final wordStartIndex = visibleText.indexOf(selectedWord, selection.start);
-    // Iterate backwards from the character immediately preceding the word
-    for (var i = wordStartIndex - 1; i >= 0; i--) {
-      final char = visibleText[i];
-      if (char.trim().isNotEmpty) {
-        return char;
-      }
-    }
-    return null;
-  } */
-
-  //
-}
-
-/// This context menu button will first navigate to the morphological
-/// information page
+/// Wiktionary pages, morphology lookups, and macron comparison status for a word.
 ///
-/// From there, it's possible to go to the desired dictionary entry (which, in
-/// case it can belong to several words, the user will have to choose)
+/// Candidate readings have not been ruled out by the word's certain macrons.
+typedef _WordLookups = ({
+  Set<String> wiktionaryPages,
+  Future<_WordReadings> Function() lookUpReadings,
+  Future<_WordReadings> Function() lookUpCandidateReadings,
+  ({bool pending, bool showIgnoringMacrons}) macronComparison,
+});
+
+/// A context menu button that opens a word's morphological analyses.
 class _WordDetailsButton extends ContextMenuButtonItem {
   _WordDetailsButton({
     required String word,
-    required this.ref,
-    required this.context,
+    required Future<_WordReadings> Function() lookUp,
+    required BuildContext pageContext,
     required bool compact,
     bool ignoreMacrons = false,
   }) : super(
          label: _label(word, compact: compact, ignoreMacrons: ignoreMacrons),
-         onPressed: () => _onPressed(
-           ignoreMacrons ? _withoutMacrons(word) : word,
-           ref,
-           context,
-         ),
+         onPressed: () => open(lookUp, pageContext),
        );
-
-  final WidgetRef ref;
-  final BuildContext context;
 
   static String _label(String word, {required bool compact, required bool ignoreMacrons}) =>
       switch ((compact, ignoreMacrons)) {
@@ -671,66 +602,64 @@ class _WordDetailsButton extends ContextMenuButtonItem {
         (false, true) => 'See details ignoring macrons',
       };
 
-  static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
-    log.entry(args: [word]);
+  static Future<void> open(
+    Future<_WordReadings> Function() lookUp,
+    BuildContext pageContext,
+  ) async {
     ContextMenuController.removeAny();
-    // Using double quotes will force an exact match, avoiding a text search
-    final results = await ref.read(enrichedMorphologicalSearchProvider('"$word"').future);
-    if (results.isNotEmpty) {
-      final selectedKeys = AnalysisKeys(
-        results.map((r) => AnalysisKey(form: r.form, item: r.item, cnt: r.cnt)),
-      );
-      if (context.mounted) {
-        log.exit<void>();
-        await MorphologicalDataRoute(selectedKeys.toJson()).push<void>(context);
-      }
+    await lookUpThenOpen(
+      pageContext,
+      lookUp: lookUp,
+      open: (readings) => _showReadings(readings, pageContext),
+    );
+  }
+
+  static Future<void> _showReadings(_WordReadings readings, BuildContext pageContext) async {
+    log.entry(args: [readings.keys]);
+    if (readings.analyses.isNotEmpty) {
+      log.exit<void>();
+      await MorphologicalDataRoute(readings.keys.toJson()).push<void>(pageContext);
     } else {
-      log.warning(() => 'Nothing found when using morph data button with "$word"');
-      if (context.mounted) {
-        log.exit(
-          r: ScaffoldMessenger.of(context).showSnackBar(
+      log
+        ..warning(() => 'Nothing found when using morph data button with ${readings.keys}')
+        ..exit(
+          r: ScaffoldMessenger.of(pageContext).showSnackBar(
             const SnackBar(
               content: Text('Not found'),
             ),
           ),
         );
-      }
     }
   }
 
   //
 }
 
-/// This context menu button will navigate to the English Wiktionary
+/// A context menu button that opens an English Wiktionary entry.
 class _WiktionaryButton extends ContextMenuButtonItem {
   _WiktionaryButton({
-    required String word,
-    required this.ref,
-    required this.context,
+    required String page,
+    required BuildContext pageContext,
     required bool compact,
   }) : super(
-         label: compact ? 'Wiktionary' : 'Look up in Wiktionary',
-         onPressed: () => _onPressed(word, ref, context),
+         label: labelFor(compact: compact),
+         onPressed: () => open(page, pageContext),
        );
 
-  final WidgetRef ref;
-  final BuildContext context;
+  static String labelFor({required bool compact}) =>
+      compact ? 'Wiktionary' : 'Look up in Wiktionary';
 
-  static Future<void> _onPressed(String word, WidgetRef ref, BuildContext context) async {
-    log.entry(args: [word]);
+  static Future<void> open(String page, BuildContext pageContext) async {
+    log.entry(args: [page]);
     ContextMenuController.removeAny();
-    final plainWord = _withoutMacrons(word);
-    final queryWord = (await _isProperNoun(word, ref))
-        ? _capitalize(plainWord)
-        : plainWord.toLowerCase();
     try {
-      if (await launchUrl(Uri.parse('https://en.wiktionary.org/wiki/$queryWord#Latin'))) {
+      if (await launchUrl(Uri.parse('https://en.wiktionary.org/wiki/$page#Latin'))) {
         log.exit<void>();
       } else {
         log.warning(() => 'Could not launch browser when using Wiktionary button');
-        if (context.mounted) {
+        if (pageContext.mounted) {
           log.exit(
-            r: ScaffoldMessenger.of(context).showSnackBar(
+            r: ScaffoldMessenger.of(pageContext).showSnackBar(
               const SnackBar(content: Text('Could not launch browser')),
             ),
           );
@@ -738,9 +667,9 @@ class _WiktionaryButton extends ContextMenuButtonItem {
       }
     } on Exception catch (e) {
       log.catching(e);
-      if (context.mounted) {
+      if (pageContext.mounted) {
         log.exit(
-          r: ScaffoldMessenger.of(context).showSnackBar(
+          r: ScaffoldMessenger.of(pageContext).showSnackBar(
             const SnackBar(content: Text('Browser error')),
           ),
         );
@@ -748,28 +677,6 @@ class _WiktionaryButton extends ContextMenuButtonItem {
     }
   }
 
-  /// Returns true if the word refers to a single person, place, etc.
-  ///
-  /// For Latin words that might exist both as a common and a proper noun, it
-  /// will return *false* (eg Lupus vs lupus)
-  ///
-  /// The logic could potentially be improved but it would require checking the
-  /// previous character (to see if it's capitalized because it appears after a
-  /// '.') and detecting whether the word starts with upper case because the
-  /// whole line is upper case (like in titles). These checks come with their
-  /// own problems
-  static Future<bool> _isProperNoun(String word, WidgetRef ref) async {
-    log.entry(args: [word]);
-    var isProperName = false;
-    if (word == _capitalize(word)) {
-      // The assumption is that the provider will not find proper names
-      final results = await ref.read(enrichedMorphologicalSearchProvider('"$word"').future);
-      isProperName = results.isEmpty;
-    }
-    return log.exit(r: isProperName)!;
-  }
-
-  static String _capitalize(String word) => '${word[0].toUpperCase()}${word.substring(1)}';
   //
 }
 
@@ -905,8 +812,7 @@ class _PageBreaks {
         : _firstWhere(mid + 1, high, test);
   }
 
-  static bool _isPunctuation(String word) =>
-      _closingPunctSigns.contains(word) || _closingPunctSigns.any((sign) => word.startsWith(sign));
+  static bool _isPunctuation(String word) => closingPunctSigns.any(word.startsWith);
   //
 }
 
@@ -947,7 +853,6 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
   /// [RenderEditable] implementation detail (verify with Flutter version)
   final _readerCaretGap = 1.0;
   final _readerCursorWidth = 2.0;
-  final _textSelector = _TextSelector();
   final StrutStyle _readerStrut = StrutStyle.disabled;
   var _layoutRevision = 0;
 
@@ -991,91 +896,60 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     ReaderSettings settings,
   ) {
     // Built using the constraints given by SizedBox
-    final visibleTextSpan = _buildTextWithOverflowDetection(context, constraints, settings);
+    final page = _buildTextWithOverflowDetection(context, constraints, settings);
     return SelectableText.rich(
-      visibleTextSpan,
+      page.text,
       strutStyle: _readerStrut,
       textScaler: MediaQuery.textScalerOf(context),
       textDirection: TextDirection.ltr,
       cursorWidth: _readerCursorWidth,
-      onSelectionChanged: (selection, _) => _preloadSelectionLookups(
-        selection,
-        visibleTextSpan.toPlainText(),
-      ),
-      contextMenuBuilder: _buildContextMenu,
+      onSelectionChanged: (selection, _) => _preloadSelectionLookups(page, selection),
+      contextMenuBuilder: (_, state) => _buildContextMenu(state, page),
     );
   }
 
-  /// Starts lookups immediately when a full word is selected and cache results
-  void _preloadSelectionLookups(
-    TextSelection selection,
-    String visibleText,
-  ) {
+  /// Preloads morphology results for a fully selected word.
+  void _preloadSelectionLookups(PageSegments page, TextSelection selection) {
     if (selection.isValid) {
-      log.info(() => 'user selected text "${selection.textInside(visibleText)}"');
+      log.info(() => 'user selected text "${selection.textInside(page.text.toPlainText())}"');
     }
-    final selectedWord = _getSelectedWord(selection, visibleText);
-    if (selectedWord != null) {
-      _preloadWordLookups(selectedWord);
-    }
-  }
-
-  String? _getSelectedWord(
-    TextSelection selection,
-    String visibleText,
-  ) => selection.isValid ? _textSelector.singleWord(selection, visibleText) : null;
-
-  void _preloadWordLookups(String word) {
-    ref.read(enrichedMorphologicalSearchProvider('"$word"'));
-    final settings =
-        ref.read(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings.defaults();
-    final plainWord = _getAlternativeLookupWord(word, settings.showMacrons);
-    if (plainWord != null) {
-      ref.read(enrichedMorphologicalSearchProvider('"$plainWord"'));
+    final segment = page.selectedSegment(selection);
+    final lookupForm = segment?.lookupForm;
+    log.info(() => segment == null ? 'no word selected' : '$segment selected');
+    if (segment != null && lookupForm != null && page.showMacrons) {
+      _lookUpCandidateReadings(segment).ignore();
+    } else if (segment != null && lookupForm != null) {
+      _lookUpAllReadings(segment, lookupForm).ignore();
     }
   }
 
-  String? _getAlternativeLookupWord(String? word, bool showMacrons) {
-    final plainWord = word == null ? null : _withoutMacrons(word);
-    return showMacrons && plainWord != word ? plainWord : null;
-  }
-
-  Widget _buildContextMenu(BuildContext readerContext, EditableTextState state) =>
+  Widget _buildContextMenu(EditableTextState state, PageSegments page) =>
       ValueListenableBuilder<TextEditingValue>(
         valueListenable: state.widget.controller,
         builder: (_, value, _) => Consumer(
-          builder: (_, menuRef, _) => _buildToolbarForSelection(
-            readerContext,
-            state,
-            value,
-            menuRef,
-          ),
+          builder: (_, menuRef, _) => _buildToolbarForSelection(state, value, menuRef, page),
         ),
       );
 
   Widget _buildToolbarForSelection(
-    BuildContext readerContext,
     EditableTextState state,
     TextEditingValue value,
     WidgetRef menuRef,
+    PageSegments page,
   ) {
-    final selectedWord = _getSelectedWord(value.selection, value.text);
-    final settings =
-        menuRef.watch(readerSettingsNotifierProvider).valueOrNull ??
-        const ReaderSettings.defaults();
-    final comparison = _watchMacronLookupComparison(menuRef, selectedWord, settings.showMacrons);
-    return comparison.pending
+    final lookups = _watchWordLookups(menuRef, page, page.selectedSegment(value.selection));
+    return lookups != null && lookups.macronComparison.pending
         ? const SizedBox.shrink()
         : AdaptiveTextSelectionToolbar.buttonItems(
             anchors: state.contextMenuAnchors,
             buttonItems: _arrangeButtonItems(
               state.contextMenuButtonItems,
-              selectedWord == null
+              lookups == null
                   ? const []
                   : _buildWordLookupButtons(
-                      readerContext,
-                      selectedWord,
-                      showIgnoringMacrons: comparison.showIgnoringMacrons,
+                      state.contextMenuAnchors.primaryAnchor,
+                      value.selection.textInside(value.text).trim(),
+                      lookups,
                     ),
             ),
           );
@@ -1103,85 +977,176 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     TargetPlatform.iOS,
   }.contains(Theme.of(context).platform);
 
-  /// Compares the normal lookup with a lookup that ignores macrons
-  ///
-  /// - `pending` is `true` while waiting for the lookup results
-  /// - `showIgnoringMacrons` is `true` when ignoring macrons finds results
-  ///   that differ from the normal lookup
-  ({bool pending, bool showIgnoringMacrons}) _watchMacronLookupComparison(
+  /// Lookup data for [segment], or `null` if [segment] is missing or has no lookup form.
+  _WordLookups? _watchWordLookups(
     WidgetRef menuRef,
-    String? word,
-    bool showMacrons,
+    PageSegments page,
+    WorkContentsSegment? segment,
   ) {
-    var comparison = (pending: false, showIgnoringMacrons: false);
-    final plainWord = _getAlternativeLookupWord(word, showMacrons);
-    if (word != null && plainWord != null) {
-      final displayedSearch = menuRef.watch(
-        enrichedMorphologicalSearchProvider('"$word"'),
-      );
-      final plainSearch = menuRef.watch(
-        enrichedMorphologicalSearchProvider('"$plainWord"'),
-      );
-      comparison = (
-        pending: _isLookupComparisonPending(displayedSearch, plainSearch),
-        showIgnoringMacrons: _plainLookupOffersDifferentResults(
-          displayedSearch.asData?.value,
-          plainSearch.asData?.value,
-        ),
-      );
-    }
-    return comparison;
+    final lookupForm = segment?.lookupForm;
+    return segment == null || lookupForm == null
+        ? null
+        : _watchLookupsOf(menuRef, page, segment, lookupForm);
   }
 
-  bool _isLookupComparisonPending(
-    AsyncValue<EnrichedResults> displayed,
-    AsyncValue<EnrichedResults> plain,
-  ) => !displayed.hasError && !plain.hasError && (displayed.isLoading || plain.isLoading);
+  /// Lookups for [segment], based on [page]'s macron setting.
+  ///
+  /// `lookUpReadings` returns all readings when macrons are hidden. Otherwise,
+  /// it returns candidate readings, matching the displayed spelling if it has macrons.
+  _WordLookups _watchLookupsOf(
+    WidgetRef menuRef,
+    PageSegments page,
+    WorkContentsSegment segment,
+    String lookupForm,
+  ) {
+    final shown = page.shownText(segment);
+    final isShownWithMacrons = shown != segment.word;
+    Future<_WordReadings> lookUpCandidateReadings() => _lookUpCandidateReadings(segment);
+    return (
+      wiktionaryPages: wiktionaryPagesOf(segment, widget.segments),
+      lookUpReadings: switch ((page.showMacrons, isShownWithMacrons)) {
+        (false, _) => () => _lookUpAllReadings(segment, lookupForm),
+        (true, false) => lookUpCandidateReadings,
+        (true, true) => () async => _readingsMacronizedAs(await lookUpCandidateReadings(), shown),
+      },
+      lookUpCandidateReadings: lookUpCandidateReadings,
+      macronComparison: isShownWithMacrons
+          ? _compareWithMacrons(_watchCandidateReadings(menuRef, segment), shown)
+          : (pending: false, showIgnoringMacrons: false),
+    );
+  }
 
-  bool _plainLookupOffersDifferentResults(EnrichedResults? displayed, EnrichedResults? plain) =>
-      displayed != null &&
-      plain != null &&
-      plain.isNotEmpty &&
-      !const SetEquality<EnrichedResult>().equals(
-        displayed.toSet(),
-        plain.toSet(),
+  /// Compares the candidate readings with [macronized].
+  ///
+  /// `pending` is true while loading without an error.
+  /// `showIgnoringMacrons` is true if a candidate has a different spelling or the lookup failed.
+  ({bool pending, bool showIgnoringMacrons}) _compareWithMacrons(
+    AsyncValue<_WordReadings> readings,
+    String macronized,
+  ) => (
+    pending: readings.isLoading && !readings.hasError,
+    showIgnoringMacrons:
+        readings.hasError || _ignoringMacronsFindsMore(readings.valueOrNull, macronized),
+  );
+
+  bool _ignoringMacronsFindsMore(_WordReadings? readings, String macronized) =>
+      readings != null &&
+      readings.analyses.any((analysis) => !_isMacronizedAs(analysis, macronized));
+
+  /// Returns only the analyses matching [macronized], along with their keys.
+  _WordReadings _readingsMacronizedAs(_WordReadings readings, String macronized) {
+    final analyses = readings.analyses
+        .where((analysis) => _isMacronizedAs(analysis, macronized))
+        .toList();
+    return (
+      keys: AnalysisKeys(
+        analyses.map(
+          (analysis) => AnalysisKey(form: analysis.form, item: analysis.item, cnt: analysis.cnt),
+        ),
+      ),
+      analyses: EnrichedAnalyses(analyses),
+    );
+  }
+
+  bool _isMacronizedAs(EnrichedAnalysis analysis, String macronized) =>
+      isMacronizedAs(macronized, form: analysis.form, macronizedForm: analysis.macronizedForm);
+
+  AsyncValue<_WordReadings> _watchCandidateReadings(
+    WidgetRef menuRef,
+    WorkContentsSegment segment,
+  ) => _watchReadings(
+    menuRef,
+    menuRef.watch(lookupFormCandidateAnalysisKeysProvider(segment.workId, segment.idx)),
+  );
+
+  AsyncValue<_WordReadings> _watchReadings(WidgetRef menuRef, AsyncValue<AnalysisKeys> keys) =>
+      keys.when(
+        data: (found) => _watchAnalysesOf(menuRef, found),
+        error: AsyncError.new,
+        loading: AsyncLoading.new,
       );
 
+  AsyncValue<_WordReadings> _watchAnalysesOf(WidgetRef menuRef, AnalysisKeys keys) => menuRef
+      .watch(enrichedMorphologicalAnalysesProvider(keys))
+      .whenData((analyses) => (keys: keys, analyses: analyses));
+
+  Future<_WordReadings> _lookUpCandidateReadings(WorkContentsSegment segment) => _lookUpReadings(
+    _providers.readRetryingFailures(
+      lookupFormCandidateAnalysisKeysProvider(segment.workId, segment.idx),
+    ),
+  );
+
+  Future<_WordReadings> _lookUpAllReadings(WorkContentsSegment segment, String lookupForm) =>
+      _lookUpReadings(_readAnalysisKeysOf(spellingsToLookUp(lookupForm, segment.properNounState)));
+
+  /// Returns analysis keys for exact matches to the spellings in [forms].
+  Future<AnalysisKeys> _readAnalysisKeysOf(Set<String> forms) async {
+    final keysByForm = await Future.wait(
+      forms.map((form) => _providers.readRetryingFailures(morphologicalAnalysisKeysProvider(form))),
+    );
+    return AnalysisKeys(keysByForm.expand((keys) => keys));
+  }
+
+  Future<_WordReadings> _lookUpReadings(Future<AnalysisKeys> keys) async {
+    final found = await keys;
+    final analyses = await _providers.readRetryingFailures(
+      enrichedMorphologicalAnalysesProvider(found),
+    );
+    return (keys: found, analyses: analyses);
+  }
+
+  ProviderContainer get _providers => ProviderScope.containerOf(context, listen: false);
+
   List<ContextMenuButtonItem> _buildWordLookupButtons(
-    BuildContext readerContext,
-    String word, {
-    required bool showIgnoringMacrons,
-  }) {
-    final compact = _usesCompactLabels(readerContext);
+    Offset anchor,
+    String word,
+    _WordLookups lookups,
+  ) {
+    final compact = _usesCompactLabels(context);
     return [
       _WordDetailsButton(
         word: word,
-        ref: ref,
-        context: readerContext,
+        lookUp: lookups.lookUpReadings,
+        pageContext: context,
         compact: compact,
       ),
-      if (showIgnoringMacrons)
+      if (lookups.macronComparison.showIgnoringMacrons)
         _WordDetailsButton(
           word: word,
-          ref: ref,
-          context: readerContext,
+          lookUp: lookups.lookUpCandidateReadings,
+          pageContext: context,
           compact: compact,
           ignoreMacrons: true,
         ),
-      _WiktionaryButton(
-        word: word,
-        ref: ref,
-        context: readerContext,
-        compact: compact,
-      ),
+      ..._buildWiktionaryButtons(anchor, lookups.wiktionaryPages, compact: compact),
     ];
   }
+
+  /// Returns a Wiktionary button, a menu for multiple pages, or no buttons for an empty set.
+  List<ContextMenuButtonItem> _buildWiktionaryButtons(
+    Offset anchor,
+    Set<String> wiktionaryPages, {
+    required bool compact,
+  }) => switch (wiktionaryPages.toList()) {
+    [] => const [],
+    [final page] => [_WiktionaryButton(page: page, pageContext: context, compact: compact)],
+    final pages => [
+      LookupMenuButton(
+        label: _WiktionaryButton.labelFor(compact: compact),
+        anchor: anchor,
+        pageContext: context,
+        choices: pages
+            .map((page) => (label: page, open: () => _WiktionaryButton.open(page, context)))
+            .toList(),
+      ),
+    ],
+  };
 
   void _rebuildOnScreenSizeChange(BuildContext context) {
     MediaQuery.of(context);
   }
 
-  TextSpan _buildTextWithOverflowDetection(
+  PageSegments _buildTextWithOverflowDetection(
     BuildContext context,
     BoxConstraints constraints,
     ReaderSettings settings,
@@ -1191,12 +1156,12 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
         widget.segments.isNotEmpty && constraints.maxWidth > 0 && constraints.maxHeight > 0;
     return isMeasurable
         ? _layOutPage(context, constraints, settings, revision)
-        : const TextSpan(text: '');
+        : const PageSegments.empty();
   }
 
   /// Fits as much of the buffer as the page holds and reports the range once
   /// it's on screen
-  TextSpan _layOutPage(
+  PageSegments _layOutPage(
     BuildContext context,
     BoxConstraints constraints,
     ReaderSettings settings,
@@ -1235,7 +1200,11 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
         notify(first, last, fitsWholeBuffer: visible.fitsWholeBuffer);
       }
     });
-    return TextSpan(children: _TextRenderer.pageSpans(allSpans, visible.first, visible.last));
+    return PageSegments(
+      _TextRenderer.pageSpans(allSpans, visible.first, visible.last),
+      segments.sublist(visible.first, visible.last + 1),
+      showMacrons: settings.showMacrons,
+    );
   }
 
   //

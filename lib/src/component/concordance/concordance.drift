@@ -38,7 +38,7 @@ WITHOUT ROWID;
 CREATE TABLE "ConcordanceCountableWordCandidateAnalyses"(
     "workId" TEXT NOT NULL,
     "idx" INTEGER NOT NULL,
-    "componentOrdinal" INTEGER NOT NULL CHECK( componentOrdinal IN (0, 1) ), -- 1 is the enclitic
+    "componentOrdinal" INTEGER NOT NULL CHECK( componentOrdinal IN (0, 1) ), -- 0: lookup form; 1: enclitic
     "form" TEXT NOT NULL,
     "item" INTEGER NOT NULL,
     PRIMARY KEY( workId, idx, componentOrdinal, form, item ),

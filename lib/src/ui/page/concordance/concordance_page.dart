@@ -9,6 +9,7 @@ import '../../../../logger.dart';
 import '../../../component/concordance/concordance_api.dart';
 import '../../../component/concordance/concordance_query.dart';
 import '../../../component/library/catalog_api.dart';
+import '../../../component/library/punctuation.dart';
 import '../../../component/library/reading_start_api.dart';
 import '../../../component/settings/concordance_settings_api.dart';
 import '../../../component/settings/reader_settings_api.dart';
@@ -436,7 +437,6 @@ class _HitText {
   final ConcordanceHit hit;
   final bool showMacrons;
 
-  static const _closingSigns = ['.', ',', '!', '?', ':', ';', ')', ']'];
   static const _openingSigns = ['(', '['];
   static const _lineBreak = ' / ';
 
@@ -449,7 +449,7 @@ class _HitText {
         null => '',
         final previous when previous.reference != token.reference => _lineBreak,
         final previous
-            when _closingSigns.any(token.word.startsWith) ||
+            when closingPunctSigns.any(token.word.startsWith) ||
                 _openingSigns.any(previous.word.endsWith) =>
           '',
         _ => ' ',

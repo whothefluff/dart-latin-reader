@@ -2389,7 +2389,7 @@ class CountableWordCandidateAnalyse extends i0.DataClass
   final int idx;
   final int componentOrdinal;
 
-  /// 1 is the enclitic
+  /// 0: lookup form; 1: enclitic
   final String form;
   final int item;
   const CountableWordCandidateAnalyse({
@@ -3129,6 +3129,183 @@ class MorphologyPeek
   };
 }
 
+class MorphologyLookupFormCandidateInflection extends i0.DataClass {
+  final String workId;
+  final int idx;
+  final String form;
+  final int item;
+  final int cnt;
+  const MorphologyLookupFormCandidateInflection({
+    required this.workId,
+    required this.idx,
+    required this.form,
+    required this.item,
+    required this.cnt,
+  });
+  factory MorphologyLookupFormCandidateInflection.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return MorphologyLookupFormCandidateInflection(
+      workId: serializer.fromJson<String>(json['workId']),
+      idx: serializer.fromJson<int>(json['idx']),
+      form: serializer.fromJson<String>(json['form']),
+      item: serializer.fromJson<int>(json['item']),
+      cnt: serializer.fromJson<int>(json['cnt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'workId': serializer.toJson<String>(workId),
+      'idx': serializer.toJson<int>(idx),
+      'form': serializer.toJson<String>(form),
+      'item': serializer.toJson<int>(item),
+      'cnt': serializer.toJson<int>(cnt),
+    };
+  }
+
+  i1.MorphologyLookupFormCandidateInflection copyWith({
+    String? workId,
+    int? idx,
+    String? form,
+    int? item,
+    int? cnt,
+  }) => i1.MorphologyLookupFormCandidateInflection(
+    workId: workId ?? this.workId,
+    idx: idx ?? this.idx,
+    form: form ?? this.form,
+    item: item ?? this.item,
+    cnt: cnt ?? this.cnt,
+  );
+  @override
+  String toString() {
+    return (StringBuffer('MorphologyLookupFormCandidateInflection(')
+          ..write('workId: $workId, ')
+          ..write('idx: $idx, ')
+          ..write('form: $form, ')
+          ..write('item: $item, ')
+          ..write('cnt: $cnt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(workId, idx, form, item, cnt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.MorphologyLookupFormCandidateInflection &&
+          other.workId == this.workId &&
+          other.idx == this.idx &&
+          other.form == this.form &&
+          other.item == this.item &&
+          other.cnt == this.cnt);
+}
+
+class MorphologyLookupFormCandidateInflections
+    extends
+        i0.ViewInfo<
+          i1.MorphologyLookupFormCandidateInflections,
+          i1.MorphologyLookupFormCandidateInflection
+        >
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  MorphologyLookupFormCandidateInflections(
+    this.attachedDatabase, [
+    this._alias,
+  ]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [workId, idx, form, item, cnt];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'morphology.LookupFormCandidateInflections';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW "morphology.LookupFormCandidateInflections" AS SELECT Candidate.workId, Candidate.idx, Infl.form, Infl.item, Infl.cnt FROM CountableWordCandidateAnalyses AS Candidate INNER JOIN MorphologicalDetailInflections AS Infl ON Infl.form = Candidate.form AND Infl.item = Candidate.item WHERE Candidate.componentOrdinal = 0',
+  };
+  @override
+  MorphologyLookupFormCandidateInflections get asDslTable => this;
+  @override
+  i1.MorphologyLookupFormCandidateInflection map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.MorphologyLookupFormCandidateInflection(
+      workId: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}workId'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      form: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}form'],
+      )!,
+      item: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}item'],
+      )!,
+      cnt: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}cnt'],
+      )!,
+    );
+  }
+
+  late final i0.GeneratedColumn<String> workId = i0.GeneratedColumn<String>(
+    'workId',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<int> idx = i0.GeneratedColumn<int>(
+    'idx',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  late final i0.GeneratedColumn<String> form = i0.GeneratedColumn<String>(
+    'form',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumn<int> item = i0.GeneratedColumn<int>(
+    'item',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
+    'cnt',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
+  @override
+  MorphologyLookupFormCandidateInflections createAlias(String alias) {
+    return MorphologyLookupFormCandidateInflections(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {
+    'CountableWordCandidateAnalyses',
+    'MorphologicalDetailInflections',
+  };
+}
+
 class MorphologyAnalyses extends i0.ViewInfo<i1.MorphologyAnalyses, i2.Analysis>
     implements i0.HasResultSet {
   final String? _alias;
@@ -3488,6 +3665,26 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
     );
   }
 
+  i0.Selectable<i2.AnalysisKey> getLookupFormCandidateAnalysisKeys(
+    String var1,
+    int var2,
+  ) {
+    return customSelect(
+      'SELECT form, item, cnt FROM "morphology.LookupFormCandidateInflections" WHERE workId = ?1 AND idx = ?2 ORDER BY form, item, cnt',
+      variables: [i0.Variable<String>(var1), i0.Variable<int>(var2)],
+      readsFrom: {
+        countableWordCandidateAnalyses,
+        morphologicalDetailInflections,
+      },
+    ).map(
+      (i0.QueryRow row) => i2.AnalysisKey.fromSql(
+        form: row.read<String>('form'),
+        item: row.read<int>('item'),
+        cnt: row.read<int>('cnt'),
+      ),
+    );
+  }
+
   i0.Selectable<i2.Analysis> dummy() {
     return customSelect(
       'SELECT * FROM "morphology.Analyses"',
@@ -3514,6 +3711,19 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
   i1.MorphologicalDetails get morphologicalDetails => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.MorphologicalDetails>('MorphologicalDetails');
+  i1.MorphologyLookupFormCandidateInflections
+  get morphologyLookupFormCandidateInflections =>
+      i3.ReadDatabaseContainer(
+        attachedDatabase,
+      ).resultSet<i1.MorphologyLookupFormCandidateInflections>(
+        'morphology.LookupFormCandidateInflections',
+      );
+  i1.CountableWordCandidateAnalyses get countableWordCandidateAnalyses =>
+      i3.ReadDatabaseContainer(
+        attachedDatabase,
+      ).resultSet<i1.CountableWordCandidateAnalyses>(
+        'CountableWordCandidateAnalyses',
+      );
   i1.MorphologyAnalyses get morphologyAnalyses => i3.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.MorphologyAnalyses>('morphology.Analyses');

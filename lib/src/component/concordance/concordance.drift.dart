@@ -1965,7 +1965,7 @@ class ConcordanceCountableWordCandidateAnalyse extends i0.DataClass
   final int idx;
   final int componentOrdinal;
 
-  /// 1 is the enclitic
+  /// 0: lookup form; 1: enclitic
   final String form;
   final int item;
   const ConcordanceCountableWordCandidateAnalyse({
