@@ -3476,28 +3476,14 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
 
   i0.Selectable<i2.AnalysisKey> getAnalysisKeysOf(String var1) {
     return customSelect(
-      'SELECT form, CAST(item AS INT) AS item, CAST(cnt AS INT) AS cnt FROM SearchableMorphDetInflections WHERE form LIKE ?1 ORDER BY form, item, cnt',
+      'SELECT form, item, cnt FROM MorphologicalDetailInflections WHERE form = ?1 ORDER BY form, item, cnt',
       variables: [i0.Variable<String>(var1)],
-      readsFrom: {searchableMorphDetInflections},
+      readsFrom: {morphologicalDetailInflections},
     ).map(
       (i0.QueryRow row) => i2.AnalysisKey.fromSql(
-        form: row.readNullable<String>('form'),
-        item: row.readNullable<int>('item'),
-        cnt: row.readNullable<int>('cnt'),
-      ),
-    );
-  }
-
-  i0.Selectable<i2.AnalysisKey> getAnalysisKeysOfMacronized(String var1) {
-    return customSelect(
-      'SELECT form, CAST(item AS INT) AS item, CAST(cnt AS INT) AS cnt FROM SearchableMorphDetInflections WHERE macronizedForm LIKE ?1 ORDER BY form, item, cnt',
-      variables: [i0.Variable<String>(var1)],
-      readsFrom: {searchableMorphDetInflections},
-    ).map(
-      (i0.QueryRow row) => i2.AnalysisKey.fromSql(
-        form: row.readNullable<String>('form'),
-        item: row.readNullable<int>('item'),
-        cnt: row.readNullable<int>('cnt'),
+        form: row.read<String>('form'),
+        item: row.read<int>('item'),
+        cnt: row.read<int>('cnt'),
       ),
     );
   }

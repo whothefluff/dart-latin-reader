@@ -1257,23 +1257,21 @@ Future<void> _goToMorphologyForLemma(
 } */
 
 // A tap must resolve to the exact (form, item) identities the bridge already
-// selected — not a fresh LIKE search, which can surface other case variants
-// the row never actually counted.
+// selected.
 Future<void> _openFrequencyMorphology(
   BuildContext context,
   WidgetRef ref,
   Iterable<FrequencyMorphCandidate> candidates,
 ) async {
-  final itemsByForm = groupBy(
+  final countedItemsByForm = groupBy(
     candidates,
     (c) => c.morphForm,
   ).map((form, matches) => MapEntry(form, matches.map((c) => c.morphItem).toSet()));
   final batches = await Future.wait(
-    // LIKE can return other spellings, keep only the exact form and item pairs of this freq. row
-    itemsByForm.keys.map(
+    countedItemsByForm.keys.map(
       (form) async => (await ref.read(
         morphologicalAnalysisKeysProvider(form).future,
-      )).where((k) => k.form == form && itemsByForm[form]!.contains(k.item)),
+      )).where((k) => countedItemsByForm[form]!.contains(k.item)),
     ),
   );
   if (context.mounted) {

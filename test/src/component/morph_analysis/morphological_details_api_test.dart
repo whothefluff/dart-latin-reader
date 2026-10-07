@@ -31,6 +31,23 @@ Future<AppDb> _numeralAndIrregular() async {
   return db;
 }
 
+/// Venere, as Venus and as venio, each under its own form
+Future<AppDb> _venereTwice() async {
+  final db = _EmptyDb();
+  addTearDown(db.close);
+  await db.customStatement(
+    "INSERT INTO MorphologicalDetails VALUES ( 'Venere', 0, 'Venus' ), ( 'venere', 0, 'venio' )",
+  );
+  await db.customStatement(
+    '''
+    INSERT INTO MorphologicalDetailInflections( form, item, cnt, partOfSpeech, stem )
+        VALUES ( 'Venere', 0, 0, 'noun', 'Vener' ),
+               ( 'venere', 0, 0, 'verb', 'vēn' )
+    ''',
+  );
+  return db;
+}
+
 void main() {
   group('morphologicalAnalysesProvider', () {
     test('numerals and irregular words have analyses like any other part of speech', () async {
@@ -48,6 +65,18 @@ void main() {
         analyses.map((analysis) => (analysis.form, analysis.partOfSpeech)),
         unorderedEquals([('tres', 'numeral'), ('nequam', 'irregular')]),
       );
+    });
+  });
+
+  group('morphologicalAnalysisKeysProvider', () {
+    test('finds the analyses stored under the form exactly as written', () async {
+      final db = await _venereTwice();
+      final container = ProviderContainer(overrides: [dbProvider.overrideWith((_) => db)]);
+      addTearDown(container.dispose);
+      final keys = await container
+          .listen(morphologicalAnalysisKeysProvider('Venere').future, (_, _) {})
+          .read();
+      expect(keys, AnalysisKeys(const [AnalysisKey(form: 'Venere', item: 0, cnt: 0)]));
     });
   });
 }
