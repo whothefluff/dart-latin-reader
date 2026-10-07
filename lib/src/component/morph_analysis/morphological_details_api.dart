@@ -37,6 +37,15 @@ Future<AnalysisKeys> morphologicalAnalysisKeys(Ref ref, String form) async {
   return GetMorphologicalAnalysisKeysUseCase(repo, form).invoke();
 }
 
+@riverpod
+Future<AnalysisKeys> lookupFormCandidateAnalysisKeys(Ref ref, String workId, int idx) async {
+  log.info(() => '@riverpod - using $workId, $idx');
+  ref.cacheFor(const Duration(minutes: 2));
+  final db = await ref.watch(dbProvider.future);
+  final repo = MorphologicalDataRepository(db.morphAnalysisDrift);
+  return GetLookupFormCandidateAnalysisKeysUseCase(repo, workId, idx).invoke();
+}
+
 class MorphologicalDataRepository implements IMorphologicalDataRepository {
   MorphologicalDataRepository(
     this._db,
@@ -62,6 +71,13 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
     return AnalysisKeys(dbData);
   }
 
+  @override
+  Future<AnalysisKeys> getLookupFormCandidateAnalysisKeys(String workId, int idx) async {
+    log.fine(() => 'retrieve the candidate AnalysisKeys of the lookup form at $idx in $workId');
+    final dbData = await _db.getLookupFormCandidateAnalysisKeys(workId, idx).get();
+    return AnalysisKeys(dbData);
+  }
+
   Expression<bool> Function(MorphologyAnalyses a) _keysMatch(AnalysisKeys keys) =>
       (a) => Expression.or(
         keys.map(
@@ -82,6 +98,8 @@ abstract interface class IMorphologicalDataRepository {
   Future<Analyses> getMorphAnalyses(AnalysisKeys keys);
 
   Future<AnalysisKeys> getMorphAnalysisKeys(String form);
+
+  Future<AnalysisKeys> getLookupFormCandidateAnalysisKeys(String workId, int idx);
   //
 }
 
@@ -113,6 +131,24 @@ class GetMorphologicalAnalysisKeysUseCase implements IGetMorphologicalAnalysisKe
   //
 }
 
+class GetLookupFormCandidateAnalysisKeysUseCase
+    implements IGetLookupFormCandidateAnalysisKeysUseCase {
+  GetLookupFormCandidateAnalysisKeysUseCase(
+    this._repository,
+    this._workId,
+    this._idx,
+  );
+
+  final IMorphologicalDataRepository _repository;
+  final String _workId;
+  final int _idx;
+
+  @override
+  Future<AnalysisKeys> invoke() async =>
+      _repository.getLookupFormCandidateAnalysisKeys(_workId, _idx);
+  //
+}
+
 //domain
 
 abstract interface class IGetMorphologicalAnalysesUseCase {
@@ -122,6 +158,12 @@ abstract interface class IGetMorphologicalAnalysesUseCase {
 }
 
 abstract interface class IGetMorphologicalAnalysisKeysUseCase {
+  //
+  Future<AnalysisKeys> invoke();
+  //
+}
+
+abstract interface class IGetLookupFormCandidateAnalysisKeysUseCase {
   //
   Future<AnalysisKeys> invoke();
   //

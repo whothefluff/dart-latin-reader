@@ -62,7 +62,7 @@ WITHOUT ROWID;
 CREATE TABLE "CountableWordCandidateAnalyses"(
     "workId" TEXT NOT NULL,
     "idx" INTEGER NOT NULL,
-    "componentOrdinal" INTEGER NOT NULL CHECK( componentOrdinal IN (0, 1) ), -- 1 is the enclitic
+    "componentOrdinal" INTEGER NOT NULL CHECK( componentOrdinal IN (0, 1) ), -- 0: lookup form; 1: enclitic
     "form" TEXT NOT NULL,
     "item" INTEGER NOT NULL,
     PRIMARY KEY( workId, idx, componentOrdinal, form, item ),
@@ -157,6 +157,24 @@ searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*, Search.mac
                                                            ORDER BY Peek.form, Peek.item, Peek.cnt;
 
 getAnalysisKeysOf WITH AnalysisKey.fromSql: SELECT form, item, cnt FROM MorphologicalDetailInflections WHERE form = ? ORDER BY form, item, cnt;
+
+CREATE VIEW "morphology.LookupFormCandidateInflections" AS
+    SELECT Candidate.workId,
+           Candidate.idx,
+           Infl.form,
+           Infl.item,
+           Infl.cnt
+        FROM CountableWordCandidateAnalyses AS Candidate
+        INNER JOIN MorphologicalDetailInflections AS Infl
+            ON Infl.form = Candidate.form
+               AND Infl.item = Candidate.item
+        WHERE Candidate.componentOrdinal = 0;
+
+getLookupFormCandidateAnalysisKeys WITH AnalysisKey.fromSql: SELECT form, item, cnt
+                                                                 FROM "morphology.LookupFormCandidateInflections"
+                                                                 WHERE workId = ?
+                                                                       AND idx = ?
+                                                                 ORDER BY form, item, cnt;
 
 CREATE VIEW "morphology.Analyses" WITH Analysis AS 
     SELECT Infl.form,

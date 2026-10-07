@@ -276,5 +276,148 @@ class _MorphologicalAnalysisKeysProviderElement
   String get form => (origin as MorphologicalAnalysisKeysProvider).form;
 }
 
+String _$lookupFormCandidateAnalysisKeysHash() =>
+    r'136942e9fba1a0b1afcf1310461dfe11448cf236';
+
+/// See also [lookupFormCandidateAnalysisKeys].
+@ProviderFor(lookupFormCandidateAnalysisKeys)
+const lookupFormCandidateAnalysisKeysProvider =
+    LookupFormCandidateAnalysisKeysFamily();
+
+/// See also [lookupFormCandidateAnalysisKeys].
+class LookupFormCandidateAnalysisKeysFamily
+    extends Family<AsyncValue<AnalysisKeys>> {
+  /// See also [lookupFormCandidateAnalysisKeys].
+  const LookupFormCandidateAnalysisKeysFamily();
+
+  /// See also [lookupFormCandidateAnalysisKeys].
+  LookupFormCandidateAnalysisKeysProvider call(String workId, int idx) {
+    return LookupFormCandidateAnalysisKeysProvider(workId, idx);
+  }
+
+  @override
+  LookupFormCandidateAnalysisKeysProvider getProviderOverride(
+    covariant LookupFormCandidateAnalysisKeysProvider provider,
+  ) {
+    return call(provider.workId, provider.idx);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'lookupFormCandidateAnalysisKeysProvider';
+}
+
+/// See also [lookupFormCandidateAnalysisKeys].
+class LookupFormCandidateAnalysisKeysProvider
+    extends AutoDisposeFutureProvider<AnalysisKeys> {
+  /// See also [lookupFormCandidateAnalysisKeys].
+  LookupFormCandidateAnalysisKeysProvider(String workId, int idx)
+    : this._internal(
+        (ref) => lookupFormCandidateAnalysisKeys(
+          ref as LookupFormCandidateAnalysisKeysRef,
+          workId,
+          idx,
+        ),
+        from: lookupFormCandidateAnalysisKeysProvider,
+        name: r'lookupFormCandidateAnalysisKeysProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$lookupFormCandidateAnalysisKeysHash,
+        dependencies: LookupFormCandidateAnalysisKeysFamily._dependencies,
+        allTransitiveDependencies:
+            LookupFormCandidateAnalysisKeysFamily._allTransitiveDependencies,
+        workId: workId,
+        idx: idx,
+      );
+
+  LookupFormCandidateAnalysisKeysProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.workId,
+    required this.idx,
+  }) : super.internal();
+
+  final String workId;
+  final int idx;
+
+  @override
+  Override overrideWith(
+    FutureOr<AnalysisKeys> Function(LookupFormCandidateAnalysisKeysRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: LookupFormCandidateAnalysisKeysProvider._internal(
+        (ref) => create(ref as LookupFormCandidateAnalysisKeysRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        workId: workId,
+        idx: idx,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<AnalysisKeys> createElement() {
+    return _LookupFormCandidateAnalysisKeysProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LookupFormCandidateAnalysisKeysProvider &&
+        other.workId == workId &&
+        other.idx == idx;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, workId.hashCode);
+    hash = _SystemHash.combine(hash, idx.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin LookupFormCandidateAnalysisKeysRef
+    on AutoDisposeFutureProviderRef<AnalysisKeys> {
+  /// The parameter `workId` of this provider.
+  String get workId;
+
+  /// The parameter `idx` of this provider.
+  int get idx;
+}
+
+class _LookupFormCandidateAnalysisKeysProviderElement
+    extends AutoDisposeFutureProviderElement<AnalysisKeys>
+    with LookupFormCandidateAnalysisKeysRef {
+  _LookupFormCandidateAnalysisKeysProviderElement(super.provider);
+
+  @override
+  String get workId =>
+      (origin as LookupFormCandidateAnalysisKeysProvider).workId;
+  @override
+  int get idx => (origin as LookupFormCandidateAnalysisKeysProvider).idx;
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
