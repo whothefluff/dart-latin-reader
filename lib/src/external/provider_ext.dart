@@ -16,3 +16,35 @@ extension CacheForExtension on Ref<Object?> {
 
   //
 }
+
+extension ReadRetryingFailuresExtension on ProviderContainer {
+  /// Reads [provider], retrying any failures in it or its dependencies.
+  ///
+  /// Reuses retries already in progress.
+  Future<T> readRetryingFailures<T>(AutoDisposeFutureProvider<T> provider) {
+    [if (exists(provider)) readProviderElement(provider)] // also when a parent container holds it
+        .expand((element) => _dependencyTreeOf(element, {}))
+        .map((element) => element.origin)
+        .whereType<ProviderBase<AsyncValue<Object?>>>()
+        .where((dependency) {
+          final state = read(dependency);
+          return state.hasError && !state.isLoading; // a retry keeps the error while it loads
+        })
+        .toSet()
+        .forEach(invalidate);
+    return read(provider.future);
+  }
+
+  /// [element] and all its dependencies, each included once.
+  Set<ProviderElementBase<Object?>> _dependencyTreeOf(
+    ProviderElementBase<Object?> element,
+    Set<ProviderElementBase<Object?>> visited,
+  ) {
+    if (visited.add(element)) {
+      element.visitAncestors((dependency) => _dependencyTreeOf(dependency, visited));
+    }
+    return visited;
+  }
+
+  //
+}
