@@ -40,25 +40,9 @@ Future<AnalysisKeys> morphologicalAnalysisKeys(Ref ref, String form) async {
 class MorphologicalDataRepository implements IMorphologicalDataRepository {
   MorphologicalDataRepository(
     this._db,
-  ) {
-    _analysisKeysQueries = {
-      (hasMacrons: true): (String form) {
-        log.fine(() => 'retrieve AnalysisKeys WHERE macronizedForm LIKE "$form"');
-        return _db.getAnalysisKeysOfMacronized(form);
-      },
-      (hasMacrons: false): (String form) {
-        log.fine(() => 'retrieve AnalysisKeys WHERE form LIKE "$form"');
-        return _db.getAnalysisKeysOf(form);
-      },
-    };
-  }
+  );
 
   final MorphAnalysisDrift _db;
-  // dart format off
-  late final Map<({bool hasMacrons}),
-                 MultiSelectable<AnalysisKey> Function(String form)>
-      _analysisKeysQueries;
-  // dart format on
 
   @override
   Future<Analyses> getMorphAnalyses(AnalysisKeys keys) async {
@@ -70,15 +54,11 @@ class MorphologicalDataRepository implements IMorphologicalDataRepository {
     return Analyses(dbData);
   }
 
-  /// If the input contains macrons, the query will look for them explicitely
-  /// and as they were specified
-  ///
-  /// If the input contains no macrons, the query will ignore them (which means
-  /// the result can contain macrons or not contain any)
+  /// The keys of the analyses stored under exactly [form]
   @override
   Future<AnalysisKeys> getMorphAnalysisKeys(String form) async {
-    final formHasMacrons = form.contains(RegExp('[āēīōūĀĒĪŌŪ]'));
-    final dbData = await _analysisKeysQueries[(hasMacrons: formHasMacrons)]!(form).get();
+    log.fine(() => 'retrieve AnalysisKeys WHERE form = "$form"');
+    final dbData = await _db.getAnalysisKeysOf(form).get();
     return AnalysisKeys(dbData);
   }
 

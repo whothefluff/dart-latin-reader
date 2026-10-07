@@ -156,9 +156,7 @@ searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*, Search.mac
                                                            WHERE Search.macronizedForm LIKE ?
                                                            ORDER BY Peek.form, Peek.item, Peek.cnt;
 
-getAnalysisKeysOf WITH AnalysisKey.fromSql: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM SearchableMorphDetInflections WHERE form LIKE ? ORDER BY form, item, cnt;
-
-getAnalysisKeysOfMacronized WITH AnalysisKey.fromSql: SELECT form, CAST( item AS INT ) AS item, CAST( cnt AS INT ) AS cnt FROM SearchableMorphDetInflections WHERE macronizedForm LIKE ? ORDER BY form, item, cnt;
+getAnalysisKeysOf WITH AnalysisKey.fromSql: SELECT form, item, cnt FROM MorphologicalDetailInflections WHERE form = ? ORDER BY form, item, cnt;
 
 CREATE VIEW "morphology.Analyses" WITH Analysis AS 
     SELECT Infl.form,
