@@ -1,0 +1,67 @@
+name: Publish rolling preview
+description: Moves a preview tag to the current commit and replaces its pre-release's files and notes.
+
+inputs:
+  tag:
+    description: Tag and release to update, e.g. android-preview
+    required: true
+  title:
+    description: Release title
+    required: true
+  files:
+    description: Files to attach, one path per line. Existing assets with the same name are replaced.
+    required: true
+  built-at:
+    description: When the app was built, shown in the release notes
+    required: true
+  data-version:
+    description: Data version of the packaged database
+    required: true
+  database-sha256:
+    description: SHA-256 of the packaged database
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Publish
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TAG: ${{ inputs.tag }}
+        TITLE: ${{ inputs.title }}
+        FILES: ${{ inputs.files }}
+        BUILT_AT: ${{ inputs.built-at }}
+        DATA_VERSION: ${{ inputs.data-version }}
+        DATABASE_SHA256: ${{ inputs.database-sha256 }}
+      run: |
+        set -u
+        mapfile -t files < <(printf '%s\n' "$FILES" | awk 'NF')
+
+        notes="$RUNNER_TEMP/$TAG-notes.md"
+        {
+          printf -- '- **Built:** %s\n' "$BUILT_AT"
+          printf -- '- **Commit:** %s\n' "$GITHUB_SHA"
+          printf -- '- **Run:** %s/%s/actions/runs/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+          printf -- '- **Database:** data version %s, SHA-256 `%s`\n' "$DATA_VERSION" "$DATABASE_SHA256"
+        } > "$notes"
+
+        if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" > /dev/null 2>&1; then
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/$TAG" \
+            -f sha="$GITHUB_SHA" -F force=true > /dev/null
+        else
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f ref="refs/tags/$TAG" -f sha="$GITHUB_SHA" > /dev/null
+        fi
+
+        if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+          gh release upload "$TAG" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --title "$TITLE" --notes-file "$notes" \
+            --prerelease --latest=false
+        else
+          gh release create "$TAG" "${files[@]}" \
+            --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "$TITLE" --notes-file "$notes" \
+            --prerelease --latest=false
+        fi

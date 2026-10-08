@@ -36,8 +36,15 @@ Your settings live elsewhere, so they survive. Builds from GitHub need nothing.
 
 ### Everyone
 
-- **Latest main, Android:** [download the APK](https://github.com/whothefluff/dart-latin-reader/releases/download/android-preview/app-release.apk). It installs as **Latin Reader Preview**, separate from your local build.
-- **Latest main, Windows:** [download the ZIP](https://github.com/whothefluff/dart-latin-reader/releases/download/windows-preview/latin-reader-windows.zip). Unzip it and run `latin_reader\latin_reader.exe`. It shares settings with your local Windows build, but not data: it keeps its own database.
+| Latest main | App | Its database |
+| --- | --- | --- |
+| Android | [APK](https://github.com/whothefluff/dart-latin-reader/releases/download/android-preview/app-release.apk) | [`data.db`](https://github.com/whothefluff/dart-latin-reader/releases/download/android-preview/data.db) |
+| Windows | [ZIP](https://github.com/whothefluff/dart-latin-reader/releases/download/windows-preview/latin-reader-windows.zip) | [`data.db`](https://github.com/whothefluff/dart-latin-reader/releases/download/windows-preview/data.db) |
+
+- **Android** installs as **Latin Reader Preview**, separate from your local build.
+- **Windows:** unzip it and run `latin_reader\latin_reader.exe`. It shares settings with your local Windows build, but not data: it keeps its own database.
+
+Each `data.db` is the exact file packaged inside that build, for opening in an SQLite browser. The pre-release pages ([Android](https://github.com/whothefluff/dart-latin-reader/releases/tag/android-preview), [Windows](https://github.com/whothefluff/dart-latin-reader/releases/tag/windows-preview)) say when each build was made (UTC), from which commit, and the database's data version and SHA-256. The date GitHub shows next to the title is when the pre-release was first created, not the latest build.
 
 ### Updating
 
@@ -57,6 +64,7 @@ Every PR run produces downloadable builds. Open the run from your PR's checks an
 - **Android:** download `latin-reader-apk-<number>`, a ZIP. Unzip it and install `app-release.apk`. It installs as **Latin Reader PR**.
   - Each PR build is signed with a throwaway key, so uninstall the previous Latin Reader PR before installing a newer one.
 - **Windows:** download `latin-reader-windows-<number>`, a ZIP of the whole app folder. Unzip it and run `latin_reader.exe`; the other files next to it are required.
+- **Database:** download `latin-reader-database-<number>`, a ZIP with the `data.db` packaged in that run's builds.
 
 If GitHub Actions is enabled in your fork, runs there build the same way PR builds do (the APK installs as Latin Reader PR) and publish nothing. The checks that count are the ones on your PR here.
 
@@ -69,6 +77,8 @@ Starting a workflow by hand needs write access to the repo.
   2. Download `latin-reader-apk-<number>` from that run.
   3. It installs as **Latin Reader Preview**, over the current preview.
 - **Windows:** run `gh workflow run windows.yml --ref <branch>`, then download `latin-reader-windows-<number>` from that run.
+
+Either run also has `latin-reader-database-<number>`. Only runs on main update the pre-releases.
 
 ## Version numbers
 

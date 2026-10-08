@@ -28,6 +28,8 @@ jobs:
     needs: [common, database]
     if: ${{ !cancelled() }}
     timeout-minutes: 45
+    outputs:
+      built-at: ${{ steps.build.outputs.built-at }}
 
     env:
       ANDROID_CI_BUILD: "true"
@@ -83,6 +85,7 @@ jobs:
           printf 'ANDROID_TEST_KEYSTORE_PATH=%s\n' "$RUNNER_TEMP/latin-reader-test.jks" >> "$GITHUB_ENV"
 
       - name: Build APK
+        id: build
         env:
           ANDROID_TEST_KEYSTORE_PASSWORD: ${{ github.event_name != 'pull_request' && secrets.ANDROID_TEST_KEYSTORE_PASSWORD || '' }}
         run: |
@@ -90,6 +93,7 @@ jobs:
           flutter build apk --release \
             --build-number="$GITHUB_RUN_NUMBER" \
             --dart-define=BUNDLED_DATABASE_ID="$database_hash"
+          printf 'built-at=%s\n' "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
 
       - name: Verify packaged database and absence of CSVs
         run: |
@@ -131,43 +135,37 @@ jobs:
 
   publish-preview:
     if: ${{ github.repository == 'whothefluff/dart-latin-reader' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
-    needs: android-specific-steps
+    needs: [database, android-specific-steps]
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
+      - name: Checkout publishing action
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+
       - name: Download verified APK
         uses: actions/download-artifact@v4
         with:
           name: latin-reader-apk-${{ github.run_number }}
-          path: apk
+          path: preview
+
+      - name: Download database
+        uses: actions/download-artifact@v4
+        with:
+          name: latin-reader-database-${{ github.run_number }}
+          path: preview
 
       - name: Publish rolling Android preview
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          printf 'Commit: %s\n\nBuild: %s/%s/actions/runs/%s\n' \
-            "$GITHUB_SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" \
-            > release-notes.md
-
-          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/android-preview" > /dev/null 2>&1; then
-            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/android-preview" \
-              -f sha="$GITHUB_SHA" -F force=true > /dev/null
-          else
-            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
-              -f ref=refs/tags/android-preview -f sha="$GITHUB_SHA" > /dev/null
-          fi
-
-          if gh release view android-preview --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            gh release upload android-preview apk/app-release.apk \
-              --repo "$GITHUB_REPOSITORY" --clobber
-            gh release edit android-preview --repo "$GITHUB_REPOSITORY" \
-              --title "Latest Android preview" --notes-file release-notes.md \
-              --prerelease --latest=false
-          else
-            gh release create android-preview apk/app-release.apk \
-              --repo "$GITHUB_REPOSITORY" --verify-tag \
-              --title "Latest Android preview" --notes-file release-notes.md \
-              --prerelease --latest=false
-          fi
+        uses: ./.github/actions/publish-preview
+        with:
+          tag: android-preview
+          title: Latest Android preview
+          files: |
+            preview/app-release.apk
+            preview/data.db
+          built-at: ${{ needs.android-specific-steps.outputs.built-at }}
+          data-version: ${{ needs.database.outputs.data-version }}
+          database-sha256: ${{ needs.database.outputs.sha256 }}

@@ -3,11 +3,21 @@ name: Database
 # Builds and validates data.db for the platform builds of the calling workflow run to package.
 on:
   workflow_call:
+    outputs:
+      sha256:
+        description: SHA-256 of data.db, which builds pass as BUNDLED_DATABASE_ID
+        value: ${{ jobs.build-database.outputs.sha256 }}
+      data-version:
+        description: The data version stored in data.db
+        value: ${{ jobs.build-database.outputs.data-version }}
 
 jobs:
   build-database:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    outputs:
+      sha256: ${{ steps.describe.outputs.sha256 }}
+      data-version: ${{ steps.describe.outputs.data-version }}
 
     steps:
       - name: Checkout code
@@ -31,6 +41,12 @@ jobs:
 
       - name: Generate and validate database
         run: flutter test tool/build_database_test.dart --reporter expanded --timeout none
+
+      - name: Describe database
+        id: describe
+        run: |
+          printf 'sha256=%s\n' "$(sha256sum build/generated_database/data.db | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          printf 'data-version=%s\n' "$(tr -d '[:space:]' < assets/preprocessed_data/data_version.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Upload database
         uses: actions/upload-artifact@v4

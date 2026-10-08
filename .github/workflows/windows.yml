@@ -28,6 +28,8 @@ jobs:
     runs-on: windows-2022 # TODO(whothefluff): change back to 'windows-latest' after upgrading flutter
     if: ${{ !cancelled() }}
     timeout-minutes: 45
+    outputs:
+      built-at: ${{ steps.build.outputs.built-at }}
 
     steps:
 
@@ -61,9 +63,13 @@ jobs:
         Remove-Item assets/preprocessed_data/*.csv
 
     - name: Build Windows app
+      id: build
       run: |
         $databaseHash = (Get-FileHash build/generated_database/data.db -Algorithm SHA256).Hash.ToLowerInvariant()
         flutter build windows --release "--dart-define=BUNDLED_DATABASE_ID=$databaseHash"
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        $builtAt = [DateTime]::UtcNow.ToString('yyyy-MM-dd HH:mm:ss', [Globalization.CultureInfo]::InvariantCulture)
+        "built-at=$builtAt UTC" >> $env:GITHUB_OUTPUT
 
     - name: Verify packaged database and absence of CSVs
       run: |
@@ -91,46 +97,42 @@ jobs:
 
   publish-preview:
     if: ${{ github.repository == 'whothefluff/dart-latin-reader' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
-    needs: windows-specific-steps
+    needs: [database, windows-specific-steps]
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
 
+    - name: Checkout publishing action
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: .github/actions
+
     - name: Download Windows build
       uses: actions/download-artifact@v4
       with:
         name: latin-reader-windows-${{ github.run_number }}
-        path: latin_reader
+        path: preview/latin_reader
+
+    - name: Download database
+      uses: actions/download-artifact@v4
+      with:
+        name: latin-reader-database-${{ github.run_number }}
+        path: preview
+
+    - name: Zip Windows build
+      working-directory: preview
+      run: zip -qr latin-reader-windows.zip latin_reader
 
     - name: Publish rolling Windows preview
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        zip -qr latin-reader-windows.zip latin_reader
-
-        printf 'Commit: %s\n\nBuild: %s/%s/actions/runs/%s\n' \
-          "$GITHUB_SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" \
-          > release-notes.md
-
-        if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/windows-preview" > /dev/null 2>&1; then
-          gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/windows-preview" \
-            -f sha="$GITHUB_SHA" -F force=true > /dev/null
-        else
-          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
-            -f ref=refs/tags/windows-preview -f sha="$GITHUB_SHA" > /dev/null
-        fi
-
-        if gh release view windows-preview --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-          gh release upload windows-preview latin-reader-windows.zip \
-            --repo "$GITHUB_REPOSITORY" --clobber
-          gh release edit windows-preview --repo "$GITHUB_REPOSITORY" \
-            --title "Latest Windows preview" --notes-file release-notes.md \
-            --prerelease --latest=false
-        else
-          gh release create windows-preview latin-reader-windows.zip \
-            --repo "$GITHUB_REPOSITORY" --verify-tag \
-            --title "Latest Windows preview" --notes-file release-notes.md \
-            --prerelease --latest=false
-        fi
+      uses: ./.github/actions/publish-preview
+      with:
+        tag: windows-preview
+        title: Latest Windows preview
+        files: |
+          preview/latin-reader-windows.zip
+          preview/data.db
+        built-at: ${{ needs.windows-specific-steps.outputs.built-at }}
+        data-version: ${{ needs.database.outputs.data-version }}
+        database-sha256: ${{ needs.database.outputs.sha256 }}
