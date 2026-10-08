@@ -117,6 +117,13 @@ class ScrollableEntries extends ConsumerStatefulWidget {
 
 class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
   //
+  static const _prototypeEntry = Entry(
+    dictionary: '',
+    lemma: 'a',
+    inflection: 'a',
+    partOfSpeech: null,
+    numberOfSenses: 0,
+  );
   double? _lastMeasuredHeight;
 
   @override
@@ -147,7 +154,7 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
         itemCount: widget.data.length,
         prototypeItem: ListTile(
           key: widget.prototypeKey,
-          title: _entryTitle(widget.data.first, titleStyle, subtitleStyle),
+          title: _entryTitle(_prototypeEntry, titleStyle, subtitleStyle),
         ),
         addAutomaticKeepAlives: false,
         itemBuilder: (context, index) => tile(context, index, titleStyle, subtitleStyle),
