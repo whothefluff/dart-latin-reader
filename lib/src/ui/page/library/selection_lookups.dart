@@ -58,7 +58,7 @@ Future<void> lookUpThenOpen<T>(
   if (pageContext.mounted && found is AsyncData<T>) {
     await open(found.value);
   } else if (pageContext.mounted && found is AsyncError<T>) {
-    log.catching(found.error, stackTrace: found.stackTrace);
+    log.catching(found.error, stackTrace: found.stackTrace); // callback can fail outside a provider
     ScaffoldMessenger.of(pageContext).showSnackBar(
       SnackBar(
         content: const Text('Lookup failed'),
