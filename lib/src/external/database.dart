@@ -172,7 +172,12 @@ Future<void> _deleteOldBundledDatabases(File current) async {
     if (file is File &&
         file.path != current.path &&
         p.basename(file.path).startsWith('bundled-data-')) {
-      await file.delete();
+      try {
+        await file.delete();
+      } on FileSystemException catch (error, stack) {
+        // Windows refuses to delete a database that another build still has open
+        log.warning(() => 'Could not delete old bundled database ${file.path}', error, stack);
+      }
     }
   }
 }
