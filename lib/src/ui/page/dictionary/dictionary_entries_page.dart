@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,6 +14,19 @@ import '../../widget/searchable_app_bar.dart';
 import '../../widget/show_error.dart';
 import '../../widget/show_loading.dart';
 import '../settings/settings_shell_page.dart' show SettingsTab;
+
+/// Scroll duration and easing for the dictionary list.
+const ({Duration duration, Curve curve}) dictionaryScrollAnimation = (
+  duration: Durations.medium2,
+  curve: Easing.standard,
+);
+
+/// Hold and fade durations for the search-result highlight.
+const ({Duration hold, Duration fade}) searchResultHighlight = (
+  //keep the highlight visible after the search view closes
+  hold: Duration(milliseconds: 1500),
+  fade: Duration(milliseconds: 500),
+);
 
 class DictionaryEntriesPage extends ConsumerStatefulWidget {
   const DictionaryEntriesPage(
@@ -28,6 +43,11 @@ class DictionaryEntriesPage extends ConsumerStatefulWidget {
 
 class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
   //
+
+  /// The entry waiting to be scrolled into view.
+  Entry? _scrollTarget;
+  Entry? _highlighted;
+  Timer? _highlightTimer;
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _prototypeKey = GlobalKey();
   double _listTileHeight = 48.0; // Fallback height
@@ -56,11 +76,56 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
       Theme.of(context).listTileTheme.titleTextStyle,
       subtitleTextStyle(context),
     ),
+    trailing: IconButton(
+      icon: const Icon(Icons.list),
+      tooltip: 'Browse the dictionary around ${lemmaText(entry.lemma)}',
+      onPressed: () => _showInList(controller, entry),
+    ),
     onTap: () async {
-      controller.closeView(controller.text);
+      _showInList(controller, entry);
       await DictionaryEntryRoute(entry.dictionary, entry.lemma).push<void>(context);
+      if (mounted) {
+        _highlight(entry); // the first highlight may have expired behind the definition page
+      }
     },
   );
+
+  /// Closes search and reveals [entry] when the list is ready.
+  void _showInList(SearchController controller, Entry entry) {
+    controller.closeView(controller.text);
+    _scrollTarget = entry;
+    _scrollToTarget();
+  }
+
+  /// Reveals and highlights the pending entry, leaving a row above it when possible.
+  ///
+  /// The request stays pending until the list is ready.
+  void _scrollToTarget() {
+    final target = _scrollTarget;
+    final entries = ref.read(dictionaryEntriesProvider(widget.dictionary)).valueOrNull;
+    if (target != null && entries != null && _scrollController.hasClients) {
+      _scrollTarget = null;
+      final index = entries.indexOf(target);
+      if (index != -1) {
+        final position = _scrollController.position;
+        unawaited(
+          position.animateTo(
+            ((index - 1) * _listTileHeight).clamp(0.0, position.maxScrollExtent),
+            duration: dictionaryScrollAnimation.duration,
+            curve: dictionaryScrollAnimation.curve,
+          ),
+        );
+        _highlight(target);
+      }
+    }
+  }
+
+  /// Briefly highlights [entry], then fades it out.
+  void _highlight(Entry entry) {
+    _highlightTimer?.cancel();
+    setState(() => _highlighted = entry);
+    _highlightTimer = Timer(searchResultHighlight.hold, () => setState(() => _highlighted = null));
+  }
 
   Widget entriesList(WidgetRef ref, BuildContext context) => ref
       .watch(dictionaryEntriesProvider(widget.dictionary))
@@ -70,9 +135,13 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
             ScrollableEntries(
               dictId: widget.dictionary,
               data: entries,
+              highlighted: _highlighted,
               scrollController: _scrollController,
               prototypeKey: _prototypeKey,
-              onHeightCalculated: (height) => _listTileHeight = height,
+              onHeightCalculated: (height) {
+                _listTileHeight = height;
+                _scrollToTarget();
+              },
             ),
             AlphabetNavigation(
               dictId: widget.dictionary,
@@ -87,6 +156,7 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
 
   @override
   void dispose() {
+    _highlightTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -99,6 +169,7 @@ class ScrollableEntries extends ConsumerStatefulWidget {
     super.key,
     required this.dictId,
     required this.data,
+    required this.highlighted,
     required this.scrollController,
     required this.prototypeKey,
     required this.onHeightCalculated,
@@ -106,6 +177,7 @@ class ScrollableEntries extends ConsumerStatefulWidget {
 
   final String dictId;
   final DictionaryEntries data;
+  final Entry? highlighted;
   final ScrollController scrollController;
   final GlobalKey prototypeKey;
   final ValueChanged<double> onHeightCalculated;
@@ -148,6 +220,7 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
   Widget build(context) {
     final titleStyle = Theme.of(context).listTileTheme.titleTextStyle;
     final subtitleStyle = subtitleTextStyle(context);
+    final highlightColor = ColorScheme.of(context).secondaryContainer;
     return Expanded(
       child: ListView.builder(
         controller: widget.scrollController,
@@ -157,18 +230,31 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
           title: _entryTitle(_prototypeEntry, titleStyle, subtitleStyle),
         ),
         addAutomaticKeepAlives: false,
-        itemBuilder: (context, index) => tile(context, index, titleStyle, subtitleStyle),
+        itemBuilder: (context, index) =>
+            tile(context, index, titleStyle, subtitleStyle, highlightColor),
       ),
     );
   }
 
-  ListTile tile(BuildContext context, int index, TextStyle? titleStyle, TextStyle subtitleStyle) {
+  Widget tile(
+    BuildContext context,
+    int index,
+    TextStyle? titleStyle,
+    TextStyle subtitleStyle,
+    Color highlightColor,
+  ) {
     final entry = widget.data[index];
-    return ListTile(
-      title: _entryTitle(entry, titleStyle, subtitleStyle),
-      onTap: () async {
-        await DictionaryEntryRoute(widget.dictId, entry.lemma).push<void>(context);
-      },
+    return TweenAnimationBuilder<Color?>(
+      tween: ColorTween(end: entry == widget.highlighted ? highlightColor : Colors.transparent),
+      duration: searchResultHighlight.fade,
+      builder: (_, color, title) => ListTile(
+        tileColor: color,
+        title: title,
+        onTap: () async {
+          await DictionaryEntryRoute(widget.dictId, entry.lemma).push<void>(context);
+        },
+      ),
+      child: _entryTitle(entry, titleStyle, subtitleStyle),
     );
   }
 
@@ -242,8 +328,8 @@ class _AlphabetNavigationState extends ConsumerState<AlphabetNavigation> {
     final clamped = target.clamp(0.0, widget.scrollController.position.maxScrollExtent);
     await widget.scrollController.animateTo(
       clamped,
-      duration: Durations.medium2,
-      curve: Easing.standard,
+      duration: dictionaryScrollAnimation.duration,
+      curve: dictionaryScrollAnimation.curve,
     );
   }
 
