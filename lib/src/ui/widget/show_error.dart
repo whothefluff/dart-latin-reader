@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../external/provider_ext.dart';
+
 Widget Function(Object error, StackTrace _) showError(
   WidgetRef ref,
   ProviderBase<Object> provider,
@@ -11,7 +13,8 @@ Widget Function(Object error, StackTrace _) showError(
         children: [
           Text(e.toString()),
           TextButton(
-            onPressed: () => ref.refresh(provider),
+            onPressed: () =>
+                ProviderScope.containerOf(ref.context, listen: false).retryFailures(provider),
             child: const Text('Retry'),
           ),
         ],

@@ -17,11 +17,19 @@ extension CacheForExtension on Ref<Object?> {
   //
 }
 
-extension ReadRetryingFailuresExtension on ProviderContainer {
+extension RetryFailuresExtension on ProviderContainer {
   /// Reads [provider], retrying any failures in it or its dependencies.
   ///
   /// Reuses retries already in progress.
   Future<T> readRetryingFailures<T>(AutoDisposeFutureProvider<T> provider) {
+    retryFailures(provider);
+    return read(provider.future);
+  }
+
+  /// Retries any failures in [provider] or its dependencies.
+  ///
+  /// Reuses retries already in progress.
+  void retryFailures(ProviderBase<Object?> provider) {
     [if (exists(provider)) readProviderElement(provider)] // also when a parent container holds it
         .expand((element) => _dependencyTreeOf(element, {}))
         .map((element) => element.origin)
@@ -32,7 +40,6 @@ extension ReadRetryingFailuresExtension on ProviderContainer {
         })
         .toSet()
         .forEach(invalidate);
-    return read(provider.future);
   }
 
   /// [element] and all its dependencies, each included once.
