@@ -170,6 +170,25 @@ void configureLogging() {
       return AppExitResponse.exit;
     },
   );
+  // 5. Log uncaught errors
+  logUncaughtErrors();
+}
+
+/// Logs uncaught errors at severe level, then forwards them to the previous handlers.
+///
+/// Logging an asynchronous error doesn’t mark it as handled, so the engine’s fallback
+/// reporting remains active unless a previous handler handles it
+void logUncaughtErrors() {
+  final earlierFlutterHandler = FlutterError.onError;
+  FlutterError.onError = (details) {
+    log.severe(details.toStringShort, details.exception, details.stack);
+    earlierFlutterHandler?.call(details);
+  };
+  final earlierPlatformHandler = PlatformDispatcher.instance.onError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    log.severe(() => 'Uncaught error', error, stack);
+    return earlierPlatformHandler?.call(error, stack) ?? false;
+  };
 }
 
 /// Safe, deterministic shutdown sequence
