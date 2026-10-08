@@ -10,9 +10,8 @@ Who generates it depends on the build:
 
 | Build | Who creates `data.db` | When |
 | --- | --- | --- |
-| Local build, Android or Windows (`flutter run` / `flutter build`) | The app itself, from the CSVs | First launch (slow) |
-| Windows build from GitHub | The app itself, from the CSVs | First launch (slow) |
-| Android APK from GitHub | GitHub. It ships inside the APK **instead** of the CSVs | During the build. Fast launch |
+| Local build (`flutter run` / `flutter build`) | The app itself, from the CSVs | First launch (slow) |
+| Android APK or Windows ZIP from GitHub | GitHub. It ships inside the app **instead** of the CSVs | During the build. Fast launch |
 
 ## Changing CSV files
 
@@ -20,25 +19,36 @@ Who generates it depends on the build:
 2. Increase the number in `data_version.txt` by 1.
 3. Commit and open a PR. GitHub rebuilds the database. Can fail from DB constraints.
 
-Step 2 is for builds where the app makes `data.db` itself: local builds and Windows builds from GitHub. Those apps already have a `data.db` from an earlier launch. On every launch they compare `data_version.txt` with the number stored inside `data.db`, and only read the CSVs again when the file's number is higher. Skip the bump and they keep showing the old data.
+Step 2 is for local builds. Those apps already have a `data.db` from an earlier launch. On every launch they compare `data_version.txt` with the number stored inside `data.db`, and only read the CSVs again when the file's number is higher. Skip the bump and they keep showing the old data.
 
-Android APKs from GitHub don't need it: they get a new `data.db` whenever the data changes.
+Builds from GitHub don't need it: they get a new `data.db` whenever the data changes.
 
 ## Changing DB schema
 
-Apps that make `data.db` themselves refill data but never change the tables in an existing `data.db`. Delete it once and the next launch makes a new one:
+Local builds refill data but never change the tables in an existing `data.db`. Delete it once and the next launch makes a new one:
 
 - **Android:** Settings → Apps → latin_reader → Storage → **Clear cache**.
 - **Windows:** delete `%LOCALAPPDATA%\com.magnetys\latin_reader\data.db`.
 
-Your settings live elsewhere, so they survive. Android APKs from GitHub need nothing.
+Your settings live elsewhere, so they survive. Builds from GitHub need nothing.
 
 ## Getting the app from GitHub
 
 ### Everyone
 
-- **Latest main, Android:** [download the APK](https://github.com/whothefluff/dart-latin-reader/releases/download/android-preview/app-release.apk). It installs as **Latin Reader Preview**, separate from your local build. New previews install over old ones and keep their settings.
-- **Latest main, Windows:** [download the ZIP](https://github.com/whothefluff/dart-latin-reader/releases/download/windows-preview/latin-reader-windows.zip). Unzip it and run `latin_reader\latin_reader.exe`. It shares data and settings with your local Windows build.
+- **Latest main, Android:** [download the APK](https://github.com/whothefluff/dart-latin-reader/releases/download/android-preview/app-release.apk). It installs as **Latin Reader Preview**, separate from your local build.
+- **Latest main, Windows:** [download the ZIP](https://github.com/whothefluff/dart-latin-reader/releases/download/windows-preview/latin-reader-windows.zip). Unzip it and run `latin_reader\latin_reader.exe`. It shares settings with your local Windows build, but not data: it keeps its own database.
+
+### Updating
+
+**Installing over the old build is enough. No uninstall needed**, not even when the data or the DB schema changed. Every build from GitHub carries its own `data.db`: on its first launch it copies it to `bundled-data-<SHA-256>.db` in the app's data folder and deletes the previous build's copy. Settings survive.
+
+- **Android preview:** install the new APK over the old one.
+- **Windows:** delete the old `latin_reader` folder and unzip the new one in its place. Unzipping on top also works, but can leave behind files the new build no longer has.
+
+The installed copy on Windows is `%APPDATA%\com.magnetys\latin_reader\bundled-data-<SHA-256>.db`. Windows builds from GitHub (preview, PR, branch) share that folder, so launching a different one swaps in its own copy.
+
+The one exception is Android PR builds (below), and only because of signing, not the database.
 
 ### Contributors: from your PR
 
@@ -46,7 +56,7 @@ Every PR run produces downloadable builds. Open the run from your PR's checks an
 
 - **Android:** download `latin-reader-apk-<number>`, a ZIP. Unzip it and install `app-release.apk`. It installs as **Latin Reader PR**.
   - Each PR build is signed with a throwaway key, so uninstall the previous Latin Reader PR before installing a newer one.
-- **Windows:** download `app-release.exe`. Despite the name, it's a ZIP of the whole app folder. Unzip it and run `latin_reader.exe`; the other files next to it are required.
+- **Windows:** download `latin-reader-windows-<number>`, a ZIP of the whole app folder. Unzip it and run `latin_reader.exe`; the other files next to it are required.
 
 If GitHub Actions is enabled in your fork, runs there build the same way PR builds do (the APK installs as Latin Reader PR) and publish nothing. The checks that count are the ones on your PR here.
 
@@ -58,9 +68,7 @@ Starting a workflow by hand needs write access to the repo.
   1. Run `gh workflow run android.yml --ref <branch>`.
   2. Download `latin-reader-apk-<number>` from that run.
   3. It installs as **Latin Reader Preview**, over the current preview.
-- **Windows:** run `gh workflow run windows.yml --ref <branch>`, then download `app-release.exe` from that run.
-
-The Windows build shares data and settings with your local Windows build, because it's the same app to Windows.
+- **Windows:** run `gh workflow run windows.yml --ref <branch>`, then download `latin-reader-windows-<number>` from that run.
 
 ## Version numbers
 
