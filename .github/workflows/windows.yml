@@ -20,15 +20,19 @@ jobs:
     with:
       runner: windows-latest
 
+  database:
+    uses: ./.github/workflows/database.yml
+
   windows-specific-steps:
-    needs: common
+    needs: [common, database]
     runs-on: windows-2022 # TODO(whothefluff): change back to 'windows-latest' after upgrading flutter
     if: ${{ !cancelled() }}
+    timeout-minutes: 45
 
     steps:
 
-    - name: Require static checks
-      if: ${{ needs.common.result != 'success' }}
+    - name: Require static checks and database
+      if: ${{ needs.common.result != 'success' || needs.database.result != 'success' }}
       run: exit 1
 
     - name: Checkout code
@@ -45,14 +49,45 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Build Windows App
-      run: flutter build windows --release
+    - name: Download database
+      uses: actions/download-artifact@v4
+      with:
+        name: latin-reader-database-${{ github.run_number }}
+        path: build/generated_database
 
-    - name: Upload Windows Build Artifact
+    - name: Stage database and exclude CSV assets
+      run: |
+        Copy-Item build/generated_database/data.db assets/preprocessed_data/data.db
+        Remove-Item assets/preprocessed_data/*.csv
+
+    - name: Build Windows app
+      run: |
+        $databaseHash = (Get-FileHash build/generated_database/data.db -Algorithm SHA256).Hash.ToLowerInvariant()
+        flutter build windows --release "--dart-define=BUNDLED_DATABASE_ID=$databaseHash"
+
+    - name: Verify packaged database and absence of CSVs
+      run: |
+        $release = 'build/windows/x64/runner/Release'
+        $assets = "$release/data/flutter_assets/assets/preprocessed_data"
+
+        if ((Get-FileHash "$assets/data.db").Hash -ne (Get-FileHash build/generated_database/data.db).Hash) {
+          throw 'The Windows build does not contain the generated database.'
+        }
+        if ((Get-FileHash "$assets/data_version.txt").Hash -ne (Get-FileHash assets/preprocessed_data/data_version.txt).Hash) {
+          throw 'The Windows build contains the wrong data version.'
+        }
+        if (Get-ChildItem $release -Recurse -File -Filter *.csv) {
+          throw 'The Windows build still contains CSV files.'
+        }
+
+        'Verified database asset; no CSV files packaged.'
+
+    - name: Upload Windows build
       uses: actions/upload-artifact@v4
       with:
-        name: app-release.exe
+        name: latin-reader-windows-${{ github.run_number }}
         path: build/windows/x64/runner/Release/
+        if-no-files-found: error
 
   publish-preview:
     if: ${{ github.repository == 'whothefluff/dart-latin-reader' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
@@ -66,7 +101,7 @@ jobs:
     - name: Download Windows build
       uses: actions/download-artifact@v4
       with:
-        name: app-release.exe
+        name: latin-reader-windows-${{ github.run_number }}
         path: latin_reader
 
     - name: Publish rolling Windows preview
