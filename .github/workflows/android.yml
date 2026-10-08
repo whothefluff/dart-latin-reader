@@ -20,9 +20,12 @@ jobs:
     with:
       runner: ubuntu-latest
 
+  database:
+    uses: ./.github/workflows/database.yml
+
   android-specific-steps:
     runs-on: ubuntu-latest
-    needs: common
+    needs: [common, database]
     if: ${{ !cancelled() }}
     timeout-minutes: 45
 
@@ -30,8 +33,8 @@ jobs:
       ANDROID_CI_BUILD: "true"
 
     steps:
-      - name: Require static checks
-        if: ${{ needs.common.result != 'success' }}
+      - name: Require static checks and database
+        if: ${{ needs.common.result != 'success' || needs.database.result != 'success' }}
         run: exit 1
 
       - name: Checkout code
@@ -51,16 +54,14 @@ jobs:
           cache: true
           pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
 
-      - name: Install SQLite for database generation
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes libsqlite3-dev
-
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Generate and validate database
-        run: flutter test tool/build_database_test.dart --reporter expanded --timeout none
+      - name: Download database
+        uses: actions/download-artifact@v4
+        with:
+          name: latin-reader-database-${{ github.run_number }}
+          path: build/generated_database
 
       - name: Stage database and exclude CSV assets
         run: |

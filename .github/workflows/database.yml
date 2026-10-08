@@ -1,0 +1,40 @@
+name: Database
+
+# Builds and validates data.db for the platform builds of the calling workflow run to package.
+on:
+  workflow_call:
+
+jobs:
+  build-database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
+
+      - name: Install SQLite for database generation
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libsqlite3-dev
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate and validate database
+        run: flutter test tool/build_database_test.dart --reporter expanded --timeout none
+
+      - name: Upload database
+        uses: actions/upload-artifact@v4
+        with:
+          name: latin-reader-database-${{ github.run_number }}
+          path: build/generated_database/data.db
+          if-no-files-found: error
