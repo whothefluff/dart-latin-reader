@@ -240,7 +240,7 @@ class ConcordanceToken {
   final String word;
   final String macronizedWord;
 
-  /// Citation of the token's line (a verse, a title...). 
+  /// Citation of the token's line (a verse, a title...).
   /// Where it changes, a new line starts.
   final String reference;
 
