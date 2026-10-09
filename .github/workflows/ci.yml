@@ -134,3 +134,13 @@ jobs:
     with:
       database-sha256: ${{ needs.database.outputs.sha256 }}
       data-version: ${{ needs.database.outputs.data-version }}
+
+  ios:
+    name: iOS
+    needs: [checks, database]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/ios.yml
+    with:
+      database-sha256: ${{ needs.database.outputs.sha256 }}
+      data-version: ${{ needs.database.outputs.data-version }}
