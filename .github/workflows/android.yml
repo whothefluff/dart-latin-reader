@@ -107,6 +107,7 @@ jobs:
           PY
 
       - name: Upload APK
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@v4
         with:
           name: latin-reader-apk-${{ github.run_number }}

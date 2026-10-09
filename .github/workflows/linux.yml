@@ -62,6 +62,7 @@ jobs:
             --transform 's,^bundle,latin_reader,' bundle
 
       - name: Upload Linux build
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@v4
         with:
           name: latin-reader-linux-${{ github.run_number }}

@@ -90,6 +90,8 @@ jobs:
           name: latin-reader-database-${{ github.run_number }}
           path: build/generated_database/data.db
           if-no-files-found: error
+          # Pull requests only need it for their own builds; 0 keeps the repository default
+          retention-days: ${{ github.event_name == 'pull_request' && 1 || 0 }}
 
   # Each platform needs the checks too, because its publish job must wait for them
   android:
