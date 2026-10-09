@@ -1,0 +1,102 @@
+name: iOS
+
+on:
+  workflow_call:
+    inputs:
+      database-sha256:
+        required: true
+        type: string
+      data-version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-15 # TODO(whothefluff): consider 'macos-latest' after upgrading flutter; newer images ship a newer Xcode
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    outputs:
+      built-at: ${{ steps.build.outputs.built-at }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Stage database
+        uses: ./.github/actions/stage-database
+
+      - name: Build iOS app
+        id: build
+        env:
+          DATABASE_SHA256: ${{ inputs.database-sha256 }}
+        run: |
+          flutter build ios --release --no-codesign --dart-define=BUNDLED_DATABASE_ID="$DATABASE_SHA256"
+          printf 'built-at=%s\n' "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
+
+      - name: Verify packaged database and absence of CSVs
+        run: bash .github/scripts/verify-bundled-database.sh build/ios/iphoneos/Runner.app
+
+      # An IPA is a ZIP with the app under Payload/; sideloading tools sign it when installing
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p ipa/Payload
+          cp -R build/ios/iphoneos/Runner.app ipa/Payload/
+          cd ipa && zip -qry ../latin-reader-ios-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: latin-reader-ios-${{ github.run_number }}
+          path: latin-reader-ios-unsigned.ipa
+          if-no-files-found: error
+
+  publish:
+    name: Publish preview
+    if: ${{ github.repository == 'whothefluff/dart-latin-reader' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout publishing action
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: latin-reader-ios-${{ github.run_number }}
+          path: preview
+
+      - name: Download database
+        uses: actions/download-artifact@v4
+        with:
+          name: latin-reader-database-${{ github.run_number }}
+          path: preview
+
+      - name: Publish rolling iOS preview
+        uses: ./.github/actions/publish-preview
+        with:
+          tag: ios-preview
+          title: Latest iOS preview
+          files: |
+            preview/latin-reader-ios-unsigned.ipa
+            preview/data.db
+          built-at: ${{ needs.build.outputs.built-at }}
+          data-version: ${{ inputs.data-version }}
+          database-sha256: ${{ inputs.database-sha256 }}
