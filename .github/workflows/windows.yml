@@ -1,138 +1,115 @@
-name: Flutter Windows CI
+name: Windows
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  workflow_call:
+    inputs:
+      database-sha256:
+        required: true
+        type: string
+      data-version:
+        required: true
+        type: string
 
 jobs:
-  common:
-    uses: ./.github/workflows/common.yml
-    with:
-      runner: windows-latest
-
-  database:
-    uses: ./.github/workflows/database.yml
-
-  windows-specific-steps:
-    needs: [common, database]
+  build:
+    name: Build
     runs-on: windows-2022 # TODO(whothefluff): change back to 'windows-latest' after upgrading flutter
-    if: ${{ !cancelled() }}
     timeout-minutes: 45
+    permissions:
+      contents: read
     outputs:
       built-at: ${{ steps.build.outputs.built-at }}
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Require static checks and database
-      if: ${{ needs.common.result != 'success' || needs.database.result != 'success' }}
-      run: exit 1
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
 
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Install dependencies
+        run: flutter pub get
 
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        channel: stable
-        flutter-version-file: pubspec.yaml
-        cache: true
-        pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
+      - name: Stage database
+        uses: ./.github/actions/stage-database
 
-    - name: Install dependencies
-      run: flutter pub get
+      - name: Build Windows app
+        id: build
+        env:
+          DATABASE_SHA256: ${{ inputs.database-sha256 }}
+        run: |
+          flutter build windows --release "--dart-define=BUNDLED_DATABASE_ID=$env:DATABASE_SHA256"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $builtAt = [DateTime]::UtcNow.ToString('yyyy-MM-dd HH:mm:ss', [Globalization.CultureInfo]::InvariantCulture)
+          "built-at=$builtAt UTC" >> $env:GITHUB_OUTPUT
 
-    - name: Download database
-      uses: actions/download-artifact@v4
-      with:
-        name: latin-reader-database-${{ github.run_number }}
-        path: build/generated_database
+      - name: Verify packaged database and absence of CSVs
+        run: |
+          $release = 'build/windows/x64/runner/Release'
+          $assets = "$release/data/flutter_assets/assets/preprocessed_data"
 
-    - name: Stage database and exclude CSV assets
-      run: |
-        Copy-Item build/generated_database/data.db assets/preprocessed_data/data.db
-        Remove-Item assets/preprocessed_data/*.csv
+          if ((Get-FileHash "$assets/data.db").Hash -ne (Get-FileHash build/generated_database/data.db).Hash) {
+            throw 'The Windows build does not contain the generated database.'
+          }
+          if ((Get-FileHash "$assets/data_version.txt").Hash -ne (Get-FileHash assets/preprocessed_data/data_version.txt).Hash) {
+            throw 'The Windows build contains the wrong data version.'
+          }
+          if (Get-ChildItem $release -Recurse -File -Filter *.csv) {
+            throw 'The Windows build still contains CSV files.'
+          }
 
-    - name: Build Windows app
-      id: build
-      run: |
-        $databaseHash = (Get-FileHash build/generated_database/data.db -Algorithm SHA256).Hash.ToLowerInvariant()
-        flutter build windows --release "--dart-define=BUNDLED_DATABASE_ID=$databaseHash"
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        $builtAt = [DateTime]::UtcNow.ToString('yyyy-MM-dd HH:mm:ss', [Globalization.CultureInfo]::InvariantCulture)
-        "built-at=$builtAt UTC" >> $env:GITHUB_OUTPUT
+          'Verified database asset; no CSV files packaged.'
 
-    - name: Verify packaged database and absence of CSVs
-      run: |
-        $release = 'build/windows/x64/runner/Release'
-        $assets = "$release/data/flutter_assets/assets/preprocessed_data"
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: latin-reader-windows-${{ github.run_number }}
+          path: build/windows/x64/runner/Release/
+          if-no-files-found: error
 
-        if ((Get-FileHash "$assets/data.db").Hash -ne (Get-FileHash build/generated_database/data.db).Hash) {
-          throw 'The Windows build does not contain the generated database.'
-        }
-        if ((Get-FileHash "$assets/data_version.txt").Hash -ne (Get-FileHash assets/preprocessed_data/data_version.txt).Hash) {
-          throw 'The Windows build contains the wrong data version.'
-        }
-        if (Get-ChildItem $release -Recurse -File -Filter *.csv) {
-          throw 'The Windows build still contains CSV files.'
-        }
-
-        'Verified database asset; no CSV files packaged.'
-
-    - name: Upload Windows build
-      uses: actions/upload-artifact@v4
-      with:
-        name: latin-reader-windows-${{ github.run_number }}
-        path: build/windows/x64/runner/Release/
-        if-no-files-found: error
-
-  publish-preview:
+  publish:
+    name: Publish preview
     if: ${{ github.repository == 'whothefluff/dart-latin-reader' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
-    needs: [database, windows-specific-steps]
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
+      - name: Checkout publishing action
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
 
-    - name: Checkout publishing action
-      uses: actions/checkout@v4
-      with:
-        sparse-checkout: .github/actions
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: latin-reader-windows-${{ github.run_number }}
+          path: preview/latin_reader
 
-    - name: Download Windows build
-      uses: actions/download-artifact@v4
-      with:
-        name: latin-reader-windows-${{ github.run_number }}
-        path: preview/latin_reader
+      - name: Download database
+        uses: actions/download-artifact@v4
+        with:
+          name: latin-reader-database-${{ github.run_number }}
+          path: preview
 
-    - name: Download database
-      uses: actions/download-artifact@v4
-      with:
-        name: latin-reader-database-${{ github.run_number }}
-        path: preview
+      - name: Zip Windows build
+        working-directory: preview
+        run: zip -qr latin-reader-windows.zip latin_reader
 
-    - name: Zip Windows build
-      working-directory: preview
-      run: zip -qr latin-reader-windows.zip latin_reader
-
-    - name: Publish rolling Windows preview
-      uses: ./.github/actions/publish-preview
-      with:
-        tag: windows-preview
-        title: Latest Windows preview
-        files: |
-          preview/latin-reader-windows.zip
-          preview/data.db
-        built-at: ${{ needs.windows-specific-steps.outputs.built-at }}
-        data-version: ${{ needs.database.outputs.data-version }}
-        database-sha256: ${{ needs.database.outputs.sha256 }}
+      - name: Publish rolling Windows preview
+        uses: ./.github/actions/publish-preview
+        with:
+          tag: windows-preview
+          title: Latest Windows preview
+          files: |
+            preview/latin-reader-windows.zip
+            preview/data.db
+          built-at: ${{ needs.build.outputs.built-at }}
+          data-version: ${{ inputs.data-version }}
+          database-sha256: ${{ inputs.database-sha256 }}

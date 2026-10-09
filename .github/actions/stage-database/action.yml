@@ -1,0 +1,17 @@
+name: Stage database
+description: Puts this run's generated data.db into the app's assets instead of the CSVs.
+
+runs:
+  using: composite
+  steps:
+    - name: Download database
+      uses: actions/download-artifact@v4
+      with:
+        name: latin-reader-database-${{ github.run_number }}
+        path: build/generated_database
+
+    - name: Stage database and exclude CSV assets
+      shell: bash
+      run: |
+        cp build/generated_database/data.db assets/preprocessed_data/data.db
+        rm assets/preprocessed_data/*.csv
