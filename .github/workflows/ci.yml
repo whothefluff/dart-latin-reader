@@ -41,6 +41,12 @@ jobs:
       - name: Check for Outdated Dependencies
         run: flutter pub outdated
 
+      # Generated files keep their generators' formatting, so they're left out
+      - name: Check formatting
+        run: |
+          git ls-files -z '*.dart' ':!:*.g.dart' ':!:*.drift.dart' ':!:lib/l10n/app_localizations*.dart' \
+            | xargs -0 dart format --output=none --set-exit-if-changed
+
       - name: Run Flutter Analyze
         run: flutter analyze
 
@@ -92,6 +98,40 @@ jobs:
           if-no-files-found: error
           # Pull requests only need it for their own builds; 0 keeps the repository default
           retention-days: ${{ github.event_name == 'pull_request' && 1 || 0 }}
+
+  # Builds use the committed files either way, so only merging waits for this
+  generated-code:
+    name: Generated code
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
+
+      # Also regenerates the l10n files
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Regenerate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Fail on stale generated files
+        run: |
+          changes="$(git status --porcelain)"
+          if [ -n "$changes" ]; then
+            printf '%s\n' "$changes"
+            echo '::error::Generated files are out of date. Run flutter pub get and build_runner, then commit the result.'
+            exit 1
+          fi
 
   # Each platform needs the checks too, because its publish job must wait for them
   android:

@@ -100,9 +100,14 @@ Only runs on main update the pre-releases.
 
 ## Owner only: required checks
 
-Set in the branch ruleset for main. Require **Checks**, **Database**, **Android / Build** and **Windows / Build**. Leave **Linux / Build**, **macOS / Build** and **iOS / Build** off: when they fail, the PR shows it, but they never block the merge.
+Set in the branch ruleset for main. Require **Checks**, **Generated code**, **Database**, **Android / Build** and **Windows / Build**. Leave **Linux / Build**, **macOS / Build** and **iOS / Build** off: when they fail, the PR shows it, but they never block the merge.
 
 **Checks** and **Database** have to be on the list: when either fails, the platform builds are skipped, and GitHub counts a skipped required check as passed.
+
+What makes them fail, besides analyze and tests:
+
+- **Checks:** unformatted code. Format the files you change (format on save does it). Don't run `dart format .`: it also reformats generated files, which then fail **Generated code**.
+- **Generated code:** committed generated files that don't match what `flutter pub get` (l10n) and `dart run build_runner build --delete-conflicting-outputs` produce. Run both and commit what changes.
 
 ## Owner only: signing key and secrets
 
