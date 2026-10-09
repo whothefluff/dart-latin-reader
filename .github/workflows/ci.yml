@@ -129,7 +129,10 @@ jobs:
           changes="$(git status --porcelain)"
           if [ -n "$changes" ]; then
             printf '%s\n' "$changes"
-            echo '::error::Generated files are out of date. Run flutter pub get and build_runner, then commit the result.'
+            # The full diff, new files included, can be copied from the log and applied with git apply
+            git add --all
+            git --no-pager diff --cached
+            echo '::error::Generated files are out of date. Run flutter pub get and build_runner with the Flutter version in pubspec.yaml, then commit the result.'
             exit 1
           fi
 
