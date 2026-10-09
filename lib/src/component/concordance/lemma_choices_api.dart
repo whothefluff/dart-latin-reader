@@ -65,10 +65,13 @@ class SearchLemmaChoicesUseCase implements ISearchLemmaChoicesUseCase {
   @override
   Future<LemmaChoices> invoke() async {
     // Lemmas are written without macrons, and LIKE's wildcards aren't lemma letters
-    final prefix = _prefix.trim().replaceAll(RegExp('[%_]'), '').replaceAllMapped(
-      RegExp('[āēīōūȳĀĒĪŌŪȲ]'),
-      (match) => _plain[match[0]]!,
-    );
+    final prefix = _prefix
+        .trim()
+        .replaceAll(RegExp('[%_]'), '')
+        .replaceAllMapped(
+          RegExp('[āēīōūȳĀĒĪŌŪȲ]'),
+          (match) => _plain[match[0]]!,
+        );
     return prefix.isEmpty ? LemmaChoices(const []) : await _repository.searchLemmas(prefix, _limit);
   }
 
