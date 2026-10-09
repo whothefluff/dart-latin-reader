@@ -5,6 +5,8 @@ updates:
     schedule:
       interval: "monthly"
   - package-ecosystem: "github-actions"
-    directory: "/" # Location of .github directory
+    directories:
+      - "/" # Workflows in .github/workflows
+      - "/.github/actions/*" # Composite actions, which pin actions too
     schedule:
       interval: "monthly"
