@@ -11,7 +11,7 @@ Who generates it depends on the build:
 | Build | Who creates `data.db` | When |
 | --- | --- | --- |
 | Local build (`flutter run` / `flutter build`) | The app itself, from the CSVs | First launch (slow) |
-| Android, Windows or Linux build from GitHub | GitHub. It ships inside the app **instead** of the CSVs | During the build. Fast launch |
+| Build from GitHub | GitHub. It ships inside the app **instead** of the CSVs | During the build. Fast launch |
 
 ## Changing CSV files
 
@@ -30,6 +30,7 @@ Local builds refill data but never change the tables in an existing `data.db`. D
 - **Android:** Settings → Apps → latin_reader → Storage → **Clear cache**.
 - **Windows:** delete `%LOCALAPPDATA%\com.magnetys\latin_reader\data.db`.
 - **Linux:** delete `~/.cache/com.magnetys.latin_reader/data.db`.
+- **macOS:** delete `~/Library/Containers/com.magnetys.latinReader/Data/Library/Caches/com.magnetys.latinReader/data.db`.
 
 Your settings live elsewhere, so they survive. Builds from GitHub need nothing.
 
@@ -42,13 +43,15 @@ Your settings live elsewhere, so they survive. Builds from GitHub need nothing.
 | Android | [APK](https://github.com/whothefluff/dart-latin-reader/releases/download/android-preview/app-release.apk) | [`data.db`](https://github.com/whothefluff/dart-latin-reader/releases/download/android-preview/data.db) |
 | Windows | [ZIP](https://github.com/whothefluff/dart-latin-reader/releases/download/windows-preview/latin-reader-windows.zip) | [`data.db`](https://github.com/whothefluff/dart-latin-reader/releases/download/windows-preview/data.db) |
 | Linux | [tarball](https://github.com/whothefluff/dart-latin-reader/releases/download/linux-preview/latin-reader-linux.tar.gz) | [`data.db`](https://github.com/whothefluff/dart-latin-reader/releases/download/linux-preview/data.db) |
+| macOS | [ZIP](https://github.com/whothefluff/dart-latin-reader/releases/download/macos-preview/latin-reader-macos.zip) | [`data.db`](https://github.com/whothefluff/dart-latin-reader/releases/download/macos-preview/data.db) |
 
 - **Android** installs as **Latin Reader Preview**, separate from your local build.
 - **Windows:** unzip it and run `latin_reader\latin_reader.exe`.
 - **Linux:** extract it and run `latin_reader/latin_reader`. It needs GTK 3, which desktop distros already have.
-- **Windows and Linux** share settings with your local build on the same OS, but not data: they keep their own database.
+- **macOS:** unzip it, run `xattr -dr com.apple.quarantine latin_reader.app` once (the app isn't notarized, so macOS blocks it otherwise), then open it.
+- **Windows, Linux and macOS** share settings with your local build on the same OS, but not data: they keep their own database.
 
-Each `data.db` is the exact file packaged inside that build, for opening in an SQLite browser. The pre-release pages ([Android](https://github.com/whothefluff/dart-latin-reader/releases/tag/android-preview), [Windows](https://github.com/whothefluff/dart-latin-reader/releases/tag/windows-preview), [Linux](https://github.com/whothefluff/dart-latin-reader/releases/tag/linux-preview)) say when each build was made (UTC), from which commit, and the database's data version and SHA-256. The date GitHub shows next to the title is when the pre-release was first created, not the latest build.
+Each `data.db` is the exact file packaged inside that build, for opening in an SQLite browser. The pre-release pages ([Android](https://github.com/whothefluff/dart-latin-reader/releases/tag/android-preview), [Windows](https://github.com/whothefluff/dart-latin-reader/releases/tag/windows-preview), [Linux](https://github.com/whothefluff/dart-latin-reader/releases/tag/linux-preview), [macOS](https://github.com/whothefluff/dart-latin-reader/releases/tag/macos-preview)) say when each build was made (UTC), from which commit, and the database's data version and SHA-256. The date GitHub shows next to the title is when the pre-release was first created, not the latest build.
 
 ### Updating
 
@@ -56,8 +59,15 @@ Each `data.db` is the exact file packaged inside that build, for opening in an S
 
 - **Android preview:** install the new APK over the old one.
 - **Windows and Linux:** delete the old `latin_reader` folder and extract the new one in its place. Extracting on top also works, but can leave behind files the new build no longer has.
+- **macOS:** replace `latin_reader.app` with the new one, and run the `xattr` command again.
 
-The installed copy is `%APPDATA%\com.magnetys\latin_reader\bundled-data-<SHA-256>.db` on Windows and `~/.local/share/com.magnetys.latin_reader/bundled-data-<SHA-256>.db` on Linux. Desktop builds from GitHub (preview, PR, branch) share that folder, so launching a different one swaps in its own copy.
+The installed copy, `bundled-data-<SHA-256>.db`, is in:
+
+- **Windows:** `%APPDATA%\com.magnetys\latin_reader\`
+- **Linux:** `~/.local/share/com.magnetys.latin_reader/`
+- **macOS:** `~/Library/Containers/com.magnetys.latinReader/Data/Library/Application Support/com.magnetys.latinReader/`
+
+Desktop builds from GitHub (preview, PR, branch) share that folder, so launching a different one swaps in its own copy.
 
 The one exception is Android PR builds (below), and only because of signing, not the database.
 
@@ -69,6 +79,7 @@ Every PR run produces downloadable builds. Open the run from your PR's checks an
   - Each PR build is signed with a throwaway key, so uninstall the previous Latin Reader PR before installing a newer one.
 - **Windows:** download `latin-reader-windows-<number>`, a ZIP of the whole app folder. Unzip it and run `latin_reader.exe`; the other files next to it are required.
 - **Linux:** download `latin-reader-linux-<number>`, a ZIP holding `latin-reader-linux.tar.gz` (a tarball keeps the app's executable bit). Extract both and run `latin_reader/latin_reader`.
+- **macOS:** download `latin-reader-macos-<number>`, a ZIP holding `latin-reader-macos.zip` (the inner ZIP keeps the app's signature and permissions). Unzip both, then run the `xattr` command above.
 - **Database:** download `latin-reader-database-<number>`, a ZIP with the `data.db` packaged in that run's builds.
 
 If GitHub Actions is enabled in your fork, runs there build the same way PR builds do (the APK installs as Latin Reader PR) and publish nothing. The checks that count are the ones on your PR here.
@@ -82,6 +93,7 @@ Run `gh workflow run ci.yml --ref <branch>`. It builds every platform; download 
 - **Android:** `latin-reader-apk-<number>`. It installs as **Latin Reader Preview**, over the current preview.
 - **Windows:** `latin-reader-windows-<number>`.
 - **Linux:** `latin-reader-linux-<number>`.
+- **macOS:** `latin-reader-macos-<number>`.
 - **Database:** `latin-reader-database-<number>`.
 
 Only runs on main update the pre-releases.
@@ -93,7 +105,7 @@ Only runs on main update the pre-releases.
 
 ## Owner only: required checks
 
-Set in the branch ruleset for main. Require **Checks**, **Database**, **Android / Build** and **Windows / Build**. Leave **Linux / Build** off: when it fails, the PR shows it, but it never blocks the merge.
+Set in the branch ruleset for main. Require **Checks**, **Database**, **Android / Build** and **Windows / Build**. Leave **Linux / Build** and **macOS / Build** off: when they fail, the PR shows it, but they never block the merge.
 
 **Checks** and **Database** have to be on the list: when either fails, the platform builds are skipped, and GitHub counts a skipped required check as passed.
 
@@ -111,6 +123,6 @@ PR builds, including contributors', never use them.
   1. Make a new key with alias `latin-reader-test`.
   2. Replace both secrets.
   3. Uninstall the preview app once.
-- NOTE: Not a Play Store key. Windows and Linux builds aren't signed.
+- NOTE: Not a Play Store key. Windows, Linux and macOS builds aren't signed with a developer identity: macOS only gets the ad-hoc signature it needs to run, hence the `xattr` step.
 
 A PR from a first-time contributor may wait for my approval: open the run in the Actions tab and choose **Approve and run**.
