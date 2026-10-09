@@ -72,18 +72,24 @@ If GitHub Actions is enabled in your fork, runs there build the same way PR buil
 
 Starting a workflow by hand needs write access to the repo.
 
-- **Android:**
-  1. Run `gh workflow run android.yml --ref <branch>`.
-  2. Download `latin-reader-apk-<number>` from that run.
-  3. It installs as **Latin Reader Preview**, over the current preview.
-- **Windows:** run `gh workflow run windows.yml --ref <branch>`, then download `latin-reader-windows-<number>` from that run.
+Run `gh workflow run ci.yml --ref <branch>`. It builds every platform; download what you need from that run:
 
-Either run also has `latin-reader-database-<number>`. Only runs on main update the pre-releases.
+- **Android:** `latin-reader-apk-<number>`. It installs as **Latin Reader Preview**, over the current preview.
+- **Windows:** `latin-reader-windows-<number>`.
+- **Database:** `latin-reader-database-<number>`.
+
+Only runs on main update the pre-releases.
 
 ## Version numbers
 
-- **Build number:** set automatically by GitHub on Android builds. Nothing to do.
+- **Build number:** set automatically on Android builds to the CI run number. Nothing to do.
 - **Visible version (`1.0.0`):** the part before `+` in `version:` in `pubspec.yaml`. Change it by hand.
+
+## Owner only: required checks
+
+Set in the branch ruleset for main. Require **Checks**, **Database**, **Android / Build** and **Windows / Build**.
+
+**Checks** and **Database** have to be on the list: when either fails, the platform builds are skipped, and GitHub counts a skipped required check as passed.
 
 ## Owner only: signing key and secrets
 
