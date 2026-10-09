@@ -1,0 +1,107 @@
+name: Linux
+
+on:
+  workflow_call:
+    inputs:
+      database-sha256:
+        required: true
+        type: string
+      data-version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build
+    # The oldest supported Ubuntu keeps the glibc requirement low, so the build runs on more distros
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    outputs:
+      built-at: ${{ steps.build.outputs.built-at }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Stage database
+        uses: ./.github/actions/stage-database
+
+      - name: Build Linux app
+        id: build
+        env:
+          DATABASE_SHA256: ${{ inputs.database-sha256 }}
+        run: |
+          flutter build linux --release --dart-define=BUNDLED_DATABASE_ID="$DATABASE_SHA256"
+          printf 'built-at=%s\n' "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
+
+      - name: Verify packaged database and absence of CSVs
+        run: bash .github/scripts/verify-bundled-database.sh build/linux/x64/release/bundle
+
+      # A tarball keeps the executable bit, which artifact ZIPs drop
+      - name: Package Linux build
+        run: |
+          tar -czf latin-reader-linux.tar.gz -C build/linux/x64/release \
+            --transform 's,^bundle,latin_reader,' bundle
+
+      - name: Upload Linux build
+        uses: actions/upload-artifact@v4
+        with:
+          name: latin-reader-linux-${{ github.run_number }}
+          path: latin-reader-linux.tar.gz
+          if-no-files-found: error
+
+  publish:
+    name: Publish preview
+    if: ${{ github.repository == 'whothefluff/dart-latin-reader' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout publishing action
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+
+      - name: Download Linux build
+        uses: actions/download-artifact@v4
+        with:
+          name: latin-reader-linux-${{ github.run_number }}
+          path: preview
+
+      - name: Download database
+        uses: actions/download-artifact@v4
+        with:
+          name: latin-reader-database-${{ github.run_number }}
+          path: preview
+
+      - name: Publish rolling Linux preview
+        uses: ./.github/actions/publish-preview
+        with:
+          tag: linux-preview
+          title: Latest Linux preview
+          files: |
+            preview/latin-reader-linux.tar.gz
+            preview/data.db
+          built-at: ${{ needs.build.outputs.built-at }}
+          data-version: ${{ inputs.data-version }}
+          database-sha256: ${{ inputs.database-sha256 }}
