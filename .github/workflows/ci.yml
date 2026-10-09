@@ -124,3 +124,13 @@ jobs:
     with:
       database-sha256: ${{ needs.database.outputs.sha256 }}
       data-version: ${{ needs.database.outputs.data-version }}
+
+  macos:
+    name: macOS
+    needs: [checks, database]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/macos.yml
+    with:
+      database-sha256: ${{ needs.database.outputs.sha256 }}
+      data-version: ${{ needs.database.outputs.data-version }}
