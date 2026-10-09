@@ -105,14 +105,13 @@ class GrammarValues {
   /// Values of [feature] for [partOfSpeech] (for every part of speech when
   /// null). Combined values count as each of theirs, so
   /// masculine/feminine/neuter adds nothing to masculine, feminine and neuter
-  Set<String> valuesOf(GrammarFeature feature, {String? partOfSpeech}) =>
-      UnmodifiableSetView(
-        (partOfSpeech == null
-                ? _byPartOfSpeech.values
-                : [_byPartOfSpeech[partOfSpeech] ?? const <GrammarFeature, Set<String>>{}])
-            .expand((features) => features[feature] ?? const <String>{})
-            .toSet(),
-      );
+  Set<String> valuesOf(GrammarFeature feature, {String? partOfSpeech}) => UnmodifiableSetView(
+    (partOfSpeech == null
+            ? _byPartOfSpeech.values
+            : [_byPartOfSpeech[partOfSpeech] ?? const <GrammarFeature, Set<String>>{}])
+        .expand((features) => features[feature] ?? const <String>{})
+        .toSet(),
+  );
 
   static Map<String, Map<GrammarFeature, Set<String>>> _index(Iterable<GrammarValueRow> rows) {
     final features = GrammarFeature.values.asNameMap();
