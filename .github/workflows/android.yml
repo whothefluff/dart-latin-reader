@@ -71,11 +71,9 @@ jobs:
         env:
           ANDROID_TEST_KEYSTORE_PASSWORD: ${{ github.event_name != 'pull_request' && secrets.ANDROID_TEST_KEYSTORE_PASSWORD || '' }}
           DATABASE_SHA256: ${{ inputs.database-sha256 }}
-        # Run numbers restarted at 1 with ci.yml. The offset keeps version codes above those of the old
-        # android.yml (up to 170), since Android refuses to install a lower version code over a higher one.
         run: |
           flutter build apk --release \
-            --build-number="$((GITHUB_RUN_NUMBER + 1000))" \
+            --build-number="$GITHUB_RUN_NUMBER" \
             --dart-define=BUNDLED_DATABASE_ID="$DATABASE_SHA256"
           printf 'built-at=%s\n' "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
 
