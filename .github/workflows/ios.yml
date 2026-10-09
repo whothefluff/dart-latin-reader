@@ -57,6 +57,7 @@ jobs:
           cd ipa && zip -qry ../latin-reader-ios-unsigned.ipa Payload
 
       - name: Upload IPA
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@v4
         with:
           name: latin-reader-ios-${{ github.run_number }}

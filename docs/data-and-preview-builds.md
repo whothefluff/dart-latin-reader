@@ -70,23 +70,13 @@ The installed copy, `bundled-data-<SHA-256>.db`, is in:
 - **Linux:** `~/.local/share/com.magnetys.latin_reader/`
 - **macOS:** `~/Library/Containers/com.magnetys.latinReader/Data/Library/Application Support/com.magnetys.latinReader/`
 
-Desktop builds from GitHub (preview, PR, branch) share that folder, so launching a different one swaps in its own copy.
+Desktop builds from GitHub (preview or branch) share that folder, so launching a different one swaps in its own copy.
 
-The one exception is Android PR builds (below), and only because of signing, not the database.
+### Contributors
 
-### Contributors: from your PR
+PR runs build and check every platform, but keep no builds to download: only main publishes previews. The checks on your PR are the ones that count.
 
-Every PR run produces downloadable builds. Open the run from your PR's checks and scroll to **Artifacts**.
-
-- **Android:** download `latin-reader-apk-<number>`, a ZIP. Unzip it and install `app-release.apk`. It installs as **Latin Reader PR**.
-  - Each PR build is signed with a throwaway key, so uninstall the previous Latin Reader PR before installing a newer one.
-- **Windows:** download `latin-reader-windows-<number>`, a ZIP of the whole app folder. Unzip it and run `latin_reader.exe`; the other files next to it are required.
-- **Linux:** download `latin-reader-linux-<number>`, a ZIP holding `latin-reader-linux.tar.gz` (a tarball keeps the app's executable bit). Extract both and run `latin_reader/latin_reader`.
-- **macOS:** download `latin-reader-macos-<number>`, a ZIP holding `latin-reader-macos.zip` (the inner ZIP keeps the app's signature and permissions). Unzip both, then run the `xattr` command above.
-- **iOS:** download `latin-reader-ios-<number>`, a ZIP holding `latin-reader-ios-unsigned.ipa`. Sign and install it as above.
-- **Database:** download `latin-reader-database-<number>`, a ZIP with the `data.db` packaged in that run's builds.
-
-If GitHub Actions is enabled in your fork, runs there build the same way PR builds do (the APK installs as Latin Reader PR) and publish nothing. The checks that count are the ones on your PR here.
+If GitHub Actions is enabled in your fork, pushes there run the same workflow and keep each build as an artifact in your fork (the APK installs as **Latin Reader PR**). Nothing is published.
 
 ### Owner: any branch
 
