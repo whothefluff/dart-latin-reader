@@ -14,9 +14,9 @@ import '../../external/db_oracle.dart';
 /// - For the word itself, `WorkContents.lookupForm`: expansions by what they
 ///   stand for (`Marcus`), words with an enclitic as written (`populusque`).
 ///   It's NULL for tokens that aren't counted words, which is what excludes them.
-/// - Enclitics counted separately use their own spelling, such as `que`.
+/// - Enclitics counted separately, `-` followed by the enclitic, such as `-que`.
 ///
-/// `macronLookupForm` is the same spelling with its macrons, and
+/// `macronLookupForm` is the text's spelling with its macrons (`que` for `-que`), and
 /// `uncertaintyBitMask` says which of its letters are uncertain:
 /// the token's own mask, and 0 for an enclitic.
 ///
@@ -37,7 +37,7 @@ const _countUnits = '''WITH TokenComponents( ordinal ) AS ( VALUES (0), (1) ),
                             END AS macronForm,
                             CASE TokenComponents.ordinal
                                  WHEN 0 THEN WorkContents.lookupForm
-                                 ELSE WorkContents.enclitic
+                                 ELSE '-' || WorkContents.enclitic
                             END AS lookupForm,
                             CASE TokenComponents.ordinal
                                  WHEN 0 THEN WorkContents.properNounState
