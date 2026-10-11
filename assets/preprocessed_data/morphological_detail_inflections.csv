@@ -1,4 +1,7 @@
 form,item,cnt,partOfSpeech,stem,suffix,segmentsInfo,gender,number,declension,case,verbForm,tense,voice,person
+-ne,0,0,adverb,ne,,,,,,,,,,
+-que,0,0,conjunction,que,,,,,,,,,,
+-ve,0,0,conjunction,ve,,,,,,,,,,
 a,0,0,preposition,ā,,,,,,,,,,
 a,1,0,interjection,ā,,,,,,,,,,
 ab,0,0,preposition,ab,,,,,,,,,,

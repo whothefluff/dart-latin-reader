@@ -108,7 +108,7 @@ final operations = [
                             TokenComponents.ordinal AS componentOrdinal,
                             CASE TokenComponents.ordinal
                                  WHEN 0 THEN WorkContents.lookupForm
-                                 ELSE WorkContents.enclitic
+                                 ELSE '-' || WorkContents.enclitic -- -que, apart from words spelled the same (ne)
                             END AS lookupForm,
                             CASE TokenComponents.ordinal
                                  WHEN 0 THEN WorkContents.properNounState

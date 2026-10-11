@@ -35,7 +35,7 @@ void main() {
     await corpus.addAnalysis('Venere', 'Venus1');
     await corpus.addAnalysis('venere', 'venio');
     await corpus.addAnalysis('populusque', 'populus1');
-    await corpus.addAnalysis('que', 'que');
+    await corpus.addAnalysis('-que', 'que');
     await corpus.populate();
   });
 

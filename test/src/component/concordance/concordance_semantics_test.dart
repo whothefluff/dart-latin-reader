@@ -137,10 +137,20 @@ void main() {
     await token(db, 1, 'populusque', enclitic: 'que');
     await analysis(db, 'populus', 'tree');
     await analysis(db, 'populusque', 'people');
-    await analysis(db, 'que', 'que', pos: 'conjunction');
+    await analysis(db, '-que', 'que', pos: 'conjunction');
     expect(await starts([_lemma('people')]), [1]);
     expect(await starts([_lemma('tree')]), [0]);
     expect(await starts([_lemma('que')]), [1]);
+  });
+
+  test('a detached enclitic has its own analyses, not those of a word spelled the same', () async {
+    await token(db, 0, 'ne');
+    await token(db, 1, 'tune', enclitic: 'ne');
+    await analysis(db, 'ne', 'ne1', pos: 'conjunction');
+    await analysis(db, 'tune', 'tu', pos: 'pronoun');
+    await analysis(db, '-ne', 'ne2', pos: 'adverb');
+    expect(await starts([_lemma('ne1')]), [0]);
+    expect(await starts([_lemma('ne2')]), [1]);
   });
 
   test('a lemma is not found where a vowel it needs long is certainly short', () async {
