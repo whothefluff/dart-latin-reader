@@ -313,7 +313,7 @@ void main() {
       // The host is looked up as populusque; que is counted separately.
       await corpus.addWord(fables, 'populusque', enclitic: 'que');
       await corpus.addAnalysis('populusque', 'populus1');
-      await corpus.addAnalysis('que', 'que');
+      await corpus.addAnalysis('-que', 'que');
       await corpus.populate();
 
       final forms = await _readCoverage(corpus.db, [fables], CoverageBasis.form);

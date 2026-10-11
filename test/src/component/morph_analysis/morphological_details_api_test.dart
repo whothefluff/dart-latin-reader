@@ -59,7 +59,7 @@ Future<AppDb> _magnoque() async {
   await db.customStatement(
     '''
     INSERT INTO MorphologicalDetails VALUES ( 'Magnoque', 0, 'magnus' ),
-                                            ( 'que', 0, 'que' ),
+                                            ( '-que', 0, 'que' ),
                                             ( 'magno', 0, 'magnus' )
     ''',
   );
@@ -68,7 +68,7 @@ Future<AppDb> _magnoque() async {
     INSERT INTO MorphologicalDetailInflections( form, item, cnt, partOfSpeech, stem )
         VALUES ( 'Magnoque', 0, 0, 'adjective', 'magn' ),
                ( 'Magnoque', 0, 1, 'adjective', 'magn' ),
-               ( 'que', 0, 0, 'conjunction', 'que' ),
+               ( '-que', 0, 0, 'conjunction', 'que' ),
                ( 'magno', 0, 0, 'adjective', 'magn' )
     ''',
   );
@@ -76,7 +76,7 @@ Future<AppDb> _magnoque() async {
     '''
     INSERT INTO CountableWordCandidateAnalyses( workId, idx, componentOrdinal, form, item )
         VALUES ( ?, 5, 0, 'Magnoque', 0 ),
-               ( ?, 5, 1, 'que', 0 ),
+               ( ?, 5, 1, '-que', 0 ),
                ( ?, 6, 0, 'magno', 0 ),
                ( ?, 5, 0, 'magno', 0 )
     ''',
