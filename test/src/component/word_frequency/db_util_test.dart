@@ -28,6 +28,8 @@ void main() {
     await corpus.addWord(fables, 'Venere', properNounState: ProperNounState.either);
     await corpus.addWord(fables, 'Venere', properNounState: ProperNounState.proper);
     await corpus.addWord(fables, 'populusque', enclitic: 'que');
+    await corpus.addWord(fables, 'ne');
+    await corpus.addWord(fables, 'tune', enclitic: 'ne');
     await corpus.addWord(letters, 'est', macronizedWord: 'ēst');
     await corpus.addAnalysis('est', 'sum1');
     await corpus.addAnalysis('est', 'edo1');
@@ -36,6 +38,9 @@ void main() {
     await corpus.addAnalysis('venere', 'venio');
     await corpus.addAnalysis('populusque', 'populus1');
     await corpus.addAnalysis('-que', 'que');
+    await corpus.addAnalysis('ne', 'ne1');
+    await corpus.addAnalysis('tune', 'tu');
+    await corpus.addAnalysis('-ne', 'ne2');
     await corpus.populate();
   });
 
