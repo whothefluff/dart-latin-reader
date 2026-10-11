@@ -3988,6 +3988,7 @@ class WorkContents extends i0.Table
     'CHECK(enclitic IS NULL OR(LENGTH(enclitic) > 0 AND LENGTH(enclitic) < LENGTH(word) AND LOWER(SUBSTR(word, LENGTH(word) - LENGTH(enclitic) + 1)) = LOWER(enclitic)))',
     'CHECK(enclitic IS NULL OR tokenType = 1)',
     'CHECK(expansion IS NULL OR macronizedWord = \'\' OR uncertaintyBitMask = 0)',
+    'CHECK(macronizedWord = \'\' OR "REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"("REPLACE"(macronizedWord, \'ā\', \'a\'), \'ē\', \'e\'), \'ī\', \'i\'), \'ō\', \'o\'), \'ū\', \'u\'), \'ȳ\', \'y\'), \'Ā\', \'A\'), \'Ē\', \'E\'), \'Ī\', \'I\'), \'Ō\', \'O\'), \'Ū\', \'U\'), \'Ȳ\', \'Y\') = word)',
     'CHECK(enclitic IS NULL OR macronizedWord = \'\' OR((uncertaintyBitMask >>(LENGTH(word) - LENGTH(enclitic)))= 0 AND LOWER(SUBSTR(macronizedWord, LENGTH(macronizedWord) - LENGTH(enclitic) + 1)) = LOWER(enclitic)))',
   ];
   @override
