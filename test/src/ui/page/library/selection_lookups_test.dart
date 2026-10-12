@@ -146,9 +146,10 @@ void main() {
       expect(isMacronizedAs('Ēsca', form: 'esca', macronizedForm: 'ēsca'), isTrue);
     });
 
-    test('j counts as i, in the text or in the analysis', () {
-      expect(isMacronizedAs('Iūnō', form: 'Iuno', macronizedForm: 'Jūnō'), isTrue);
-      expect(isMacronizedAs('Jūnō', form: 'Juno', macronizedForm: 'Iūnō'), isTrue);
+    test('j and i are different letters, as are v and u', () {
+      expect(isMacronizedAs('Jūnō', form: 'Juno', macronizedForm: 'Jūnō'), isTrue);
+      expect(isMacronizedAs('Iūnō', form: 'Juno', macronizedForm: 'Jūnō'), isFalse);
+      expect(isMacronizedAs('voluit', form: 'voluit', macronizedForm: 'volvit'), isFalse);
     });
   });
 
@@ -187,6 +188,13 @@ void main() {
     test('a lowercase word with no state is looked up in lowercase', () {
       final line = [_segment(1, 'Et'), _segment(2, 'buvile')];
       expect(wiktionaryPagesOf(line.last, line), {'buvile'});
+    });
+
+    test('j is looked up as i, as Wiktionary writes its Latin entries', () {
+      final jam = _segment(1, 'Jam', baseNormForm: 'jam', state: ProperNounState.common);
+      final juno = _segment(2, 'Juno', baseNormForm: 'Juno', state: ProperNounState.proper);
+      expect(wiktionaryPagesOf(jam, [jam]), {'iam'});
+      expect(wiktionaryPagesOf(juno, [juno]), {'Iuno'});
     });
   });
 }
