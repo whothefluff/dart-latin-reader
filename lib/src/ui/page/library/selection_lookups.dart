@@ -72,22 +72,21 @@ Future<void> lookUpThenOpen<T>(
 }
 
 /// Whether [macronizedForm] matches [macronized], including macrons.
-/// Ignores case and treats `j` and `i` as equivalent.
+/// Ignores case.
 ///
 /// Restores any missing suffix, such as an enclitic, from [form] before comparing.
 bool isMacronizedAs(String macronized, {required String form, required String macronizedForm}) {
   final restOfForm = form.length > macronizedForm.length
       ? form.substring(macronizedForm.length)
       : '';
-  return _comparable('$macronizedForm$restOfForm') == _comparable(macronized);
+  return '$macronizedForm$restOfForm'.toLowerCase() == macronized.toLowerCase();
 }
-
-String _comparable(String spelling) => spelling.toLowerCase().replaceAll('j', 'i');
 
 /// Wiktionary page names for [segment], based on its proper-noun state.
 ///
 /// Without a state, follows the word's capitalization in the text. Includes
 /// lowercase too when the word's position could explain the capital letter.
+/// Wiktionary's Latin entries write j as i.
 Set<String> wiktionaryPagesOf(
   WorkContentsSegment segment,
   Iterable<WorkContentsSegment> segments,
@@ -98,7 +97,9 @@ Set<String> wiktionaryPagesOf(
     if (_isCapitalizedByPosition(segment, segments)) baseNormForm,
   },
   (final baseNormForm?, final state) => spellingsToLookUp(baseNormForm, state),
-};
+}.map(_withIForJ).toSet();
+
+String _withIForJ(String page) => page.replaceAll('j', 'i').replaceAll('J', 'I');
 
 /// Whether [segment]'s position could explain its capitalization.
 ///

@@ -992,26 +992,27 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
   /// Lookups for [segment], based on [page]'s macron setting.
   ///
   /// `lookUpReadings` returns all readings when macrons are hidden. Otherwise,
-  /// it returns candidate readings, matching the displayed spelling if it has macrons.
+  /// it returns candidate readings, matching the word's macronized spelling if it has macrons.
   _WordLookups _watchLookupsOf(
     WidgetRef menuRef,
     PageSegments page,
     WorkContentsSegment segment,
     String lookupForm,
   ) {
-    final shown = page.shownText(segment);
-    final isShownWithMacrons = shown != segment.word;
+    final isShownWithMacrons = page.showMacrons && segment.macronizedWord != segment.word;
     Future<_WordReadings> lookUpCandidateReadings() => _lookUpCandidateReadings(segment);
+    Future<_WordReadings> lookUpMacronizedReadings() async =>
+        _readingsMacronizedAs(await lookUpCandidateReadings(), segment.macronizedWord);
     return (
       wiktionaryPages: wiktionaryPagesOf(segment, widget.segments),
       lookUpReadings: switch ((page.showMacrons, isShownWithMacrons)) {
         (false, _) => () => _lookUpAllReadings(segment, lookupForm),
         (true, false) => lookUpCandidateReadings,
-        (true, true) => () async => _readingsMacronizedAs(await lookUpCandidateReadings(), shown),
+        (true, true) => lookUpMacronizedReadings,
       },
       lookUpCandidateReadings: lookUpCandidateReadings,
       macronComparison: isShownWithMacrons
-          ? _compareWithMacrons(_watchCandidateReadings(menuRef, segment), shown)
+          ? _compareWithMacrons(_watchCandidateReadings(menuRef, segment), segment.macronizedWord)
           : (pending: false, showIgnoringMacrons: false),
     );
   }
