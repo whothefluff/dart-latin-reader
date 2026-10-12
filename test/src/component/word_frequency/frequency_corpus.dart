@@ -24,8 +24,13 @@ class FrequencyCorpus {
   final AppDb db;
   final Map<String, int> _nextIdx = {};
 
-  Future<void> addWork(String id, {String name = 'A work'}) =>
-      db.customStatement('INSERT INTO Works( id, name, about ) VALUES ( ?, ?, ? )', [id, name, '']);
+  Future<void> addWork(String id, {String name = 'A work'}) => db.customStatement(
+    '''
+    INSERT INTO Works( id, name, about, uvLowercase, uvCapitals, ijLowercase, ijCapitals )
+        VALUES ( ?, ?, '', 'uv', 'UV', 'i', 'I' )
+    ''',
+    [id, name],
+  );
 
   Future<void> addWord(
     String workId,
