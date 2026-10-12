@@ -27,6 +27,7 @@ WorkContentsSegment _segment(
   macronLookupForm: word,
   baseNormForm: baseNormForm ?? word.toLowerCase(),
   properNounState: state,
+  isNumeral: false,
   sourceReference: '1',
 );
 

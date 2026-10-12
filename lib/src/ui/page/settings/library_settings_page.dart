@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../component/library/semivowel_spelling.dart';
 import '../../../component/settings/reader_settings_api.dart';
 import '../../../component/word_frequency/lookup_frequency_api.dart' show FrequencyScope;
 import '../../../core/bundled_fonts.dart';
@@ -89,6 +90,7 @@ class _ReaderSettingsSection extends StatelessWidget {
     icon: Icons.my_library_books,
     groups: [
       _readerMacrons(),
+      _readerSemivowels(context),
       _readerTypography(context),
       _readerFrequencies(context),
     ],
@@ -97,6 +99,48 @@ class _ReaderSettingsSection extends StatelessWidget {
   SettingsGroup _readerMacrons() => SettingsGroup(
     rows: [
       _macronsToggle(),
+    ],
+  );
+
+  SettingsGroup _readerSemivowels(BuildContext context) => SettingsGroup(
+    rows: [
+      _semivowelsHeader(context),
+      const Divider(height: 1),
+      _editionSemivowelSpellingToggle(),
+      if (!settings.showEditionSemivowelSpelling) ...[
+        _semivowelLowercaseChoice(
+          vowelLetter: 'u',
+          semivowelLetter: 'v',
+          current: settings.uvLowercase,
+          onChanged: (letters) => notifier.updateSettings(
+            settings.copyWith(uvLowercase: letters),
+          ),
+        ),
+        _semivowelCapitalsChoice(
+          vowelLetter: 'U',
+          semivowelLetter: 'V',
+          current: settings.uvCapitals,
+          onChanged: (letters) => notifier.updateSettings(
+            settings.copyWith(uvCapitals: letters),
+          ),
+        ),
+        _semivowelLowercaseChoice(
+          vowelLetter: 'i',
+          semivowelLetter: 'j',
+          current: settings.ijLowercase,
+          onChanged: (letters) => notifier.updateSettings(
+            settings.copyWith(ijLowercase: letters),
+          ),
+        ),
+        _semivowelCapitalsChoice(
+          vowelLetter: 'I',
+          semivowelLetter: 'J',
+          current: settings.ijCapitals,
+          onChanged: (letters) => notifier.updateSettings(
+            settings.copyWith(ijCapitals: letters),
+          ),
+        ),
+      ],
     ],
   );
 
@@ -133,6 +177,68 @@ class _ReaderSettingsSection extends StatelessWidget {
       settings.copyWith(showMacrons: val),
     ),
   );
+
+  Widget _semivowelsHeader(BuildContext context) => ColoredBox(
+    color: Theme.of(context).colorScheme.surfaceContainer,
+    child: const ListTile(
+      leading: Icon(Icons.abc),
+      title: Text('Letters', style: TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text('How the text writes u and v, and i and j'),
+    ),
+  );
+
+  SwitchListTile _editionSemivowelSpellingToggle() => SwitchListTile(
+    title: const Text('Original Edition'),
+    subtitle: const Text("Write each work with its edition's letters"),
+    value: settings.showEditionSemivowelSpelling,
+    onChanged: (val) => notifier.updateSettings(
+      settings.copyWith(showEditionSemivowelSpelling: val),
+    ),
+  );
+
+  ChipChoice _semivowelLowercaseChoice({
+    required String vowelLetter,
+    required String semivowelLetter,
+    required SemivowelLetters current,
+    required ValueChanged<SemivowelLetters> onChanged,
+  }) => ChipChoice(
+    title: '${vowelLetter.toUpperCase()} and ${semivowelLetter.toUpperCase()}',
+    subtitle: 'Letters for the vowel $vowelLetter and the consonant $semivowelLetter',
+    chips: choiceChips(
+      values: SemivowelLetters.values,
+      current: current,
+      label: (letters) => _semivowelLettersLabel(letters, vowelLetter, semivowelLetter),
+      onChanged: onChanged,
+    ),
+  );
+
+  ChipChoice _semivowelCapitalsChoice({
+    required String vowelLetter,
+    required String semivowelLetter,
+    required SemivowelLetters? current,
+    required ValueChanged<SemivowelLetters?> onChanged,
+  }) => ChipChoice(
+    title: 'Capital $vowelLetter and $semivowelLetter',
+    subtitle: 'Letters for the capitals',
+    chips: choiceChips(
+      values: const [null, ...SemivowelLetters.values],
+      current: current,
+      label: (letters) => letters == null
+          ? 'Like Lowercase'
+          : _semivowelLettersLabel(letters, vowelLetter, semivowelLetter),
+      onChanged: onChanged,
+    ),
+  );
+
+  static String _semivowelLettersLabel(
+    SemivowelLetters letters,
+    String vowelLetter,
+    String semivowelLetter,
+  ) => switch (letters) {
+    SemivowelLetters.both => '$vowelLetter and $semivowelLetter',
+    SemivowelLetters.vowelLetterOnly => '$vowelLetter only',
+    SemivowelLetters.semivowelLetterOnly => '$semivowelLetter only',
+  };
 
   Widget _frequenciesHeader(BuildContext context) => ColoredBox(
     color: Theme.of(context).colorScheme.surfaceContainer,

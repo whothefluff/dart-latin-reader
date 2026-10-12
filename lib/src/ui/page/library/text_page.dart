@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../logger.dart';
 import '../../../component/library/proper_noun_state.dart';
 import '../../../component/library/punctuation.dart';
+import '../../../component/library/semivowel_spelling.dart';
 import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_contents_api.dart';
 import '../../../component/library/work_details_api.dart';
@@ -107,10 +108,15 @@ class TextPageState extends ConsumerState<TextPage> {
 
   @override
   Widget build(context) {
-    final lastIndexProvider = ref.watch(
-      workDetailsProvider(
-        widget.workId,
-      ).select((model) => model.whenData((work) => work.lastIndex)),
+    final workProvider = ref.watch(
+      workDetailsProvider(widget.workId).select(
+        (model) => model.whenData(
+          (work) => (
+            lastIndex: work.lastIndex,
+            editionSemivowelSpelling: work.editionSemivowelSpelling,
+          ),
+        ),
+      ),
     );
     //the scaffold wraps both stages so the loading and error states are padded too
     return SafeBodyScaffold(
@@ -119,10 +125,10 @@ class TextPageState extends ConsumerState<TextPage> {
         onNext: _loadNextPage,
         onPrevious: _loadPreviousPage,
         onOpenMenu: _openMenu,
-        child: lastIndexProvider.when(
-          data: (lastIndex) {
-            _lastIndex = lastIndex;
-            return _contents();
+        child: workProvider.when(
+          data: (work) {
+            _lastIndex = work.lastIndex;
+            return _contents(work.editionSemivowelSpelling);
           },
           loading: showLoading,
           error: showError(ref, workDetailsProvider(widget.workId)),
@@ -131,17 +137,20 @@ class TextPageState extends ConsumerState<TextPage> {
     );
   }
 
-  Widget _contents() {
+  Widget _contents(SemivowelSpelling editionSemivowelSpelling) {
     final segmentsProvider = ref.watch(workContentsProvider(widget.workId, _fromIndex, _toIndex));
     return segmentsProvider.when(
-      data: _withFrequencies,
+      data: (segments) => _withFrequencies(segments, editionSemivowelSpelling),
       loading: showLoading,
       error: showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex)),
     );
   }
 
   /// Waits for the frequencies only while common or uncommon words are marked
-  Widget _withFrequencies(WorkContentsSegments segments) {
+  Widget _withFrequencies(
+    WorkContentsSegments segments,
+    SemivowelSpelling editionSemivowelSpelling,
+  ) {
     final (:marks, :scope) = ref.watch(
       readerSettingsNotifierProvider.select(
         (value) => (
@@ -160,16 +169,18 @@ class TextPageState extends ConsumerState<TextPage> {
         ? ref
               .watch(provider)
               .when(
-                data: (frequencies) => _buildResponsiveContent(segments, frequencies),
+                data: (frequencies) =>
+                    _buildResponsiveContent(segments, frequencies, editionSemivowelSpelling),
                 loading: showLoading,
                 error: showError(ref, provider),
               )
-        : _buildResponsiveContent(segments, null);
+        : _buildResponsiveContent(segments, null, editionSemivowelSpelling);
   }
 
   Widget _buildResponsiveContent(
     WorkContentsSegments segments,
     LookupFrequencies? frequencies,
+    SemivowelSpelling editionSemivowelSpelling,
   ) => LayoutBuilder(
     builder: (context, pageConstraints) {
       //keep the generation that produced these segments (so stale callbacks can be ignored)
@@ -178,6 +189,7 @@ class TextPageState extends ConsumerState<TextPage> {
         key: ValueKey((widget.workId, generation)), // Recreate selection state after explicit nav
         segments: segments,
         frequencies: frequencies,
+        editionSemivowelSpelling: editionSemivowelSpelling,
         highlights: widget.highlights,
         onNavigateNext: _loadNextPage,
         onNavigatePrevious: _loadPreviousPage,
@@ -345,11 +357,16 @@ class TextPageState extends ConsumerState<TextPage> {
       final workId = widget.workId;
       try {
         ContextMenuController.removeAny();
-        final workName = ref.read(workDetailsProvider(workId)).valueOrNull?.name ?? 'This work';
+        final work = ref.read(workDetailsProvider(workId)).valueOrNull;
+        final settings =
+            ref.read(readerSettingsNotifierProvider).valueOrNull ?? const ReaderSettings.defaults();
         final selected = await showWorkIndex(
           context: context,
           workId: workId,
-          workName: workName,
+          workName: work?.name ?? 'This work',
+          semivowelSpelling: settings.semivowelSpellingFor(
+            work?.editionSemivowelSpelling ?? SemivowelSpelling.stored,
+          ),
           currentIndex: _currentFirstVisibleIndex,
         );
         // The displayed work may have changed while the sheet was open
@@ -390,6 +407,7 @@ class _TextRenderer {
     this.theme,
     this.workSegments,
     this.readerSettings,
+    this.semivowelSpelling,
     this.highlights,
     this.bands,
   );
@@ -397,6 +415,7 @@ class _TextRenderer {
   final ThemeData theme;
   final WorkContentsSegments workSegments;
   final ReaderSettings readerSettings;
+  final SemivowelSpelling semivowelSpelling;
 
   /// Token indices to mark
   final List<int> highlights;
@@ -512,12 +531,14 @@ class _TextRenderer {
       decorationColor: theme.colorScheme.primary,
       decorationThickness: 1,
     );
+    final spelling = semivowelSpellingOf(segment, semivowelSpelling);
+    // mask bits follow the stored characters, and respellEach writes one string for each
     final letters = mask == 0
-        ? [TextSpan(text: word)]
-        : word.runes.mapIndexed((i, rune) {
+        ? [TextSpan(text: spelling.respell(word))]
+        : spelling.respellEach(word).mapIndexed((i, letter) {
             final isUncertain = ((mask >> i) & 1) != 0;
             return TextSpan(
-              text: String.fromCharCode(rune),
+              text: letter,
               style: isUncertain ? uncertainStyle : null,
             );
           }).toList();
@@ -821,6 +842,7 @@ class _StyledWordList extends ConsumerStatefulWidget {
     super.key,
     required this.segments,
     required this.frequencies,
+    required this.editionSemivowelSpelling,
     required this.highlights,
     required this.onNavigateNext,
     required this.onNavigatePrevious,
@@ -832,6 +854,7 @@ class _StyledWordList extends ConsumerStatefulWidget {
 
   /// `null` unless common or uncommon words are marked
   final LookupFrequencies? frequencies;
+  final SemivowelSpelling editionSemivowelSpelling;
   final WorkContentsSegments segments;
   final List<int> highlights;
   final VoidCallback onNavigateNext;
@@ -993,6 +1016,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
   ///
   /// `lookUpReadings` returns all readings when macrons are hidden. Otherwise,
   /// it returns candidate readings, matching the word's macronized spelling if it has macrons.
+  /// Readings are compared with the stored spelling, not with the letters shown.
   _WordLookups _watchLookupsOf(
     WidgetRef menuRef,
     PageSegments page,
@@ -1169,10 +1193,12 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     int revision,
   ) {
     final segments = widget.segments;
+    final semivowelSpelling = settings.semivowelSpellingFor(widget.editionSemivowelSpelling);
     final allSpans = _TextRenderer(
       Theme.of(context),
       segments,
       settings,
+      semivowelSpelling,
       widget.highlights,
       widget.frequencies?.bandsFor(
         commonPercent: settings.commonWordsPercent,
@@ -1205,6 +1231,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
       _TextRenderer.pageSpans(allSpans, visible.first, visible.last),
       segments.sublist(visible.first, visible.last + 1),
       showMacrons: settings.showMacrons,
+      semivowelSpelling: semivowelSpelling,
     );
   }
 

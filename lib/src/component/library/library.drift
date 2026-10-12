@@ -449,6 +449,7 @@ CREATE VIEW "library.WorkContents" AS
                                         WorkContents.macronLookupForm,
                                         WorkContents.baseNormForm,
                                         WorkContents.properNounState,
+                                        WorkContents.tokenType = 3 AS isNumeral,
                                         SubdivsHierarchy.node,
                                         SubdivsHierarchy.typ,
                                         SubdivsHierarchy.parent,
@@ -476,6 +477,7 @@ CREATE VIEW "library.WorkContents" AS
                macronLookupForm,
                baseNormForm,
                properNounState,
+               isNumeral,
                sourceReference --( SELECT name FROM WorkContentSubdivisions AS aux WHERE aux.parent = ClosestSubdivision.parent AND aux.typ = 'TITL' LIMIT 1 ) AS title
             FROM ClosestSubdivision
             WHERE rn = 1
@@ -516,6 +518,16 @@ CREATE VIEW "library.WorkIndexes" AS
            SubdivsHierarchy.fromIndex,
            SubdivsHierarchy.toIndex,
            Titles.name AS label,
+           ( SELECT GROUP_CONCAT( ( SELECT COUNT( * )
+                                        FROM WorkContents AS Words
+                                        WHERE Words.workId = Numerals.workId
+                                              AND Words.idx >= Titles.fromIndex
+                                              AND Words.idx < Numerals.idx
+                                              AND Words.tokenType <= 3 ) )
+                 FROM WorkContents AS Numerals
+                 WHERE Numerals.workId = Titles.workId
+                       AND Numerals.idx BETWEEN Titles.fromIndex AND Titles.toIndex
+                       AND Numerals.tokenType = 3 ) AS numeralWordIndexes,
            StartToken.sourceReference AS startReference,
            EndToken.sourceReference AS endReference
         FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy
@@ -531,7 +543,7 @@ CREATE VIEW "library.WorkIndexes" AS
                AND Titles.toIndex = EndToken.idx
         ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.cnt, SubdivsHierarchy.node;
 
-getLibraryWorkIndexes WITH WorkIndexEntry: SELECT * FROM "library.WorkIndexes" WHERE workId = ?;
+getLibraryWorkIndexes WITH WorkIndexEntry.fromSql: SELECT * FROM "library.WorkIndexes" WHERE workId = ?;
 
 CREATE VIEW "library.Catalog" AS 
     SELECT Works.id AS workId,

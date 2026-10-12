@@ -103,6 +103,7 @@ class WorkContentsSegment {
     required this.macronLookupForm,
     required this.baseNormForm,
     required this.properNounState,
+    required this.isNumeral,
     required this.sourceReference,
   });
 
@@ -123,6 +124,7 @@ class WorkContentsSegment {
   /// `null` when unknown
   final ProperNounState? properNounState;
 
+  final bool isNumeral;
   final String macronizedWord;
   final String workId;
   final String? parent;

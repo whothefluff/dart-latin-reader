@@ -7,6 +7,7 @@ import '../../../component/concordance/concordance_query.dart';
 import '../../../component/concordance/grammar_values_api.dart';
 import '../../../component/concordance/lemma_choices_api.dart';
 import '../../../component/library/catalog_api.dart';
+import '../../../component/library/semivowel_spelling.dart';
 import '../../../component/settings/concordance_settings_api.dart';
 import '../../../component/word_frequency/library_selection_api.dart';
 import '../../widget/labeled_dropdown.dart';
@@ -348,6 +349,7 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
       context: context,
       workId: work.id,
       workName: work.name,
+      semivowelSpelling: SemivowelSpelling.stored,
       currentIndex: _part?.fromIndex ?? -1,
     );
     if (entry != null && mounted) {

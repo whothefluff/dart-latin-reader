@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../component/library/semivowel_spelling.dart';
 import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_index_api.dart';
 import '../../../core/contains_text.dart';
@@ -18,15 +19,18 @@ const workIndexLabel = 'Contents';
 ///
 /// Choosing an entry does not navigate directly.
 /// The reader owns the jump and applies it after this route closes.
+/// Titles are shown and searched with [semivowelSpelling], like the text.
 Future<WorkIndexEntry?> showWorkIndex({
   required BuildContext context,
   required String workId,
   required String workName,
+  required SemivowelSpelling semivowelSpelling,
   required int currentIndex,
 }) {
   final panel = _WorkIndexPanel(
     workId: workId,
     workName: workName,
+    semivowelSpelling: semivowelSpelling,
     currentIndex: currentIndex,
   );
   return Breakpoints.mediumAndUp.isActive(context)
@@ -72,11 +76,13 @@ class _WorkIndexPanel extends ConsumerWidget {
   const _WorkIndexPanel({
     required this.workId,
     required this.workName,
+    required this.semivowelSpelling,
     required this.currentIndex,
   });
 
   final String workId;
   final String workName;
+  final SemivowelSpelling semivowelSpelling;
   final int currentIndex;
 
   @override
@@ -128,6 +134,7 @@ class _WorkIndexPanel extends ConsumerWidget {
                     : _WorkIndexTree(
                         key: ObjectKey(index),
                         index: index,
+                        semivowelSpelling: semivowelSpelling,
                         currentIndex: currentIndex,
                       ),
               ),
@@ -143,10 +150,12 @@ class _WorkIndexTree extends StatefulWidget {
   const _WorkIndexTree({
     super.key,
     required this.index,
+    required this.semivowelSpelling,
     required this.currentIndex,
   });
 
   final WorkIndex index;
+  final SemivowelSpelling semivowelSpelling;
   final int currentIndex;
 
   @override
@@ -261,7 +270,7 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
     final subtitle = _subtitle(entry);
     // Cap visual indentation so deep trees remain readable on narrow screens
     final indentation = searching ? 0.0 : min(entry.depth, 6) * 16.0;
-    final path = [..._ancestry(entry), entry.label].join(' / ');
+    final path = [..._ancestry(entry), _label(entry)].join(' / ');
     return Tooltip(
       message: [path, subtitle].where((line) => line.isNotEmpty).join('\n'),
       child: Semantics(
@@ -273,7 +282,7 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
               SizedBox(width: indentation),
               if (hasChildren && !searching)
                 IconButton(
-                  tooltip: '${expanded ? 'Collapse' : 'Expand'} ${entry.label}',
+                  tooltip: '${expanded ? 'Collapse' : 'Expand'} ${_label(entry)}',
                   onPressed: () => _toggle(entry.node),
                   icon: AnimatedRotation(
                     turns: expanded ? 0.25 : 0,
@@ -294,7 +303,7 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            entry.label,
+                            _label(entry),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -338,8 +347,9 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
   ].join(' • ');
 
   /// Ancestor labels, outermost first
-  Iterable<String> _ancestry(WorkIndexEntry entry) =>
-      widget.index.ancestorsOf(entry).map((ancestor) => ancestor.label);
+  Iterable<String> _ancestry(WorkIndexEntry entry) => widget.index.ancestorsOf(entry).map(_label);
+
+  String _label(WorkIndexEntry entry) => entry.labelSpelledWith(widget.semivowelSpelling);
 
   double _rowExtent(BuildContext context) {
     final scaler = MediaQuery.textScalerOf(context);
@@ -361,7 +371,7 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
 
   // References intentionally do not participate in search or tree structure.
   Iterable<WorkIndexEntry> get _matches => widget.index.entries.where(
-    (entry) => containsText([entry.label, _typeLabel(entry)], _query),
+    (entry) => containsText([_label(entry), _typeLabel(entry)], _query),
   );
 
   void _search(String text) {
