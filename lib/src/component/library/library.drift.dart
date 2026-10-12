@@ -7822,6 +7822,7 @@ class LibraryWorkContent extends i0.DataClass {
   final String? macronLookupForm;
   final String? baseNormForm;
   final i4.ProperNounState? properNounState;
+  final bool isNumeral;
   final String sourceReference;
   const LibraryWorkContent({
     required this.workId,
@@ -7837,6 +7838,7 @@ class LibraryWorkContent extends i0.DataClass {
     this.macronLookupForm,
     this.baseNormForm,
     this.properNounState,
+    required this.isNumeral,
     required this.sourceReference,
   });
   factory LibraryWorkContent.fromJson(
@@ -7860,6 +7862,7 @@ class LibraryWorkContent extends i0.DataClass {
       properNounState: serializer.fromJson<i4.ProperNounState?>(
         json['properNounState'],
       ),
+      isNumeral: serializer.fromJson<bool>(json['isNumeral']),
       sourceReference: serializer.fromJson<String>(json['sourceReference']),
     );
   }
@@ -7882,6 +7885,7 @@ class LibraryWorkContent extends i0.DataClass {
       'properNounState': serializer.toJson<i4.ProperNounState?>(
         properNounState,
       ),
+      'isNumeral': serializer.toJson<bool>(isNumeral),
       'sourceReference': serializer.toJson<String>(sourceReference),
     };
   }
@@ -7900,6 +7904,7 @@ class LibraryWorkContent extends i0.DataClass {
     i0.Value<String?> macronLookupForm = const i0.Value.absent(),
     i0.Value<String?> baseNormForm = const i0.Value.absent(),
     i0.Value<i4.ProperNounState?> properNounState = const i0.Value.absent(),
+    bool? isNumeral,
     String? sourceReference,
   }) => i1.LibraryWorkContent(
     workId: workId ?? this.workId,
@@ -7919,6 +7924,7 @@ class LibraryWorkContent extends i0.DataClass {
     properNounState: properNounState.present
         ? properNounState.value
         : this.properNounState,
+    isNumeral: isNumeral ?? this.isNumeral,
     sourceReference: sourceReference ?? this.sourceReference,
   );
   @override
@@ -7937,6 +7943,7 @@ class LibraryWorkContent extends i0.DataClass {
           ..write('macronLookupForm: $macronLookupForm, ')
           ..write('baseNormForm: $baseNormForm, ')
           ..write('properNounState: $properNounState, ')
+          ..write('isNumeral: $isNumeral, ')
           ..write('sourceReference: $sourceReference')
           ..write(')'))
         .toString();
@@ -7957,6 +7964,7 @@ class LibraryWorkContent extends i0.DataClass {
     macronLookupForm,
     baseNormForm,
     properNounState,
+    isNumeral,
     sourceReference,
   );
   @override
@@ -7976,6 +7984,7 @@ class LibraryWorkContent extends i0.DataClass {
           other.macronLookupForm == this.macronLookupForm &&
           other.baseNormForm == this.baseNormForm &&
           other.properNounState == this.properNounState &&
+          other.isNumeral == this.isNumeral &&
           other.sourceReference == this.sourceReference);
 }
 
@@ -8001,6 +8010,7 @@ class LibraryWorkContents
     macronLookupForm,
     baseNormForm,
     properNounState,
+    isNumeral,
     sourceReference,
   ];
   @override
@@ -8010,7 +8020,7 @@ class LibraryWorkContents
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.baseNormForm, WorkContents.properNounState, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, lookupForm, macronLookupForm, baseNormForm, properNounState, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.baseNormForm, WorkContents.properNounState, WorkContents.tokenType = 3 AS isNumeral, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, lookupForm, macronLookupForm, baseNormForm, properNounState, isNumeral, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
   };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -8074,6 +8084,10 @@ class LibraryWorkContents
           data['${effectivePrefix}properNounState'],
         ),
       ),
+      isNumeral: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.bool,
+        data['${effectivePrefix}isNumeral'],
+      )!,
       sourceReference: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}sourceReference'],
@@ -8168,6 +8182,15 @@ class LibraryWorkContents
       ).withConverter<i4.ProperNounState?>(
         i1.WorkContents.$converterproperNounStaten,
       );
+  late final i0.GeneratedColumn<bool> isNumeral = i0.GeneratedColumn<bool>(
+    'isNumeral',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.bool,
+    defaultConstraints: i0.GeneratedColumn.constraintIsAlways(
+      'CHECK ("isNumeral" IN (0, 1))',
+    ),
+  );
   late final i0.GeneratedColumn<String> sourceReference =
       i0.GeneratedColumn<String>(
         'sourceReference',
@@ -8327,6 +8350,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   final int fromIndex;
   final int toIndex;
   final String label;
+  final String? numeralWordIndexes;
   final String startReference;
   final String endReference;
   const LibraryWorkIndexe({
@@ -8339,6 +8363,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     required this.fromIndex,
     required this.toIndex,
     required this.label,
+    this.numeralWordIndexes,
     required this.startReference,
     required this.endReference,
   });
@@ -8357,6 +8382,9 @@ class LibraryWorkIndexe extends i0.DataClass {
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
       label: serializer.fromJson<String>(json['label']),
+      numeralWordIndexes: serializer.fromJson<String?>(
+        json['numeralWordIndexes'],
+      ),
       startReference: serializer.fromJson<String>(json['startReference']),
       endReference: serializer.fromJson<String>(json['endReference']),
     );
@@ -8374,6 +8402,7 @@ class LibraryWorkIndexe extends i0.DataClass {
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
       'label': serializer.toJson<String>(label),
+      'numeralWordIndexes': serializer.toJson<String?>(numeralWordIndexes),
       'startReference': serializer.toJson<String>(startReference),
       'endReference': serializer.toJson<String>(endReference),
     };
@@ -8389,6 +8418,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     int? fromIndex,
     int? toIndex,
     String? label,
+    i0.Value<String?> numeralWordIndexes = const i0.Value.absent(),
     String? startReference,
     String? endReference,
   }) => i1.LibraryWorkIndexe(
@@ -8401,6 +8431,9 @@ class LibraryWorkIndexe extends i0.DataClass {
     fromIndex: fromIndex ?? this.fromIndex,
     toIndex: toIndex ?? this.toIndex,
     label: label ?? this.label,
+    numeralWordIndexes: numeralWordIndexes.present
+        ? numeralWordIndexes.value
+        : this.numeralWordIndexes,
     startReference: startReference ?? this.startReference,
     endReference: endReference ?? this.endReference,
   );
@@ -8416,6 +8449,7 @@ class LibraryWorkIndexe extends i0.DataClass {
           ..write('fromIndex: $fromIndex, ')
           ..write('toIndex: $toIndex, ')
           ..write('label: $label, ')
+          ..write('numeralWordIndexes: $numeralWordIndexes, ')
           ..write('startReference: $startReference, ')
           ..write('endReference: $endReference')
           ..write(')'))
@@ -8433,6 +8467,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     fromIndex,
     toIndex,
     label,
+    numeralWordIndexes,
     startReference,
     endReference,
   );
@@ -8449,6 +8484,7 @@ class LibraryWorkIndexe extends i0.DataClass {
           other.fromIndex == this.fromIndex &&
           other.toIndex == this.toIndex &&
           other.label == this.label &&
+          other.numeralWordIndexes == this.numeralWordIndexes &&
           other.startReference == this.startReference &&
           other.endReference == this.endReference);
 }
@@ -8471,6 +8507,7 @@ class LibraryWorkIndexes
     fromIndex,
     toIndex,
     label,
+    numeralWordIndexes,
     startReference,
     endReference,
   ];
@@ -8481,7 +8518,7 @@ class LibraryWorkIndexes
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name AS label, StartToken.sourceReference AS startReference, EndToken.sourceReference AS endReference FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy INNER JOIN WorkContentSubdivisions AS Titles ON SubdivsHierarchy.workId = Titles.workId AND SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ INNER JOIN WorkContents AS StartToken ON Titles.workId = StartToken.workId AND Titles.fromIndex = StartToken.idx INNER JOIN WorkContents AS EndToken ON Titles.workId = EndToken.workId AND Titles.toIndex = EndToken.idx ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.cnt, SubdivsHierarchy.node',
+        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name AS label, (SELECT GROUP_CONCAT((SELECT COUNT(*) FROM WorkContents AS Words WHERE Words.workId = Numerals.workId AND Words.idx >= Titles.fromIndex AND Words.idx < Numerals.idx AND Words.tokenType <= 3)) FROM WorkContents AS Numerals WHERE Numerals.workId = Titles.workId AND Numerals.idx BETWEEN Titles.fromIndex AND Titles.toIndex AND Numerals.tokenType = 3) AS numeralWordIndexes, StartToken.sourceReference AS startReference, EndToken.sourceReference AS endReference FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy INNER JOIN WorkContentSubdivisions AS Titles ON SubdivsHierarchy.workId = Titles.workId AND SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ INNER JOIN WorkContents AS StartToken ON Titles.workId = StartToken.workId AND Titles.fromIndex = StartToken.idx INNER JOIN WorkContents AS EndToken ON Titles.workId = EndToken.workId AND Titles.toIndex = EndToken.idx ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.cnt, SubdivsHierarchy.node',
   };
   @override
   LibraryWorkIndexes get asDslTable => this;
@@ -8527,6 +8564,10 @@ class LibraryWorkIndexes
         i0.DriftSqlType.string,
         data['${effectivePrefix}label'],
       )!,
+      numeralWordIndexes: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}numeralWordIndexes'],
+      ),
       startReference: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}startReference'],
@@ -8593,6 +8634,13 @@ class LibraryWorkIndexes
     false,
     type: i0.DriftSqlType.string,
   );
+  late final i0.GeneratedColumn<String> numeralWordIndexes =
+      i0.GeneratedColumn<String>(
+        'numeralWordIndexes',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
   late final i0.GeneratedColumn<String> startReference =
       i0.GeneratedColumn<String>(
         'startReference',
@@ -8923,6 +8971,7 @@ class LibraryDrift extends i6.ModularAccessor {
           i1.WorkContents.$converterproperNounState,
           row.readNullable<int>('properNounState'),
         ),
+        isNumeral: row.read<bool>('isNumeral'),
         sourceReference: row.read<String>('sourceReference'),
       ),
     );
@@ -8945,7 +8994,7 @@ class LibraryDrift extends i6.ModularAccessor {
       variables: [i0.Variable<String>(var1)],
       readsFrom: {workContentSubdivisions, workContents},
     ).map(
-      (i0.QueryRow row) => i10.WorkIndexEntry(
+      (i0.QueryRow row) => i10.WorkIndexEntry.fromSql(
         workId: row.read<String>('workId'),
         node: row.read<String>('node'),
         parent: row.readNullable<String>('parent'),
@@ -8957,6 +9006,7 @@ class LibraryDrift extends i6.ModularAccessor {
         fromIndex: row.read<int>('fromIndex'),
         toIndex: row.read<int>('toIndex'),
         label: row.read<String>('label'),
+        numeralWordIndexes: row.readNullable<String>('numeralWordIndexes'),
         startReference: row.read<String>('startReference'),
         endReference: row.read<String>('endReference'),
       ),

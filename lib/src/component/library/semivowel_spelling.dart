@@ -60,6 +60,31 @@ class SemivowelSpelling {
   final SemivowelLetters ijLowercase;
   final SemivowelLetters ijCapitals;
 
+  /// Respells [text] from the [stored] spelling into this one.
+  String respell(String text) => respellEach(text).join();
+
+  /// Respells each character of [text] from the [stored] spelling into this one.
+  ///
+  /// A long vowel written with a semivowel letter takes a combining macron: `ū` becomes `v̄`.
+  List<String> respellEach(String text) =>
+      text.runes.map((rune) => _respelled(String.fromCharCode(rune))).toList();
+
+  String _respelled(String letter) => switch (letter) {
+    'v' when uvLowercase == SemivowelLetters.vowelLetterOnly => 'u',
+    'u' when uvLowercase == SemivowelLetters.semivowelLetterOnly => 'v',
+    'ū' when uvLowercase == SemivowelLetters.semivowelLetterOnly => 'v̄',
+    'V' when uvCapitals == SemivowelLetters.vowelLetterOnly => 'U',
+    'U' when uvCapitals == SemivowelLetters.semivowelLetterOnly => 'V',
+    'Ū' when uvCapitals == SemivowelLetters.semivowelLetterOnly => 'V̄',
+    'j' when ijLowercase == SemivowelLetters.vowelLetterOnly => 'i',
+    'i' when ijLowercase == SemivowelLetters.semivowelLetterOnly => 'j',
+    'ī' when ijLowercase == SemivowelLetters.semivowelLetterOnly => 'j̄',
+    'J' when ijCapitals == SemivowelLetters.vowelLetterOnly => 'I',
+    'I' when ijCapitals == SemivowelLetters.semivowelLetterOnly => 'J',
+    'Ī' when ijCapitals == SemivowelLetters.semivowelLetterOnly => 'J̄',
+    _ => letter,
+  };
+
   @override
   String toString() =>
       'SemivowelSpelling{uvLowercase: $uvLowercase, uvCapitals: $uvCapitals, '

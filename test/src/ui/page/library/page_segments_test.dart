@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latin_reader/src/component/library/semivowel_spelling.dart';
 import 'package:latin_reader/src/component/library/subdivision_type.dart';
 import 'package:latin_reader/src/component/library/work_contents_api.dart';
 import 'package:latin_reader/src/ui/page/library/page_segments.dart';
 
-WorkContentsSegment _segment(int idx, String word, {String? macronized}) => WorkContentsSegment(
+WorkContentsSegment _segment(
+  int idx,
+  String word, {
+  String? macronized,
+  bool isNumeral = false,
+}) => WorkContentsSegment(
   workId: 'fables',
   parent: null,
   node: 'verse',
@@ -18,11 +24,15 @@ WorkContentsSegment _segment(int idx, String word, {String? macronized}) => Work
   macronLookupForm: macronized ?? word,
   baseNormForm: word,
   properNounState: null,
+  isNumeral: isNumeral,
   sourceReference: '1',
 );
 
 /// A page with two verses, each preceded by a line break, and no spaces before punctuation.
-PageSegments _page({required bool showMacrons}) {
+PageSegments _page({
+  required bool showMacrons,
+  SemivowelSpelling semivowelSpelling = SemivowelSpelling.stored,
+}) {
   final laidOut = [
     (_segment(10, 'Lupus'), before: '\n', after: ' '),
     (_segment(11, 'et'), before: '', after: ' '),
@@ -31,6 +41,7 @@ PageSegments _page({required bool showMacrons}) {
     (_segment(14, 'et'), before: '\n', after: ' '),
     (_segment(15, 'venerunt', macronized: 'vēnērunt'), before: '', after: ''),
     (_segment(16, '.'), before: '', after: ''),
+    (_segment(17, 'IV', isNumeral: true), before: '\n', after: ''),
   ];
   return PageSegments(
     laidOut
@@ -38,7 +49,11 @@ PageSegments _page({required bool showMacrons}) {
           (entry) => TextSpan(
             text: entry.before,
             children: [
-              TextSpan(text: showMacrons ? entry.$1.macronizedWord : entry.$1.word),
+              TextSpan(
+                text: semivowelSpellingOf(entry.$1, semivowelSpelling).respell(
+                  showMacrons ? entry.$1.macronizedWord : entry.$1.word,
+                ),
+              ),
               TextSpan(text: entry.after),
             ],
           ),
@@ -46,6 +61,7 @@ PageSegments _page({required bool showMacrons}) {
         .toList(),
     laidOut.map((entry) => entry.$1),
     showMacrons: showMacrons,
+    semivowelSpelling: semivowelSpelling,
   );
 }
 
@@ -89,6 +105,19 @@ void main() {
       expect(withMacrons.selectedSegment(_select(withMacrons, 'vēnērunt'))?.idx, 15);
       expect(page.selectedSegment(_select(page, 'venerunt'))?.idx, 15);
       expect(withMacrons.selectedSegment(_select(withMacrons, 'et', occurrence: 1))?.idx, 14);
+    });
+
+    test('a word is found by the letters shown', () {
+      const uOnly = SemivowelSpelling(
+        uvLowercase: SemivowelLetters.vowelLetterOnly,
+        uvCapitals: SemivowelLetters.vowelLetterOnly,
+        ijLowercase: SemivowelLetters.both,
+        ijCapitals: SemivowelLetters.both,
+      );
+      final withMacrons = _page(showMacrons: true, semivowelSpelling: uOnly);
+
+      expect(withMacrons.selectedSegment(_select(withMacrons, 'uēnērunt'))?.idx, 15);
+      expect(withMacrons.selectedSegment(_select(withMacrons, 'IV'))?.idx, 17);
     });
   });
 }
