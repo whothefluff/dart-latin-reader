@@ -20,14 +20,10 @@ class FixtureDb extends AppDb {
 }
 
 Future<void> seedCatalog(AppDb db) async {
-  await db.customStatement('INSERT INTO Works VALUES (?, ?, ?), (?, ?, ?)', [
-    work,
-    'Fables',
-    '',
-    otherWork,
-    'Other work',
-    '',
-  ]);
+  await db.customStatement(
+    "INSERT INTO Works VALUES (?, ?, ?, 'uv', 'UV', 'i', 'I'), (?, ?, ?, 'uv', 'UV', 'i', 'I')",
+    [work, 'Fables', '', otherWork, 'Other work', ''],
+  );
   await db.customStatement('INSERT INTO Dictionaries VALUES (?, ?, ?, ?, ?)', [
     dictionary,
     'Lewis & Short',

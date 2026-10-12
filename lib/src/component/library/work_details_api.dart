@@ -9,6 +9,7 @@ import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import 'library.drift.dart';
+import 'semivowel_spelling.dart';
 
 part 'work_details_api.g.dart';
 
@@ -80,7 +81,14 @@ class WorkDetails {
     required this.numberOfWords,
     required this.authorId,
     required this.authorName,
-  });
+    required SemivowelLetters uvLowercase,
+    required SemivowelLetters uvCapitals,
+    required SemivowelLetters ijLowercase,
+    required SemivowelLetters ijCapitals,
+  }) : _uvLowercase = uvLowercase,
+       _uvCapitals = uvCapitals,
+       _ijLowercase = ijLowercase,
+       _ijCapitals = ijCapitals;
 
   /// Highest WorkContents.idx in the work, counting punctuation. Inclusive.
   final int lastIndex;
@@ -90,6 +98,17 @@ class WorkDetails {
   final int numberOfWords; // display only
   final String? authorId;
   final String? authorName;
+  final SemivowelLetters _uvLowercase;
+  final SemivowelLetters _uvCapitals;
+  final SemivowelLetters _ijLowercase;
+  final SemivowelLetters _ijCapitals;
+
+  SemivowelSpelling get editionSemivowelSpelling => SemivowelSpelling(
+    uvLowercase: _uvLowercase,
+    uvCapitals: _uvCapitals,
+    ijLowercase: _ijLowercase,
+    ijCapitals: _ijCapitals,
+  );
 
   @override
   String toString() => 'WorkDetails{name: $name}';

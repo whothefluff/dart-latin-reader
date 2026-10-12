@@ -40,9 +40,10 @@ Future<AppDb> smallLibrary() async {
   );
   await db.customStatement(
     '''
-    INSERT INTO Works( id, name, about ) VALUES ( ?, 'Fabulae Aesopiae', '' ),
-                                                ( ?, 'De officiis', '' ),
-                                                ( ?, 'Carmina', '' )
+    INSERT INTO Works( id, name, about, uvLowercase, uvCapitals, ijLowercase, ijCapitals )
+        VALUES ( ?, 'Fabulae Aesopiae', '', 'u', 'V', 'ij', 'J' ),
+               ( ?, 'De officiis', '', 'uv', 'UV', 'i', 'I' ),
+               ( ?, 'Carmina', '', 'uv', 'UV', 'ij', 'IJ' )
     ''',
     [fables, duties, anonymous],
   );
