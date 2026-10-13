@@ -74,15 +74,19 @@ WITHOUT ROWID;
 CREATE VIRTUAL TABLE SearchableMorphDetInflections USING fts5(
     form,
     macronizedForm,
+    formInVowelLetters,
+    macronizedFormInVowelLetters,
     item UNINDEXED,
     cnt UNINDEXED,
     tokenize = "trigram remove_diacritics 0 case_sensitive 0"
 );
 
 fillSearchableMorphDetInflections:
-    INSERT INTO SearchableMorphDetInflections( form, macronizedForm, item, cnt )
+    INSERT INTO SearchableMorphDetInflections( form, macronizedForm, formInVowelLetters, macronizedFormInVowelLetters, item, cnt )
         SELECT form,
                macronizedForm,
+               IIF( form GLOB '*[jvJV]*', "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( form, 'j', 'i' ), 'J', 'I' ), 'v', 'u' ), 'V', 'U' ), NULL ),
+               IIF( macronizedForm GLOB '*[jvJV]*', "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( macronizedForm, 'j', 'i' ), 'J', 'I' ), 'v', 'u' ), 'V', 'U' ), NULL ),
                item,
                cnt
             FROM MorphologicalDetailInflections;
@@ -155,6 +159,42 @@ searchMacronizedMorphologicalDataWithLike WITH Result: SELECT Peek.*, Search.mac
                                                                   AND Search.cnt = Peek.cnt
                                                            WHERE Search.macronizedForm LIKE ?
                                                            ORDER BY Peek.form, Peek.item, Peek.cnt;
+
+searchMorphologicalDataInVowelLettersWithFts WITH Result: SELECT Peek.*, Search.macronizedForm
+                                                              FROM SearchableMorphDetInflections AS Search
+                                                              INNER JOIN "morphology.Peek" AS Peek
+                                                                  ON Search.form = Peek.form
+                                                                     AND Search.item = Peek.item
+                                                                     AND Search.cnt = Peek.cnt
+                                                              WHERE Search.formInVowelLetters MATCH ?
+                                                              ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
+
+searchMorphologicalDataInVowelLettersWithLike WITH Result: SELECT Peek.*, Search.macronizedForm
+                                                               FROM SearchableMorphDetInflections AS Search
+                                                               INNER JOIN "morphology.Peek" AS Peek
+                                                                   ON Search.form = Peek.form
+                                                                      AND Search.item = Peek.item
+                                                                      AND Search.cnt = Peek.cnt
+                                                               WHERE Search.formInVowelLetters LIKE ?
+                                                               ORDER BY Peek.form, Peek.item, Peek.cnt;
+
+searchMacronizedMorphologicalDataInVowelLettersWithFts WITH Result: SELECT Peek.*, Search.macronizedForm
+                                                                        FROM SearchableMorphDetInflections AS Search
+                                                                        INNER JOIN "morphology.Peek" AS Peek
+                                                                            ON Search.form = Peek.form
+                                                                               AND Search.item = Peek.item
+                                                                               AND Search.cnt = Peek.cnt
+                                                                        WHERE Search.macronizedFormInVowelLetters MATCH ?
+                                                                        ORDER BY BM25( SearchableMorphDetInflections ), Peek.form, Peek.item, Peek.cnt;
+
+searchMacronizedMorphologicalDataInVowelLettersWithLike WITH Result: SELECT Peek.*, Search.macronizedForm
+                                                                         FROM SearchableMorphDetInflections AS Search
+                                                                         INNER JOIN "morphology.Peek" AS Peek
+                                                                             ON Search.form = Peek.form
+                                                                                AND Search.item = Peek.item
+                                                                                AND Search.cnt = Peek.cnt
+                                                                         WHERE Search.macronizedFormInVowelLetters LIKE ?
+                                                                         ORDER BY Peek.form, Peek.item, Peek.cnt;
 
 getAnalysisKeysOf WITH AnalysisKey.fromSql: SELECT form, item, cnt FROM MorphologicalDetailInflections WHERE form = ? ORDER BY form, item, cnt;
 

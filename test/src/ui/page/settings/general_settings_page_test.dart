@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latin_reader/src/component/settings/general_settings_api.dart';
+import 'package:latin_reader/src/core/semivowel_search.dart';
 import 'package:latin_reader/src/ui/page/settings/general_settings_page.dart';
 
 class _InMemoryGeneral extends GeneralSettingsNotifier {
@@ -26,6 +27,7 @@ class _InMemoryGeneral extends GeneralSettingsNotifier {
 const _tealInTheDark = GeneralSettings(
   themeMode: ThemeMode.dark,
   accentColor: Color(0xFF009688),
+  semivowelSearchRules: SemivowelSearchRules(iFindsJ: false, uFindsV: false),
 );
 
 // keep ProviderScope directly inside pumpWidget for riverpod_lint

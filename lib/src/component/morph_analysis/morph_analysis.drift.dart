@@ -826,6 +826,8 @@ typedef $SearchableMorphDetInflectionsCreateCompanionBuilder =
     i1.SearchableMorphDetInflectionsCompanion Function({
       i0.Value<String?> form,
       i0.Value<String?> macronizedForm,
+      i0.Value<String?> formInVowelLetters,
+      i0.Value<String?> macronizedFormInVowelLetters,
       i0.Value<String?> item,
       i0.Value<String?> cnt,
       i0.Value<int> rowid,
@@ -834,6 +836,8 @@ typedef $SearchableMorphDetInflectionsUpdateCompanionBuilder =
     i1.SearchableMorphDetInflectionsCompanion Function({
       i0.Value<String?> form,
       i0.Value<String?> macronizedForm,
+      i0.Value<String?> formInVowelLetters,
+      i0.Value<String?> macronizedFormInVowelLetters,
       i0.Value<String?> item,
       i0.Value<String?> cnt,
       i0.Value<int> rowid,
@@ -858,6 +862,17 @@ class $SearchableMorphDetInflectionsFilterComposer
     column: $table.macronizedForm,
     builder: (column) => i0.ColumnFilters(column),
   );
+
+  i0.ColumnFilters<String> get formInVowelLetters => $composableBuilder(
+    column: $table.formInVowelLetters,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get macronizedFormInVowelLetters =>
+      $composableBuilder(
+        column: $table.macronizedFormInVowelLetters,
+        builder: (column) => i0.ColumnFilters(column),
+      );
 
   i0.ColumnFilters<String> get item => $composableBuilder(
     column: $table.item,
@@ -890,6 +905,17 @@ class $SearchableMorphDetInflectionsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<String> get formInVowelLetters => $composableBuilder(
+    column: $table.formInVowelLetters,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get macronizedFormInVowelLetters =>
+      $composableBuilder(
+        column: $table.macronizedFormInVowelLetters,
+        builder: (column) => i0.ColumnOrderings(column),
+      );
+
   i0.ColumnOrderings<String> get item => $composableBuilder(
     column: $table.item,
     builder: (column) => i0.ColumnOrderings(column),
@@ -918,6 +944,17 @@ class $SearchableMorphDetInflectionsAnnotationComposer
     column: $table.macronizedForm,
     builder: (column) => column,
   );
+
+  i0.GeneratedColumn<String> get formInVowelLetters => $composableBuilder(
+    column: $table.formInVowelLetters,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get macronizedFormInVowelLetters =>
+      $composableBuilder(
+        column: $table.macronizedFormInVowelLetters,
+        builder: (column) => column,
+      );
 
   i0.GeneratedColumn<String> get item =>
       $composableBuilder(column: $table.item, builder: (column) => column);
@@ -974,12 +1011,17 @@ class $SearchableMorphDetInflectionsTableManager
               ({
                 i0.Value<String?> form = const i0.Value.absent(),
                 i0.Value<String?> macronizedForm = const i0.Value.absent(),
+                i0.Value<String?> formInVowelLetters = const i0.Value.absent(),
+                i0.Value<String?> macronizedFormInVowelLetters =
+                    const i0.Value.absent(),
                 i0.Value<String?> item = const i0.Value.absent(),
                 i0.Value<String?> cnt = const i0.Value.absent(),
                 i0.Value<int> rowid = const i0.Value.absent(),
               }) => i1.SearchableMorphDetInflectionsCompanion(
                 form: form,
                 macronizedForm: macronizedForm,
+                formInVowelLetters: formInVowelLetters,
+                macronizedFormInVowelLetters: macronizedFormInVowelLetters,
                 item: item,
                 cnt: cnt,
                 rowid: rowid,
@@ -988,12 +1030,17 @@ class $SearchableMorphDetInflectionsTableManager
               ({
                 i0.Value<String?> form = const i0.Value.absent(),
                 i0.Value<String?> macronizedForm = const i0.Value.absent(),
+                i0.Value<String?> formInVowelLetters = const i0.Value.absent(),
+                i0.Value<String?> macronizedFormInVowelLetters =
+                    const i0.Value.absent(),
                 i0.Value<String?> item = const i0.Value.absent(),
                 i0.Value<String?> cnt = const i0.Value.absent(),
                 i0.Value<int> rowid = const i0.Value.absent(),
               }) => i1.SearchableMorphDetInflectionsCompanion.insert(
                 form: form,
                 macronizedForm: macronizedForm,
+                formInVowelLetters: formInVowelLetters,
+                macronizedFormInVowelLetters: macronizedFormInVowelLetters,
                 item: item,
                 cnt: cnt,
                 rowid: rowid,
@@ -2624,6 +2671,28 @@ class SearchableMorphDetInflections extends i0.Table
         requiredDuringInsert: false,
         $customConstraints: '',
       );
+  static const i0.VerificationMeta _formInVowelLettersMeta =
+      const i0.VerificationMeta('formInVowelLetters');
+  late final i0.GeneratedColumn<String> formInVowelLetters =
+      i0.GeneratedColumn<String>(
+        'formInVowelLetters',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: false,
+        $customConstraints: '',
+      );
+  static const i0.VerificationMeta _macronizedFormInVowelLettersMeta =
+      const i0.VerificationMeta('macronizedFormInVowelLetters');
+  late final i0.GeneratedColumn<String> macronizedFormInVowelLetters =
+      i0.GeneratedColumn<String>(
+        'macronizedFormInVowelLetters',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: false,
+        $customConstraints: '',
+      );
   static const i0.VerificationMeta _itemMeta = const i0.VerificationMeta(
     'item',
   );
@@ -2645,7 +2714,14 @@ class SearchableMorphDetInflections extends i0.Table
     $customConstraints: '',
   );
   @override
-  List<i0.GeneratedColumn> get $columns => [form, macronizedForm, item, cnt];
+  List<i0.GeneratedColumn> get $columns => [
+    form,
+    macronizedForm,
+    formInVowelLetters,
+    macronizedFormInVowelLetters,
+    item,
+    cnt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2670,6 +2746,24 @@ class SearchableMorphDetInflections extends i0.Table
         macronizedForm.isAcceptableOrUnknown(
           data['macronizedForm']!,
           _macronizedFormMeta,
+        ),
+      );
+    }
+    if (data.containsKey('formInVowelLetters')) {
+      context.handle(
+        _formInVowelLettersMeta,
+        formInVowelLetters.isAcceptableOrUnknown(
+          data['formInVowelLetters']!,
+          _formInVowelLettersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('macronizedFormInVowelLetters')) {
+      context.handle(
+        _macronizedFormInVowelLettersMeta,
+        macronizedFormInVowelLetters.isAcceptableOrUnknown(
+          data['macronizedFormInVowelLetters']!,
+          _macronizedFormInVowelLettersMeta,
         ),
       );
     }
@@ -2705,6 +2799,14 @@ class SearchableMorphDetInflections extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}macronizedForm'],
       ),
+      formInVowelLetters: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}formInVowelLetters'],
+      ),
+      macronizedFormInVowelLetters: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}macronizedFormInVowelLetters'],
+      ),
       item: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}item'],
@@ -2725,18 +2827,22 @@ class SearchableMorphDetInflections extends i0.Table
   bool get dontWriteConstraints => true;
   @override
   String get moduleAndArgs =>
-      'fts5(form, macronizedForm, item UNINDEXED, cnt UNINDEXED, tokenize = "trigram remove_diacritics 0 case_sensitive 0")';
+      'fts5(form, macronizedForm, formInVowelLetters, macronizedFormInVowelLetters, item UNINDEXED, cnt UNINDEXED, tokenize = "trigram remove_diacritics 0 case_sensitive 0")';
 }
 
 class SearchableMorphDetInflection extends i0.DataClass
     implements i0.Insertable<i1.SearchableMorphDetInflection> {
   final String? form;
   final String? macronizedForm;
+  final String? formInVowelLetters;
+  final String? macronizedFormInVowelLetters;
   final String? item;
   final String? cnt;
   const SearchableMorphDetInflection({
     this.form,
     this.macronizedForm,
+    this.formInVowelLetters,
+    this.macronizedFormInVowelLetters,
     this.item,
     this.cnt,
   });
@@ -2748,6 +2854,14 @@ class SearchableMorphDetInflection extends i0.DataClass
     }
     if (!nullToAbsent || macronizedForm != null) {
       map['macronizedForm'] = i0.Variable<String>(macronizedForm);
+    }
+    if (!nullToAbsent || formInVowelLetters != null) {
+      map['formInVowelLetters'] = i0.Variable<String>(formInVowelLetters);
+    }
+    if (!nullToAbsent || macronizedFormInVowelLetters != null) {
+      map['macronizedFormInVowelLetters'] = i0.Variable<String>(
+        macronizedFormInVowelLetters,
+      );
     }
     if (!nullToAbsent || item != null) {
       map['item'] = i0.Variable<String>(item);
@@ -2766,6 +2880,13 @@ class SearchableMorphDetInflection extends i0.DataClass
       macronizedForm: macronizedForm == null && nullToAbsent
           ? const i0.Value.absent()
           : i0.Value(macronizedForm),
+      formInVowelLetters: formInVowelLetters == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(formInVowelLetters),
+      macronizedFormInVowelLetters:
+          macronizedFormInVowelLetters == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(macronizedFormInVowelLetters),
       item: item == null && nullToAbsent
           ? const i0.Value.absent()
           : i0.Value(item),
@@ -2783,6 +2904,12 @@ class SearchableMorphDetInflection extends i0.DataClass
     return SearchableMorphDetInflection(
       form: serializer.fromJson<String?>(json['form']),
       macronizedForm: serializer.fromJson<String?>(json['macronizedForm']),
+      formInVowelLetters: serializer.fromJson<String?>(
+        json['formInVowelLetters'],
+      ),
+      macronizedFormInVowelLetters: serializer.fromJson<String?>(
+        json['macronizedFormInVowelLetters'],
+      ),
       item: serializer.fromJson<String?>(json['item']),
       cnt: serializer.fromJson<String?>(json['cnt']),
     );
@@ -2793,6 +2920,10 @@ class SearchableMorphDetInflection extends i0.DataClass
     return <String, dynamic>{
       'form': serializer.toJson<String?>(form),
       'macronizedForm': serializer.toJson<String?>(macronizedForm),
+      'formInVowelLetters': serializer.toJson<String?>(formInVowelLetters),
+      'macronizedFormInVowelLetters': serializer.toJson<String?>(
+        macronizedFormInVowelLetters,
+      ),
       'item': serializer.toJson<String?>(item),
       'cnt': serializer.toJson<String?>(cnt),
     };
@@ -2801,6 +2932,8 @@ class SearchableMorphDetInflection extends i0.DataClass
   i1.SearchableMorphDetInflection copyWith({
     i0.Value<String?> form = const i0.Value.absent(),
     i0.Value<String?> macronizedForm = const i0.Value.absent(),
+    i0.Value<String?> formInVowelLetters = const i0.Value.absent(),
+    i0.Value<String?> macronizedFormInVowelLetters = const i0.Value.absent(),
     i0.Value<String?> item = const i0.Value.absent(),
     i0.Value<String?> cnt = const i0.Value.absent(),
   }) => i1.SearchableMorphDetInflection(
@@ -2808,6 +2941,12 @@ class SearchableMorphDetInflection extends i0.DataClass
     macronizedForm: macronizedForm.present
         ? macronizedForm.value
         : this.macronizedForm,
+    formInVowelLetters: formInVowelLetters.present
+        ? formInVowelLetters.value
+        : this.formInVowelLetters,
+    macronizedFormInVowelLetters: macronizedFormInVowelLetters.present
+        ? macronizedFormInVowelLetters.value
+        : this.macronizedFormInVowelLetters,
     item: item.present ? item.value : this.item,
     cnt: cnt.present ? cnt.value : this.cnt,
   );
@@ -2819,6 +2958,12 @@ class SearchableMorphDetInflection extends i0.DataClass
       macronizedForm: data.macronizedForm.present
           ? data.macronizedForm.value
           : this.macronizedForm,
+      formInVowelLetters: data.formInVowelLetters.present
+          ? data.formInVowelLetters.value
+          : this.formInVowelLetters,
+      macronizedFormInVowelLetters: data.macronizedFormInVowelLetters.present
+          ? data.macronizedFormInVowelLetters.value
+          : this.macronizedFormInVowelLetters,
       item: data.item.present ? data.item.value : this.item,
       cnt: data.cnt.present ? data.cnt.value : this.cnt,
     );
@@ -2829,6 +2974,10 @@ class SearchableMorphDetInflection extends i0.DataClass
     return (StringBuffer('SearchableMorphDetInflection(')
           ..write('form: $form, ')
           ..write('macronizedForm: $macronizedForm, ')
+          ..write('formInVowelLetters: $formInVowelLetters, ')
+          ..write(
+            'macronizedFormInVowelLetters: $macronizedFormInVowelLetters, ',
+          )
           ..write('item: $item, ')
           ..write('cnt: $cnt')
           ..write(')'))
@@ -2836,13 +2985,23 @@ class SearchableMorphDetInflection extends i0.DataClass
   }
 
   @override
-  int get hashCode => Object.hash(form, macronizedForm, item, cnt);
+  int get hashCode => Object.hash(
+    form,
+    macronizedForm,
+    formInVowelLetters,
+    macronizedFormInVowelLetters,
+    item,
+    cnt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.SearchableMorphDetInflection &&
           other.form == this.form &&
           other.macronizedForm == this.macronizedForm &&
+          other.formInVowelLetters == this.formInVowelLetters &&
+          other.macronizedFormInVowelLetters ==
+              this.macronizedFormInVowelLetters &&
           other.item == this.item &&
           other.cnt == this.cnt);
 }
@@ -2851,12 +3010,16 @@ class SearchableMorphDetInflectionsCompanion
     extends i0.UpdateCompanion<i1.SearchableMorphDetInflection> {
   final i0.Value<String?> form;
   final i0.Value<String?> macronizedForm;
+  final i0.Value<String?> formInVowelLetters;
+  final i0.Value<String?> macronizedFormInVowelLetters;
   final i0.Value<String?> item;
   final i0.Value<String?> cnt;
   final i0.Value<int> rowid;
   const SearchableMorphDetInflectionsCompanion({
     this.form = const i0.Value.absent(),
     this.macronizedForm = const i0.Value.absent(),
+    this.formInVowelLetters = const i0.Value.absent(),
+    this.macronizedFormInVowelLetters = const i0.Value.absent(),
     this.item = const i0.Value.absent(),
     this.cnt = const i0.Value.absent(),
     this.rowid = const i0.Value.absent(),
@@ -2864,6 +3027,8 @@ class SearchableMorphDetInflectionsCompanion
   SearchableMorphDetInflectionsCompanion.insert({
     this.form = const i0.Value.absent(),
     this.macronizedForm = const i0.Value.absent(),
+    this.formInVowelLetters = const i0.Value.absent(),
+    this.macronizedFormInVowelLetters = const i0.Value.absent(),
     this.item = const i0.Value.absent(),
     this.cnt = const i0.Value.absent(),
     this.rowid = const i0.Value.absent(),
@@ -2871,6 +3036,8 @@ class SearchableMorphDetInflectionsCompanion
   static i0.Insertable<i1.SearchableMorphDetInflection> custom({
     i0.Expression<String>? form,
     i0.Expression<String>? macronizedForm,
+    i0.Expression<String>? formInVowelLetters,
+    i0.Expression<String>? macronizedFormInVowelLetters,
     i0.Expression<String>? item,
     i0.Expression<String>? cnt,
     i0.Expression<int>? rowid,
@@ -2878,6 +3045,9 @@ class SearchableMorphDetInflectionsCompanion
     return i0.RawValuesInsertable({
       if (form != null) 'form': form,
       if (macronizedForm != null) 'macronizedForm': macronizedForm,
+      if (formInVowelLetters != null) 'formInVowelLetters': formInVowelLetters,
+      if (macronizedFormInVowelLetters != null)
+        'macronizedFormInVowelLetters': macronizedFormInVowelLetters,
       if (item != null) 'item': item,
       if (cnt != null) 'cnt': cnt,
       if (rowid != null) 'rowid': rowid,
@@ -2887,6 +3057,8 @@ class SearchableMorphDetInflectionsCompanion
   i1.SearchableMorphDetInflectionsCompanion copyWith({
     i0.Value<String?>? form,
     i0.Value<String?>? macronizedForm,
+    i0.Value<String?>? formInVowelLetters,
+    i0.Value<String?>? macronizedFormInVowelLetters,
     i0.Value<String?>? item,
     i0.Value<String?>? cnt,
     i0.Value<int>? rowid,
@@ -2894,6 +3066,9 @@ class SearchableMorphDetInflectionsCompanion
     return i1.SearchableMorphDetInflectionsCompanion(
       form: form ?? this.form,
       macronizedForm: macronizedForm ?? this.macronizedForm,
+      formInVowelLetters: formInVowelLetters ?? this.formInVowelLetters,
+      macronizedFormInVowelLetters:
+          macronizedFormInVowelLetters ?? this.macronizedFormInVowelLetters,
       item: item ?? this.item,
       cnt: cnt ?? this.cnt,
       rowid: rowid ?? this.rowid,
@@ -2908,6 +3083,14 @@ class SearchableMorphDetInflectionsCompanion
     }
     if (macronizedForm.present) {
       map['macronizedForm'] = i0.Variable<String>(macronizedForm.value);
+    }
+    if (formInVowelLetters.present) {
+      map['formInVowelLetters'] = i0.Variable<String>(formInVowelLetters.value);
+    }
+    if (macronizedFormInVowelLetters.present) {
+      map['macronizedFormInVowelLetters'] = i0.Variable<String>(
+        macronizedFormInVowelLetters.value,
+      );
     }
     if (item.present) {
       map['item'] = i0.Variable<String>(item.value);
@@ -2926,6 +3109,10 @@ class SearchableMorphDetInflectionsCompanion
     return (StringBuffer('SearchableMorphDetInflectionsCompanion(')
           ..write('form: $form, ')
           ..write('macronizedForm: $macronizedForm, ')
+          ..write('formInVowelLetters: $formInVowelLetters, ')
+          ..write(
+            'macronizedFormInVowelLetters: $macronizedFormInVowelLetters, ',
+          )
           ..write('item: $item, ')
           ..write('cnt: $cnt, ')
           ..write('rowid: $rowid')
@@ -3553,7 +3740,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
   MorphAnalysisDrift(i0.GeneratedDatabase db) : super(db);
   Future<int> fillSearchableMorphDetInflections() {
     return customInsert(
-      'INSERT INTO SearchableMorphDetInflections (form, macronizedForm, item, cnt) SELECT form, macronizedForm, item, cnt FROM MorphologicalDetailInflections',
+      'INSERT INTO SearchableMorphDetInflections (form, macronizedForm, formInVowelLetters, macronizedFormInVowelLetters, item, cnt) SELECT form, macronizedForm, IIF(form GLOB \'*[jvJV]*\', "REPLACE"("REPLACE"("REPLACE"("REPLACE"(form, \'j\', \'i\'), \'J\', \'I\'), \'v\', \'u\'), \'V\', \'U\'), NULL), IIF(macronizedForm GLOB \'*[jvJV]*\', "REPLACE"("REPLACE"("REPLACE"("REPLACE"(macronizedForm, \'j\', \'i\'), \'J\', \'I\'), \'v\', \'u\'), \'V\', \'U\'), NULL), item, cnt FROM MorphologicalDetailInflections',
       variables: [],
       updates: {searchableMorphDetInflections},
     );
@@ -3632,6 +3819,100 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
   ) {
     return customSelect(
       'SELECT Peek.*, Search.macronizedForm FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.macronizedForm LIKE ?1 ORDER BY Peek.form, Peek.item, Peek.cnt',
+      variables: [i0.Variable<String>(var1)],
+      readsFrom: {
+        searchableMorphDetInflections,
+        morphologicalDetailInflections,
+        morphologicalDetails,
+      },
+    ).map(
+      (i0.QueryRow row) => i4.Result(
+        form: row.read<String>('form'),
+        macronizedForm: row.readNullable<String>('macronizedForm'),
+        partOfSpeech: row.readNullable<String>('partOfSpeech'),
+        dictionaryRef: row.read<String>('dictionaryRef'),
+        additional: row.readNullable<String>('additional'),
+        item: row.read<int>('item'),
+        cnt: row.read<int>('cnt'),
+      ),
+    );
+  }
+
+  i0.Selectable<i4.Result> searchMorphologicalDataInVowelLettersWithFts(
+    String var1,
+  ) {
+    return customSelect(
+      'SELECT Peek.*, Search.macronizedForm FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.formInVowelLetters MATCH ?1 ORDER BY BM25(SearchableMorphDetInflections), Peek.form, Peek.item, Peek.cnt',
+      variables: [i0.Variable<String>(var1)],
+      readsFrom: {
+        searchableMorphDetInflections,
+        morphologicalDetailInflections,
+        morphologicalDetails,
+      },
+    ).map(
+      (i0.QueryRow row) => i4.Result(
+        form: row.read<String>('form'),
+        macronizedForm: row.readNullable<String>('macronizedForm'),
+        partOfSpeech: row.readNullable<String>('partOfSpeech'),
+        dictionaryRef: row.read<String>('dictionaryRef'),
+        additional: row.readNullable<String>('additional'),
+        item: row.read<int>('item'),
+        cnt: row.read<int>('cnt'),
+      ),
+    );
+  }
+
+  i0.Selectable<i4.Result> searchMorphologicalDataInVowelLettersWithLike(
+    String var1,
+  ) {
+    return customSelect(
+      'SELECT Peek.*, Search.macronizedForm FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.formInVowelLetters LIKE ?1 ORDER BY Peek.form, Peek.item, Peek.cnt',
+      variables: [i0.Variable<String>(var1)],
+      readsFrom: {
+        searchableMorphDetInflections,
+        morphologicalDetailInflections,
+        morphologicalDetails,
+      },
+    ).map(
+      (i0.QueryRow row) => i4.Result(
+        form: row.read<String>('form'),
+        macronizedForm: row.readNullable<String>('macronizedForm'),
+        partOfSpeech: row.readNullable<String>('partOfSpeech'),
+        dictionaryRef: row.read<String>('dictionaryRef'),
+        additional: row.readNullable<String>('additional'),
+        item: row.read<int>('item'),
+        cnt: row.read<int>('cnt'),
+      ),
+    );
+  }
+
+  i0.Selectable<i4.Result>
+  searchMacronizedMorphologicalDataInVowelLettersWithFts(String var1) {
+    return customSelect(
+      'SELECT Peek.*, Search.macronizedForm FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.macronizedFormInVowelLetters MATCH ?1 ORDER BY BM25(SearchableMorphDetInflections), Peek.form, Peek.item, Peek.cnt',
+      variables: [i0.Variable<String>(var1)],
+      readsFrom: {
+        searchableMorphDetInflections,
+        morphologicalDetailInflections,
+        morphologicalDetails,
+      },
+    ).map(
+      (i0.QueryRow row) => i4.Result(
+        form: row.read<String>('form'),
+        macronizedForm: row.readNullable<String>('macronizedForm'),
+        partOfSpeech: row.readNullable<String>('partOfSpeech'),
+        dictionaryRef: row.read<String>('dictionaryRef'),
+        additional: row.readNullable<String>('additional'),
+        item: row.read<int>('item'),
+        cnt: row.read<int>('cnt'),
+      ),
+    );
+  }
+
+  i0.Selectable<i4.Result>
+  searchMacronizedMorphologicalDataInVowelLettersWithLike(String var1) {
+    return customSelect(
+      'SELECT Peek.*, Search.macronizedForm FROM SearchableMorphDetInflections AS Search INNER JOIN "morphology.Peek" AS Peek ON Search.form = Peek.form AND Search.item = Peek.item AND Search.cnt = Peek.cnt WHERE Search.macronizedFormInVowelLetters LIKE ?1 ORDER BY Peek.form, Peek.item, Peek.cnt',
       variables: [i0.Variable<String>(var1)],
       readsFrom: {
         searchableMorphDetInflections,

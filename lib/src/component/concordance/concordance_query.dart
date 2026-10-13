@@ -148,7 +148,11 @@ sealed class ConcordanceCriterion {
   const ConcordanceCriterion();
 
   factory ConcordanceCriterion.fromJsonMap(Map<String, Object?> map) => switch (map) {
-    {'form': final String text} => FormCriterion(text, exactCase: map['exactCase'] == true),
+    {'form': final String text} => FormCriterion(
+      text,
+      exactCase: map['exactCase'] == true,
+      exactLetters: map['exactLetters'] == true,
+    ),
     {'grammar': final Map<String, Object?> grammar} => GrammarCriterion(
       GrammarFilter.fromJsonMap(grammar),
       lemma: switch (map['lemma']) {
@@ -174,6 +178,7 @@ final class FormCriterion extends ConcordanceCriterion {
   const FormCriterion(
     this.text, {
     this.exactCase = false,
+    this.exactLetters = false,
   });
 
   final String text;
@@ -181,6 +186,10 @@ final class FormCriterion extends ConcordanceCriterion {
   /// When false, a word matches whether it's capitalized (a proper noun) or
   /// not. When true, only the capitalization of [text] does
   final bool exactCase;
+
+  /// Whether [text] is a stored spelling, such as a frequency row's, so that
+  /// its i and u never find a j or a v, whatever the search settings
+  final bool exactLetters;
 
   static final _space = RegExp(r'\s');
 
@@ -191,18 +200,26 @@ final class FormCriterion extends ConcordanceCriterion {
   bool get isComplete => text.trim().isNotEmpty && !isPhrase;
 
   @override
-  Map<String, Object?> toJsonMap() => {'form': text, if (exactCase) 'exactCase': true};
+  Map<String, Object?> toJsonMap() => {
+    'form': text,
+    if (exactCase) 'exactCase': true,
+    if (exactLetters) 'exactLetters': true,
+  };
 
   @override
-  String toString() => 'FormCriterion{text: $text, exactCase: $exactCase}';
+  String toString() =>
+      'FormCriterion{text: $text, exactCase: $exactCase, exactLetters: $exactLetters}';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is FormCriterion && other.text == text && other.exactCase == exactCase);
+      (other is FormCriterion &&
+          other.text == text &&
+          other.exactCase == exactCase &&
+          other.exactLetters == exactLetters);
 
   @override
-  int get hashCode => Object.hash(text, exactCase);
+  int get hashCode => Object.hash(text, exactCase, exactLetters);
   //
 }
 

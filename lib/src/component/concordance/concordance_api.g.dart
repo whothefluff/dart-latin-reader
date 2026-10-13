@@ -6,7 +6,7 @@ part of 'concordance_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$concordanceHitsHash() => r'acaddb142c4ea66163d3f8ecafcf3e877b2ce79c';
+String _$concordanceHitsHash() => r'fee059bc6317a87f5ce502b5bfbe37d349a6d4c6';
 
 /// Copied from Dart SDK
 class _SystemHash {

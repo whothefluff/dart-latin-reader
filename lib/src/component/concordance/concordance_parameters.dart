@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../core/semivowel_search.dart';
 import 'concordance_query.dart';
 
 //infrastructure
@@ -14,7 +15,11 @@ import 'concordance_query.dart';
 @immutable
 class ConcordanceParameters {
   /// [workIds] in the order of the hits, never empty
-  factory ConcordanceParameters.of(ConcordanceQuery query, List<String> workIds) {
+  factory ConcordanceParameters.of(
+    ConcordanceQuery query,
+    List<String> workIds, {
+    required SpellingsWithSemivowels spellingsWithSemivowels,
+  }) {
     assert(workIds.isNotEmpty, 'Nothing to search in');
     assert(query.isComplete, 'Incomplete query $query');
     final part = query.part;
@@ -23,6 +28,7 @@ class ConcordanceParameters {
         criterion,
         distance: i == 0 ? null : query.distanceBefore(i),
         matchMacrons: query.matchMacrons,
+        spellingsWithSemivowels: spellingsWithSemivowels,
       ),
     );
     return ConcordanceParameters._(
@@ -82,19 +88,59 @@ class ConcordanceParameters {
   //
 }
 
+@immutable
+class SpellingsWithSemivowels {
+  const SpellingsWithSemivowels(
+    this._spellings,
+    this._semivowelSearchRules,
+  );
+
+  static const none = SpellingsWithSemivowels(
+    {},
+    SemivowelSearchRules(iFindsJ: false, uFindsV: false),
+  );
+
+  final Set<String> _spellings;
+  final SemivowelSearchRules _semivowelSearchRules;
+
+  Iterable<String> foundBy(String typedSpelling) =>
+      _spellings.where((spelling) => _semivowelSearchRules.allows(typedSpelling, spelling));
+
+  @override
+  String toString() => 'SpellingsWithSemivowels{semivowelSearchRules: $_semivowelSearchRules}';
+  //
+}
+
+/// Returns every spelling that the form criteria of [query] match as typed, with macrons and
+/// without them.
+Set<String> typedSpellingsOf(ConcordanceQuery query) => query.slots
+    .whereType<FormCriterion>()
+    .expand(
+      (criterion) => [
+        ..._spellings(_withoutMacrons(_typed(criterion.text)), exactCase: criterion.exactCase),
+        if (query.matchMacrons)
+          ..._spellings(_typed(criterion.text), exactCase: criterion.exactCase),
+      ],
+    )
+    .toSet();
+
 /// One word of the phrase: how far after the previous one it may be, and
 /// either how it can be spelled or what its analyses must have
 Map<String, Object> _word(
   ConcordanceCriterion criterion, {
   required int? distance,
   required bool matchMacrons,
+  required SpellingsWithSemivowels spellingsWithSemivowels,
 }) => {
   'distance': ?distance,
   ...switch (criterion) {
-    FormCriterion(:final text, :final exactCase) => _spelled(
+    FormCriterion(:final text, :final exactCase, :final exactLetters) => _spelled(
       _typed(text),
       exactCase: exactCase,
       matchMacrons: matchMacrons,
+      spellingsWithSemivowels: exactLetters
+          ? SpellingsWithSemivowels.none
+          : spellingsWithSemivowels,
     ),
     LemmaCriterion(:final lemma) => _analysed(lemma, const GrammarFilter.empty()),
     GrammarCriterion(:final grammar, :final lemma) => _analysed(lemma, grammar),
@@ -102,15 +148,25 @@ Map<String, Object> _word(
 };
 
 /// Every spelling [text] matches, without macrons, and with them too when
-/// they have to match
+/// they have to match, plus the spellings with semivowel letters that each one finds
 Map<String, Object> _spelled(
   String text, {
   required bool exactCase,
   required bool matchMacrons,
-}) => {
-  'spellings': [..._spellings(_withoutMacrons(text), exactCase: exactCase)],
-  if (matchMacrons) 'macronSpellings': [..._spellings(text, exactCase: exactCase)],
-};
+  required SpellingsWithSemivowels spellingsWithSemivowels,
+}) {
+  final spellings = _spellings(_withoutMacrons(text), exactCase: exactCase);
+  final macronSpellings = _spellings(text, exactCase: exactCase);
+  return {
+    'spellings': [
+      ...{...spellings, ...spellings.expand(spellingsWithSemivowels.foundBy)},
+    ],
+    if (matchMacrons)
+      'macronSpellings': [
+        ...{...macronSpellings, ...macronSpellings.expand(spellingsWithSemivowels.foundBy)},
+      ],
+  };
+}
 
 /// The lemma (any when null) and the values of [grammar], by feature name
 Map<String, Object> _analysed(LemmaChoice? lemma, GrammarFilter grammar) => {

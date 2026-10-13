@@ -66,6 +66,40 @@ final operations = [
       ''');
     },
   ),
+  (
+    id: 'ConcordanceSpellingsWithSemivowels',
+    delete: (AppDb db) async {
+      await db.delete(db.concordanceSpellingsWithSemivowels).go();
+    },
+    insert: (AppDb db) async {
+      await db.customStatement('''
+        INSERT INTO ConcordanceSpellingsWithSemivowels( spellingInVowelLetters, spelling )
+            WITH Spellings AS ( SELECT lookupForm AS spelling
+                                    FROM WorkContents
+                                    WHERE lookupForm IS NOT NULL
+                                UNION
+                                SELECT macronLookupForm
+                                    FROM WorkContents
+                                    WHERE macronLookupForm IS NOT NULL
+                                UNION
+                                SELECT enclitic
+                                    FROM WorkContents
+                                    WHERE enclitic IS NOT NULL
+                                UNION
+                                SELECT baseNormForm
+                                    FROM WorkContents
+                                    WHERE enclitic IS NOT NULL
+                                UNION
+                                SELECT macronBaseNormForm
+                                    FROM WorkContents
+                                    WHERE enclitic IS NOT NULL )
+            SELECT "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( spelling, 'j', 'i' ), 'J', 'I' ), 'v', 'u' ), 'V', 'U' ),
+                   spelling
+                FROM Spellings
+                WHERE spelling GLOB '*[jvJV]*'
+      ''');
+    },
+  ),
 ];
 
 const List<DbOracle> oracles = [];

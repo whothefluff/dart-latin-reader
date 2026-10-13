@@ -25,6 +25,10 @@ abstract class $AppDb extends i0.GeneratedDatabase {
   late final i1.ConcordanceCountableWordCandidateAnalyses
   concordanceCountableWordCandidateAnalyses =
       i1.ConcordanceCountableWordCandidateAnalyses(this);
+  late final i1.ConcordanceSpellingsWithSemivowels
+  concordanceSpellingsWithSemivowels = i1.ConcordanceSpellingsWithSemivowels(
+    this,
+  );
   late final i1.ConcordanceAnalysesWithOptionalInflections
   concordanceAnalysesWithOptionalInflections =
       i1.ConcordanceAnalysesWithOptionalInflections(this);
@@ -150,6 +154,7 @@ abstract class $AppDb extends i0.GeneratedDatabase {
     concordanceDetailInflections,
     concordanceCountableWordCandidateAnalyses,
     i1.concordanceCountableWordCandidateAnalysesAnalysis,
+    concordanceSpellingsWithSemivowels,
     concordanceAnalysesWithOptionalInflections,
     lnsRefResolutions,
     dictionaries,
@@ -229,6 +234,12 @@ class $AppDbManager {
       i1.$ConcordanceCountableWordCandidateAnalysesTableManager(
         _db,
         _db.concordanceCountableWordCandidateAnalyses,
+      );
+  i1.$ConcordanceSpellingsWithSemivowelsTableManager
+  get concordanceSpellingsWithSemivowels =>
+      i1.$ConcordanceSpellingsWithSemivowelsTableManager(
+        _db,
+        _db.concordanceSpellingsWithSemivowels,
       );
   i2.$LnsRefResolutionsTableManager get lnsRefResolutions =>
       i2.$LnsRefResolutionsTableManager(_db, _db.lnsRefResolutions);

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import 'semivowel_search.dart';
+
 /// The text typed in a search bar backed by an FTS5 index (morphology, dictionary entries), parsed
 /// with the same rules for both:
 ///
@@ -9,6 +11,7 @@ import 'package:flutter/foundation.dart';
 /// - Any other text can appear anywhere in the value, punctuation and spaces included
 /// - Where the values have macrons, typed ones must match, and text without macrons finds values
 ///   with or without them
+/// - A typed i or u finds a stored j or v only as a [SemivowelSearchRules] allows
 ///
 /// The searches bind [query]. Searches without an index (library, dictionaries) find the text as
 /// typed, anywhere, and don't use this
@@ -55,6 +58,30 @@ class SearchTerm {
     useLike: useLike,
     hasMacrons: false,
   );
+
+  /// The same search with `j` written as `i` and `v` written as `u`
+  SearchTerm get inVowelLetters => SearchTerm._(
+    text: toVowelLetters(_text),
+    useLike: useLike,
+    hasMacrons: hasMacrons,
+  );
+
+  /// Returns a pattern where a typed i or u also matches the stored j or v that [rules] allows.
+  /// Ignores case, like the searches.
+  RegExp semivowelPatternWith(SemivowelSearchRules rules) {
+    final pattern = _text
+        .split('')
+        .map(
+          (character) => switch (character) {
+            '%' when useLike => '.*',
+            '_' when useLike => '.',
+            'i' || 'I' when rules.iFindsJ => '[ij]',
+            'u' || 'U' when rules.uFindsV => '[uv]',
+            _ => RegExp.escape(character),
+          },
+        );
+    return RegExp(useLike ? '^${pattern.join()}\$' : pattern.join(), caseSensitive: false);
+  }
 
   static final RegExp _quoted = RegExp(r'''^(["'])(.*)\1$''');
   static final RegExp _wildcards = RegExp('[*%?_]');

@@ -12,7 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../logger.dart';
 import '../../../component/library/proper_noun_state.dart';
 import '../../../component/library/punctuation.dart';
-import '../../../component/library/semivowel_spelling.dart';
+import '../../../component/library/semivowel_orthography.dart';
 import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_contents_api.dart';
 import '../../../component/library/work_details_api.dart';
@@ -113,7 +113,7 @@ class TextPageState extends ConsumerState<TextPage> {
         (model) => model.whenData(
           (work) => (
             lastIndex: work.lastIndex,
-            editionSemivowelSpelling: work.editionSemivowelSpelling,
+            editionSemivowelOrthography: work.editionSemivowelOrthography,
           ),
         ),
       ),
@@ -128,7 +128,7 @@ class TextPageState extends ConsumerState<TextPage> {
         child: workProvider.when(
           data: (work) {
             _lastIndex = work.lastIndex;
-            return _contents(work.editionSemivowelSpelling);
+            return _contents(work.editionSemivowelOrthography);
           },
           loading: showLoading,
           error: showError(ref, workDetailsProvider(widget.workId)),
@@ -137,10 +137,10 @@ class TextPageState extends ConsumerState<TextPage> {
     );
   }
 
-  Widget _contents(SemivowelSpelling editionSemivowelSpelling) {
+  Widget _contents(SemivowelOrthography editionSemivowelOrthography) {
     final segmentsProvider = ref.watch(workContentsProvider(widget.workId, _fromIndex, _toIndex));
     return segmentsProvider.when(
-      data: (segments) => _withFrequencies(segments, editionSemivowelSpelling),
+      data: (segments) => _withFrequencies(segments, editionSemivowelOrthography),
       loading: showLoading,
       error: showError(ref, workContentsProvider(widget.workId, _fromIndex, _toIndex)),
     );
@@ -149,7 +149,7 @@ class TextPageState extends ConsumerState<TextPage> {
   /// Waits for the frequencies only while common or uncommon words are marked
   Widget _withFrequencies(
     WorkContentsSegments segments,
-    SemivowelSpelling editionSemivowelSpelling,
+    SemivowelOrthography editionSemivowelOrthography,
   ) {
     final (:marks, :scope) = ref.watch(
       readerSettingsNotifierProvider.select(
@@ -170,17 +170,17 @@ class TextPageState extends ConsumerState<TextPage> {
               .watch(provider)
               .when(
                 data: (frequencies) =>
-                    _buildResponsiveContent(segments, frequencies, editionSemivowelSpelling),
+                    _buildResponsiveContent(segments, frequencies, editionSemivowelOrthography),
                 loading: showLoading,
                 error: showError(ref, provider),
               )
-        : _buildResponsiveContent(segments, null, editionSemivowelSpelling);
+        : _buildResponsiveContent(segments, null, editionSemivowelOrthography);
   }
 
   Widget _buildResponsiveContent(
     WorkContentsSegments segments,
     LookupFrequencies? frequencies,
-    SemivowelSpelling editionSemivowelSpelling,
+    SemivowelOrthography editionSemivowelOrthography,
   ) => LayoutBuilder(
     builder: (context, pageConstraints) {
       //keep the generation that produced these segments (so stale callbacks can be ignored)
@@ -189,7 +189,7 @@ class TextPageState extends ConsumerState<TextPage> {
         key: ValueKey((widget.workId, generation)), // Recreate selection state after explicit nav
         segments: segments,
         frequencies: frequencies,
-        editionSemivowelSpelling: editionSemivowelSpelling,
+        editionSemivowelOrthography: editionSemivowelOrthography,
         highlights: widget.highlights,
         onNavigateNext: _loadNextPage,
         onNavigatePrevious: _loadPreviousPage,
@@ -364,8 +364,8 @@ class TextPageState extends ConsumerState<TextPage> {
           context: context,
           workId: workId,
           workName: work?.name ?? 'This work',
-          semivowelSpelling: settings.semivowelSpellingFor(
-            work?.editionSemivowelSpelling ?? SemivowelSpelling.stored,
+          semivowelOrthography: settings.semivowelOrthographyFor(
+            work?.editionSemivowelOrthography ?? SemivowelOrthography.allVocalicConsonantal,
           ),
           currentIndex: _currentFirstVisibleIndex,
         );
@@ -407,7 +407,7 @@ class _TextRenderer {
     this.theme,
     this.workSegments,
     this.readerSettings,
-    this.semivowelSpelling,
+    this.semivowelOrthography,
     this.highlights,
     this.bands,
   );
@@ -415,7 +415,7 @@ class _TextRenderer {
   final ThemeData theme;
   final WorkContentsSegments workSegments;
   final ReaderSettings readerSettings;
-  final SemivowelSpelling semivowelSpelling;
+  final SemivowelOrthography semivowelOrthography;
 
   /// Token indices to mark
   final List<int> highlights;
@@ -531,7 +531,7 @@ class _TextRenderer {
       decorationColor: theme.colorScheme.primary,
       decorationThickness: 1,
     );
-    final spelling = semivowelSpellingOf(segment, semivowelSpelling);
+    final spelling = semivowelOrthographyOf(segment, semivowelOrthography);
     // mask bits follow the stored characters, and respellEach writes one string for each
     final letters = mask == 0
         ? [TextSpan(text: spelling.respell(word))]
@@ -842,7 +842,7 @@ class _StyledWordList extends ConsumerStatefulWidget {
     super.key,
     required this.segments,
     required this.frequencies,
-    required this.editionSemivowelSpelling,
+    required this.editionSemivowelOrthography,
     required this.highlights,
     required this.onNavigateNext,
     required this.onNavigatePrevious,
@@ -854,7 +854,7 @@ class _StyledWordList extends ConsumerStatefulWidget {
 
   /// `null` unless common or uncommon words are marked
   final LookupFrequencies? frequencies;
-  final SemivowelSpelling editionSemivowelSpelling;
+  final SemivowelOrthography editionSemivowelOrthography;
   final WorkContentsSegments segments;
   final List<int> highlights;
   final VoidCallback onNavigateNext;
@@ -1193,12 +1193,14 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     int revision,
   ) {
     final segments = widget.segments;
-    final semivowelSpelling = settings.semivowelSpellingFor(widget.editionSemivowelSpelling);
+    final semivowelOrthography = settings.semivowelOrthographyFor(
+      widget.editionSemivowelOrthography,
+    );
     final allSpans = _TextRenderer(
       Theme.of(context),
       segments,
       settings,
-      semivowelSpelling,
+      semivowelOrthography,
       widget.highlights,
       widget.frequencies?.bandsFor(
         commonPercent: settings.commonWordsPercent,
@@ -1231,7 +1233,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
       _TextRenderer.pageSpans(allSpans, visible.first, visible.last),
       segments.sublist(visible.first, visible.last + 1),
       showMacrons: settings.showMacrons,
-      semivowelSpelling: semivowelSpelling,
+      semivowelOrthography: semivowelOrthography,
     );
   }
 

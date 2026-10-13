@@ -1,11 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-import '../../../component/library/semivowel_spelling.dart';
+import '../../../component/library/semivowel_orthography.dart';
 import '../../../component/library/work_contents_api.dart';
 
-SemivowelSpelling semivowelSpellingOf(WorkContentsSegment segment, SemivowelSpelling spelling) =>
-    segment.isNumeral ? SemivowelSpelling.stored : spelling;
+SemivowelOrthography semivowelOrthographyOf(
+  WorkContentsSegment segment,
+  SemivowelOrthography orthography,
+) => segment.isNumeral ? SemivowelOrthography.allVocalicConsonantal : orthography;
 
 /// A page's rendered text and its source segments.
 @immutable
@@ -17,19 +19,19 @@ class PageSegments {
     List<TextSpan> spans,
     Iterable<WorkContentsSegment> segments, {
     required bool showMacrons,
-    required SemivowelSpelling semivowelSpelling,
+    required SemivowelOrthography semivowelOrthography,
   }) : this._(
          TextSpan(children: spans),
          Map.unmodifiable(Map.fromIterables(_textStartsOf(spans), segments)),
          showMacrons: showMacrons,
-         semivowelSpelling: semivowelSpelling,
+         semivowelOrthography: semivowelOrthography,
        );
 
   PageSegments._(
     this.text,
     this._byTextStart, {
     required this.showMacrons,
-    required this.semivowelSpelling,
+    required this.semivowelOrthography,
   }) : _plainText = text.toPlainText();
 
   const PageSegments.empty()
@@ -37,14 +39,14 @@ class PageSegments {
       _plainText = '',
       _byTextStart = const {},
       showMacrons = false,
-      semivowelSpelling = SemivowelSpelling.stored;
+      semivowelOrthography = SemivowelOrthography.allVocalicConsonantal;
 
   /// The page's styled text.
   final TextSpan text;
   final String _plainText;
   final Map<int, WorkContentsSegment> _byTextStart;
   final bool showMacrons;
-  final SemivowelSpelling semivowelSpelling;
+  final SemivowelOrthography semivowelOrthography;
 
   /// Returns the segment whose full text is selected, or `null` if there is no exact match.
   /// Ignores surrounding whitespace.
@@ -60,7 +62,7 @@ class PageSegments {
 
   String shownText(WorkContentsSegment segment) {
     final word = showMacrons ? segment.macronizedWord : segment.word;
-    return semivowelSpellingOf(segment, semivowelSpelling).respell(word);
+    return semivowelOrthographyOf(segment, semivowelOrthography).respell(word);
   }
 
   static Iterable<int> _textStartsOf(List<TextSpan> spans) {

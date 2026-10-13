@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latin_reader/src/component/settings/general_settings_api.dart';
+import 'package:latin_reader/src/core/semivowel_search.dart';
 import 'package:latin_reader/src/external/settings.dart';
 
 class _InMemorySettings implements SettingsRepository {
@@ -50,7 +51,11 @@ void main() {
   group('GeneralSettingsNotifier', () {
     test('an accent color is kept after a restart', () async {
       final repository = _InMemorySettings({'app.themeMode': const PrefString('dark')});
-      const teal = GeneralSettings(themeMode: ThemeMode.dark, accentColor: Color(0xFF009688));
+      const teal = GeneralSettings(
+        themeMode: ThemeMode.dark,
+        accentColor: Color(0xFF009688),
+        semivowelSearchRules: SemivowelSearchRules(iFindsJ: false, uFindsV: false),
+      );
 
       await _save(repository, teal);
 
@@ -62,11 +67,28 @@ void main() {
         'app.themeMode': const PrefString('dark'),
         'app.accentColor': const PrefInt(0xFF009688),
       });
-      const baseline = GeneralSettings(themeMode: ThemeMode.dark, accentColor: null);
+      const baseline = GeneralSettings(
+        themeMode: ThemeMode.dark,
+        accentColor: null,
+        semivowelSearchRules: SemivowelSearchRules(iFindsJ: false, uFindsV: false),
+      );
 
       await _save(repository, baseline);
 
       expect(await _loadAfterRestart(repository), baseline);
+    });
+
+    test('the letters a typed i and u find are kept after a restart', () async {
+      final repository = _InMemorySettings({'app.themeMode': const PrefString('dark')});
+      const iFindsJ = GeneralSettings(
+        themeMode: ThemeMode.dark,
+        accentColor: null,
+        semivowelSearchRules: SemivowelSearchRules(iFindsJ: true, uFindsV: false),
+      );
+
+      await _save(repository, iFindsJ);
+
+      expect(await _loadAfterRestart(repository), iFindsJ);
     });
   });
 }

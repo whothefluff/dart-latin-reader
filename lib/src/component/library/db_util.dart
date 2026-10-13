@@ -9,7 +9,7 @@ import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'library.drift.dart';
 import 'proper_noun_state.dart';
-import 'semivowel_spelling.dart';
+import 'semivowel_orthography.dart';
 import 'subdivision_type.dart';
 
 const path = 'assets/preprocessed_data/';
@@ -86,10 +86,10 @@ final operations = [
                   id: Value(row[0].toString()),
                   name: Value(row[1].toString()),
                   about: Value(row[2].toString()),
-                  uvLowercase: Value(SemivowelLetters.fromLetters(row[3].toString())),
-                  uvCapitals: Value(SemivowelLetters.fromLetters(row[4].toString())),
-                  ijLowercase: Value(SemivowelLetters.fromLetters(row[5].toString())),
-                  ijCapitals: Value(SemivowelLetters.fromLetters(row[6].toString())),
+                  uvLowercase: Value(SemivowelForm.fromIndicator(row[3].toString())),
+                  uvCapitals: Value(SemivowelForm.fromIndicator(row[4].toString())),
+                  ijLowercase: Value(SemivowelForm.fromIndicator(row[5].toString())),
+                  ijCapitals: Value(SemivowelForm.fromIndicator(row[6].toString())),
                 ),
               ),
           mode: InsertMode.insertOrRollback,

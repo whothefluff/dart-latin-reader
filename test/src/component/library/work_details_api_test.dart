@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:latin_reader/src/component/library/semivowel_spelling.dart';
+import 'package:latin_reader/src/component/library/semivowel_orthography.dart';
 import 'package:latin_reader/src/component/library/work_details_api.dart';
 import 'package:latin_reader/src/external/database.dart';
 
@@ -14,7 +14,7 @@ Future<WorkDetails> _details(AppDb db, String work) {
 
 void main() {
   group('workDetailsProvider', () {
-    test("a work's semivowel spelling is its edition's", () async {
+    test("a work's semivowel orthography is its edition's", () async {
       final db = await smallLibrary();
       await db.customStatement(
         '''
@@ -26,12 +26,12 @@ void main() {
       );
 
       expect(
-        (await _details(db, fables)).editionSemivowelSpelling,
-        const SemivowelSpelling(
-          uvLowercase: SemivowelLetters.vowelLetterOnly,
-          uvCapitals: SemivowelLetters.semivowelLetterOnly,
-          ijLowercase: SemivowelLetters.both,
-          ijCapitals: SemivowelLetters.semivowelLetterOnly,
+        (await _details(db, fables)).editionSemivowelOrthography,
+        const SemivowelOrthography(
+          uvLowercase: SemivowelForm.vocalic,
+          uvCapitals: SemivowelForm.consonantal,
+          ijLowercase: SemivowelForm.vocalicConsonantal,
+          ijCapitals: SemivowelForm.consonantal,
         ),
       );
     });

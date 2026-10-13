@@ -126,21 +126,25 @@ getDictionaryEntrySenses WITH EntrySense: SELECT prettyLevel,
                                               WHERE dictionary = ? AND lemma = ?
                                               ORDER BY dictionary, lemma, lvl;
 
--- headword is the lemma without its homograph number and with i instead of j: 
--- L&S writes 'jam', the texts 'iam'
+-- headword is the lemma without its homograph number
 CREATE VIRTUAL TABLE SearchableDictionaryEntries USING fts5(
     headword,
+    headwordInVowelLetters,
     dictionary UNINDEXED,
     idx UNINDEXED,
     tokenize = "trigram remove_diacritics 0 case_sensitive 0"
 );
 
 fillSearchableDictionaryEntries:
-    INSERT INTO SearchableDictionaryEntries( headword, dictionary, idx )
-        SELECT RTRIM( "REPLACE"( "REPLACE"( lemma, 'j', 'i' ), 'J', 'I' ), '0123456789' ),
+    INSERT INTO SearchableDictionaryEntries( headword, headwordInVowelLetters, dictionary, idx )
+        SELECT headword,
+               IIF( headword GLOB '*[jvJV]*', "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( headword, 'j', 'i' ), 'J', 'I' ), 'v', 'u' ), 'V', 'U' ), NULL ),
                dictionary,
                idx
-            FROM DictionaryEntries;
+            FROM ( SELECT RTRIM( lemma, '0123456789' ) AS headword,
+                          dictionary,
+                          idx
+                       FROM DictionaryEntries );
 
 searchDictionaryEntriesWithFts(:term AS TEXT) WITH Entry:
     SELECT Entries.*
@@ -148,8 +152,7 @@ searchDictionaryEntriesWithFts(:term AS TEXT) WITH Entry:
         INNER JOIN "dictionary.DictionaryEntries" AS Entries
             ON Search.dictionary = Entries.dictionary
                AND Search.idx = Entries.idx
-        --the typed text also gets i instead of j, to match headword
-        WHERE Search.headword MATCH "REPLACE"( "REPLACE"( :term, 'j', 'i' ), 'J', 'I' )
+        WHERE Search.headword MATCH :term
               AND Entries.dictionary = :dictionary
         ORDER BY BM25( SearchableDictionaryEntries ), Entries.dictionary, Entries.idx;
 
@@ -159,8 +162,27 @@ searchDictionaryEntriesWithLike(:term AS TEXT) WITH Entry:
         INNER JOIN "dictionary.DictionaryEntries" AS Entries
             ON Search.dictionary = Entries.dictionary
                AND Search.idx = Entries.idx
-        -- the typed text also gets i instead of j, to match headword
-        WHERE Search.headword LIKE "REPLACE"( "REPLACE"( :term, 'j', 'i' ), 'J', 'I' )
+        WHERE Search.headword LIKE :term
+              AND Entries.dictionary = :dictionary
+        ORDER BY Entries.dictionary, Entries.idx;
+
+searchDictionaryEntriesInVowelLettersWithFts(:term AS TEXT) WITH Entry:
+    SELECT Entries.*
+        FROM SearchableDictionaryEntries AS Search
+        INNER JOIN "dictionary.DictionaryEntries" AS Entries
+            ON Search.dictionary = Entries.dictionary
+               AND Search.idx = Entries.idx
+        WHERE Search.headwordInVowelLetters MATCH :term
+              AND Entries.dictionary = :dictionary
+        ORDER BY BM25( SearchableDictionaryEntries ), Entries.dictionary, Entries.idx;
+
+searchDictionaryEntriesInVowelLettersWithLike(:term AS TEXT) WITH Entry:
+    SELECT Entries.*
+        FROM SearchableDictionaryEntries AS Search
+        INNER JOIN "dictionary.DictionaryEntries" AS Entries
+            ON Search.dictionary = Entries.dictionary
+               AND Search.idx = Entries.idx
+        WHERE Search.headwordInVowelLetters LIKE :term
               AND Entries.dictionary = :dictionary
         ORDER BY Entries.dictionary, Entries.idx;
 

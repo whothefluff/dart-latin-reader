@@ -1176,6 +1176,7 @@ Future<void> _goToConcordance(
     FormFrequencyRow(:final displayForm, :final lookupForm) => FormCriterion(
       filter.showMacrons ? displayForm : lookupForm,
       exactCase: true,
+      exactLetters: true,
     ),
   };
   final query = ConcordanceQuery(

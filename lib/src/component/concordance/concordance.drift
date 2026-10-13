@@ -51,6 +51,16 @@ WITHOUT ROWID;
 CREATE INDEX "ConcordanceCountableWordCandidateAnalyses_Analysis"
     ON ConcordanceCountableWordCandidateAnalyses( form, item );
 
+CREATE TABLE "ConcordanceSpellingsWithSemivowels"(
+    "spellingInVowelLetters" TEXT NOT NULL,
+    "spelling" TEXT NOT NULL,
+    PRIMARY KEY( spellingInVowelLetters, spelling )
+)
+STRICT,
+WITHOUT ROWID;
+
+getConcordanceSpellingsWithSemivowelsOf: SELECT spelling FROM ConcordanceSpellingsWithSemivowels WHERE spellingInVowelLetters IN :spellingsInVowelLetters;
+
 CREATE VIEW "concordance.AnalysesWithOptionalInflections" AS
     SELECT Details.form,
            Details.item,

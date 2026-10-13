@@ -758,6 +758,177 @@ typedef $ConcordanceCountableWordCandidateAnalysesProcessedTableManager =
       i1.ConcordanceCountableWordCandidateAnalyse,
       i0.PrefetchHooks Function()
     >;
+typedef $ConcordanceSpellingsWithSemivowelsCreateCompanionBuilder =
+    i1.ConcordanceSpellingsWithSemivowelsCompanion Function({
+      required String spellingInVowelLetters,
+      required String spelling,
+    });
+typedef $ConcordanceSpellingsWithSemivowelsUpdateCompanionBuilder =
+    i1.ConcordanceSpellingsWithSemivowelsCompanion Function({
+      i0.Value<String> spellingInVowelLetters,
+      i0.Value<String> spelling,
+    });
+
+class $ConcordanceSpellingsWithSemivowelsFilterComposer
+    extends
+        i0.Composer<
+          i0.GeneratedDatabase,
+          i1.ConcordanceSpellingsWithSemivowels
+        > {
+  $ConcordanceSpellingsWithSemivowelsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnFilters<String> get spellingInVowelLetters => $composableBuilder(
+    column: $table.spellingInVowelLetters,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get spelling => $composableBuilder(
+    column: $table.spelling,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+}
+
+class $ConcordanceSpellingsWithSemivowelsOrderingComposer
+    extends
+        i0.Composer<
+          i0.GeneratedDatabase,
+          i1.ConcordanceSpellingsWithSemivowels
+        > {
+  $ConcordanceSpellingsWithSemivowelsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.ColumnOrderings<String> get spellingInVowelLetters => $composableBuilder(
+    column: $table.spellingInVowelLetters,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
+  i0.ColumnOrderings<String> get spelling => $composableBuilder(
+    column: $table.spelling,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+}
+
+class $ConcordanceSpellingsWithSemivowelsAnnotationComposer
+    extends
+        i0.Composer<
+          i0.GeneratedDatabase,
+          i1.ConcordanceSpellingsWithSemivowels
+        > {
+  $ConcordanceSpellingsWithSemivowelsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  i0.GeneratedColumn<String> get spellingInVowelLetters => $composableBuilder(
+    column: $table.spellingInVowelLetters,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumn<String> get spelling =>
+      $composableBuilder(column: $table.spelling, builder: (column) => column);
+}
+
+class $ConcordanceSpellingsWithSemivowelsTableManager
+    extends
+        i0.RootTableManager<
+          i0.GeneratedDatabase,
+          i1.ConcordanceSpellingsWithSemivowels,
+          i1.ConcordanceSpellingsWithSemivowel,
+          i1.$ConcordanceSpellingsWithSemivowelsFilterComposer,
+          i1.$ConcordanceSpellingsWithSemivowelsOrderingComposer,
+          i1.$ConcordanceSpellingsWithSemivowelsAnnotationComposer,
+          $ConcordanceSpellingsWithSemivowelsCreateCompanionBuilder,
+          $ConcordanceSpellingsWithSemivowelsUpdateCompanionBuilder,
+          (
+            i1.ConcordanceSpellingsWithSemivowel,
+            i0.BaseReferences<
+              i0.GeneratedDatabase,
+              i1.ConcordanceSpellingsWithSemivowels,
+              i1.ConcordanceSpellingsWithSemivowel
+            >,
+          ),
+          i1.ConcordanceSpellingsWithSemivowel,
+          i0.PrefetchHooks Function()
+        > {
+  $ConcordanceSpellingsWithSemivowelsTableManager(
+    i0.GeneratedDatabase db,
+    i1.ConcordanceSpellingsWithSemivowels table,
+  ) : super(
+        i0.TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              i1.$ConcordanceSpellingsWithSemivowelsFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              i1.$ConcordanceSpellingsWithSemivowelsOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              i1.$ConcordanceSpellingsWithSemivowelsAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                i0.Value<String> spellingInVowelLetters =
+                    const i0.Value.absent(),
+                i0.Value<String> spelling = const i0.Value.absent(),
+              }) => i1.ConcordanceSpellingsWithSemivowelsCompanion(
+                spellingInVowelLetters: spellingInVowelLetters,
+                spelling: spelling,
+              ),
+          createCompanionCallback:
+              ({
+                required String spellingInVowelLetters,
+                required String spelling,
+              }) => i1.ConcordanceSpellingsWithSemivowelsCompanion.insert(
+                spellingInVowelLetters: spellingInVowelLetters,
+                spelling: spelling,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $ConcordanceSpellingsWithSemivowelsProcessedTableManager =
+    i0.ProcessedTableManager<
+      i0.GeneratedDatabase,
+      i1.ConcordanceSpellingsWithSemivowels,
+      i1.ConcordanceSpellingsWithSemivowel,
+      i1.$ConcordanceSpellingsWithSemivowelsFilterComposer,
+      i1.$ConcordanceSpellingsWithSemivowelsOrderingComposer,
+      i1.$ConcordanceSpellingsWithSemivowelsAnnotationComposer,
+      $ConcordanceSpellingsWithSemivowelsCreateCompanionBuilder,
+      $ConcordanceSpellingsWithSemivowelsUpdateCompanionBuilder,
+      (
+        i1.ConcordanceSpellingsWithSemivowel,
+        i0.BaseReferences<
+          i0.GeneratedDatabase,
+          i1.ConcordanceSpellingsWithSemivowels,
+          i1.ConcordanceSpellingsWithSemivowel
+        >,
+      ),
+      i1.ConcordanceSpellingsWithSemivowel,
+      i0.PrefetchHooks Function()
+    >;
 
 class ConcordanceDetails extends i0.Table
     with i0.TableInfo<ConcordanceDetails, i1.ConcordanceDetail> {
@@ -2171,6 +2342,256 @@ i0.Index get concordanceCountableWordCandidateAnalysesAnalysis => i0.Index(
   'CREATE INDEX ConcordanceCountableWordCandidateAnalyses_Analysis ON ConcordanceCountableWordCandidateAnalyses (form, item)',
 );
 
+class ConcordanceSpellingsWithSemivowels extends i0.Table
+    with
+        i0.TableInfo<
+          ConcordanceSpellingsWithSemivowels,
+          i1.ConcordanceSpellingsWithSemivowel
+        > {
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  ConcordanceSpellingsWithSemivowels(this.attachedDatabase, [this._alias]);
+  static const i0.VerificationMeta _spellingInVowelLettersMeta =
+      const i0.VerificationMeta('spellingInVowelLetters');
+  late final i0.GeneratedColumn<String> spellingInVowelLetters =
+      i0.GeneratedColumn<String>(
+        'spellingInVowelLetters',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL',
+      );
+  static const i0.VerificationMeta _spellingMeta = const i0.VerificationMeta(
+    'spelling',
+  );
+  late final i0.GeneratedColumn<String> spelling = i0.GeneratedColumn<String>(
+    'spelling',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<i0.GeneratedColumn> get $columns => [spellingInVowelLetters, spelling];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ConcordanceSpellingsWithSemivowels';
+  @override
+  i0.VerificationContext validateIntegrity(
+    i0.Insertable<i1.ConcordanceSpellingsWithSemivowel> instance, {
+    bool isInserting = false,
+  }) {
+    final context = i0.VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('spellingInVowelLetters')) {
+      context.handle(
+        _spellingInVowelLettersMeta,
+        spellingInVowelLetters.isAcceptableOrUnknown(
+          data['spellingInVowelLetters']!,
+          _spellingInVowelLettersMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_spellingInVowelLettersMeta);
+    }
+    if (data.containsKey('spelling')) {
+      context.handle(
+        _spellingMeta,
+        spelling.isAcceptableOrUnknown(data['spelling']!, _spellingMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_spellingMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<i0.GeneratedColumn> get $primaryKey => {spellingInVowelLetters, spelling};
+  @override
+  i1.ConcordanceSpellingsWithSemivowel map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i1.ConcordanceSpellingsWithSemivowel(
+      spellingInVowelLetters: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}spellingInVowelLetters'],
+      )!,
+      spelling: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}spelling'],
+      )!,
+    );
+  }
+
+  @override
+  ConcordanceSpellingsWithSemivowels createAlias(String alias) {
+    return ConcordanceSpellingsWithSemivowels(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+  @override
+  bool get isStrict => true;
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(spellingInVowelLetters, spelling)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class ConcordanceSpellingsWithSemivowel extends i0.DataClass
+    implements i0.Insertable<i1.ConcordanceSpellingsWithSemivowel> {
+  final String spellingInVowelLetters;
+  final String spelling;
+  const ConcordanceSpellingsWithSemivowel({
+    required this.spellingInVowelLetters,
+    required this.spelling,
+  });
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    map['spellingInVowelLetters'] = i0.Variable<String>(spellingInVowelLetters);
+    map['spelling'] = i0.Variable<String>(spelling);
+    return map;
+  }
+
+  i1.ConcordanceSpellingsWithSemivowelsCompanion toCompanion(
+    bool nullToAbsent,
+  ) {
+    return i1.ConcordanceSpellingsWithSemivowelsCompanion(
+      spellingInVowelLetters: i0.Value(spellingInVowelLetters),
+      spelling: i0.Value(spelling),
+    );
+  }
+
+  factory ConcordanceSpellingsWithSemivowel.fromJson(
+    Map<String, dynamic> json, {
+    i0.ValueSerializer? serializer,
+  }) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return ConcordanceSpellingsWithSemivowel(
+      spellingInVowelLetters: serializer.fromJson<String>(
+        json['spellingInVowelLetters'],
+      ),
+      spelling: serializer.fromJson<String>(json['spelling']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({i0.ValueSerializer? serializer}) {
+    serializer ??= i0.driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'spellingInVowelLetters': serializer.toJson<String>(
+        spellingInVowelLetters,
+      ),
+      'spelling': serializer.toJson<String>(spelling),
+    };
+  }
+
+  i1.ConcordanceSpellingsWithSemivowel copyWith({
+    String? spellingInVowelLetters,
+    String? spelling,
+  }) => i1.ConcordanceSpellingsWithSemivowel(
+    spellingInVowelLetters:
+        spellingInVowelLetters ?? this.spellingInVowelLetters,
+    spelling: spelling ?? this.spelling,
+  );
+  ConcordanceSpellingsWithSemivowel copyWithCompanion(
+    i1.ConcordanceSpellingsWithSemivowelsCompanion data,
+  ) {
+    return ConcordanceSpellingsWithSemivowel(
+      spellingInVowelLetters: data.spellingInVowelLetters.present
+          ? data.spellingInVowelLetters.value
+          : this.spellingInVowelLetters,
+      spelling: data.spelling.present ? data.spelling.value : this.spelling,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ConcordanceSpellingsWithSemivowel(')
+          ..write('spellingInVowelLetters: $spellingInVowelLetters, ')
+          ..write('spelling: $spelling')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(spellingInVowelLetters, spelling);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is i1.ConcordanceSpellingsWithSemivowel &&
+          other.spellingInVowelLetters == this.spellingInVowelLetters &&
+          other.spelling == this.spelling);
+}
+
+class ConcordanceSpellingsWithSemivowelsCompanion
+    extends i0.UpdateCompanion<i1.ConcordanceSpellingsWithSemivowel> {
+  final i0.Value<String> spellingInVowelLetters;
+  final i0.Value<String> spelling;
+  const ConcordanceSpellingsWithSemivowelsCompanion({
+    this.spellingInVowelLetters = const i0.Value.absent(),
+    this.spelling = const i0.Value.absent(),
+  });
+  ConcordanceSpellingsWithSemivowelsCompanion.insert({
+    required String spellingInVowelLetters,
+    required String spelling,
+  }) : spellingInVowelLetters = i0.Value(spellingInVowelLetters),
+       spelling = i0.Value(spelling);
+  static i0.Insertable<i1.ConcordanceSpellingsWithSemivowel> custom({
+    i0.Expression<String>? spellingInVowelLetters,
+    i0.Expression<String>? spelling,
+  }) {
+    return i0.RawValuesInsertable({
+      if (spellingInVowelLetters != null)
+        'spellingInVowelLetters': spellingInVowelLetters,
+      if (spelling != null) 'spelling': spelling,
+    });
+  }
+
+  i1.ConcordanceSpellingsWithSemivowelsCompanion copyWith({
+    i0.Value<String>? spellingInVowelLetters,
+    i0.Value<String>? spelling,
+  }) {
+    return i1.ConcordanceSpellingsWithSemivowelsCompanion(
+      spellingInVowelLetters:
+          spellingInVowelLetters ?? this.spellingInVowelLetters,
+      spelling: spelling ?? this.spelling,
+    );
+  }
+
+  @override
+  Map<String, i0.Expression> toColumns(bool nullToAbsent) {
+    final map = <String, i0.Expression>{};
+    if (spellingInVowelLetters.present) {
+      map['spellingInVowelLetters'] = i0.Variable<String>(
+        spellingInVowelLetters.value,
+      );
+    }
+    if (spelling.present) {
+      map['spelling'] = i0.Variable<String>(spelling.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ConcordanceSpellingsWithSemivowelsCompanion(')
+          ..write('spellingInVowelLetters: $spellingInVowelLetters, ')
+          ..write('spelling: $spelling')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
   final String form;
   final int item;
@@ -2800,6 +3221,24 @@ class ConcordanceGrammarValues
 
 class ConcordanceDrift extends i2.ModularAccessor {
   ConcordanceDrift(i0.GeneratedDatabase db) : super(db);
+  i0.Selectable<String> getConcordanceSpellingsWithSemivowelsOf({
+    required List<String> spellingsInVowelLetters,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedspellingsInVowelLetters = $expandVar(
+      $arrayStartIndex,
+      spellingsInVowelLetters.length,
+    );
+    $arrayStartIndex += spellingsInVowelLetters.length;
+    return customSelect(
+      'SELECT spelling FROM ConcordanceSpellingsWithSemivowels WHERE spellingInVowelLetters IN ($expandedspellingsInVowelLetters)',
+      variables: [
+        for (var $ in spellingsInVowelLetters) i0.Variable<String>($),
+      ],
+      readsFrom: {concordanceSpellingsWithSemivowels},
+    ).map((i0.QueryRow row) => row.read<String>('spelling'));
+  }
+
   i0.Selectable<i3.LemmaChoice> searchConcordanceLemmas({
     required String prefix,
     required int limit,
@@ -2895,6 +3334,13 @@ class ConcordanceDrift extends i2.ModularAccessor {
     );
   }
 
+  i1.ConcordanceSpellingsWithSemivowels
+  get concordanceSpellingsWithSemivowels =>
+      i2.ReadDatabaseContainer(
+        attachedDatabase,
+      ).resultSet<i1.ConcordanceSpellingsWithSemivowels>(
+        'ConcordanceSpellingsWithSemivowels',
+      );
   i1.ConcordanceLemmas get concordanceLemmas => i2.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.ConcordanceLemmas>('concordance.Lemmas');

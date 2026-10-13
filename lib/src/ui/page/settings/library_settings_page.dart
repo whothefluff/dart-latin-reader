@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../component/library/semivowel_spelling.dart';
+import '../../../component/library/semivowel_orthography.dart';
 import '../../../component/settings/reader_settings_api.dart';
 import '../../../component/word_frequency/lookup_frequency_api.dart' show FrequencyScope;
 import '../../../core/bundled_fonts.dart';
@@ -106,38 +106,38 @@ class _ReaderSettingsSection extends StatelessWidget {
     rows: [
       _semivowelsHeader(context),
       const Divider(height: 1),
-      _editionSemivowelSpellingToggle(),
-      if (!settings.showEditionSemivowelSpelling) ...[
+      _semivowelOrthographyChoice(),
+      if (settings.semivowelOrthographyChoice == SemivowelOrthographyChoice.manual) ...[
         _semivowelLowercaseChoice(
           vowelLetter: 'u',
           semivowelLetter: 'v',
           current: settings.uvLowercase,
-          onChanged: (letters) => notifier.updateSettings(
-            settings.copyWith(uvLowercase: letters),
+          onChanged: (form) => notifier.updateSettings(
+            settings.copyWith(uvLowercase: form),
           ),
         ),
         _semivowelCapitalsChoice(
           vowelLetter: 'U',
           semivowelLetter: 'V',
           current: settings.uvCapitals,
-          onChanged: (letters) => notifier.updateSettings(
-            settings.copyWith(uvCapitals: letters),
+          onChanged: (form) => notifier.updateSettings(
+            settings.copyWith(uvCapitals: form),
           ),
         ),
         _semivowelLowercaseChoice(
           vowelLetter: 'i',
           semivowelLetter: 'j',
           current: settings.ijLowercase,
-          onChanged: (letters) => notifier.updateSettings(
-            settings.copyWith(ijLowercase: letters),
+          onChanged: (form) => notifier.updateSettings(
+            settings.copyWith(ijLowercase: form),
           ),
         ),
         _semivowelCapitalsChoice(
           vowelLetter: 'I',
           semivowelLetter: 'J',
           current: settings.ijCapitals,
-          onChanged: (letters) => notifier.updateSettings(
-            settings.copyWith(ijCapitals: letters),
+          onChanged: (form) => notifier.updateSettings(
+            settings.copyWith(ijCapitals: form),
           ),
         ),
       ],
@@ -182,32 +182,43 @@ class _ReaderSettingsSection extends StatelessWidget {
     color: Theme.of(context).colorScheme.surfaceContainer,
     child: const ListTile(
       leading: Icon(Icons.abc),
-      title: Text('Letters', style: TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text('How the text writes u and v, and i and j'),
+      title: Text('Orthography', style: TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text('How the text writes u/v, and i/j'),
     ),
   );
 
-  SwitchListTile _editionSemivowelSpellingToggle() => SwitchListTile(
-    title: const Text('Original Edition'),
-    subtitle: const Text("Write each work with its edition's letters"),
-    value: settings.showEditionSemivowelSpelling,
-    onChanged: (val) => notifier.updateSettings(
-      settings.copyWith(showEditionSemivowelSpelling: val),
+  ChipChoice _semivowelOrthographyChoice() => ChipChoice(
+    title: 'Write the Text With',
+    subtitle: "Each work's edition, or the same letters for every work",
+    chips: choiceChips(
+      values: SemivowelOrthographyChoice.values,
+      current: settings.semivowelOrthographyChoice,
+      label: _semivowelOrthographyChoiceLabel,
+      onChanged: (choice) => notifier.updateSettings(
+        settings.copyWith(semivowelOrthographyChoice: choice),
+      ),
     ),
   );
+
+  static String _semivowelOrthographyChoiceLabel(SemivowelOrthographyChoice choice) =>
+      switch (choice) {
+        SemivowelOrthographyChoice.edition => 'Original Edition',
+        SemivowelOrthographyChoice.allVocalicConsonantal => 'Modern Edition (u/v, i/j)',
+        SemivowelOrthographyChoice.manual => 'Manual',
+      };
 
   ChipChoice _semivowelLowercaseChoice({
     required String vowelLetter,
     required String semivowelLetter,
-    required SemivowelLetters current,
-    required ValueChanged<SemivowelLetters> onChanged,
+    required SemivowelForm current,
+    required ValueChanged<SemivowelForm> onChanged,
   }) => ChipChoice(
     title: '${vowelLetter.toUpperCase()} and ${semivowelLetter.toUpperCase()}',
-    subtitle: 'Letters for the vowel $vowelLetter and the consonant $semivowelLetter',
+    subtitle: 'Letters for the vowel "$vowelLetter" and the consonant "$semivowelLetter"',
     chips: choiceChips(
-      values: SemivowelLetters.values,
+      values: SemivowelForm.values,
       current: current,
-      label: (letters) => _semivowelLettersLabel(letters, vowelLetter, semivowelLetter),
+      label: (form) => _semivowelFormLabel(form, vowelLetter, semivowelLetter),
       onChanged: onChanged,
     ),
   );
@@ -215,29 +226,28 @@ class _ReaderSettingsSection extends StatelessWidget {
   ChipChoice _semivowelCapitalsChoice({
     required String vowelLetter,
     required String semivowelLetter,
-    required SemivowelLetters? current,
-    required ValueChanged<SemivowelLetters?> onChanged,
+    required SemivowelForm? current,
+    required ValueChanged<SemivowelForm?> onChanged,
   }) => ChipChoice(
     title: 'Capital $vowelLetter and $semivowelLetter',
     subtitle: 'Letters for the capitals',
     chips: choiceChips(
-      values: const [null, ...SemivowelLetters.values],
+      values: const [null, ...SemivowelForm.values],
       current: current,
-      label: (letters) => letters == null
-          ? 'Like Lowercase'
-          : _semivowelLettersLabel(letters, vowelLetter, semivowelLetter),
+      label: (form) =>
+          form == null ? 'Like Lowercase' : _semivowelFormLabel(form, vowelLetter, semivowelLetter),
       onChanged: onChanged,
     ),
   );
 
-  static String _semivowelLettersLabel(
-    SemivowelLetters letters,
+  static String _semivowelFormLabel(
+    SemivowelForm form,
     String vowelLetter,
     String semivowelLetter,
-  ) => switch (letters) {
-    SemivowelLetters.both => '$vowelLetter and $semivowelLetter',
-    SemivowelLetters.vowelLetterOnly => '$vowelLetter only',
-    SemivowelLetters.semivowelLetterOnly => '$semivowelLetter only',
+  ) => switch (form) {
+    SemivowelForm.vocalicConsonantal => '"$vowelLetter" and "$semivowelLetter"',
+    SemivowelForm.vocalic => '"$vowelLetter" only',
+    SemivowelForm.consonantal => '"$semivowelLetter" only',
   };
 
   Widget _frequenciesHeader(BuildContext context) => ColoredBox(

@@ -3,6 +3,7 @@ import 'package:drift/drift.dart' show Variable;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latin_reader/src/component/concordance/concordance_api.dart';
+import 'package:latin_reader/src/component/concordance/concordance_parameters.dart';
 import 'package:latin_reader/src/component/concordance/concordance_query.dart';
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
@@ -37,7 +38,13 @@ void main() {
     int offset = 0,
     int limit = 1 << 30,
   }) async {
-    final page = await repository.getHits(query, workIds, offset, limit);
+    final page = await repository.getHits(
+      query,
+      workIds,
+      offset,
+      limit,
+      SpellingsWithSemivowels.none,
+    );
     return page.hits.map((hit) => (hit.workId, hit.slotIndices.toList())).toList();
   }
 
@@ -71,7 +78,8 @@ void main() {
 
   Future<int> total(ConcordanceCriterion criterion, {bool matchMacrons = false}) async {
     final query = ConcordanceQuery(slots: [criterion], matchMacrons: matchMacrons);
-    return (await repository.getHits(query, workIds, 0, 1)).total;
+    final page = await repository.getHits(query, workIds, 0, 1, SpellingsWithSemivowels.none);
+    return page.total;
   }
 
   /// Rows of (form, frequency's count, tokens written that way with an enclitic)

@@ -1,7 +1,7 @@
 import 'package:latin_reader/src/component/library/author_details_api.dart';
 import 'package:latin_reader/src/component/library/authors_api.dart';
 import 'package:latin_reader/src/component/library/proper_noun_state.dart';
-import 'package:latin_reader/src/component/library/semivowel_spelling.dart';
+import 'package:latin_reader/src/component/library/semivowel_orthography.dart';
 import 'package:latin_reader/src/component/library/subdivision_type.dart';
 import 'package:latin_reader/src/component/library/work_contents_api.dart';
 import 'package:latin_reader/src/component/library/work_details_api.dart';
@@ -32,10 +32,10 @@ CREATE TABLE "Works"(
     "id" TEXT NOT NULL CHECK( id LIKE '________-____-____-____-____________' ),
     "name" TEXT NOT NULL,
     "about" TEXT NOT NULL,
-    "uvLowercase" TEXT NOT NULL MAPPED BY `const SemivowelLettersConverter('u', 'v')` CHECK( uvLowercase IN ('uv', 'u', 'v') ),
-    "uvCapitals" TEXT NOT NULL MAPPED BY `const SemivowelLettersConverter('U', 'V')` CHECK( uvCapitals IN ('UV', 'U', 'V') ),
-    "ijLowercase" TEXT NOT NULL MAPPED BY `const SemivowelLettersConverter('i', 'j')` CHECK( ijLowercase IN ('ij', 'i', 'j') ),
-    "ijCapitals" TEXT NOT NULL MAPPED BY `const SemivowelLettersConverter('I', 'J')` CHECK( ijCapitals IN ('IJ', 'I', 'J') ),
+    "uvLowercase" TEXT NOT NULL MAPPED BY `const SemivowelsConverter('u', 'v')` CHECK( uvLowercase IN ('uv', 'u', 'v') ),
+    "uvCapitals" TEXT NOT NULL MAPPED BY `const SemivowelsConverter('U', 'V')` CHECK( uvCapitals IN ('UV', 'U', 'V') ),
+    "ijLowercase" TEXT NOT NULL MAPPED BY `const SemivowelsConverter('i', 'j')` CHECK( ijLowercase IN ('ij', 'i', 'j') ),
+    "ijCapitals" TEXT NOT NULL MAPPED BY `const SemivowelsConverter('I', 'J')` CHECK( ijCapitals IN ('IJ', 'I', 'J') ),
     PRIMARY KEY( id )
 ) 
 STRICT, 
