@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:latin_reader/src/component/library/semivowel_spelling.dart';
+import 'package:latin_reader/src/component/library/semivowel_orthography.dart';
 import 'package:latin_reader/src/component/library/subdivision_type.dart';
 import 'package:latin_reader/src/component/library/work_contents_api.dart';
 import 'package:latin_reader/src/ui/page/library/page_segments.dart';
@@ -31,7 +31,7 @@ WorkContentsSegment _segment(
 /// A page with two verses, each preceded by a line break, and no spaces before punctuation.
 PageSegments _page({
   required bool showMacrons,
-  SemivowelSpelling semivowelSpelling = SemivowelSpelling.stored,
+  SemivowelOrthography semivowelOrthography = SemivowelOrthography.allVocalicConsonantal,
 }) {
   final laidOut = [
     (_segment(10, 'Lupus'), before: '\n', after: ' '),
@@ -50,7 +50,7 @@ PageSegments _page({
             text: entry.before,
             children: [
               TextSpan(
-                text: semivowelSpellingOf(entry.$1, semivowelSpelling).respell(
+                text: semivowelOrthographyOf(entry.$1, semivowelOrthography).respell(
                   showMacrons ? entry.$1.macronizedWord : entry.$1.word,
                 ),
               ),
@@ -61,7 +61,7 @@ PageSegments _page({
         .toList(),
     laidOut.map((entry) => entry.$1),
     showMacrons: showMacrons,
-    semivowelSpelling: semivowelSpelling,
+    semivowelOrthography: semivowelOrthography,
   );
 }
 
@@ -108,13 +108,13 @@ void main() {
     });
 
     test('a word is found by the letters shown', () {
-      const uOnly = SemivowelSpelling(
-        uvLowercase: SemivowelLetters.vowelLetterOnly,
-        uvCapitals: SemivowelLetters.vowelLetterOnly,
-        ijLowercase: SemivowelLetters.both,
-        ijCapitals: SemivowelLetters.both,
+      const uOnly = SemivowelOrthography(
+        uvLowercase: SemivowelForm.vocalic,
+        uvCapitals: SemivowelForm.vocalic,
+        ijLowercase: SemivowelForm.vocalicConsonantal,
+        ijCapitals: SemivowelForm.vocalicConsonantal,
       );
-      final withMacrons = _page(showMacrons: true, semivowelSpelling: uOnly);
+      final withMacrons = _page(showMacrons: true, semivowelOrthography: uOnly);
 
       expect(withMacrons.selectedSegment(_select(withMacrons, 'uēnērunt'))?.idx, 15);
       expect(withMacrons.selectedSegment(_select(withMacrons, 'IV'))?.idx, 17);

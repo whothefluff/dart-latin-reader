@@ -149,7 +149,7 @@ class _DictionaryEntriesProviderElement
 }
 
 String _$dictionaryEntriesSearchHash() =>
-    r'e49a923aa1746aaae8bdba63e80666239ed12f1b';
+    r'b06d400b96268f1d5791af51b074f603c2b2906a';
 
 /// See also [dictionaryEntriesSearch].
 @ProviderFor(dictionaryEntriesSearch)

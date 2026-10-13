@@ -1,5 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latin_reader/src/core/search_term.dart';
+import 'package:latin_reader/src/core/semivowel_search.dart';
+
+const _neither = SemivowelSearchRules(iFindsJ: false, uFindsV: false);
+const _iOnly = SemivowelSearchRules(iFindsJ: true, uFindsV: false);
+const _both = SemivowelSearchRules(iFindsJ: true, uFindsV: true);
 
 void main() {
   group('SearchTerm', () {
@@ -68,6 +73,39 @@ void main() {
       expect(term.query, 'Atriy');
       expect(term.hasMacrons, isFalse);
       expect(term.useLike, isTrue);
+    });
+  });
+
+  group('SearchTerm.inVowelLetters', () {
+    test('j is written as i and v as u, in any case, the rest as it was', () {
+      expect(SearchTerm('Jūv*').inVowelLetters, SearchTerm('Iūu*'));
+    });
+  });
+
+  group('SearchTerm.patternWith', () {
+    test('a typed i or u also matches the j or v that the settings allow', () {
+      final semivowelPattern = SearchTerm('seruus').semivowelPatternWith(_both);
+
+      expect(semivowelPattern.hasMatch('servus'), isTrue);
+      expect(semivowelPattern.hasMatch('Servus'), isTrue);
+      expect(SearchTerm('seruus').semivowelPatternWith(_neither).hasMatch('servus'), isFalse);
+      expect(SearchTerm('iuu').semivowelPatternWith(_iOnly).hasMatch('juv'), isFalse);
+    });
+
+    test('a typed j or v only matches itself', () {
+      expect(SearchTerm('jam').semivowelPatternWith(_both).hasMatch('iam'), isFalse);
+      expect(SearchTerm('vir').semivowelPatternWith(_both).hasMatch('uir'), isFalse);
+    });
+
+    test('wildcards and quotes ask for the whole value, other text for a part of it', () {
+      expect(SearchTerm('"iam"').semivowelPatternWith(_both).hasMatch('jamque'), isFalse);
+      expect(SearchTerm('iu*').semivowelPatternWith(_both).hasMatch('jubet'), isTrue);
+      expect(SearchTerm('?uuen').semivowelPatternWith(_both).hasMatch('juvenis'), isFalse);
+      expect(SearchTerm('iuuen').semivowelPatternWith(_both).hasMatch('Juvenis'), isTrue);
+    });
+
+    test('other characters match literally', () {
+      expect(SearchTerm('a.b').semivowelPatternWith(_both).hasMatch('axb'), isFalse);
     });
   });
 }

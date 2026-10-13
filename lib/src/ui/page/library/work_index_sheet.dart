@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../component/library/semivowel_spelling.dart';
+import '../../../component/library/semivowel_orthography.dart';
 import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_index_api.dart';
 import '../../../core/contains_text.dart';
@@ -19,18 +19,18 @@ const workIndexLabel = 'Contents';
 ///
 /// Choosing an entry does not navigate directly.
 /// The reader owns the jump and applies it after this route closes.
-/// Titles are shown and searched with [semivowelSpelling], like the text.
+/// Titles are shown and searched with [semivowelOrthography], like the text.
 Future<WorkIndexEntry?> showWorkIndex({
   required BuildContext context,
   required String workId,
   required String workName,
-  required SemivowelSpelling semivowelSpelling,
+  required SemivowelOrthography semivowelOrthography,
   required int currentIndex,
 }) {
   final panel = _WorkIndexPanel(
     workId: workId,
     workName: workName,
-    semivowelSpelling: semivowelSpelling,
+    semivowelOrthography: semivowelOrthography,
     currentIndex: currentIndex,
   );
   return Breakpoints.mediumAndUp.isActive(context)
@@ -76,13 +76,13 @@ class _WorkIndexPanel extends ConsumerWidget {
   const _WorkIndexPanel({
     required this.workId,
     required this.workName,
-    required this.semivowelSpelling,
+    required this.semivowelOrthography,
     required this.currentIndex,
   });
 
   final String workId;
   final String workName;
-  final SemivowelSpelling semivowelSpelling;
+  final SemivowelOrthography semivowelOrthography;
   final int currentIndex;
 
   @override
@@ -134,7 +134,7 @@ class _WorkIndexPanel extends ConsumerWidget {
                     : _WorkIndexTree(
                         key: ObjectKey(index),
                         index: index,
-                        semivowelSpelling: semivowelSpelling,
+                        semivowelOrthography: semivowelOrthography,
                         currentIndex: currentIndex,
                       ),
               ),
@@ -150,12 +150,12 @@ class _WorkIndexTree extends StatefulWidget {
   const _WorkIndexTree({
     super.key,
     required this.index,
-    required this.semivowelSpelling,
+    required this.semivowelOrthography,
     required this.currentIndex,
   });
 
   final WorkIndex index;
-  final SemivowelSpelling semivowelSpelling;
+  final SemivowelOrthography semivowelOrthography;
   final int currentIndex;
 
   @override
@@ -349,7 +349,7 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
   /// Ancestor labels, outermost first
   Iterable<String> _ancestry(WorkIndexEntry entry) => widget.index.ancestorsOf(entry).map(_label);
 
-  String _label(WorkIndexEntry entry) => entry.labelSpelledWith(widget.semivowelSpelling);
+  String _label(WorkIndexEntry entry) => entry.labelSpelledWith(widget.semivowelOrthography);
 
   double _rowExtent(BuildContext context) {
     final scaler = MediaQuery.textScalerOf(context);

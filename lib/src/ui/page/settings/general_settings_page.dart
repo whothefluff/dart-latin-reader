@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../logger.dart';
 import '../../../component/settings/general_settings_api.dart';
 import '../../../core/image_colors.dart';
+import '../../../core/semivowel_search.dart';
 import '../../app.dart';
 import '../../widget/page_scaffold.dart';
 import '../../widget/responsive_coordinate_grid.dart';
@@ -44,6 +45,16 @@ class GeneralSettingsPage extends ConsumerWidget {
                         accentColor: settings.accentColor,
                         onAccentColorChanged: (color) =>
                             notifier.updateSettings(settings.copyWith(accentColor: color)),
+                      ),
+                    ),
+                    GridSlot(
+                      row: 2,
+                      col: 1,
+                      child: _SearchSection(
+                        semivowelSearchRules: settings.semivowelSearchRules,
+                        onSemivowelSearchChanged: (search) => notifier.updateSettings(
+                          settings.copyWith(semivowelSearchRules: search),
+                        ),
                       ),
                     ),
                   ],
@@ -424,5 +435,42 @@ class _ImageColorsDialogState extends State<_ImageColorsDialog> {
     );
   });
 
+  //
+}
+
+class _SearchSection extends StatelessWidget {
+  const _SearchSection({
+    required this.semivowelSearchRules,
+    required this.onSemivowelSearchChanged,
+  });
+
+  final SemivowelSearchRules semivowelSearchRules;
+  final ValueChanged<SemivowelSearchRules> onSemivowelSearchChanged;
+
+  @override
+  Widget build(context) => SettingsSection(
+    title: 'Search',
+    icon: Icons.search,
+    groups: [
+      SettingsGroup(
+        rows: [
+          SwitchListTile(
+            title: const Text('A Typed i Also Finds j'),
+            subtitle: const Text('Dictionary, morphology and concordance: iam finds jam'),
+            value: semivowelSearchRules.iFindsJ,
+            onChanged: (val) =>
+                onSemivowelSearchChanged(semivowelSearchRules.copyWith(iFindsJ: val)),
+          ),
+          SwitchListTile(
+            title: const Text('A Typed u Also Finds v'),
+            subtitle: const Text('Dictionary, morphology and concordance: seruus finds servus'),
+            value: semivowelSearchRules.uFindsV,
+            onChanged: (val) =>
+                onSemivowelSearchChanged(semivowelSearchRules.copyWith(uFindsV: val)),
+          ),
+        ],
+      ),
+    ],
+  );
   //
 }

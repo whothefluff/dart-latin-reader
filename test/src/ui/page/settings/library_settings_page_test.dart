@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:latin_reader/src/component/library/semivowel_spelling.dart';
+import 'package:latin_reader/src/component/library/semivowel_orthography.dart';
 import 'package:latin_reader/src/component/settings/reader_settings_api.dart';
 import 'package:latin_reader/src/component/word_frequency/lookup_frequency_api.dart';
 import 'package:latin_reader/src/ui/page/settings/library_settings_page.dart';
@@ -37,10 +37,10 @@ const _marking = ReaderSettings(
   markUncommonWords: true,
   uncommonWordsPercent: 5,
   frequencyScope: FrequencyScope.work,
-  showEditionSemivowelSpelling: false,
-  uvLowercase: SemivowelLetters.both,
+  semivowelOrthographyChoice: SemivowelOrthographyChoice.manual,
+  uvLowercase: SemivowelForm.vocalicConsonantal,
   uvCapitals: null,
-  ijLowercase: SemivowelLetters.both,
+  ijLowercase: SemivowelForm.vocalicConsonantal,
   ijCapitals: null,
 );
 
@@ -87,42 +87,6 @@ void main() {
         container.read(readerSettingsNotifierProvider).value,
         _marking.copyWith(wordSpacing: 10.0),
       );
-    });
-  });
-
-  group('Letters', () {
-    testWidgets('choosing i only saves only that', (tester) async {
-      final container = await _pumpPage(tester);
-
-      await _tap(tester, find.widgetWithText(ChoiceChip, 'i only'));
-
-      expect(
-        container.read(readerSettingsNotifierProvider).value,
-        _marking.copyWith(ijLowercase: SemivowelLetters.vowelLetterOnly),
-      );
-    });
-
-    testWidgets('choosing capital V only saves only that', (tester) async {
-      final container = await _pumpPage(tester);
-
-      await _tap(tester, find.widgetWithText(ChoiceChip, 'V only'));
-
-      expect(
-        container.read(readerSettingsNotifierProvider).value,
-        _marking.copyWith(uvCapitals: SemivowelLetters.semivowelLetterOnly),
-      );
-    });
-
-    testWidgets('the original edition saves only that, and hides the choices', (tester) async {
-      final container = await _pumpPage(tester);
-
-      await _tap(tester, find.text('Original Edition'));
-
-      expect(
-        container.read(readerSettingsNotifierProvider).value,
-        _marking.copyWith(showEditionSemivowelSpelling: true),
-      );
-      expect(find.widgetWithText(ChoiceChip, 'i only'), findsNothing);
     });
   });
 

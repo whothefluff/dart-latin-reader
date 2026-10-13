@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../../external/settings.dart';
-import '../library/semivowel_spelling.dart';
+import '../library/semivowel_orthography.dart';
 import '../word_frequency/lookup_frequency_api.dart' show FrequencyScope;
 
 part 'reader_settings_api.g.dart';
@@ -25,7 +25,7 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
   static const _markUncommonWords = '${_prefix}markUncommonWords';
   static const _uncommonWordsPercent = '${_prefix}uncommonWordsPercent';
   static const _frequencyScope = '${_prefix}frequencyScope';
-  static const _showEditionSemivowelSpelling = '${_prefix}showEditionSemivowelSpelling';
+  static const _semivowelOrthographyChoice = '${_prefix}semivowelOrthographyChoice';
   static const _uvLowercase = '${_prefix}uvLowercase';
   static const _uvCapitals = '${_prefix}uvCapitals';
   static const _ijLowercase = '${_prefix}ijLowercase';
@@ -38,8 +38,12 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
 
   /// Stored by name.
   /// A renamed value falls back to the default.
-  static final Map<String, SemivowelLetters> _semivowelLettersByName = SemivowelLetters.values
-      .asNameMap();
+  static final Map<String, SemivowelForm> _semivowelFormsByName = SemivowelForm.values.asNameMap();
+
+  /// Stored by name.
+  /// A renamed value falls back to the default.
+  static final Map<String, SemivowelOrthographyChoice> _semivowelOrthographyChoicesByName =
+      SemivowelOrthographyChoice.values.asNameMap();
 
   @override
   Future<ReaderSettings> build() async {
@@ -56,9 +60,9 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
     final savedMarkUncommonWords = await repo.get(_markUncommonWords, PrefBool.hint);
     final savedUncommonWordsPercent = await repo.get(_uncommonWordsPercent, PrefInt.hint);
     final savedFrequencyScope = await repo.get(_frequencyScope, PrefString.hint);
-    final savedShowEditionSemivowelSpelling = await repo.get(
-      _showEditionSemivowelSpelling,
-      PrefBool.hint,
+    final savedSemivowelOrthographyChoice = await repo.get(
+      _semivowelOrthographyChoice,
+      PrefString.hint,
     );
     final savedUvLowercase = await repo.get(_uvLowercase, PrefString.hint);
     final savedUvCapitals = await repo.get(_uvCapitals, PrefString.hint);
@@ -80,15 +84,15 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
       frequencyScope:
           _frequencyScopesByName[savedFrequencyScope?.value] ??
           ReaderSettings._defaultFrequencyScope,
-      showEditionSemivowelSpelling:
-          savedShowEditionSemivowelSpelling?.value ??
-          ReaderSettings._defaultShowEditionSemivowelSpelling,
+      semivowelOrthographyChoice:
+          _semivowelOrthographyChoicesByName[savedSemivowelOrthographyChoice?.value] ??
+          ReaderSettings._defaultSemivowelOrthographyChoice,
       uvLowercase:
-          _semivowelLettersByName[savedUvLowercase?.value] ?? ReaderSettings._defaultUvLowercase,
-      uvCapitals: _semivowelLettersByName[savedUvCapitals?.value],
+          _semivowelFormsByName[savedUvLowercase?.value] ?? ReaderSettings._defaultUvLowercase,
+      uvCapitals: _semivowelFormsByName[savedUvCapitals?.value],
       ijLowercase:
-          _semivowelLettersByName[savedIjLowercase?.value] ?? ReaderSettings._defaultIjLowercase,
-      ijCapitals: _semivowelLettersByName[savedIjCapitals?.value],
+          _semivowelFormsByName[savedIjLowercase?.value] ?? ReaderSettings._defaultIjLowercase,
+      ijCapitals: _semivowelFormsByName[savedIjCapitals?.value],
     );
     return log.exit(r: settings)!;
   }
@@ -114,13 +118,13 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
         await repo.set(_uncommonWordsPercent, PrefInt(newSettings.uncommonWordsPercent));
         await repo.set(_frequencyScope, PrefString(newSettings.frequencyScope.name));
         await repo.set(
-          _showEditionSemivowelSpelling,
-          PrefBool(newSettings.showEditionSemivowelSpelling),
+          _semivowelOrthographyChoice,
+          PrefString(newSettings.semivowelOrthographyChoice.name),
         );
         await repo.set(_uvLowercase, PrefString(newSettings.uvLowercase.name));
-        await repo.set(_uvCapitals, _semivowelLettersValue(newSettings.uvCapitals));
+        await repo.set(_uvCapitals, _semivowelFormValue(newSettings.uvCapitals));
         await repo.set(_ijLowercase, PrefString(newSettings.ijLowercase.name));
-        await repo.set(_ijCapitals, _semivowelLettersValue(newSettings.ijCapitals));
+        await repo.set(_ijCapitals, _semivowelFormValue(newSettings.ijCapitals));
       } on Exception catch (e, st) {
         log
           ..catching(e, stackTrace: st)
@@ -136,8 +140,8 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
   PrefString? _fontFamilyValue(ReaderSettings newSettings) =>
       newSettings.fontFamily != null ? PrefString(newSettings.fontFamily!) : null;
 
-  PrefString? _semivowelLettersValue(SemivowelLetters? letters) =>
-      letters != null ? PrefString(letters.name) : null;
+  PrefString? _semivowelFormValue(SemivowelForm? form) =>
+      form != null ? PrefString(form.name) : null;
 
   //
 }
@@ -159,7 +163,7 @@ class ReaderSettings {
     required this.markUncommonWords,
     required this.uncommonWordsPercent,
     required this.frequencyScope,
-    required this.showEditionSemivowelSpelling,
+    required this.semivowelOrthographyChoice,
     required this.uvLowercase,
     required this.uvCapitals,
     required this.ijLowercase,
@@ -179,7 +183,7 @@ class ReaderSettings {
         markUncommonWords: _defaultMarkUncommonWords,
         uncommonWordsPercent: _defaultUncommonWordsPercent,
         frequencyScope: _defaultFrequencyScope,
-        showEditionSemivowelSpelling: _defaultShowEditionSemivowelSpelling,
+        semivowelOrthographyChoice: _defaultSemivowelOrthographyChoice,
         uvLowercase: _defaultUvLowercase,
         uvCapitals: _defaultUvCapitals,
         ijLowercase: _defaultIjLowercase,
@@ -200,15 +204,15 @@ class ReaderSettings {
   /// The works a word is common or uncommon in
   final FrequencyScope frequencyScope;
 
-  final bool showEditionSemivowelSpelling;
-  final SemivowelLetters uvLowercase;
+  final SemivowelOrthographyChoice semivowelOrthographyChoice;
+  final SemivowelForm uvLowercase;
 
   /// `null` for the same letters as [uvLowercase].
-  final SemivowelLetters? uvCapitals;
-  final SemivowelLetters ijLowercase;
+  final SemivowelForm? uvCapitals;
+  final SemivowelForm ijLowercase;
 
   /// `null` for the same letters as [ijLowercase].
-  final SemivowelLetters? ijCapitals;
+  final SemivowelForm? ijCapitals;
 
   final bool showMacrons;
   final double fontSize;
@@ -228,11 +232,12 @@ class ReaderSettings {
   static const bool _defaultMarkUncommonWords = true;
   static const int _defaultUncommonWordsPercent = 5;
   static const FrequencyScope _defaultFrequencyScope = FrequencyScope.library;
-  static const bool _defaultShowEditionSemivowelSpelling = false;
-  static const SemivowelLetters _defaultUvLowercase = SemivowelLetters.both;
-  static const SemivowelLetters? _defaultUvCapitals = null;
-  static const SemivowelLetters _defaultIjLowercase = SemivowelLetters.both;
-  static const SemivowelLetters? _defaultIjCapitals = null;
+  static const SemivowelOrthographyChoice _defaultSemivowelOrthographyChoice =
+      SemivowelOrthographyChoice.allVocalicConsonantal;
+  static const SemivowelForm _defaultUvLowercase = SemivowelForm.vocalicConsonantal;
+  static const SemivowelForm? _defaultUvCapitals = null;
+  static const SemivowelForm _defaultIjLowercase = SemivowelForm.vocalicConsonantal;
+  static const SemivowelForm? _defaultIjCapitals = null;
 
   /// Returns a copy with the given fields replaced.
   ///
@@ -251,10 +256,10 @@ class ReaderSettings {
     bool? markUncommonWords,
     int? uncommonWordsPercent,
     FrequencyScope? frequencyScope,
-    bool? showEditionSemivowelSpelling,
-    SemivowelLetters? uvLowercase,
+    SemivowelOrthographyChoice? semivowelOrthographyChoice,
+    SemivowelForm? uvLowercase,
     Object? uvCapitals = _unset,
-    SemivowelLetters? ijLowercase,
+    SemivowelForm? ijLowercase,
     Object? ijCapitals = _unset,
   }) => ReaderSettings(
     showMacrons: showMacrons ?? this.showMacrons,
@@ -268,25 +273,28 @@ class ReaderSettings {
     markUncommonWords: markUncommonWords ?? this.markUncommonWords,
     uncommonWordsPercent: uncommonWordsPercent ?? this.uncommonWordsPercent,
     frequencyScope: frequencyScope ?? this.frequencyScope,
-    showEditionSemivowelSpelling:
-        showEditionSemivowelSpelling ?? this.showEditionSemivowelSpelling,
+    semivowelOrthographyChoice: semivowelOrthographyChoice ?? this.semivowelOrthographyChoice,
     uvLowercase: uvLowercase ?? this.uvLowercase,
-    uvCapitals: uvCapitals == _unset ? this.uvCapitals : uvCapitals as SemivowelLetters?,
+    uvCapitals: uvCapitals == _unset ? this.uvCapitals : uvCapitals as SemivowelForm?,
     ijLowercase: ijLowercase ?? this.ijLowercase,
-    ijCapitals: ijCapitals == _unset ? this.ijCapitals : ijCapitals as SemivowelLetters?,
+    ijCapitals: ijCapitals == _unset ? this.ijCapitals : ijCapitals as SemivowelForm?,
   );
 
   /// `true` when the reader uses the words' frequencies in any way
   bool get marksFrequencies => markCommonWords || markUncommonWords;
 
-  SemivowelSpelling semivowelSpellingFor(SemivowelSpelling edition) => showEditionSemivowelSpelling
-      ? edition
-      : SemivowelSpelling(
+  SemivowelOrthography semivowelOrthographyFor(SemivowelOrthography edition) =>
+      switch (semivowelOrthographyChoice) {
+        SemivowelOrthographyChoice.edition => edition,
+        SemivowelOrthographyChoice.allVocalicConsonantal =>
+          SemivowelOrthography.allVocalicConsonantal,
+        SemivowelOrthographyChoice.manual => SemivowelOrthography(
           uvLowercase: uvLowercase,
           uvCapitals: uvCapitals ?? uvLowercase,
           ijLowercase: ijLowercase,
           ijCapitals: ijCapitals ?? ijLowercase,
-        );
+        ),
+      };
 
   @override
   String toString() =>
@@ -302,7 +310,7 @@ class ReaderSettings {
       'markUncommonWords: $markUncommonWords, '
       'uncommonWordsPercent: $uncommonWordsPercent, '
       'frequencyScope: $frequencyScope, '
-      'showEditionSemivowelSpelling: $showEditionSemivowelSpelling, '
+      'semivowelOrthographyChoice: $semivowelOrthographyChoice, '
       'uvLowercase: $uvLowercase, '
       'uvCapitals: $uvCapitals, '
       'ijLowercase: $ijLowercase, '
@@ -323,7 +331,7 @@ class ReaderSettings {
           other.markUncommonWords == markUncommonWords &&
           other.uncommonWordsPercent == uncommonWordsPercent &&
           other.frequencyScope == frequencyScope &&
-          other.showEditionSemivowelSpelling == showEditionSemivowelSpelling &&
+          other.semivowelOrthographyChoice == semivowelOrthographyChoice &&
           other.uvLowercase == uvLowercase &&
           other.uvCapitals == uvCapitals &&
           other.ijLowercase == ijLowercase &&
@@ -342,7 +350,7 @@ class ReaderSettings {
     markUncommonWords,
     uncommonWordsPercent,
     frequencyScope,
-    showEditionSemivowelSpelling,
+    semivowelOrthographyChoice,
     uvLowercase,
     uvCapitals,
     ijLowercase,
@@ -350,3 +358,5 @@ class ReaderSettings {
   );
   //
 }
+
+enum SemivowelOrthographyChoice { edition, allVocalicConsonantal, manual }

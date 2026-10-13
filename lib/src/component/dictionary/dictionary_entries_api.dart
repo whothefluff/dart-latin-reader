@@ -9,8 +9,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../../core/search_term.dart';
+import '../../core/semivowel_search.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import '../settings/general_settings_api.dart';
 
 part 'dictionary_entries_api.g.dart';
 
@@ -33,9 +35,10 @@ Future<DictionaryEntries> dictionaryEntriesSearch(
 ) async {
   log.info(() => '@riverpod - using $headword in $dictionary');
   ref.cacheFor(const Duration(minutes: 2));
+  final settings = await ref.watch(generalSettingsNotifierProvider.future);
   final db = await ref.watch(dbProvider.future);
   final repo = DictionaryRepository(db);
-  return SearchEntriesUseCase(repo, dictionary, headword).invoke();
+  return SearchEntriesUseCase(repo, dictionary, headword, settings.semivowelSearchRules).invoke();
 }
 
 class DictionaryRepository implements IDictionaryRepository {
@@ -62,6 +65,25 @@ class DictionaryRepository implements IDictionaryRepository {
     return DictionaryEntries(await query.get());
   }
 
+  @override
+  Future<DictionaryEntries> getEntriesMatchingInVowelLetters(
+    String dictionary,
+    SearchTerm term,
+  ) async {
+    log.fine(() => 'reading entries of "$dictionary" matching ${term.query} in vowel letters');
+    final drift = _db.dictionaryDrift;
+    final query = term.useLike
+        ? drift.searchDictionaryEntriesInVowelLettersWithLike(
+            term: term.query,
+            dictionary: dictionary,
+          )
+        : drift.searchDictionaryEntriesInVowelLettersWithFts(
+            term: term.query,
+            dictionary: dictionary,
+          );
+    return DictionaryEntries(await query.get());
+  }
+
   //
 }
 
@@ -72,6 +94,8 @@ abstract interface class IDictionaryRepository {
   Future<DictionaryEntries> getEntriesOf(String dictionary);
 
   Future<DictionaryEntries> getEntriesMatching(String dictionary, SearchTerm term);
+
+  Future<DictionaryEntries> getEntriesMatchingInVowelLetters(String dictionary, SearchTerm term);
   //
 }
 
@@ -94,21 +118,37 @@ class SearchEntriesUseCase implements ISearchEntriesUseCase {
     this._repository,
     this._dictionary,
     this._headword,
+    this._semivowelSearchRules,
   );
 
   final IDictionaryRepository _repository;
   final String _dictionary;
   final String _headword;
+  final SemivowelSearchRules _semivowelSearchRules;
+  static final RegExp _homographNumber = RegExp(r'\d+$');
 
   @override
   Future<DictionaryEntries> invoke() async {
     // headwords are written without macrons
     final term = SearchTerm(_headword).withoutMacrons;
-    return term.isEmpty
-        ? DictionaryEntries(const [])
-        : await _repository.getEntriesMatching(_dictionary, term);
+    return term.isEmpty ? DictionaryEntries(const []) : await _entriesMatching(term);
   }
 
+  Future<DictionaryEntries> _entriesMatching(SearchTerm term) async {
+    final found = await _repository.getEntriesMatching(_dictionary, term);
+    final foundInVowelLetters = await _repository.getEntriesMatchingInVowelLetters(
+      _dictionary,
+      term.inVowelLetters,
+    );
+    final semivowelPattern = term.semivowelPatternWith(_semivowelSearchRules);
+    return DictionaryEntries({
+      ...found,
+      ...foundInVowelLetters.where((entry) => semivowelPattern.hasMatch(_headwordOf(entry))),
+    });
+  }
+
+  /// Returns [entry]'s lemma without its homograph number
+  static String _headwordOf(Entry entry) => entry.lemma.replaceFirst(_homographNumber, '');
   //
 }
 

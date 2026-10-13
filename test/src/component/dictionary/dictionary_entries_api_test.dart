@@ -1,14 +1,38 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latin_reader/src/component/dictionary/db_util.dart' as dict_util;
 import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dart';
+import 'package:latin_reader/src/component/settings/general_settings_api.dart';
+import 'package:latin_reader/src/core/semivowel_search.dart';
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
 
 const _lewisAndShort = '00000000-0000-0000-0000-00000000000a';
 const _other = '00000000-0000-0000-0000-00000000000b';
+
+class _InMemoryGeneral extends GeneralSettingsNotifier {
+  _InMemoryGeneral(
+    this._initial,
+  );
+
+  final GeneralSettings _initial;
+
+  @override
+  Future<GeneralSettings> build() async => _initial;
+
+  //
+}
+
+/// Settings with explicit values, so the tests don't depend on the defaults
+GeneralSettings _searching(SemivowelSearchRules rules) =>
+    GeneralSettings(themeMode: ThemeMode.system, accentColor: null, semivowelSearchRules: rules);
+
+const _neither = SemivowelSearchRules(iFindsJ: false, uFindsV: false);
+const _iOnly = SemivowelSearchRules(iFindsJ: true, uFindsV: false);
+const _both = SemivowelSearchRules(iFindsJ: true, uFindsV: true);
 
 class _EmptyDb extends AppDb {
   _EmptyDb() : super(executor: NativeDatabase.memory(setup: util.setupRegExp));
@@ -72,8 +96,14 @@ Future<DictionaryEntries> _found(
   AppDb db,
   String text, {
   String dictionary = _lewisAndShort,
+  SemivowelSearchRules rules = _neither,
 }) {
-  final container = ProviderContainer(overrides: [dbProvider.overrideWith((_) => db)]);
+  final container = ProviderContainer(
+    overrides: [
+      dbProvider.overrideWith((_) => db),
+      generalSettingsNotifierProvider.overrideWith(() => _InMemoryGeneral(_searching(rules))),
+    ],
+  );
   addTearDown(container.dispose);
   return container
       .listen(dictionaryEntriesSearchProvider(dictionary, text).future, (_, _) {})
@@ -84,7 +114,11 @@ Future<List<String>> _lemmasFound(
   AppDb db,
   String text, {
   String dictionary = _lewisAndShort,
-}) async => (await _found(db, text, dictionary: dictionary)).map((entry) => entry.lemma).toList();
+  SemivowelSearchRules search = _neither,
+}) async {
+  final entries = await _found(db, text, dictionary: dictionary, rules: search);
+  return entries.map((entry) => entry.lemma).toList();
+}
 
 void main() {
   group('dictionaryEntriesSearchProvider', () {
@@ -119,14 +153,34 @@ void main() {
       expect(await _lemmasFound(db, 'ha!'), ['ha!']);
     });
 
-    test('i finds j and j finds i, since L&S writes j', () async {
+    test('headwords are found with their own j and v', () async {
       final db = await _dictionariesWith({
-        _lewisAndShort: ['jam', 'injuria', 'iambus'],
+        _lewisAndShort: ['jam', 'iambus', 'servus'],
       });
 
-      expect(await _lemmasFound(db, '"iam"'), ['jam']);
-      expect(await _lemmasFound(db, 'iniur'), ['injuria']);
-      expect(await _lemmasFound(db, 'jamb'), ['iambus']);
+      expect(await _lemmasFound(db, '"jam"'), ['jam']);
+      expect(await _lemmasFound(db, '"iam"'), isEmpty);
+      expect(await _lemmasFound(db, 'seruus'), isEmpty);
+    });
+
+    test('a typed i or u also finds j or v as the settings say, and not the reverse', () async {
+      final db = await _dictionariesWith({
+        _lewisAndShort: ['jam', 'injuria', 'iambus', 'servus'],
+      });
+
+      expect(await _lemmasFound(db, '"iam"', search: _both), ['jam']);
+      expect(await _lemmasFound(db, 'iniur', search: _both), ['injuria']);
+      expect(await _lemmasFound(db, 'seruus', search: _both), ['servus']);
+      expect(await _lemmasFound(db, 'seruus', search: _iOnly), isEmpty);
+      expect(await _lemmasFound(db, 'jamb', search: _both), isEmpty);
+    });
+
+    test('what the headwords match as typed is listed once, first', () async {
+      final db = await _dictionariesWith({
+        _lewisAndShort: ['iam', 'jam'],
+      });
+
+      expect(await _lemmasFound(db, '"iam"', search: _both), ['iam', 'jam']);
     });
 
     test('typed macrons are ignored', () async {

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:latin_reader/src/component/library/semivowel_spelling.dart';
+import 'package:latin_reader/src/component/library/semivowel_orthography.dart';
 import 'package:latin_reader/src/component/library/subdivision_type.dart';
 import 'package:latin_reader/src/component/library/work_index_api.dart';
 import 'package:latin_reader/src/external/database.dart';
@@ -28,11 +28,11 @@ Future<WorkIndex> _index(AppDb db, String work) {
   return container.listen(workIndexProvider(work).future, (_, _) {}).read();
 }
 
-const _uAndIOnly = SemivowelSpelling(
-  uvLowercase: SemivowelLetters.vowelLetterOnly,
-  uvCapitals: SemivowelLetters.vowelLetterOnly,
-  ijLowercase: SemivowelLetters.vowelLetterOnly,
-  ijCapitals: SemivowelLetters.vowelLetterOnly,
+const _uAndIOnly = SemivowelOrthography(
+  uvLowercase: SemivowelForm.vocalic,
+  uvCapitals: SemivowelForm.vocalic,
+  ijLowercase: SemivowelForm.vocalic,
+  ijCapitals: SemivowelForm.vocalic,
 );
 
 void main() {

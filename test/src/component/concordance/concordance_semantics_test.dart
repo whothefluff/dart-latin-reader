@@ -1,16 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latin_reader/src/component/concordance/concordance_api.dart';
+import 'package:latin_reader/src/component/concordance/concordance_parameters.dart';
 import 'package:latin_reader/src/component/concordance/concordance_query.dart';
 import 'package:latin_reader/src/component/concordance/grammar_values_api.dart' as grammar;
 import 'package:latin_reader/src/component/concordance/lemma_choices_api.dart' as lemmas;
 import 'package:latin_reader/src/component/library/catalog_api.dart' as catalog;
 import 'package:latin_reader/src/component/library/proper_noun_state.dart';
 import 'package:latin_reader/src/component/word_frequency/library_selection_api.dart';
+import 'package:latin_reader/src/core/semivowel_search.dart';
 
 import 'concordance_fixture.dart';
 
 LemmaCriterion _lemma(String reference) =>
     LemmaCriterion(LemmaChoice(label: reference, dictionaryRefs: [reference]));
+
+const _neither = SemivowelSearchRules(iFindsJ: false, uFindsV: false);
+const _iFindsJ = SemivowelSearchRules(iFindsJ: true, uFindsV: false);
+const _uFindsV = SemivowelSearchRules(iFindsJ: false, uFindsV: true);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +44,7 @@ void main() {
       [work],
       0,
       100,
+      SpellingsWithSemivowels.none,
     );
     return page.hits.map((hit) => hit.firstIdx).toList();
   }
@@ -106,6 +113,7 @@ void main() {
       [work],
       0,
       100,
+      SpellingsWithSemivowels.none,
     );
     expect(page.hits.map((hit) => hit.slotIndices), [
       [0, 1],
@@ -300,8 +308,14 @@ void main() {
       await token(db, idx, 'rosa', macron: idx.isEven ? 'rosā' : 'rosa');
     }
     final query = ConcordanceQuery(slots: const [FormCriterion('rosā')], matchMacrons: true);
-    final first = await repository.getHits(query, [work], 0, 2);
-    final second = await repository.getHits(query, [work], 2, 2);
+    final first = await repository.getHits(query, [work], 0, 2, SpellingsWithSemivowels.none);
+    final second = await repository.getHits(
+      query,
+      [work],
+      2,
+      2,
+      SpellingsWithSemivowels.none,
+    );
     expect(first.hits.map((hit) => hit.firstIdx), [0, 2]);
     expect(first.total, 4);
     expect(first.hasNextPage, isTrue);
@@ -320,10 +334,82 @@ void main() {
         null: {otherWork},
       }),
     );
-    final page = await GetConcordanceHitsUseCase(repository, selected, library, 0, 100).invoke();
+    final page = await GetConcordanceHitsUseCase(
+      repository,
+      selected,
+      library,
+      0,
+      100,
+      _neither,
+    ).invoke();
     expect(page.hits.single.workId, otherWork);
     expect(page.hits.single.firstIdx, 4);
     expect(page.hits.single.reference, '1.1');
+  });
+
+  test('a typed i also finds j as the settings say, and a typed j only finds j', () async {
+    await token(db, 0, 'jam');
+    await token(db, 1, 'iam');
+    await token(db, 2, 'jamque', enclitic: 'que');
+    await token(db, 3, 'Jam', proper: ProperNounState.proper);
+    await populateConcordanceTables(db);
+    final library = await catalog.LibraryRepository(db.libraryDrift).getCatalog();
+    Future<List<int>> found(FormCriterion form, SemivowelSearchRules search) async {
+      final query = ConcordanceQuery(slots: [form]);
+      final page = await GetConcordanceHitsUseCase(
+        repository,
+        query,
+        library,
+        0,
+        100,
+        search,
+      ).invoke();
+      return page.hits.map((hit) => hit.firstIdx).toList();
+    }
+
+    expect(await found(const FormCriterion('iam'), _neither), [1]);
+    expect(await found(const FormCriterion('iam'), _iFindsJ), [0, 1, 2, 3]);
+    expect(await found(const FormCriterion('iam', exactCase: true), _iFindsJ), [0, 1, 2]);
+    expect(await found(const FormCriterion('jam'), _iFindsJ), [0, 2, 3]);
+  });
+
+  test('a form with exact letters, such as a frequency row, ignores the settings', () async {
+    await token(db, 0, 'voluit');
+    await token(db, 1, 'volvit');
+    await populateConcordanceTables(db);
+    final library = await catalog.LibraryRepository(db.libraryDrift).getCatalog();
+    Future<List<int>> found(FormCriterion form) async {
+      final page = await GetConcordanceHitsUseCase(
+        repository,
+        ConcordanceQuery(slots: [form]),
+        library,
+        0,
+        100,
+        _uFindsV,
+      ).invoke();
+      return page.hits.map((hit) => hit.firstIdx).toList();
+    }
+
+    expect(await found(const FormCriterion('voluit', exactCase: true)), [0, 1]);
+    expect(await found(const FormCriterion('voluit', exactCase: true, exactLetters: true)), [0]);
+  });
+
+  test('with macrons on, a typed i also finds the macronized j', () async {
+    await token(db, 0, 'jus', macron: 'jūs');
+    await populateConcordanceTables(db);
+    final library = await catalog.LibraryRepository(db.libraryDrift).getCatalog();
+    final query = ConcordanceQuery(slots: const [FormCriterion('iūs')], matchMacrons: true);
+
+    final page = await GetConcordanceHitsUseCase(
+      repository,
+      query,
+      library,
+      0,
+      100,
+      _iFindsJ,
+    ).invoke();
+
+    expect(page.hits.map((hit) => hit.firstIdx), [0]);
   });
 
   test('an apostrophe is part of a word, and _ and % are no wildcards', () async {

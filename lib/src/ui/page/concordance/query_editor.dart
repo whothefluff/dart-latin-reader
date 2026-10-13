@@ -7,7 +7,7 @@ import '../../../component/concordance/concordance_query.dart';
 import '../../../component/concordance/grammar_values_api.dart';
 import '../../../component/concordance/lemma_choices_api.dart';
 import '../../../component/library/catalog_api.dart';
-import '../../../component/library/semivowel_spelling.dart';
+import '../../../component/library/semivowel_orthography.dart';
 import '../../../component/settings/concordance_settings_api.dart';
 import '../../../component/word_frequency/library_selection_api.dart';
 import '../../widget/labeled_dropdown.dart';
@@ -349,7 +349,7 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
       context: context,
       workId: work.id,
       workName: work.name,
-      semivowelSpelling: SemivowelSpelling.stored,
+      semivowelOrthography: SemivowelOrthography.allVocalicConsonantal,
       currentIndex: _part?.fromIndex ?? -1,
     );
     if (entry != null && mounted) {
@@ -378,6 +378,7 @@ class _SlotDraft {
     this.kind = _SlotKind.form,
     this.text = '',
     this.exactCase = false,
+    this.exactLetters = false,
     this.lemma,
     this.grammar = const GrammarFilter.empty(),
     this.distance = 1,
@@ -385,10 +386,11 @@ class _SlotDraft {
 
   factory _SlotDraft.of(int id, ConcordanceCriterion criterion, int? distance) =>
       switch (criterion) {
-        FormCriterion(:final text, :final exactCase) => _SlotDraft(
+        FormCriterion(:final text, :final exactCase, :final exactLetters) => _SlotDraft(
           id: id,
           text: text,
           exactCase: exactCase,
+          exactLetters: exactLetters,
           distance: distance,
         ),
         LemmaCriterion(:final lemma) => _SlotDraft(
@@ -413,6 +415,9 @@ class _SlotDraft {
   final String text;
   final bool exactCase;
 
+  /// Kept from a search with exact letters until [text] changes
+  final bool exactLetters;
+
   /// Required for [_SlotKind.lemma], optional for [_SlotKind.grammar]
   final LemmaChoice? lemma;
 
@@ -424,7 +429,7 @@ class _SlotDraft {
   /// Null while there's nothing to search for
   ConcordanceCriterion? get criterion {
     final criterion = switch (kind) {
-      _SlotKind.form => FormCriterion(text, exactCase: exactCase),
+      _SlotKind.form => FormCriterion(text, exactCase: exactCase, exactLetters: exactLetters),
       _SlotKind.lemma => switch (lemma) {
         final lemma? => LemmaCriterion(lemma),
         null => null,
@@ -444,6 +449,7 @@ class _SlotDraft {
     kind: kind ?? this.kind,
     text: text ?? this.text,
     exactCase: exactCase ?? this.exactCase,
+    exactLetters: exactLetters && (text ?? this.text) == this.text,
     lemma: lemma,
     grammar: grammar ?? this.grammar,
     distance: distance,
@@ -462,6 +468,7 @@ class _SlotDraft {
     kind: kind,
     text: text,
     exactCase: exactCase,
+    exactLetters: exactLetters,
     lemma: lemma,
     grammar: grammar,
     distance: distance,
@@ -472,6 +479,7 @@ class _SlotDraft {
     kind: kind,
     text: text,
     exactCase: exactCase,
+    exactLetters: exactLetters,
     lemma: lemma,
     grammar: grammar,
     distance: distance,

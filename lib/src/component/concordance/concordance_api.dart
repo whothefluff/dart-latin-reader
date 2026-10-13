@@ -7,9 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
+import '../../core/semivowel_search.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import '../library/catalog_api.dart';
+import '../settings/general_settings_api.dart';
 import 'concordance.drift.dart';
 import 'concordance_parameters.dart';
 import 'concordance_query.dart';
@@ -31,9 +33,18 @@ Future<ConcordanceHits> concordanceHits(
   log.info(() => '@riverpod - using $query, offset $offset, limit $limit');
   ref.cacheFor(const Duration(minutes: 5));
   final catalog = await ref.watch(libraryCatalogProvider.future);
+  final settings = await ref.watch(generalSettingsNotifierProvider.future);
   final db = await ref.watch(dbProvider.future);
   final repo = ConcordanceRepository(db.concordanceDrift);
-  return GetConcordanceHitsUseCase(repo, query, catalog, offset, limit).invoke();
+  final semivowelSearchRules = settings.semivowelSearchRules;
+  return GetConcordanceHitsUseCase(
+    repo,
+    query,
+    catalog,
+    offset,
+    limit,
+    semivowelSearchRules,
+  ).invoke();
 }
 
 class ConcordanceRepository implements IConcordanceRepository {
@@ -44,8 +55,18 @@ class ConcordanceRepository implements IConcordanceRepository {
   final ConcordanceDrift _db;
 
   @override
-  Future<ConcordanceHits> getHits(query, workIds, offset, limit) async {
-    final parameters = ConcordanceParameters.of(query, workIds);
+  Future<ConcordanceHits> getHits(
+    query,
+    workIds,
+    offset,
+    limit,
+    spellingsWithSemivowels,
+  ) async {
+    final parameters = ConcordanceParameters.of(
+      query,
+      workIds,
+      spellingsWithSemivowels: spellingsWithSemivowels,
+    );
     final stopwatch = Stopwatch()..start();
     final rows = await _db
         .getConcordanceHits(
@@ -69,6 +90,17 @@ class ConcordanceRepository implements IConcordanceRepository {
     );
     log.fine(() => 'read ${hits.hits.length} of ${hits.total} hits in $elapsed ms: $parameters');
     return hits;
+  }
+
+  @override
+  Future<Set<String>> getSpellingsWithSemivowelsOf(spellingsInVowelLetters) async {
+    log.fine(() => 'reading the spellings with semivowel letters of $spellingsInVowelLetters');
+    final spellings = await _db
+        .getConcordanceSpellingsWithSemivowelsOf(
+          spellingsInVowelLetters: spellingsInVowelLetters.toList(),
+        )
+        .get();
+    return spellings.toSet();
   }
 
   static ConcordanceHit _hit(List<GetConcordanceHitsResult> rows) {
@@ -102,7 +134,10 @@ abstract interface class IConcordanceRepository {
     List<String> workIds,
     int offset,
     int limit,
+    SpellingsWithSemivowels spellingsWithSemivowels,
   );
+
+  Future<Set<String>> getSpellingsWithSemivowelsOf(Set<String> spellingsInVowelLetters);
   //
 }
 
@@ -113,6 +148,7 @@ class GetConcordanceHitsUseCase implements IGetConcordanceHitsUseCase {
     this._catalog,
     this._offset,
     this._limit,
+    this._semivowelSearchRules,
   );
 
   final IConcordanceRepository _repository;
@@ -120,14 +156,28 @@ class GetConcordanceHitsUseCase implements IGetConcordanceHitsUseCase {
   final LibraryCatalog _catalog;
   final int _offset;
   final int _limit;
+  final SemivowelSearchRules _semivowelSearchRules;
 
   @override
   Future<ConcordanceHits> invoke() async {
     final workIds = _searchedWorks();
     return workIds.isEmpty || !_query.isComplete
         ? ConcordanceHits(hits: const [], total: 0, offset: _offset)
-        : await _repository.getHits(_query, workIds, _offset, _limit);
+        : await _repository.getHits(
+            _query,
+            workIds,
+            _offset,
+            _limit,
+            await _spellingsWithSemivowels(),
+          );
   }
+
+  Future<SpellingsWithSemivowels> _spellingsWithSemivowels() async => SpellingsWithSemivowels(
+    await _repository.getSpellingsWithSemivowelsOf(
+      typedSpellingsOf(_query).map(toVowelLetters).toSet(),
+    ),
+    _semivowelSearchRules,
+  );
 
   /// The works to search, by author and then by name (the catalog's order)
   List<String> _searchedWorks() {

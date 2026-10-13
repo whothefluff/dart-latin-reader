@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show Color, ThemeMode;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
+import '../../core/semivowel_search.dart';
 import '../../external/settings.dart';
 
 part 'general_settings_api.g.dart';
@@ -18,6 +19,8 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
   //
   static const _theme = 'app.themeMode';
   static const _accentColor = 'app.accentColor';
+  static const _typedIFindsJ = 'app.typedIFindsJ';
+  static const _typedUFindsV = 'app.typedUFindsV';
   static final Map<String, ThemeMode> _themeModesByName = ThemeMode.values.asNameMap();
 
   /// Loads the User's preferred ThemeMode and other global settings
@@ -28,11 +31,17 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
     final repo = ref.watch(settingsRepositoryProvider);
     final savedTheme = (await repo.get(_theme, PrefString.hint))?.value;
     final savedAccentColor = await repo.get(_accentColor, PrefInt.hint);
+    final savedTypedIFindsJ = await repo.get(_typedIFindsJ, PrefBool.hint);
+    final savedTypedUFindsV = await repo.get(_typedUFindsV, PrefBool.hint);
     final settings = GeneralSettings(
       themeMode: _themeModesByName[savedTheme] ?? GeneralSettings._defaultThemeMode,
       accentColor: savedAccentColor != null
           ? Color(savedAccentColor.value)
           : GeneralSettings._defaultAccentColor,
+      semivowelSearchRules: SemivowelSearchRules(
+        iFindsJ: savedTypedIFindsJ?.value ?? GeneralSettings._defaultSemivowelSearch.iFindsJ,
+        uFindsV: savedTypedUFindsV?.value ?? GeneralSettings._defaultSemivowelSearch.uFindsV,
+      ),
     );
     return log.exit(r: settings)!;
   }
@@ -49,6 +58,8 @@ class GeneralSettingsNotifier extends _$GeneralSettingsNotifier {
         final repo = ref.read(settingsRepositoryProvider);
         await repo.set(_theme, PrefString(newSettings.themeMode.name));
         await repo.set(_accentColor, _accentColorValue(newSettings));
+        await repo.set(_typedIFindsJ, PrefBool(newSettings.semivowelSearchRules.iFindsJ));
+        await repo.set(_typedUFindsV, PrefBool(newSettings.semivowelSearchRules.uFindsV));
       } on Exception catch (e, st) {
         log
           ..catching(e, stackTrace: st)
@@ -75,21 +86,30 @@ class GeneralSettings {
   const GeneralSettings({
     required this.themeMode,
     required this.accentColor,
+    required this.semivowelSearchRules,
   });
 
   const GeneralSettings.defaults()
     : this(
         themeMode: _defaultThemeMode,
         accentColor: _defaultAccentColor,
+        semivowelSearchRules: _defaultSemivowelSearch,
       );
 
   final ThemeMode themeMode;
 
   /// The color the app's color scheme is generated from, or `null` for Material's baseline scheme
   final Color? accentColor;
+
+  final SemivowelSearchRules semivowelSearchRules;
+
   static const _unset = Object();
   static const ThemeMode _defaultThemeMode = ThemeMode.system;
   static const Color? _defaultAccentColor = null;
+  static const SemivowelSearchRules _defaultSemivowelSearch = SemivowelSearchRules(
+    iFindsJ: false,
+    uFindsV: false,
+  );
 
   /// Returns a copy with the given fields replaced.
   ///
@@ -99,21 +119,26 @@ class GeneralSettings {
   GeneralSettings copyWith({
     ThemeMode? themeMode,
     Object? accentColor = _unset,
+    SemivowelSearchRules? semivowelSearchRules,
   }) => GeneralSettings(
     themeMode: themeMode ?? this.themeMode,
     accentColor: accentColor == _unset ? this.accentColor : accentColor as Color?,
+    semivowelSearchRules: semivowelSearchRules ?? this.semivowelSearchRules,
   );
   @override
-  String toString() => 'GeneralSettings{themeMode: $themeMode, accentColor: $accentColor}';
+  String toString() =>
+      'GeneralSettings{themeMode: $themeMode, accentColor: $accentColor, '
+      'semivowelSearch: $semivowelSearchRules}';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is GeneralSettings &&
           other.themeMode == themeMode &&
-          other.accentColor == accentColor);
+          other.accentColor == accentColor &&
+          other.semivowelSearchRules == semivowelSearchRules);
 
   @override
-  int get hashCode => Object.hash(themeMode, accentColor);
+  int get hashCode => Object.hash(themeMode, accentColor, semivowelSearchRules);
   //
 }

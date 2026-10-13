@@ -3,7 +3,7 @@
 import 'package:drift/drift.dart' as i0;
 import 'package:latin_reader/src/component/library/library.drift.dart' as i1;
 import 'dart:typed_data' as i2;
-import 'package:latin_reader/src/component/library/semivowel_spelling.dart'
+import 'package:latin_reader/src/component/library/semivowel_orthography.dart'
     as i3;
 import 'package:latin_reader/src/component/library/proper_noun_state.dart'
     as i4;
@@ -361,20 +361,20 @@ typedef $WorksCreateCompanionBuilder =
       required String id,
       required String name,
       required String about,
-      required i3.SemivowelLetters uvLowercase,
-      required i3.SemivowelLetters uvCapitals,
-      required i3.SemivowelLetters ijLowercase,
-      required i3.SemivowelLetters ijCapitals,
+      required i3.SemivowelForm uvLowercase,
+      required i3.SemivowelForm uvCapitals,
+      required i3.SemivowelForm ijLowercase,
+      required i3.SemivowelForm ijCapitals,
     });
 typedef $WorksUpdateCompanionBuilder =
     i1.WorksCompanion Function({
       i0.Value<String> id,
       i0.Value<String> name,
       i0.Value<String> about,
-      i0.Value<i3.SemivowelLetters> uvLowercase,
-      i0.Value<i3.SemivowelLetters> uvCapitals,
-      i0.Value<i3.SemivowelLetters> ijLowercase,
-      i0.Value<i3.SemivowelLetters> ijCapitals,
+      i0.Value<i3.SemivowelForm> uvLowercase,
+      i0.Value<i3.SemivowelForm> uvCapitals,
+      i0.Value<i3.SemivowelForm> ijLowercase,
+      i0.Value<i3.SemivowelForm> ijCapitals,
     });
 
 class $WorksFilterComposer extends i0.Composer<i0.GeneratedDatabase, i1.Works> {
@@ -400,41 +400,25 @@ class $WorksFilterComposer extends i0.Composer<i0.GeneratedDatabase, i1.Works> {
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnWithTypeConverterFilters<
-    i3.SemivowelLetters,
-    i3.SemivowelLetters,
-    String
-  >
+  i0.ColumnWithTypeConverterFilters<i3.SemivowelForm, i3.SemivowelForm, String>
   get uvLowercase => $composableBuilder(
     column: $table.uvLowercase,
     builder: (column) => i0.ColumnWithTypeConverterFilters(column),
   );
 
-  i0.ColumnWithTypeConverterFilters<
-    i3.SemivowelLetters,
-    i3.SemivowelLetters,
-    String
-  >
+  i0.ColumnWithTypeConverterFilters<i3.SemivowelForm, i3.SemivowelForm, String>
   get uvCapitals => $composableBuilder(
     column: $table.uvCapitals,
     builder: (column) => i0.ColumnWithTypeConverterFilters(column),
   );
 
-  i0.ColumnWithTypeConverterFilters<
-    i3.SemivowelLetters,
-    i3.SemivowelLetters,
-    String
-  >
+  i0.ColumnWithTypeConverterFilters<i3.SemivowelForm, i3.SemivowelForm, String>
   get ijLowercase => $composableBuilder(
     column: $table.ijLowercase,
     builder: (column) => i0.ColumnWithTypeConverterFilters(column),
   );
 
-  i0.ColumnWithTypeConverterFilters<
-    i3.SemivowelLetters,
-    i3.SemivowelLetters,
-    String
-  >
+  i0.ColumnWithTypeConverterFilters<i3.SemivowelForm, i3.SemivowelForm, String>
   get ijCapitals => $composableBuilder(
     column: $table.ijCapitals,
     builder: (column) => i0.ColumnWithTypeConverterFilters(column),
@@ -504,25 +488,25 @@ class $WorksAnnotationComposer
   i0.GeneratedColumn<String> get about =>
       $composableBuilder(column: $table.about, builder: (column) => column);
 
-  i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   get uvLowercase => $composableBuilder(
     column: $table.uvLowercase,
     builder: (column) => column,
   );
 
-  i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   get uvCapitals => $composableBuilder(
     column: $table.uvCapitals,
     builder: (column) => column,
   );
 
-  i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   get ijLowercase => $composableBuilder(
     column: $table.ijLowercase,
     builder: (column) => column,
   );
 
-  i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   get ijCapitals => $composableBuilder(
     column: $table.ijCapitals,
     builder: (column) => column,
@@ -560,14 +544,12 @@ class $WorksTableManager
                 i0.Value<String> id = const i0.Value.absent(),
                 i0.Value<String> name = const i0.Value.absent(),
                 i0.Value<String> about = const i0.Value.absent(),
-                i0.Value<i3.SemivowelLetters> uvLowercase =
+                i0.Value<i3.SemivowelForm> uvLowercase =
                     const i0.Value.absent(),
-                i0.Value<i3.SemivowelLetters> uvCapitals =
+                i0.Value<i3.SemivowelForm> uvCapitals = const i0.Value.absent(),
+                i0.Value<i3.SemivowelForm> ijLowercase =
                     const i0.Value.absent(),
-                i0.Value<i3.SemivowelLetters> ijLowercase =
-                    const i0.Value.absent(),
-                i0.Value<i3.SemivowelLetters> ijCapitals =
-                    const i0.Value.absent(),
+                i0.Value<i3.SemivowelForm> ijCapitals = const i0.Value.absent(),
               }) => i1.WorksCompanion(
                 id: id,
                 name: name,
@@ -582,10 +564,10 @@ class $WorksTableManager
                 required String id,
                 required String name,
                 required String about,
-                required i3.SemivowelLetters uvLowercase,
-                required i3.SemivowelLetters uvCapitals,
-                required i3.SemivowelLetters ijLowercase,
-                required i3.SemivowelLetters ijCapitals,
+                required i3.SemivowelForm uvLowercase,
+                required i3.SemivowelForm uvCapitals,
+                required i3.SemivowelForm ijLowercase,
+                required i3.SemivowelForm ijCapitals,
               }) => i1.WorksCompanion.insert(
                 id: id,
                 name: name,
@@ -2915,7 +2897,7 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
-  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   uvLowercase = i0.GeneratedColumn<String>(
     'uvLowercase',
     aliasedName,
@@ -2924,8 +2906,8 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
     requiredDuringInsert: true,
     $customConstraints:
         'NOT NULL CHECK (uvLowercase IN (\'uv\', \'u\', \'v\'))',
-  ).withConverter<i3.SemivowelLetters>(i1.Works.$converteruvLowercase);
-  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  ).withConverter<i3.SemivowelForm>(i1.Works.$converteruvLowercase);
+  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   uvCapitals = i0.GeneratedColumn<String>(
     'uvCapitals',
     aliasedName,
@@ -2933,8 +2915,8 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
     type: i0.DriftSqlType.string,
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL CHECK (uvCapitals IN (\'UV\', \'U\', \'V\'))',
-  ).withConverter<i3.SemivowelLetters>(i1.Works.$converteruvCapitals);
-  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  ).withConverter<i3.SemivowelForm>(i1.Works.$converteruvCapitals);
+  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   ijLowercase = i0.GeneratedColumn<String>(
     'ijLowercase',
     aliasedName,
@@ -2943,8 +2925,8 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
     requiredDuringInsert: true,
     $customConstraints:
         'NOT NULL CHECK (ijLowercase IN (\'ij\', \'i\', \'j\'))',
-  ).withConverter<i3.SemivowelLetters>(i1.Works.$converterijLowercase);
-  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  ).withConverter<i3.SemivowelForm>(i1.Works.$converterijLowercase);
+  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   ijCapitals = i0.GeneratedColumn<String>(
     'ijCapitals',
     aliasedName,
@@ -2952,7 +2934,7 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
     type: i0.DriftSqlType.string,
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL CHECK (ijCapitals IN (\'IJ\', \'I\', \'J\'))',
-  ).withConverter<i3.SemivowelLetters>(i1.Works.$converterijCapitals);
+  ).withConverter<i3.SemivowelForm>(i1.Works.$converterijCapitals);
   @override
   List<i0.GeneratedColumn> get $columns => [
     id,
@@ -3049,14 +3031,14 @@ class Works extends i0.Table with i0.TableInfo<Works, i1.Work> {
     return Works(attachedDatabase, alias);
   }
 
-  static i0.TypeConverter<i3.SemivowelLetters, String> $converteruvLowercase =
-      const i3.SemivowelLettersConverter('u', 'v');
-  static i0.TypeConverter<i3.SemivowelLetters, String> $converteruvCapitals =
-      const i3.SemivowelLettersConverter('U', 'V');
-  static i0.TypeConverter<i3.SemivowelLetters, String> $converterijLowercase =
-      const i3.SemivowelLettersConverter('i', 'j');
-  static i0.TypeConverter<i3.SemivowelLetters, String> $converterijCapitals =
-      const i3.SemivowelLettersConverter('I', 'J');
+  static i0.TypeConverter<i3.SemivowelForm, String> $converteruvLowercase =
+      const i3.SemivowelsConverter('u', 'v');
+  static i0.TypeConverter<i3.SemivowelForm, String> $converteruvCapitals =
+      const i3.SemivowelsConverter('U', 'V');
+  static i0.TypeConverter<i3.SemivowelForm, String> $converterijLowercase =
+      const i3.SemivowelsConverter('i', 'j');
+  static i0.TypeConverter<i3.SemivowelForm, String> $converterijCapitals =
+      const i3.SemivowelsConverter('I', 'J');
   @override
   bool get withoutRowId => true;
   @override
@@ -3071,10 +3053,10 @@ class Work extends i0.DataClass implements i0.Insertable<i1.Work> {
   final String id;
   final String name;
   final String about;
-  final i3.SemivowelLetters uvLowercase;
-  final i3.SemivowelLetters uvCapitals;
-  final i3.SemivowelLetters ijLowercase;
-  final i3.SemivowelLetters ijCapitals;
+  final i3.SemivowelForm uvLowercase;
+  final i3.SemivowelForm uvCapitals;
+  final i3.SemivowelForm ijLowercase;
+  final i3.SemivowelForm ijCapitals;
   const Work({
     required this.id,
     required this.name,
@@ -3134,14 +3116,10 @@ class Work extends i0.DataClass implements i0.Insertable<i1.Work> {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       about: serializer.fromJson<String>(json['about']),
-      uvLowercase: serializer.fromJson<i3.SemivowelLetters>(
-        json['uvLowercase'],
-      ),
-      uvCapitals: serializer.fromJson<i3.SemivowelLetters>(json['uvCapitals']),
-      ijLowercase: serializer.fromJson<i3.SemivowelLetters>(
-        json['ijLowercase'],
-      ),
-      ijCapitals: serializer.fromJson<i3.SemivowelLetters>(json['ijCapitals']),
+      uvLowercase: serializer.fromJson<i3.SemivowelForm>(json['uvLowercase']),
+      uvCapitals: serializer.fromJson<i3.SemivowelForm>(json['uvCapitals']),
+      ijLowercase: serializer.fromJson<i3.SemivowelForm>(json['ijLowercase']),
+      ijCapitals: serializer.fromJson<i3.SemivowelForm>(json['ijCapitals']),
     );
   }
   @override
@@ -3151,10 +3129,10 @@ class Work extends i0.DataClass implements i0.Insertable<i1.Work> {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'about': serializer.toJson<String>(about),
-      'uvLowercase': serializer.toJson<i3.SemivowelLetters>(uvLowercase),
-      'uvCapitals': serializer.toJson<i3.SemivowelLetters>(uvCapitals),
-      'ijLowercase': serializer.toJson<i3.SemivowelLetters>(ijLowercase),
-      'ijCapitals': serializer.toJson<i3.SemivowelLetters>(ijCapitals),
+      'uvLowercase': serializer.toJson<i3.SemivowelForm>(uvLowercase),
+      'uvCapitals': serializer.toJson<i3.SemivowelForm>(uvCapitals),
+      'ijLowercase': serializer.toJson<i3.SemivowelForm>(ijLowercase),
+      'ijCapitals': serializer.toJson<i3.SemivowelForm>(ijCapitals),
     };
   }
 
@@ -3162,10 +3140,10 @@ class Work extends i0.DataClass implements i0.Insertable<i1.Work> {
     String? id,
     String? name,
     String? about,
-    i3.SemivowelLetters? uvLowercase,
-    i3.SemivowelLetters? uvCapitals,
-    i3.SemivowelLetters? ijLowercase,
-    i3.SemivowelLetters? ijCapitals,
+    i3.SemivowelForm? uvLowercase,
+    i3.SemivowelForm? uvCapitals,
+    i3.SemivowelForm? ijLowercase,
+    i3.SemivowelForm? ijCapitals,
   }) => i1.Work(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -3236,10 +3214,10 @@ class WorksCompanion extends i0.UpdateCompanion<i1.Work> {
   final i0.Value<String> id;
   final i0.Value<String> name;
   final i0.Value<String> about;
-  final i0.Value<i3.SemivowelLetters> uvLowercase;
-  final i0.Value<i3.SemivowelLetters> uvCapitals;
-  final i0.Value<i3.SemivowelLetters> ijLowercase;
-  final i0.Value<i3.SemivowelLetters> ijCapitals;
+  final i0.Value<i3.SemivowelForm> uvLowercase;
+  final i0.Value<i3.SemivowelForm> uvCapitals;
+  final i0.Value<i3.SemivowelForm> ijLowercase;
+  final i0.Value<i3.SemivowelForm> ijCapitals;
   const WorksCompanion({
     this.id = const i0.Value.absent(),
     this.name = const i0.Value.absent(),
@@ -3253,10 +3231,10 @@ class WorksCompanion extends i0.UpdateCompanion<i1.Work> {
     required String id,
     required String name,
     required String about,
-    required i3.SemivowelLetters uvLowercase,
-    required i3.SemivowelLetters uvCapitals,
-    required i3.SemivowelLetters ijLowercase,
-    required i3.SemivowelLetters ijCapitals,
+    required i3.SemivowelForm uvLowercase,
+    required i3.SemivowelForm uvCapitals,
+    required i3.SemivowelForm ijLowercase,
+    required i3.SemivowelForm ijCapitals,
   }) : id = i0.Value(id),
        name = i0.Value(name),
        about = i0.Value(about),
@@ -3288,10 +3266,10 @@ class WorksCompanion extends i0.UpdateCompanion<i1.Work> {
     i0.Value<String>? id,
     i0.Value<String>? name,
     i0.Value<String>? about,
-    i0.Value<i3.SemivowelLetters>? uvLowercase,
-    i0.Value<i3.SemivowelLetters>? uvCapitals,
-    i0.Value<i3.SemivowelLetters>? ijLowercase,
-    i0.Value<i3.SemivowelLetters>? ijCapitals,
+    i0.Value<i3.SemivowelForm>? uvLowercase,
+    i0.Value<i3.SemivowelForm>? uvCapitals,
+    i0.Value<i3.SemivowelForm>? ijLowercase,
+    i0.Value<i3.SemivowelForm>? ijCapitals,
   }) {
     return i1.WorksCompanion(
       id: id ?? this.id,
@@ -7495,10 +7473,10 @@ class LibraryWorkDetail extends i0.DataClass {
   final String id;
   final String name;
   final String about;
-  final i3.SemivowelLetters uvLowercase;
-  final i3.SemivowelLetters uvCapitals;
-  final i3.SemivowelLetters ijLowercase;
-  final i3.SemivowelLetters ijCapitals;
+  final i3.SemivowelForm uvLowercase;
+  final i3.SemivowelForm uvCapitals;
+  final i3.SemivowelForm ijLowercase;
+  final i3.SemivowelForm ijCapitals;
   final int numberOfWords;
   final int lastIndex;
   final String? authorId;
@@ -7525,14 +7503,10 @@ class LibraryWorkDetail extends i0.DataClass {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       about: serializer.fromJson<String>(json['about']),
-      uvLowercase: serializer.fromJson<i3.SemivowelLetters>(
-        json['uvLowercase'],
-      ),
-      uvCapitals: serializer.fromJson<i3.SemivowelLetters>(json['uvCapitals']),
-      ijLowercase: serializer.fromJson<i3.SemivowelLetters>(
-        json['ijLowercase'],
-      ),
-      ijCapitals: serializer.fromJson<i3.SemivowelLetters>(json['ijCapitals']),
+      uvLowercase: serializer.fromJson<i3.SemivowelForm>(json['uvLowercase']),
+      uvCapitals: serializer.fromJson<i3.SemivowelForm>(json['uvCapitals']),
+      ijLowercase: serializer.fromJson<i3.SemivowelForm>(json['ijLowercase']),
+      ijCapitals: serializer.fromJson<i3.SemivowelForm>(json['ijCapitals']),
       numberOfWords: serializer.fromJson<int>(json['numberOfWords']),
       lastIndex: serializer.fromJson<int>(json['lastIndex']),
       authorId: serializer.fromJson<String?>(json['authorId']),
@@ -7546,10 +7520,10 @@ class LibraryWorkDetail extends i0.DataClass {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'about': serializer.toJson<String>(about),
-      'uvLowercase': serializer.toJson<i3.SemivowelLetters>(uvLowercase),
-      'uvCapitals': serializer.toJson<i3.SemivowelLetters>(uvCapitals),
-      'ijLowercase': serializer.toJson<i3.SemivowelLetters>(ijLowercase),
-      'ijCapitals': serializer.toJson<i3.SemivowelLetters>(ijCapitals),
+      'uvLowercase': serializer.toJson<i3.SemivowelForm>(uvLowercase),
+      'uvCapitals': serializer.toJson<i3.SemivowelForm>(uvCapitals),
+      'ijLowercase': serializer.toJson<i3.SemivowelForm>(ijLowercase),
+      'ijCapitals': serializer.toJson<i3.SemivowelForm>(ijCapitals),
       'numberOfWords': serializer.toJson<int>(numberOfWords),
       'lastIndex': serializer.toJson<int>(lastIndex),
       'authorId': serializer.toJson<String?>(authorId),
@@ -7561,10 +7535,10 @@ class LibraryWorkDetail extends i0.DataClass {
     String? id,
     String? name,
     String? about,
-    i3.SemivowelLetters? uvLowercase,
-    i3.SemivowelLetters? uvCapitals,
-    i3.SemivowelLetters? ijLowercase,
-    i3.SemivowelLetters? ijCapitals,
+    i3.SemivowelForm? uvLowercase,
+    i3.SemivowelForm? uvCapitals,
+    i3.SemivowelForm? ijLowercase,
+    i3.SemivowelForm? ijCapitals,
     int? numberOfWords,
     int? lastIndex,
     i0.Value<String?> authorId = const i0.Value.absent(),
@@ -7740,34 +7714,34 @@ class LibraryWorkDetails
     false,
     type: i0.DriftSqlType.string,
   );
-  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   uvLowercase = i0.GeneratedColumn<String>(
     'uvLowercase',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  ).withConverter<i3.SemivowelLetters>(i1.Works.$converteruvLowercase);
-  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  ).withConverter<i3.SemivowelForm>(i1.Works.$converteruvLowercase);
+  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   uvCapitals = i0.GeneratedColumn<String>(
     'uvCapitals',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  ).withConverter<i3.SemivowelLetters>(i1.Works.$converteruvCapitals);
-  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  ).withConverter<i3.SemivowelForm>(i1.Works.$converteruvCapitals);
+  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   ijLowercase = i0.GeneratedColumn<String>(
     'ijLowercase',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  ).withConverter<i3.SemivowelLetters>(i1.Works.$converterijLowercase);
-  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelLetters, String>
+  ).withConverter<i3.SemivowelForm>(i1.Works.$converterijLowercase);
+  late final i0.GeneratedColumnWithTypeConverter<i3.SemivowelForm, String>
   ijCapitals = i0.GeneratedColumn<String>(
     'ijCapitals',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
-  ).withConverter<i3.SemivowelLetters>(i1.Works.$converterijCapitals);
+  ).withConverter<i3.SemivowelForm>(i1.Works.$converterijCapitals);
   late final i0.GeneratedColumn<int> numberOfWords = i0.GeneratedColumn<int>(
     'numberOfWords',
     aliasedName,

@@ -9,7 +9,7 @@ import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import 'library.drift.dart';
-import 'semivowel_spelling.dart';
+import 'semivowel_orthography.dart';
 
 part 'work_details_api.g.dart';
 
@@ -81,10 +81,10 @@ class WorkDetails {
     required this.numberOfWords,
     required this.authorId,
     required this.authorName,
-    required SemivowelLetters uvLowercase,
-    required SemivowelLetters uvCapitals,
-    required SemivowelLetters ijLowercase,
-    required SemivowelLetters ijCapitals,
+    required SemivowelForm uvLowercase,
+    required SemivowelForm uvCapitals,
+    required SemivowelForm ijLowercase,
+    required SemivowelForm ijCapitals,
   }) : _uvLowercase = uvLowercase,
        _uvCapitals = uvCapitals,
        _ijLowercase = ijLowercase,
@@ -98,12 +98,12 @@ class WorkDetails {
   final int numberOfWords; // display only
   final String? authorId;
   final String? authorName;
-  final SemivowelLetters _uvLowercase;
-  final SemivowelLetters _uvCapitals;
-  final SemivowelLetters _ijLowercase;
-  final SemivowelLetters _ijCapitals;
+  final SemivowelForm _uvLowercase;
+  final SemivowelForm _uvCapitals;
+  final SemivowelForm _ijLowercase;
+  final SemivowelForm _ijCapitals;
 
-  SemivowelSpelling get editionSemivowelSpelling => SemivowelSpelling(
+  SemivowelOrthography get editionSemivowelOrthography => SemivowelOrthography(
     uvLowercase: _uvLowercase,
     uvCapitals: _uvCapitals,
     ijLowercase: _ijLowercase,

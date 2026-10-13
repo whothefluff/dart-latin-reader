@@ -10,7 +10,7 @@ import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
 import 'library.drift.dart';
-import 'semivowel_spelling.dart';
+import 'semivowel_orthography.dart';
 import 'subdivision_type.dart';
 
 part 'work_index_api.g.dart';
@@ -151,13 +151,20 @@ class WorkIndexEntry {
   String get referenceLabel =>
       startReference == endReference ? startReference : '$startReference – $endReference';
 
-  /// Returns [label] with [spelling], except for its numerals.
-  String labelSpelledWith(SemivowelSpelling spelling) {
-    final words = _word.allMatches(label).indexed.map(
-      (word) => numeralWordIndexes.contains(word.$1) ? word.$2[0]! : spelling.respell(word.$2[0]!),
-    );
+  /// Returns [label] with [orthography], except for its numerals.
+  String labelSpelledWith(SemivowelOrthography orthography) {
+    final words = _word
+        .allMatches(label)
+        .indexed
+        .map(
+          (word) =>
+              numeralWordIndexes.contains(word.$1) ? word.$2[0]! : orthography.respell(word.$2[0]!),
+        );
     final gaps = label.split(_word);
-    return [gaps.first, ...IterableZip([words, gaps.skip(1)]).expand((pair) => pair)].join();
+    return [
+      gaps.first,
+      ...IterableZip([words, gaps.skip(1)]).expand((pair) => pair),
+    ].join();
   }
 
   static final RegExp _word = RegExp(r'\p{L}+', unicode: true);

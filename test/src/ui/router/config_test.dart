@@ -12,7 +12,7 @@ void main() {
     expect(reader.queryParametersAll['highlights'], ['43', '45']);
     final query = ConcordanceQuery(
       slots: [
-        const FormCriterion('rosā'),
+        const FormCriterion('rosā', exactCase: true, exactLetters: true),
         LemmaCriterion(LemmaChoice(label: 'sum1', dictionaryRefs: const ['sum1', 'esum'])),
         GrammarCriterion(
           GrammarFilter(const {

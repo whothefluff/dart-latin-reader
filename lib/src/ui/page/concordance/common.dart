@@ -94,8 +94,7 @@ String describePhrase(ConcordanceQuery query) => query.slots
     .mapIndexed((i, slot) {
       final distance = i == 0 ? null : _distanceText(query.distanceBefore(i));
       return switch (slot) {
-        FormCriterion(:final text, :final exactCase) =>
-          '“${text.trim()}”${_notes([if (exactCase) 'exact case', ?distance])}',
+        final FormCriterion form => '“${form.text.trim()}”${_notes(_formNotes(form, distance))}',
         LemmaCriterion(:final lemma) => '${lemmaText(lemma.label)}${_notes(['lemma', ?distance])}',
         GrammarCriterion(:final grammar, :final lemma) =>
           '${_grammarText(grammar)}'
@@ -143,3 +142,10 @@ String? _distanceText(int? distance) => switch (distance) {
 };
 
 String _notes(List<String> notes) => notes.isEmpty ? '' : ' (${notes.join(', ')})';
+
+/// Returns the options of [form] that narrow what it finds, then [distance].
+List<String> _formNotes(FormCriterion form, String? distance) => [
+  if (form.exactCase) 'exact case',
+  if (form.exactLetters) 'exact letters',
+  ?distance,
+];
