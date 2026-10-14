@@ -1,13 +1,10 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/services.dart';
 
 import '../../external/database.dart';
 import '../../external/db_oracle.dart';
 import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'morph_analysis.drift.dart';
-
-const _path = 'assets/preprocessed_data/';
 
 // Type not important
 // ignore: specify_nonobvious_property_types
@@ -18,7 +15,7 @@ final operations = [
       await db.delete(db.morphologicalDetails).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${_path}morphological_details.csv');
+      final csvData = await db.csvSource.loadString('morphological_details.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch((b) {
         //ignore these entries, which won't have inflections anyway
@@ -46,7 +43,7 @@ final operations = [
       await db.delete(db.morphologicalDetailInflections).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${_path}morphological_detail_inflections.csv');
+      final csvData = await db.csvSource.loadString('morphological_detail_inflections.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
