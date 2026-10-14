@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
-import 'package:flutter/services.dart';
 
 import '../../external/database.dart';
 import '../../external/db_oracle.dart';
@@ -12,8 +11,6 @@ import 'proper_noun_state.dart';
 import 'semivowel_orthography.dart';
 import 'subdivision_type.dart';
 
-const path = 'assets/preprocessed_data/';
-
 // Type not important
 // ignore: specify_nonobvious_property_types
 final operations = [
@@ -23,7 +20,7 @@ final operations = [
       await db.delete(db.authors).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}authors.csv');
+      final csvData = await db.csvSource.loadString('authors.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -49,7 +46,7 @@ final operations = [
       await db.delete(db.authorAbbreviations).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}author_abbreviations.csv');
+      final csvData = await db.csvSource.loadString('author_abbreviations.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -74,7 +71,7 @@ final operations = [
       await db.delete(db.works).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}works.csv');
+      final csvData = await db.csvSource.loadString('works.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -103,7 +100,7 @@ final operations = [
       await db.delete(db.workAbbreviations).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}work_abbreviations.csv');
+      final csvData = await db.csvSource.loadString('work_abbreviations.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -128,7 +125,7 @@ final operations = [
       await db.delete(db.workContents).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}work_contents.csv');
+      final csvData = await db.csvSource.loadString('work_contents.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -164,7 +161,7 @@ final operations = [
       await db.delete(db.workContentSubdivisions).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}work_content_subdivisions.csv');
+      final csvData = await db.csvSource.loadString('work_content_subdivisions.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -209,7 +206,7 @@ final operations = [
       await db.delete(db.workContentSupplementary).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}work_content_supplementary.csv');
+      final csvData = await db.csvSource.loadString('work_content_supplementary.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -237,7 +234,7 @@ final operations = [
       await db.delete(db.unambiguousMacronizations).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}unambiguous_macronizations.csv');
+      final csvData = await db.csvSource.loadString('unambiguous_macronizations.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -261,7 +258,7 @@ final operations = [
       await db.delete(db.workMacronizations).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}work_macronizations.csv');
+      final csvData = await db.csvSource.loadString('work_macronizations.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -302,7 +299,7 @@ final operations = [
       await db.delete(db.authorsAndWorks).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}authors_and_works.csv');
+      final csvData = await db.csvSource.loadString('authors_and_works.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(

@@ -52,10 +52,13 @@ class AppDb extends $AppDb {
   AppDb({
     QueryExecutor? executor,
     bool? populateFromCsv,
+    util.CsvSource? csvSource,
   }) : _populateFromCsv = populateFromCsv ?? !_useBundledDatabase,
+       csvSource = csvSource ?? const util.BundledCsvSource(),
        super(executor ?? _openConnection());
 
   final bool _populateFromCsv;
+  final util.CsvSource csvSource;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

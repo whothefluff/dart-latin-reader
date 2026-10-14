@@ -1,13 +1,10 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 import '../../external/database.dart';
 import '../../external/db_oracle.dart';
 import '../../external/file_util.dart';
 import '../../external/value_util.dart';
 import 'dictionary.drift.dart';
-
-const path = 'assets/preprocessed_data/';
 
 // Type not important
 // ignore: specify_nonobvious_property_types
@@ -18,7 +15,7 @@ final operations = [
       await db.delete(db.dictionaries).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}dictionaries.csv');
+      final csvData = await db.csvSource.loadString('dictionaries.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -45,7 +42,7 @@ final operations = [
       await db.delete(db.dictionaryEntries).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}dictionary_entries.csv');
+      final csvData = await db.csvSource.loadString('dictionary_entries.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(
@@ -73,7 +70,7 @@ final operations = [
       await db.delete(db.dictEntrySenses).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}dict_entry_senses.csv');
+      final csvData = await db.csvSource.loadString('dict_entry_senses.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(
         csvData,
         shouldParseNumbers: false,
@@ -103,7 +100,7 @@ final operations = [
       await db.delete(db.dictEntrySenseQuotes).go();
     },
     insert: (AppDb db) async {
-      final csvData = await rootBundle.loadString('${path}dict_entry_sense_quotes.csv');
+      final csvData = await db.csvSource.loadString('dict_entry_sense_quotes.csv');
       final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
       await db.batch(
         (b) => b.insertAll(

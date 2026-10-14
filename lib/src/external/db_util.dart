@@ -14,6 +14,24 @@ import 'db_oracle.dart';
 
 const path = 'assets/preprocessed_data/';
 
+/// A source of the CSV files that populate the database.
+// Exception for APIs
+// ignore: one_member_abstracts
+abstract interface class CsvSource {
+  //
+  Future<String> loadString(String fileName);
+  //
+}
+
+/// The CSV files that come with the app.
+class BundledCsvSource implements CsvSource {
+  const BundledCsvSource();
+
+  @override
+  Future<String> loadString(String fileName) => rootBundle.loadString('$path$fileName');
+  //
+}
+
 void setupRegExp(Database db) {
   db.createFunction(
     functionName: 'regexp',
