@@ -23,6 +23,8 @@ Step 2 is for local builds. Those apps already have a `data.db` from an earlier 
 
 Builds from GitHub don't need it: they get a new `data.db` whenever the data changes.
 
+If the producer changed the columns of its CSV files, or how it combines several works, also update the test files in `test/fixtures/two_works_by_one_author/`. Its README explains how. New data alone, such as a new work, doesn't need it.
+
 ## Changing DB schema
 
 Local builds refill data but never change the tables in an existing `data.db`. Delete it once and the next launch makes a new one:
