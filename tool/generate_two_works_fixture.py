@@ -101,34 +101,55 @@ def readme(producer_commit: str, library_files: List[str], counts: Dict[str, int
     lines = [
         '# Two works by one author',
         '',
-        'The CSV files that `test/src/external/db_util_test.dart` populates a database from, written by '
-        '`tool/generate_two_works_fixture.py`. Don\'t edit them by hand.',
+        'The test `test/src/external/db_util_test.dart` loads these CSV files into a database. The script '
+        '`tool/generate_two_works_fixture.py` writes them. Don\'t edit them by hand: the test checks the app\'s import '
+        'code against what the producer really writes.',
         '',
-        f'## From the producer, at `{producer_commit}`',
+        '## Where the files come from',
         '',
-        f'{library_list}: the aggregate of the producer\'s `{PRODUCER_FIXTURE.as_posix()}`, with `{WORKS[0]}` '
-        f'aggregated first and `{WORKS[1]}` added to it.',
+        f'These files come from the producer (python-latin-sources-processor), at commit `{producer_commit}`: '
+        f'{library_list}.',
         '',
-        f'## From the reader\'s `{ASSETS.as_posix()}`',
+        f'The producer has two small invented works in `{PRODUCER_FIXTURE.as_posix()}`. The script runs the '
+        f'producer\'s own code for combining works over them, one at a time: first `{WORKS[0]}`, then `{WORKS[1]}` '
+        'added to it.',
         '',
-        'Rows copied as they are:',
+        f'The other files come from this repository\'s `{ASSETS.as_posix()}`. The script copies only the rows that the '
+        'two works need, without changing them:',
         '',
-        f'- `morphological_details.csv` ({counts["morphological_details.csv"]} rows): the rows whose form is one of '
-        'the works\' words, case aside.',
+        f'- `morphological_details.csv` ({counts["morphological_details.csv"]} rows): the analyses of the works\' '
+        'words, whatever their capital letters.',
         f'- `morphological_detail_inflections.csv` ({counts["morphological_detail_inflections.csv"]} rows): the '
-        'inflections of those rows.',
+        'inflections of those analyses.',
         f'- `dictionaries.csv` ({counts["dictionaries.csv"]} row): the whole file.',
-        f'- `dictionary_entries.csv` ({counts["dictionary_entries.csv"]} rows): the entries whose headword (the lemma '
-        'without its number) is the headword of one of those rows\' `dictionaryRef`.',
-        f'- {", ".join(f"`{name}`" for name in HEADER_ONLY)}: the header only (the quotes file has none).',
+        f'- `dictionary_entries.csv` ({counts["dictionary_entries.csv"]} rows): the dictionary entries of those '
+        'analyses\' lemmas, and the other entries with the same headword.',
+        f'- {" and ".join(f"`{name}`" for name in HEADER_ONLY)}: only the first line (the quotes file is empty).',
         '',
-        '## Generating it again',
+        '## Updating these files',
         '',
-        'With the producer\'s requirements installed:',
+        'Run the script again when the producer changes:',
         '',
-        '```sh',
-        'python3 tool/generate_two_works_fixture.py <producer checkout>',
-        '```',
+        '- the columns of its CSV files (the test fails until you do),',
+        '- the way it combines several works into one set of files, or',
+        '- its two invented works.',
+        '',
+        'You don\'t need to run it when only the data changes: for example when you add a work, generate a work '
+        'again, or get new morphology or dictionary rows. But adding a work often comes with changes to the producer, '
+        'and those can be one of the reasons above.',
+        '',
+        'To run it:',
+        '',
+        '1. Get the producer\'s code at the commit you want, and install its requirements '
+        '(`pip install -r requirements.txt`).',
+        '2. From this repository, run:',
+        '',
+        '   ```sh',
+        '   python3 tool/generate_two_works_fixture.py <path to the producer>',
+        '   ```',
+        '',
+        '3. If the files changed, change the expected rows in `test/src/external/db_util_test.dart` to match.',
+        '4. Commit the files and the test together.',
     ]
     return '\n'.join(lines) + '\n'
 
