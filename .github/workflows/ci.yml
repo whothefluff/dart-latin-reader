@@ -125,16 +125,25 @@ jobs:
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Fail on stale generated files
+        id: generated
         run: |
           changes="$(git status --porcelain)"
           if [ -n "$changes" ]; then
             printf '%s\n' "$changes"
-            # The full diff, new files included, can be copied from the log and applied with git apply
+            # The full diff, new files included, goes in the log and in an artifact, to apply with git apply
             git add --all
-            git --no-pager diff --cached
-            echo '::error::Generated files are out of date. Run flutter pub get and build_runner with the Flutter version in pubspec.yaml, then commit the result.'
+            git --no-pager diff --cached | tee "$RUNNER_TEMP/generated-code.diff"
+            echo "::error::Generated files are out of date. Apply generated-code.diff from this run's artifacts, or run flutter pub get and build_runner with the Flutter version in pubspec.yaml, then commit the result."
             exit 1
           fi
+
+      - name: Upload the generated files' diff
+        if: failure() && steps.generated.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: generated-code-diff-${{ github.run_number }}
+          path: ${{ runner.temp }}/generated-code.diff
+          if-no-files-found: error
 
   # Each platform needs the checks too, because its publish job must wait for them
   android:
