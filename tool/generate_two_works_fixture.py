@@ -50,8 +50,8 @@ def git(repo: Path, *args: str) -> str:
     return subprocess.run(['git', '-C', str(repo), *args], check=True, capture_output=True, text=True).stdout.strip()
 
 
-def require_committed(repo: Path, *paths: str) -> None:
-    changes = git(repo, 'status', '--porcelain', '--', *paths)
+def require_committed(repo: Path) -> None:
+    changes = git(repo, 'status', '--porcelain')
     if changes:
         raise SystemExit(f'{repo} has uncommitted changes, so the fixture couldn\'t name its source:\n{changes}')
 
@@ -96,7 +96,7 @@ def aggregate_works(producer: Path, output_dir: Path) -> None:
         raise SystemExit('The aggregate saved nothing:\n' + '\n'.join(errors.messages))
 
 
-def readme(producer_commit: str, assets_commit: str, library_files: List[str], counts: Dict[str, int]) -> str:
+def readme(producer_commit: str, library_files: List[str], counts: Dict[str, int]) -> str:
     library_list = ', '.join(f'`{name}`' for name in library_files)
     lines = [
         '# Two works by one author',
@@ -109,7 +109,7 @@ def readme(producer_commit: str, assets_commit: str, library_files: List[str], c
         f'{library_list}: the aggregate of the producer\'s `{PRODUCER_FIXTURE.as_posix()}`, with `{WORKS[0]}` '
         f'aggregated first and `{WORKS[1]}` added to it.',
         '',
-        f'## From the reader\'s `{ASSETS.as_posix()}`, at `{assets_commit}`',
+        f'## From the reader\'s `{ASSETS.as_posix()}`',
         '',
         'Rows copied as they are:',
         '',
@@ -135,9 +135,7 @@ def readme(producer_commit: str, assets_commit: str, library_files: List[str], c
 
 def generate(producer: Path) -> None:
     require_committed(producer)
-    require_committed(READER, ASSETS.as_posix())
-    producer_commit = git(producer, 'rev-parse', '--short=7', 'HEAD')
-    assets_commit = git(READER, 'log', '-1', '--format=%h', '--abbrev=7', '--', ASSETS.as_posix())
+    producer_commit = git(producer, 'rev-parse', 'HEAD')
     assets = READER / ASSETS
     with tempfile.TemporaryDirectory() as temporary:
         fixture = Path(temporary)
@@ -172,13 +170,13 @@ def generate(producer: Path) -> None:
                   'morphological_detail_inflections.csv': len(word_inflections),
                   'dictionary_entries.csv': len(word_entries),
                   'dictionaries.csv': len(dictionaries.rows)}
-        (fixture / 'README.md').write_text(readme(producer_commit, assets_commit, library_files, counts),
+        (fixture / 'README.md').write_text(readme(producer_commit, library_files, counts),
                                            encoding='utf-8', newline='')
 
         target = READER / FIXTURE
         shutil.rmtree(target, ignore_errors=True)
         shutil.copytree(fixture, target)
-    print(f'Wrote {FIXTURE.as_posix()} from the producer at {producer_commit} and the assets at {assets_commit}')
+    print(f'Wrote {FIXTURE.as_posix()} from the producer at {producer_commit}')
 
 
 if __name__ == '__main__':
