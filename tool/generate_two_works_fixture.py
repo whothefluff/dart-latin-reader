@@ -135,8 +135,8 @@ def readme(producer_commit: str, library_files: List[str], counts: Dict[str, int
         '- its two invented works.',
         '',
         'You don\'t need to run it when only the data changes: for example when you add a work, generate a work '
-        'again, or get new morphology or dictionary rows. But adding a work often comes with changes to the producer, '
-        'and those can be one of the reasons above.',
+        'again, or get new morphology or dictionary rows. That said, adding a work often comes with changes to the '
+        'producer that can be one of the reasons above.',
         '',
         'To run it:',
         '',
