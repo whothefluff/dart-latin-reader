@@ -10,16 +10,20 @@ WorkContentsSegment _segment(
   String word, {
   String? macronized,
   bool isNumeral = false,
+  String node = 'verse',
+  SubdivisionType typ = SubdivisionType.verse,
+  String? poem = 'poem',
 }) => WorkContentsSegment(
   workId: 'fables',
   parent: null,
-  node: 'verse',
+  node: node,
   idx: idx,
   word: word,
   macronizedWord: macronized ?? word,
   uncertaintyBitMask: 0,
-  typ: SubdivisionType.verse,
+  typ: typ,
   depth: 1,
+  poem: poem,
   lookupForm: word,
   macronLookupForm: macronized ?? word,
   baseNormForm: word,
@@ -118,6 +122,68 @@ void main() {
 
       expect(withMacrons.selectedSegment(_select(withMacrons, 'uēnērunt'))?.idx, 15);
       expect(withMacrons.selectedSegment(_select(withMacrons, 'IV'))?.idx, 17);
+    });
+  });
+
+  group('lineBreaksBefore', () {
+    final lastVerse = _segment(16, '.', node: 'last verse', poem: 'poem 1');
+
+    test('the first verse of the next untitled poem comes after a blank line', () {
+      expect(
+        lineBreaksBefore(lastVerse, _segment(17, 'Ranae', node: 'first verse', poem: 'poem 2')),
+        2,
+      );
+    });
+
+    test('the speaker who opens the next untitled poem comes after a blank line', () {
+      expect(
+        lineBreaksBefore(
+          lastVerse,
+          _segment(17, 'Damon', node: 'speaker', typ: SubdivisionType.speech, poem: 'poem 2'),
+        ),
+        2,
+      );
+    });
+
+    test('the title of the next book comes after two blank lines', () {
+      expect(
+        lineBreaksBefore(
+          lastVerse,
+          _segment(17, 'LIBER', node: 'book title', typ: SubdivisionType.book, poem: null),
+        ),
+        3,
+      );
+    });
+
+    test('a verse of another line group of the same poem comes on the next line', () {
+      expect(
+        lineBreaksBefore(lastVerse, _segment(17, 'Ranae', node: 'next verse', poem: 'poem 1')),
+        1,
+      );
+    });
+
+    test('the speaker of another speech of the same poem comes on the next line', () {
+      expect(
+        lineBreaksBefore(
+          lastVerse,
+          _segment(17, 'Damon', node: 'speaker', typ: SubdivisionType.speech, poem: 'poem 1'),
+        ),
+        1,
+      );
+    });
+
+    test('a word of the same verse comes on the same line', () {
+      expect(
+        lineBreaksBefore(
+          _segment(16, 'Ranae', poem: 'poem 1'),
+          _segment(17, 'regem', poem: 'poem 1'),
+        ),
+        0,
+      );
+    });
+
+    test('the first segment starts a line, whatever poem it belongs to', () {
+      expect(lineBreaksBefore(null, _segment(17, 'Ranae', poem: 'poem 2')), 1);
     });
   });
 }

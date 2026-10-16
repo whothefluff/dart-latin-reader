@@ -347,13 +347,20 @@ CREATE VIEW "library.staging.ResolvedMacronizations" AS
 
 CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS 
     WITH RECURSIVE Subsets AS ( SELECT *,
-                                       0 AS depth
+                                       0 AS depth,
+                                       CASE WHEN typ IN ('POEM','PROL','EPIL') 
+                                            THEN node 
+                                       END AS poem -- the poem, prologue or epilogue that holds it
                                     FROM WorkContentSubdivisions
                                     WHERE parent IS NULL
                                 UNION ALL
                                 -- Recursively find descendants until reaching leaf nodes
                                 SELECT s.*,
-                                       Subsets.depth + 1
+                                       Subsets.depth + 1,
+                                       CASE WHEN s.typ IN ('POEM','PROL','EPIL') 
+                                            THEN s.node 
+                                            ELSE Subsets.poem 
+                                       END
                                     FROM WorkContentSubdivisions AS s
                                     INNER JOIN Subsets 
                                         ON s.workId = Subsets.workId
@@ -455,6 +462,7 @@ CREATE VIEW "library.WorkContents" AS
                                         SubdivsHierarchy.typ,
                                         SubdivsHierarchy.parent,
                                         SubdivsHierarchy.depth,
+                                        SubdivsHierarchy.poem,
                                         ROW_NUMBER( ) OVER( PARTITION BY WorkContents.workId, WorkContents.idx
                                                             ORDER BY SubdivsHierarchy.fromIndex DESC, -- deterministic ordering thanks to the node
                                                                      SubdivsHierarchy.depth DESC,
@@ -474,6 +482,7 @@ CREATE VIEW "library.WorkContents" AS
                uncertaintyBitMask,
                typ,
                depth,
+               poem,
                lookupForm,
                macronLookupForm,
                baseNormForm,

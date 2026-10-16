@@ -432,19 +432,6 @@ class _TextRenderer {
   /// Should be used to open every page no matter what preceded its first segment
   static const String _pageStartBreak = _lineTerminator;
 
-  /// Separation before a block whose type differs from the previous one
-  static String _lineBreakBefore(SubdivisionType type) => switch (type) {
-    SubdivisionType.book => _lineTerminator * 3,
-    SubdivisionType.prologue => _lineTerminator * 2,
-    SubdivisionType.epilogue => _lineTerminator * 2,
-    SubdivisionType.poem => _lineTerminator * 2,
-    SubdivisionType.lineGroup => _lineTerminator,
-    SubdivisionType.speech => _lineTerminator,
-    SubdivisionType.title => _lineTerminator,
-    SubdivisionType.verse => _lineTerminator,
-    SubdivisionType.paragraph => _lineTerminator,
-  };
-
   /// Theme style for a block of [type]
   TextStyle _themeStyle(SubdivisionType type) => switch (type) {
     SubdivisionType.book => textTheme.headlineSmall!,
@@ -468,23 +455,6 @@ class _TextRenderer {
     return nextIsPunctuation || endsWithOpeningParenthesis ? _empty : _blank;
   }
 
-  String _getLineBreak(
-    SubdivisionType? previousStyle,
-    SubdivisionType currentStyle,
-    String? previousNode,
-    String currentNode,
-  ) {
-    var lineBreak = _empty;
-    if (previousStyle != null && currentStyle != previousStyle) {
-      lineBreak = _lineBreakBefore(currentStyle);
-    } else {
-      if (currentNode != previousNode) {
-        lineBreak = _lineTerminator;
-      }
-    }
-    return lineBreak;
-  }
-
   List<TextSpan> createSpans() {
     final baseTextStyle = TextStyle(
       fontFamily: readerSettings.fontFamily,
@@ -495,10 +465,7 @@ class _TextRenderer {
     );
     return workSegments.mapIndexed((i, segment) {
       final previousSegment = i > 0 ? workSegments[i - 1] : null;
-      final prevStyle = previousSegment?.typ;
-      final prevNode = previousSegment?.node;
       final currStyle = segment.typ;
-      final currNode = segment.node;
       // Merge the theme style for this block (e.g. TITL vs VERS) with the user settings
       final blockThemeStyle = _themeStyle(currStyle);
       final mergedStyle = blockThemeStyle.merge(baseTextStyle);
@@ -507,7 +474,7 @@ class _TextRenderer {
           : mergedStyle;
       // Pagination expects one outer span per segment
       return TextSpan(
-        text: _getLineBreak(prevStyle, currStyle, prevNode, currNode),
+        text: _lineTerminator * lineBreaksBefore(previousSegment, segment),
         style: finalStyle,
         children: [
           ..._wordSpans(segment, finalStyle.color ?? theme.colorScheme.onSurface),

@@ -1,13 +1,49 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../../component/library/semivowel_orthography.dart';
+import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_contents_api.dart';
 
 SemivowelOrthography semivowelOrthographyOf(
   WorkContentsSegment segment,
   SemivowelOrthography orthography,
 ) => segment.isNumeral ? SemivowelOrthography.allVocalicConsonantal : orthography;
+
+/// Returns how many line breaks go before [segment], which comes after [previous].
+///
+/// The next word of a verse or title stays on the same line, and the next verse starts a new line.
+/// Where one kind of block follows another, as the verses after a title do, the new kind decides
+int lineBreaksBefore(WorkContentsSegment? previous, WorkContentsSegment segment) {
+  final lineBreaks = previous != null && segment.typ != previous.typ
+      ? _lineBreaksBefore(segment.typ)
+      : (segment.node != previous?.node ? 1 : 0);
+  final poemLineBreaks = _lineBreaksBefore(SubdivisionType.poem);
+  return _belongsToAnotherPoem(previous, segment) ? max(lineBreaks, poemLineBreaks) : lineBreaks;
+}
+
+/// Returns how many line breaks go before a block of [type] when the block before it is of
+/// another kind.
+int _lineBreaksBefore(SubdivisionType type) => switch (type) {
+  SubdivisionType.book => 3,
+  SubdivisionType.prologue => 2,
+  SubdivisionType.epilogue => 2,
+  SubdivisionType.poem => 2,
+  SubdivisionType.lineGroup => 1,
+  SubdivisionType.speech => 1,
+  SubdivisionType.title => 1,
+  SubdivisionType.verse => 1,
+  SubdivisionType.paragraph => 1,
+};
+
+/// True when [segment] belongs to another poem, prologue or epilogue than [previous].
+bool _belongsToAnotherPoem(WorkContentsSegment? previous, WorkContentsSegment segment) =>
+    switch (previous?.poem) {
+      final poem? => poem != segment.poem,
+      null => false,
+    };
 
 /// A page's rendered text and its source segments.
 @immutable
