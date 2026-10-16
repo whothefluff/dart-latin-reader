@@ -126,7 +126,10 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await db.csvSource.loadString('work_contents.csv');
-      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(
+        csvData,
+        shouldParseNumbers: false,
+      );
       await db.batch(
         (b) => b.insertAll(
           db.workContents,
@@ -135,14 +138,14 @@ final operations = [
               .map(
                 (row) => WorkContentsCompanion(
                   workId: Value(row[0].toString()),
-                  idx: Value(row[1] as int),
+                  idx: Value(int.parse(row[1].toString())),
                   word: Value(row[2].toString()),
                   sourceReference: Value(row[3].toString()),
                   properNounState: row[4].toString().isEmpty
                       ? const Value.absent()
-                      : Value(ProperNounState.fromCode(row[4] as int)),
-                  tokenType: Value(row[5] as int),
-                  sentenceIdx: Value(row[6] as int),
+                      : Value(ProperNounState.fromCode(int.parse(row[4].toString()))),
+                  tokenType: Value(int.parse(row[5].toString())),
+                  sentenceIdx: Value(int.parse(row[6].toString())),
                   wordIdx: intValue(row[7].toString()),
                   enclitic: stringValue(row[8].toString()),
                   expansion: stringValue(row[9].toString()),
