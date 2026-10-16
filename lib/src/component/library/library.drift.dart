@@ -6789,6 +6789,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
   final int fromIndex;
   final int toIndex;
   final int depth;
+  final String poem;
   const LibraryWorkContentSubdivisionsHierarchyData({
     required this.workId,
     required this.node,
@@ -6799,6 +6800,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     required this.fromIndex,
     required this.toIndex,
     required this.depth,
+    required this.poem,
   });
   factory LibraryWorkContentSubdivisionsHierarchyData.fromJson(
     Map<String, dynamic> json, {
@@ -6815,6 +6817,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
       depth: serializer.fromJson<int>(json['depth']),
+      poem: serializer.fromJson<String>(json['poem']),
     );
   }
   @override
@@ -6830,6 +6833,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
       'depth': serializer.toJson<int>(depth),
+      'poem': serializer.toJson<String>(poem),
     };
   }
 
@@ -6843,6 +6847,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     int? fromIndex,
     int? toIndex,
     int? depth,
+    String? poem,
   }) => i1.LibraryWorkContentSubdivisionsHierarchyData(
     workId: workId ?? this.workId,
     node: node ?? this.node,
@@ -6853,6 +6858,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     fromIndex: fromIndex ?? this.fromIndex,
     toIndex: toIndex ?? this.toIndex,
     depth: depth ?? this.depth,
+    poem: poem ?? this.poem,
   );
   @override
   String toString() {
@@ -6865,7 +6871,8 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
           ..write('parent: $parent, ')
           ..write('fromIndex: $fromIndex, ')
           ..write('toIndex: $toIndex, ')
-          ..write('depth: $depth')
+          ..write('depth: $depth, ')
+          ..write('poem: $poem')
           ..write(')'))
         .toString();
   }
@@ -6881,6 +6888,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     fromIndex,
     toIndex,
     depth,
+    poem,
   );
   @override
   bool operator ==(Object other) =>
@@ -6894,7 +6902,8 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
           other.parent == this.parent &&
           other.fromIndex == this.fromIndex &&
           other.toIndex == this.toIndex &&
-          other.depth == this.depth);
+          other.depth == this.depth &&
+          other.poem == this.poem);
 }
 
 class LibraryWorkContentSubdivisionsHierarchy
@@ -6919,6 +6928,7 @@ class LibraryWorkContentSubdivisionsHierarchy
     fromIndex,
     toIndex,
     depth,
+    poem,
   ];
   @override
   String get aliasedName => _alias ?? entityName;
@@ -6927,7 +6937,7 @@ class LibraryWorkContentSubdivisionsHierarchy
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1 FROM WorkContentSubdivisions AS s INNER JOIN Subsets ON s.workId = Subsets.workId AND s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
+        'CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS WITH RECURSIVE Subsets AS (SELECT *, 0 AS depth, CASE WHEN typ IN (\'POEM\', \'PROL\', \'EPIL\') THEN node END AS poem FROM WorkContentSubdivisions WHERE parent IS NULL UNION ALL SELECT s.*, Subsets.depth + 1, CASE WHEN s.typ IN (\'POEM\', \'PROL\', \'EPIL\') THEN s.node ELSE Subsets.poem END FROM WorkContentSubdivisions AS s INNER JOIN Subsets ON s.workId = Subsets.workId AND s.parent = Subsets.node) SELECT * FROM Subsets ORDER BY fromindex, depth, toindex',
   };
   @override
   LibraryWorkContentSubdivisionsHierarchy get asDslTable => this;
@@ -6975,6 +6985,10 @@ class LibraryWorkContentSubdivisionsHierarchy
       depth: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}depth'],
+      )!,
+      poem: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}poem'],
       )!,
     );
   }
@@ -7033,6 +7047,12 @@ class LibraryWorkContentSubdivisionsHierarchy
     aliasedName,
     false,
     type: i0.DriftSqlType.int,
+  );
+  late final i0.GeneratedColumn<String> poem = i0.GeneratedColumn<String>(
+    'poem',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
   );
   @override
   LibraryWorkContentSubdivisionsHierarchy createAlias(String alias) {
@@ -7793,6 +7813,7 @@ class LibraryWorkContent extends i0.DataClass {
   final int uncertaintyBitMask;
   final i5.SubdivisionType typ;
   final int depth;
+  final String poem;
   final String? lookupForm;
   final String? macronLookupForm;
   final String? baseNormForm;
@@ -7809,6 +7830,7 @@ class LibraryWorkContent extends i0.DataClass {
     required this.uncertaintyBitMask,
     required this.typ,
     required this.depth,
+    required this.poem,
     this.lookupForm,
     this.macronLookupForm,
     this.baseNormForm,
@@ -7831,6 +7853,7 @@ class LibraryWorkContent extends i0.DataClass {
       uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
       typ: serializer.fromJson<i5.SubdivisionType>(json['typ']),
       depth: serializer.fromJson<int>(json['depth']),
+      poem: serializer.fromJson<String>(json['poem']),
       lookupForm: serializer.fromJson<String?>(json['lookupForm']),
       macronLookupForm: serializer.fromJson<String?>(json['macronLookupForm']),
       baseNormForm: serializer.fromJson<String?>(json['baseNormForm']),
@@ -7854,6 +7877,7 @@ class LibraryWorkContent extends i0.DataClass {
       'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
       'typ': serializer.toJson<i5.SubdivisionType>(typ),
       'depth': serializer.toJson<int>(depth),
+      'poem': serializer.toJson<String>(poem),
       'lookupForm': serializer.toJson<String?>(lookupForm),
       'macronLookupForm': serializer.toJson<String?>(macronLookupForm),
       'baseNormForm': serializer.toJson<String?>(baseNormForm),
@@ -7875,6 +7899,7 @@ class LibraryWorkContent extends i0.DataClass {
     int? uncertaintyBitMask,
     i5.SubdivisionType? typ,
     int? depth,
+    String? poem,
     i0.Value<String?> lookupForm = const i0.Value.absent(),
     i0.Value<String?> macronLookupForm = const i0.Value.absent(),
     i0.Value<String?> baseNormForm = const i0.Value.absent(),
@@ -7891,6 +7916,7 @@ class LibraryWorkContent extends i0.DataClass {
     uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     typ: typ ?? this.typ,
     depth: depth ?? this.depth,
+    poem: poem ?? this.poem,
     lookupForm: lookupForm.present ? lookupForm.value : this.lookupForm,
     macronLookupForm: macronLookupForm.present
         ? macronLookupForm.value
@@ -7914,6 +7940,7 @@ class LibraryWorkContent extends i0.DataClass {
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
           ..write('typ: $typ, ')
           ..write('depth: $depth, ')
+          ..write('poem: $poem, ')
           ..write('lookupForm: $lookupForm, ')
           ..write('macronLookupForm: $macronLookupForm, ')
           ..write('baseNormForm: $baseNormForm, ')
@@ -7935,6 +7962,7 @@ class LibraryWorkContent extends i0.DataClass {
     uncertaintyBitMask,
     typ,
     depth,
+    poem,
     lookupForm,
     macronLookupForm,
     baseNormForm,
@@ -7955,6 +7983,7 @@ class LibraryWorkContent extends i0.DataClass {
           other.uncertaintyBitMask == this.uncertaintyBitMask &&
           other.typ == this.typ &&
           other.depth == this.depth &&
+          other.poem == this.poem &&
           other.lookupForm == this.lookupForm &&
           other.macronLookupForm == this.macronLookupForm &&
           other.baseNormForm == this.baseNormForm &&
@@ -7981,6 +8010,7 @@ class LibraryWorkContents
     uncertaintyBitMask,
     typ,
     depth,
+    poem,
     lookupForm,
     macronLookupForm,
     baseNormForm,
@@ -7995,7 +8025,7 @@ class LibraryWorkContents
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.baseNormForm, WorkContents.properNounState, WorkContents.tokenType = 3 AS isNumeral, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, lookupForm, macronLookupForm, baseNormForm, properNounState, isNumeral, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.baseNormForm, WorkContents.properNounState, WorkContents.tokenType = 3 AS isNumeral, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, SubdivsHierarchy.poem, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, poem, lookupForm, macronLookupForm, baseNormForm, properNounState, isNumeral, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
   };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -8040,6 +8070,10 @@ class LibraryWorkContents
       depth: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}depth'],
+      )!,
+      poem: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}poem'],
       )!,
       lookupForm: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -8126,6 +8160,12 @@ class LibraryWorkContents
     aliasedName,
     false,
     type: i0.DriftSqlType.int,
+  );
+  late final i0.GeneratedColumn<String> poem = i0.GeneratedColumn<String>(
+    'poem',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
   );
   late final i0.GeneratedColumn<String> lookupForm = i0.GeneratedColumn<String>(
     'lookupForm',
@@ -8939,6 +8979,7 @@ class LibraryDrift extends i6.ModularAccessor {
           row.read<String>('typ'),
         ),
         depth: row.read<int>('depth'),
+        poem: row.read<String>('poem'),
         lookupForm: row.readNullable<String>('lookupForm'),
         macronLookupForm: row.readNullable<String>('macronLookupForm'),
         baseNormForm: row.readNullable<String>('baseNormForm'),
