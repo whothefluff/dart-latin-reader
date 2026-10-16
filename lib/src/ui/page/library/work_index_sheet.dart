@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../component/library/semivowel_orthography.dart';
-import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_index_api.dart';
 import '../../../core/contains_text.dart';
 import '../../widget/custom_adaptive_scaffold/breakpoints.dart';
@@ -342,7 +341,7 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
   // Search results are flat, with ancestry displayed as context.
   String _subtitle(WorkIndexEntry entry) => [
     if (_query.isNotEmpty) ..._ancestry(entry),
-    _typeLabel(entry),
+    if (entry.title != null) entry.typeLabel,
     'Ref. ${entry.referenceLabel}',
   ].join(' • ');
 
@@ -371,7 +370,7 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
 
   // References intentionally do not participate in search or tree structure.
   Iterable<WorkIndexEntry> get _matches => widget.index.entries.where(
-    (entry) => containsText([_label(entry), _typeLabel(entry)], _query),
+    (entry) => containsText([_label(entry), entry.typeLabel], _query),
   );
 
   void _search(String text) {
@@ -428,18 +427,5 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
   }
 
   static void _jumpToTop(ScrollPosition position) => position.jumpTo(0);
-
-  // Counters are zero-based within their parent
-  static String _typeLabel(WorkIndexEntry entry) => switch (entry.typ) {
-    SubdivisionType.book => 'Book ${entry.cnt + 1}',
-    SubdivisionType.poem => 'Poem ${entry.cnt + 1}',
-    SubdivisionType.prologue => 'Prologue',
-    SubdivisionType.epilogue => 'Epilogue',
-    SubdivisionType.lineGroup => 'Line group ${entry.cnt + 1}',
-    SubdivisionType.speech => 'Speech ${entry.cnt + 1}',
-    SubdivisionType.verse => 'Verse ${entry.cnt + 1}',
-    SubdivisionType.paragraph => 'Paragraph ${entry.cnt + 1}',
-    SubdivisionType.title => 'Title',
-  };
   //
 }
