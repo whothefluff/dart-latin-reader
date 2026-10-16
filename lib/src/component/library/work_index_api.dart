@@ -73,7 +73,7 @@ abstract interface class IGetWorkIndexUseCase {
   //
 }
 
-/// A titled subdivision of a work
+/// A book, poem, prologue or epilogue of a work
 @immutable
 class WorkIndexEntry {
   const WorkIndexEntry({
@@ -85,7 +85,7 @@ class WorkIndexEntry {
     required this.cnt,
     required this.fromIndex,
     required this.toIndex,
-    required this.label,
+    required this.title,
     required this.numeralWordIndexes,
     required this.startReference,
     required this.endReference,
@@ -100,7 +100,7 @@ class WorkIndexEntry {
     required int cnt,
     required int fromIndex,
     required int toIndex,
-    required String label,
+    required String? title,
     required String? numeralWordIndexes,
     required String startReference,
     required String endReference,
@@ -113,7 +113,7 @@ class WorkIndexEntry {
          cnt: cnt,
          fromIndex: fromIndex,
          toIndex: toIndex,
-         label: label,
+         title: title,
          numeralWordIndexes: LabelWordIndexes.fromSql(numeralWordIndexes),
          startReference: startReference,
          endReference: endReference,
@@ -137,30 +137,49 @@ class WorkIndexEntry {
   /// Last WorkContents.idx of the subdivision. Inclusive.
   final int toIndex;
 
-  /// The title
-  final String label;
+  /// `null` when the edition gives it none.
+  final String? title;
 
   final LabelWordIndexes numeralWordIndexes;
 
-  /// Source reference of the title (e.g. 1.3). Display only.
+  /// Source reference of its first token (e.g. 1.3). Display only.
   final String startReference;
 
-  /// Source reference of the title's last token. Display only.
+  /// Source reference of its last token. Display only.
   final String endReference;
 
   String get referenceLabel =>
       startReference == endReference ? startReference : '$startReference – $endReference';
 
-  /// Returns [label] with [orthography], except for its numerals.
-  String labelSpelledWith(SemivowelOrthography orthography) {
+  // Counters are zero-based within their parent
+  String get typeLabel => switch (typ) {
+    SubdivisionType.book => 'Book ${cnt + 1}',
+    SubdivisionType.poem => 'Poem ${cnt + 1}',
+    SubdivisionType.prologue => 'Prologue',
+    SubdivisionType.epilogue => 'Epilogue',
+    SubdivisionType.lineGroup => 'Line group ${cnt + 1}',
+    SubdivisionType.speech => 'Speech ${cnt + 1}',
+    SubdivisionType.verse => 'Verse ${cnt + 1}',
+    SubdivisionType.paragraph => 'Paragraph ${cnt + 1}',
+    SubdivisionType.title => 'Title',
+  };
+
+  /// Returns [title] with [orthography], except for its numerals, or [typeLabel] as it is when
+  /// there's no title.
+  String labelSpelledWith(SemivowelOrthography orthography) => switch (title) {
+    final title? => _spelledWith(title, orthography),
+    null => typeLabel,
+  };
+
+  String _spelledWith(String title, SemivowelOrthography orthography) {
     final words = _word
-        .allMatches(label)
+        .allMatches(title)
         .indexed
         .map(
           (word) =>
               numeralWordIndexes.contains(word.$1) ? word.$2[0]! : orthography.respell(word.$2[0]!),
         );
-    final gaps = label.split(_word);
+    final gaps = title.split(_word);
     return [
       gaps.first,
       ...IterableZip([words, gaps.skip(1)]).expand((pair) => pair),
@@ -170,7 +189,7 @@ class WorkIndexEntry {
   static final RegExp _word = RegExp(r'\p{L}+', unicode: true);
 
   @override
-  String toString() => 'WorkIndexEntry{label: $label}';
+  String toString() => 'WorkIndexEntry{title: $title, typ: $typ}';
 
   @override
   bool operator ==(Object other) =>
@@ -193,7 +212,7 @@ extension type const LabelWordIndexes._(UnmodifiableSetView<int> unm)
       );
 }
 
-/// Titled subdivisions of a work, as a tree
+/// The books, poems, prologues and epilogues of a work, as a tree
 @immutable
 class WorkIndex {
   WorkIndex(

@@ -8324,7 +8324,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   final int cnt;
   final int fromIndex;
   final int toIndex;
-  final String label;
+  final String? title;
   final String? numeralWordIndexes;
   final String startReference;
   final String endReference;
@@ -8337,7 +8337,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     required this.cnt,
     required this.fromIndex,
     required this.toIndex,
-    required this.label,
+    this.title,
     this.numeralWordIndexes,
     required this.startReference,
     required this.endReference,
@@ -8356,7 +8356,7 @@ class LibraryWorkIndexe extends i0.DataClass {
       cnt: serializer.fromJson<int>(json['cnt']),
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
-      label: serializer.fromJson<String>(json['label']),
+      title: serializer.fromJson<String?>(json['title']),
       numeralWordIndexes: serializer.fromJson<String?>(
         json['numeralWordIndexes'],
       ),
@@ -8376,7 +8376,7 @@ class LibraryWorkIndexe extends i0.DataClass {
       'cnt': serializer.toJson<int>(cnt),
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
-      'label': serializer.toJson<String>(label),
+      'title': serializer.toJson<String?>(title),
       'numeralWordIndexes': serializer.toJson<String?>(numeralWordIndexes),
       'startReference': serializer.toJson<String>(startReference),
       'endReference': serializer.toJson<String>(endReference),
@@ -8392,7 +8392,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     int? cnt,
     int? fromIndex,
     int? toIndex,
-    String? label,
+    i0.Value<String?> title = const i0.Value.absent(),
     i0.Value<String?> numeralWordIndexes = const i0.Value.absent(),
     String? startReference,
     String? endReference,
@@ -8405,7 +8405,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     cnt: cnt ?? this.cnt,
     fromIndex: fromIndex ?? this.fromIndex,
     toIndex: toIndex ?? this.toIndex,
-    label: label ?? this.label,
+    title: title.present ? title.value : this.title,
     numeralWordIndexes: numeralWordIndexes.present
         ? numeralWordIndexes.value
         : this.numeralWordIndexes,
@@ -8423,7 +8423,7 @@ class LibraryWorkIndexe extends i0.DataClass {
           ..write('cnt: $cnt, ')
           ..write('fromIndex: $fromIndex, ')
           ..write('toIndex: $toIndex, ')
-          ..write('label: $label, ')
+          ..write('title: $title, ')
           ..write('numeralWordIndexes: $numeralWordIndexes, ')
           ..write('startReference: $startReference, ')
           ..write('endReference: $endReference')
@@ -8441,7 +8441,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     cnt,
     fromIndex,
     toIndex,
-    label,
+    title,
     numeralWordIndexes,
     startReference,
     endReference,
@@ -8458,7 +8458,7 @@ class LibraryWorkIndexe extends i0.DataClass {
           other.cnt == this.cnt &&
           other.fromIndex == this.fromIndex &&
           other.toIndex == this.toIndex &&
-          other.label == this.label &&
+          other.title == this.title &&
           other.numeralWordIndexes == this.numeralWordIndexes &&
           other.startReference == this.startReference &&
           other.endReference == this.endReference);
@@ -8481,7 +8481,7 @@ class LibraryWorkIndexes
     cnt,
     fromIndex,
     toIndex,
-    label,
+    title,
     numeralWordIndexes,
     startReference,
     endReference,
@@ -8493,7 +8493,7 @@ class LibraryWorkIndexes
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name AS label, (SELECT GROUP_CONCAT((SELECT COUNT(*) FROM WorkContents AS Words WHERE Words.workId = Numerals.workId AND Words.idx >= Titles.fromIndex AND Words.idx < Numerals.idx AND Words.tokenType <= 3)) FROM WorkContents AS Numerals WHERE Numerals.workId = Titles.workId AND Numerals.idx BETWEEN Titles.fromIndex AND Titles.toIndex AND Numerals.tokenType = 3) AS numeralWordIndexes, StartToken.sourceReference AS startReference, EndToken.sourceReference AS endReference FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy INNER JOIN WorkContentSubdivisions AS Titles ON SubdivsHierarchy.workId = Titles.workId AND SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ INNER JOIN WorkContents AS StartToken ON Titles.workId = StartToken.workId AND Titles.fromIndex = StartToken.idx INNER JOIN WorkContents AS EndToken ON Titles.workId = EndToken.workId AND Titles.toIndex = EndToken.idx ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.cnt, SubdivsHierarchy.node',
+        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name AS title, (SELECT GROUP_CONCAT((SELECT COUNT(*) FROM WorkContents AS Words WHERE Words.workId = Numerals.workId AND Words.idx >= Titles.fromIndex AND Words.idx < Numerals.idx AND Words.tokenType <= 3)) FROM WorkContents AS Numerals WHERE Numerals.workId = Titles.workId AND Numerals.idx BETWEEN Titles.fromIndex AND Titles.toIndex AND Numerals.tokenType = 3) AS numeralWordIndexes, StartToken.sourceReference AS startReference, EndToken.sourceReference AS endReference FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy LEFT JOIN WorkContentSubdivisions AS Titles ON SubdivsHierarchy.workId = Titles.workId AND SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ INNER JOIN WorkContents AS StartToken ON SubdivsHierarchy.workId = StartToken.workId AND SubdivsHierarchy.fromIndex = StartToken.idx INNER JOIN WorkContents AS EndToken ON SubdivsHierarchy.workId = EndToken.workId AND SubdivsHierarchy.toIndex = EndToken.idx WHERE SubdivsHierarchy.typ IN (\'BOOK\', \'POEM\', \'PROL\', \'EPIL\') ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.depth, SubdivsHierarchy.cnt, SubdivsHierarchy.node',
   };
   @override
   LibraryWorkIndexes get asDslTable => this;
@@ -8535,10 +8535,10 @@ class LibraryWorkIndexes
         i0.DriftSqlType.int,
         data['${effectivePrefix}toIndex'],
       )!,
-      label: attachedDatabase.typeMapping.read(
+      title: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}label'],
-      )!,
+        data['${effectivePrefix}title'],
+      ),
       numeralWordIndexes: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}numeralWordIndexes'],
@@ -8603,10 +8603,10 @@ class LibraryWorkIndexes
     false,
     type: i0.DriftSqlType.int,
   );
-  late final i0.GeneratedColumn<String> label = i0.GeneratedColumn<String>(
-    'label',
+  late final i0.GeneratedColumn<String> title = i0.GeneratedColumn<String>(
+    'title',
     aliasedName,
-    false,
+    true,
     type: i0.DriftSqlType.string,
   );
   late final i0.GeneratedColumn<String> numeralWordIndexes =
@@ -8980,7 +8980,7 @@ class LibraryDrift extends i6.ModularAccessor {
         cnt: row.read<int>('cnt'),
         fromIndex: row.read<int>('fromIndex'),
         toIndex: row.read<int>('toIndex'),
-        label: row.read<String>('label'),
+        title: row.readNullable<String>('title'),
         numeralWordIndexes: row.readNullable<String>('numeralWordIndexes'),
         startReference: row.read<String>('startReference'),
         endReference: row.read<String>('endReference'),

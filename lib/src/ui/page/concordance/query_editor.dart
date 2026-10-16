@@ -358,7 +358,9 @@ class _QueryEditorState extends ConsumerState<QueryEditor> {
           workId: entry.workId,
           fromIndex: entry.fromIndex,
           toIndex: entry.toIndex,
-          label: '${entry.label} (${entry.referenceLabel})',
+          label:
+              '${entry.labelSpelledWith(SemivowelOrthography.allVocalicConsonantal)} '
+              '(${entry.referenceLabel})',
         ),
       );
     }
