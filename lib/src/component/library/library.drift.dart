@@ -4906,7 +4906,7 @@ class WorkContentSubdivisions extends i0.Table
     type: i0.DriftSqlType.string,
     requiredDuringInsert: true,
     $customConstraints:
-        'NOT NULL CHECK (typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'TITL\', \'PARA\'))',
+        'NOT NULL CHECK (typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'LGRP\', \'SPCH\', \'TITL\', \'PARA\'))',
   ).withConverter<i5.SubdivisionType>(i1.WorkContentSubdivisions.$convertertyp);
   static const i0.VerificationMeta _cntMeta = const i0.VerificationMeta('cnt');
   late final i0.GeneratedColumn<int> cnt = i0.GeneratedColumn<int>(
@@ -5106,8 +5106,9 @@ class WorkContentSubdivisions extends i0.Table
     'FOREIGN KEY(workId, toIndex)REFERENCES WorkContents(workId, idx)',
     'FOREIGN KEY(workId, parent)REFERENCES WorkContentSubdivisions(workId, node)DEFERRABLE INITIALLY DEFERRED',
     'CHECK(fromIndex <= toIndex)',
-    'CHECK((parent IS NULL)=(typ = \'BOOK\'))',
-    'CHECK(typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'PARA\') OR LENGTH(TRIM(name)) > 0)',
+    'CHECK(typ <> \'BOOK\' OR parent IS NULL)',
+    'CHECK(parent IS NOT NULL OR typ IN (\'BOOK\', \'POEM\', \'PROL\', \'EPIL\'))',
+    'CHECK(typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'LGRP\', \'SPCH\', \'PARA\') OR LENGTH(TRIM(name)) > 0)',
   ];
   @override
   bool get dontWriteConstraints => true;

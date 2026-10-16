@@ -22,6 +22,8 @@ enum SubdivisionType {
   prologue('PROL'),
   poem('POEM'),
   epilogue('EPIL'),
+  lineGroup('LGRP'),
+  speech('SPCH'),
   title('TITL'),
   verse('VERS'),
   paragraph('PARA');
