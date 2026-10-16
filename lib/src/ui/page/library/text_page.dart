@@ -46,9 +46,10 @@ bool _isHeadingType(SubdivisionType type) => switch (type) {
       SubdivisionType.prologue ||
       SubdivisionType.poem ||
       SubdivisionType.epilogue ||
+      SubdivisionType.speech ||
       SubdivisionType.title) =>
     true,
-  SubdivisionType.verse || SubdivisionType.paragraph => false,
+  SubdivisionType.lineGroup || SubdivisionType.verse || SubdivisionType.paragraph => false,
 };
 
 /// Whether nodes of [type] never break across pages
@@ -437,6 +438,8 @@ class _TextRenderer {
     SubdivisionType.prologue => _lineTerminator * 2,
     SubdivisionType.epilogue => _lineTerminator * 2,
     SubdivisionType.poem => _lineTerminator * 2,
+    SubdivisionType.lineGroup => _lineTerminator,
+    SubdivisionType.speech => _lineTerminator,
     SubdivisionType.title => _lineTerminator,
     SubdivisionType.verse => _lineTerminator,
     SubdivisionType.paragraph => _lineTerminator,
@@ -448,6 +451,8 @@ class _TextRenderer {
     SubdivisionType.prologue => textTheme.titleMedium!,
     SubdivisionType.epilogue => textTheme.titleMedium!,
     SubdivisionType.poem => textTheme.titleMedium!,
+    SubdivisionType.lineGroup => textTheme.bodyLarge!,
+    SubdivisionType.speech => textTheme.titleSmall!,
     SubdivisionType.title => textTheme.bodyMedium!,
     SubdivisionType.verse => textTheme.bodyLarge!,
     SubdivisionType.paragraph => textTheme.bodyMedium!,

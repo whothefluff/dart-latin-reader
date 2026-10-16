@@ -435,6 +435,8 @@ class _WorkIndexTreeState extends State<_WorkIndexTree> {
     SubdivisionType.poem => 'Poem ${entry.cnt + 1}',
     SubdivisionType.prologue => 'Prologue',
     SubdivisionType.epilogue => 'Epilogue',
+    SubdivisionType.lineGroup => 'Line group ${entry.cnt + 1}',
+    SubdivisionType.speech => 'Speech ${entry.cnt + 1}',
     SubdivisionType.verse => 'Verse ${entry.cnt + 1}',
     SubdivisionType.paragraph => 'Paragraph ${entry.cnt + 1}',
     SubdivisionType.title => 'Title',
