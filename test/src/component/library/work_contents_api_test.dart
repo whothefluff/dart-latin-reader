@@ -33,19 +33,21 @@ void main() {
       await db.customStatement(
         '''
         INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
-                                             toIndex )
-            VALUES ( ?, '$_firstPoem', 'POEM', 0, 'ECLOGA', NULL, 0, 2 ),
+                                             toIndex, editionLabel )
+            VALUES ( ?, '$_firstPoem', 'POEM', 0, 'ECLOGA', NULL, 0, 2, '8' ),
                    ( ?, '00000000-0000-0000-0000-0000000000c2', 'TITL', 0, 'ECLOGA', '$_firstPoem',
-                     0, 0 ),
-                   ( ?, '00000000-0000-0000-0000-0000000000c3', 'LGRP', 0, '', '$_firstPoem', 1, 1 ),
+                     0, 0, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c3', 'LGRP', 0, '', '$_firstPoem', 1, 1,
+                     NULL ),
                    ( ?, '00000000-0000-0000-0000-0000000000c4', 'VERS', 0, 'Pastorum',
-                     '00000000-0000-0000-0000-0000000000c3', 1, 1 ),
-                   ( ?, '00000000-0000-0000-0000-0000000000c5', 'LGRP', 1, '', '$_firstPoem', 2, 2 ),
+                     '00000000-0000-0000-0000-0000000000c3', 1, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c5', 'LGRP', 1, '', '$_firstPoem', 2, 2,
+                     NULL ),
                    ( ?, '00000000-0000-0000-0000-0000000000c6', 'VERS', 0, 'Tu',
-                     '00000000-0000-0000-0000-0000000000c5', 2, 2 ),
-                   ( ?, '$_secondPoem', 'POEM', 1, '', NULL, 3, 3 ),
+                     '00000000-0000-0000-0000-0000000000c5', 2, 2, '6' ),
+                   ( ?, '$_secondPoem', 'POEM', 1, '', NULL, 3, 3, '9' ),
                    ( ?, '00000000-0000-0000-0000-0000000000c8', 'VERS', 0, 'Formosum', '$_secondPoem',
-                     3, 3 )
+                     3, 3, '1' )
         ''',
         List.filled(8, duties),
       );

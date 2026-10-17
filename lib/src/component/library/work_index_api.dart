@@ -85,6 +85,7 @@ class WorkIndexEntry {
     required this.cnt,
     required this.fromIndex,
     required this.toIndex,
+    required this.editionLabel,
     required this.title,
     required this.numeralWordIndexes,
     required this.startReference,
@@ -100,6 +101,7 @@ class WorkIndexEntry {
     required int cnt,
     required int fromIndex,
     required int toIndex,
+    required String editionLabel,
     required String? title,
     required String? numeralWordIndexes,
     required String startReference,
@@ -113,6 +115,7 @@ class WorkIndexEntry {
          cnt: cnt,
          fromIndex: fromIndex,
          toIndex: toIndex,
+         editionLabel: editionLabel,
          title: title,
          numeralWordIndexes: LabelWordIndexes.fromSql(numeralWordIndexes),
          startReference: startReference,
@@ -137,6 +140,9 @@ class WorkIndexEntry {
   /// Last WorkContents.idx of the subdivision. Inclusive.
   final int toIndex;
 
+  /// Its TEI n, such as 1, 14a, prologus or appendix.
+  final String editionLabel;
+
   /// `null` when the edition gives it none.
   final String? title;
 
@@ -151,15 +157,16 @@ class WorkIndexEntry {
   String get referenceLabel =>
       startReference == endReference ? startReference : '$startReference – $endReference';
 
-  // Counters are zero-based within their parent
+  // Counters are zero-based within their parent.
+  //A book whose TEI n isn't a number is counted
   String get typeLabel => switch (typ) {
-    SubdivisionType.book => 'Book ${cnt + 1}',
-    SubdivisionType.poem => 'Poem ${cnt + 1}',
+    SubdivisionType.book => 'Book ${int.tryParse(editionLabel) ?? cnt + 1}',
+    SubdivisionType.poem => 'Poem $editionLabel',
     SubdivisionType.prologue => 'Prologue',
     SubdivisionType.epilogue => 'Epilogue',
     SubdivisionType.lineGroup => 'Line group ${cnt + 1}',
     SubdivisionType.speech => 'Speech ${cnt + 1}',
-    SubdivisionType.verse => 'Verse ${cnt + 1}',
+    SubdivisionType.verse => 'Verse $editionLabel',
     SubdivisionType.paragraph => 'Paragraph ${cnt + 1}',
     SubdivisionType.title => 'Title',
   };

@@ -207,6 +207,7 @@ CREATE TABLE "WorkContentSubdivisions"(
     "parent" TEXT CHECK( parent IS NULL OR parent LIKE '________-____-____-____-____________' ),
     "fromIndex" INTEGER NOT NULL CHECK( fromIndex >= 0 ),
     "toIndex" INTEGER NOT NULL,
+    "editionLabel" TEXT, -- the subdivision's TEI n, preserved as text
     PRIMARY KEY( workId, node ),
     FOREIGN KEY( workId, fromIndex ) REFERENCES WorkContents( workId, idx ),
     FOREIGN KEY( workId, toIndex ) REFERENCES WorkContents( workId, idx ),
@@ -214,7 +215,8 @@ CREATE TABLE "WorkContentSubdivisions"(
     CHECK( fromIndex <= toIndex ),
     CHECK( typ <> 'BOOK' OR parent IS NULL ), --Books are roots...
     CHECK( parent IS NOT NULL OR typ IN ('BOOK','POEM','PROL','EPIL') ), --...and so are the poems of a work without books.
-    CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','LGRP','SPCH','PARA') OR LENGTH( TRIM( name ) ) > 0 ) --titles must be labelled
+    CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','LGRP','SPCH','PARA') OR LENGTH( TRIM( name ) ) > 0 ), --titles must be labelled
+    CHECK( ( editionLabel IS NOT NULL ) = ( typ IN ('BOOK','POEM','PROL','EPIL','VERS') ) )
 ) 
 STRICT, 
 WITHOUT ROWID;
@@ -527,6 +529,7 @@ CREATE VIEW "library.WorkIndexes" AS
            SubdivsHierarchy.cnt,
            SubdivsHierarchy.fromIndex,
            SubdivsHierarchy.toIndex,
+           COALESCE( SubdivsHierarchy.editionLabel, '' ) AS editionLabel, -- COALESCE required because of Drift typing
            Titles.name AS title,
            ( SELECT GROUP_CONCAT( ( SELECT COUNT( * )
                                         FROM WorkContents AS Words

@@ -7,21 +7,27 @@ import 'package:latin_reader/src/external/database.dart';
 
 import 'library_fixture.dart';
 
-WorkIndexEntry _entry(SubdivisionType typ, {String? title, String? numeralWordIndexes}) =>
-    WorkIndexEntry.fromSql(
-      workId: 'fables',
-      node: 'book',
-      parent: null,
-      depth: 0,
-      typ: typ,
-      cnt: 0,
-      fromIndex: 0,
-      toIndex: 3,
-      title: title,
-      numeralWordIndexes: numeralWordIndexes,
-      startReference: '1',
-      endReference: '1.1',
-    );
+WorkIndexEntry _entry(
+  SubdivisionType typ, {
+  int cnt = 0,
+  String editionLabel = '1',
+  String? title,
+  String? numeralWordIndexes,
+}) => WorkIndexEntry.fromSql(
+  workId: 'fables',
+  node: 'book',
+  parent: null,
+  depth: 0,
+  typ: typ,
+  cnt: cnt,
+  fromIndex: 0,
+  toIndex: 3,
+  editionLabel: editionLabel,
+  title: title,
+  numeralWordIndexes: numeralWordIndexes,
+  startReference: '1',
+  endReference: '1.1',
+);
 
 Future<WorkIndex> _index(AppDb db, String work) {
   final container = ProviderContainer(overrides: [dbProvider.overrideWith((_) => db)]);
@@ -68,6 +74,17 @@ void main() {
     });
   });
 
+  group('WorkIndexEntry.typeLabel', () {
+    test('a poem is labelled with its TEI n', () {
+      expect(_entry(SubdivisionType.poem, editionLabel: '14a').typeLabel, 'Poem 14a');
+    });
+
+    test('a book is labelled with its TEI n when that is a number, and counted when it is not', () {
+      expect(_entry(SubdivisionType.book, editionLabel: '4').typeLabel, 'Book 4');
+      expect(_entry(SubdivisionType.book, cnt: 5, editionLabel: 'appendix').typeLabel, 'Book 6');
+    });
+  });
+
   group('workIndexProvider', () {
     test('a numeral keeps its letters, unlike a word spelled the same', () async {
       final db = await smallLibrary();
@@ -87,10 +104,10 @@ void main() {
       await db.customStatement(
         '''
         INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
-                                             toIndex )
-            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'BOOK', 0, '', NULL, 0, 5 ),
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'BOOK', 0, '', NULL, 0, 5, '1' ),
                    ( ?, '00000000-0000-0000-0000-0000000000c2', 'TITL', 0, 'DE VI: LIBER VI',
-                     '00000000-0000-0000-0000-0000000000c1', 0, 4 )
+                     '00000000-0000-0000-0000-0000000000c1', 0, 4, NULL )
         ''',
         [duties, duties],
       );
@@ -118,33 +135,36 @@ void main() {
       await db.customStatement(
         '''
         INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
-                                             toIndex )
-            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'POEM', 0, 'ECLOGA', NULL, 0, 3 ),
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'POEM', 0, 'ECLOGA', NULL, 0, 3, '8' ),
                    ( ?, '00000000-0000-0000-0000-0000000000c2', 'TITL', 0, 'ECLOGA',
-                     '00000000-0000-0000-0000-0000000000c1', 0, 0 ),
+                     '00000000-0000-0000-0000-0000000000c1', 0, 0, NULL ),
                    ( ?, '00000000-0000-0000-0000-0000000000c3', 'SPCH', 0, 'Damon',
-                     '00000000-0000-0000-0000-0000000000c1', 1, 3 ),
+                     '00000000-0000-0000-0000-0000000000c1', 1, 3, NULL ),
                    ( ?, '00000000-0000-0000-0000-0000000000c4', 'TITL', 0, 'Damon',
-                     '00000000-0000-0000-0000-0000000000c3', 1, 1 ),
+                     '00000000-0000-0000-0000-0000000000c3', 1, 1, NULL ),
                    ( ?, '00000000-0000-0000-0000-0000000000c5', 'VERS', 0, 'Nascere',
-                     '00000000-0000-0000-0000-0000000000c3', 2, 2 ),
+                     '00000000-0000-0000-0000-0000000000c3', 2, 2, '17' ),
                    ( ?, '00000000-0000-0000-0000-0000000000c6', 'LGRP', 0, '',
-                     '00000000-0000-0000-0000-0000000000c3', 3, 3 ),
+                     '00000000-0000-0000-0000-0000000000c3', 3, 3, NULL ),
                    ( ?, '00000000-0000-0000-0000-0000000000c7', 'VERS', 0, 'Incipe',
-                     '00000000-0000-0000-0000-0000000000c6', 3, 3 ),
-                   ( ?, '00000000-0000-0000-0000-0000000000c8', 'POEM', 1, '', NULL, 4, 4 ),
+                     '00000000-0000-0000-0000-0000000000c6', 3, 3, '21' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c8', 'POEM', 1, '', NULL, 4, 4, '9' ),
                    ( ?, '00000000-0000-0000-0000-0000000000c9', 'VERS', 0, 'Pastorum',
-                     '00000000-0000-0000-0000-0000000000c8', 4, 4 )
+                     '00000000-0000-0000-0000-0000000000c8', 4, 4, '1' )
         ''',
         List.filled(9, duties),
       );
       final index = await _index(db, duties);
 
       expect(
-        index.entries.map((entry) => (entry.typ, entry.parent, entry.title, entry.referenceLabel)),
+        index.entries.map(
+          (entry) =>
+              (entry.typ, entry.parent, entry.labelSpelledWith(_uAndIOnly), entry.referenceLabel),
+        ),
         [
           (SubdivisionType.poem, null, 'ECLOGA', '8 – 8.21'),
-          (SubdivisionType.poem, null, null, '9.1'),
+          (SubdivisionType.poem, null, 'Poem 9', '9.1'),
         ],
       );
     });
@@ -163,13 +183,13 @@ void main() {
       await db.customStatement(
         '''
         INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
-                                             toIndex )
-            VALUES ( ?, '00000000-0000-0000-0000-0000000000c4', 'BOOK', 0, '', NULL, 0, 0 ),
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c4', 'BOOK', 0, '', NULL, 0, 0, '1' ),
                    ( ?, '00000000-0000-0000-0000-0000000000c3', 'POEM', 0, '',
-                     '00000000-0000-0000-0000-0000000000c4', 0, 0 ),
-                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'BOOK', 1, '', NULL, 1, 1 ),
+                     '00000000-0000-0000-0000-0000000000c4', 0, 0, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'BOOK', 1, '', NULL, 1, 1, '2' ),
                    ( ?, '00000000-0000-0000-0000-0000000000c1', 'POEM', 0, '',
-                     '00000000-0000-0000-0000-0000000000c2', 1, 1 )
+                     '00000000-0000-0000-0000-0000000000c2', 1, 1, '1' )
         ''',
         List.filled(4, duties),
       );

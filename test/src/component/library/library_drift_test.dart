@@ -9,6 +9,7 @@ const _poem = '00000000-0000-0000-0000-0000000000c2';
 const _lineGroup = '00000000-0000-0000-0000-0000000000c3';
 const _speech = '00000000-0000-0000-0000-0000000000c4';
 const _verse = '00000000-0000-0000-0000-0000000000c5';
+const _title = '00000000-0000-0000-0000-0000000000c6';
 
 final Matcher _checkFailure = throwsA(
   isA<SqliteException>().having(
@@ -25,12 +26,14 @@ Future<void> _addSubdivision(
   required String typ,
   String? parent,
   String name = '',
+  String? editionLabel,
 }) => db.customStatement(
   '''
-  INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex, toIndex )
-      VALUES ( ?, ?, ?, 0, ?, ?, 0, 1 )
+  INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex, toIndex,
+                                       editionLabel )
+      VALUES ( ?, ?, ?, 0, ?, ?, 0, 1, ? )
   ''',
-  [fables, node, typ, name, parent],
+  [fables, node, typ, name, parent, editionLabel],
 );
 
 void main() {
@@ -51,7 +54,7 @@ void main() {
 
   group('WorkContentSubdivisions', () {
     test('a work without books has its poems as roots, with line groups and speeches', () async {
-      await _addSubdivision(db, node: _poem, typ: 'POEM');
+      await _addSubdivision(db, node: _poem, typ: 'POEM', editionLabel: '8');
       await _addSubdivision(db, node: _lineGroup, typ: 'LGRP', parent: _poem);
       await _addSubdivision(db, node: _speech, typ: 'SPCH', parent: _poem, name: 'Damon');
 
@@ -66,14 +69,37 @@ void main() {
     });
 
     test('a verse is never a root', () async {
-      await expectLater(_addSubdivision(db, node: _verse, typ: 'VERS'), _checkFailure);
+      await expectLater(
+        _addSubdivision(db, node: _verse, typ: 'VERS', editionLabel: '17'),
+        _checkFailure,
+      );
     });
 
     test('a book is always a root', () async {
-      await _addSubdivision(db, node: _book, typ: 'BOOK');
+      await _addSubdivision(db, node: _book, typ: 'BOOK', editionLabel: '1');
 
       await expectLater(
-        _addSubdivision(db, node: _poem, typ: 'BOOK', parent: _book),
+        _addSubdivision(db, node: _poem, typ: 'BOOK', parent: _book, editionLabel: '2'),
+        _checkFailure,
+      );
+    });
+
+    test('a poem has its TEI n as its edition label', () async {
+      await expectLater(_addSubdivision(db, node: _poem, typ: 'POEM'), _checkFailure);
+    });
+
+    test('a title has no edition label', () async {
+      await _addSubdivision(db, node: _poem, typ: 'POEM', editionLabel: '8');
+
+      await expectLater(
+        _addSubdivision(
+          db,
+          node: _title,
+          typ: 'TITL',
+          parent: _poem,
+          name: 'Damon',
+          editionLabel: '1',
+        ),
         _checkFailure,
       );
     });
