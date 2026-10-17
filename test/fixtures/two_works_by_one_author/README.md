@@ -4,7 +4,7 @@ The test `test/src/external/db_util_test.dart` loads these CSV files into a data
 
 ## Where the files come from
 
-These files come from the producer (python-latin-sources-processor), at commit `2a9861158e0cda043aa42f377fb93069c48c2e8c`: `author_abbreviations.csv`, `authors.csv`, `authors_and_works.csv`, `unambiguous_macronizations.csv`, `work_abbreviations.csv`, `work_content_subdivisions.csv`, `work_content_supplementary.csv`, `work_contents.csv`, `work_macronizations.csv`, `works.csv`.
+These files come from the producer (python-latin-sources-processor), at commit `bcb14f1269dc853148a24af524c77613c6f3e4b6`: `author_abbreviations.csv`, `authors.csv`, `authors_and_works.csv`, `unambiguous_macronizations.csv`, `work_abbreviations.csv`, `work_content_subdivisions.csv`, `work_content_supplementary.csv`, `work_contents.csv`, `work_macronizations.csv`, `works.csv`.
 
 The producer has two small invented works in `tests/library/fixtures/two_works_by_one_author`. The script runs the producer's own code for combining works over them, one at a time: first `carmina_prima`, then `carmina_altera` added to it.
 
