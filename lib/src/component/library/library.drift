@@ -352,6 +352,7 @@ CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS
                                        0 AS depth,
                                        CASE WHEN typ IN ('POEM','PROL','EPIL') 
                                             THEN node 
+                                            ELSE NULL -- required because of Drift typing
                                        END AS poem -- the poem, prologue or epilogue that holds it
                                     FROM WorkContentSubdivisions
                                     WHERE parent IS NULL

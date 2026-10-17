@@ -63,5 +63,42 @@ void main() {
         ],
       );
     });
+
+    test("a book's title belongs to no poem", () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'LIBER', '1', 1, 0, 0, 'LIBER', 0, TRUE ),
+                   ( ?, 1, 'Ranae', '1.1.1', 1, 1, 0, 'Ranae', 0, FALSE )
+        ''',
+        [duties, duties],
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c9', 'BOOK', 0, 'LIBER', NULL, 0, 1,
+                     '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000ca', 'TITL', 0, 'LIBER',
+                     '00000000-0000-0000-0000-0000000000c9', 0, 0, NULL ),
+                   ( ?, '$_firstPoem', 'POEM', 0, '', '00000000-0000-0000-0000-0000000000c9', 1, 1,
+                     '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000cb', 'VERS', 0, 'Ranae',
+                     '$_firstPoem', 1, 1, '1' )
+        ''',
+        List.filled(4, duties),
+      );
+      final contents = await _contents(db, duties, 0, 1);
+
+      expect(
+        contents.map((segment) => (segment.idx, segment.typ, segment.poem)),
+        [
+          (0, SubdivisionType.book, null),
+          (1, SubdivisionType.verse, _firstPoem),
+        ],
+      );
+    });
   });
 }
