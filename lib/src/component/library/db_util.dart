@@ -165,7 +165,10 @@ final operations = [
     },
     insert: (AppDb db) async {
       final csvData = await db.csvSource.loadString('work_content_subdivisions.csv');
-      final rows = const CsvParser.withAutoDetectedSettings().convert(csvData);
+      final rows = const CsvParser.withAutoDetectedSettings().convert(
+        csvData,
+        shouldParseNumbers: false,
+      );
       await db.batch(
         (b) => b.insertAll(
           db.workContentSubdivisions,
@@ -176,11 +179,12 @@ final operations = [
                   workId: Value(row[0].toString()),
                   node: Value(row[1].toString()),
                   typ: Value(SubdivisionType.fromCode(row[2].toString())),
-                  cnt: Value(row[3] as int),
+                  cnt: Value(int.parse(row[3].toString())),
                   name: Value(row[4].toString()),
                   parent: stringValue(row[5].toString()),
-                  fromIndex: Value(row[6] as int),
-                  toIndex: Value(row[7] as int),
+                  fromIndex: Value(int.parse(row[6].toString())),
+                  toIndex: Value(int.parse(row[7].toString())),
+                  editionLabel: stringValue(row[8].toString()),
                 ),
               ),
           mode: InsertMode.insertOrRollback,

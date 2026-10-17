@@ -145,7 +145,7 @@ void main() {
     expect(
       await rows('''
         SELECT Works.name AS work, Division.typ, Division.cnt, Division.name,
-               Parent.typ AS parentTyp, Division.fromIndex, Division.toIndex
+               Parent.typ AS parentTyp, Division.fromIndex, Division.toIndex, Division.editionLabel
             FROM WorkContentSubdivisions AS Division
             INNER JOIN Works
                 ON Works.id = Division.workId
@@ -154,17 +154,17 @@ void main() {
                    AND Parent.node = Division.parent
             ORDER BY Division.workId, Division.node'''),
       [
-        [_carminaPrima, 'POEM', 0, 'Ad amicum', null, 0, 10],
-        [_carminaPrima, 'TITL', 0, 'Ad amicum', 'POEM', 0, 1],
-        [_carminaPrima, 'VERS', 0, 'Levis et Roma est.', 'POEM', 2, 6],
-        [_carminaPrima, 'VERS', 1, 'et levis aura.', 'POEM', 7, 10],
-        [_carminaAltera, 'BOOK', 0, '', null, 0, 12],
-        [_carminaAltera, 'POEM', 0, 'De speculo', 'BOOK', 0, 9],
-        [_carminaAltera, 'TITL', 0, 'De speculo', 'POEM', 0, 1],
-        [_carminaAltera, 'VERS', 0, 'levis speculum et Roma.', 'POEM', 2, 6],
-        [_carminaAltera, 'VERS', 1, 'est levis.', 'POEM', 7, 9],
-        [_carminaAltera, 'POEM', 1, '', 'BOOK', 10, 12],
-        [_carminaAltera, 'VERS', 0, 'Roma est.', 'POEM', 10, 12],
+        [_carminaPrima, 'POEM', 0, 'Ad amicum', null, 0, 10, '1'],
+        [_carminaPrima, 'TITL', 0, 'Ad amicum', 'POEM', 0, 1, null],
+        [_carminaPrima, 'VERS', 0, 'Levis et Roma est.', 'POEM', 2, 6, '1'],
+        [_carminaPrima, 'VERS', 1, 'et levis aura.', 'POEM', 7, 10, '2'],
+        [_carminaAltera, 'BOOK', 0, '', null, 0, 12, '1'],
+        [_carminaAltera, 'POEM', 0, 'De speculo', 'BOOK', 0, 9, '10'],
+        [_carminaAltera, 'TITL', 0, 'De speculo', 'POEM', 0, 1, null],
+        [_carminaAltera, 'VERS', 0, 'levis speculum et Roma.', 'POEM', 2, 6, '1'],
+        [_carminaAltera, 'VERS', 1, 'est levis.', 'POEM', 7, 9, '2'],
+        [_carminaAltera, 'POEM', 1, '', 'BOOK', 10, 12, '10a'],
+        [_carminaAltera, 'VERS', 0, 'Roma est.', 'POEM', 10, 12, '1'],
       ],
     );
   });

@@ -1310,6 +1310,7 @@ typedef $WorkContentSubdivisionsCreateCompanionBuilder =
       i0.Value<String?> parent,
       required int fromIndex,
       required int toIndex,
+      i0.Value<String?> editionLabel,
     });
 typedef $WorkContentSubdivisionsUpdateCompanionBuilder =
     i1.WorkContentSubdivisionsCompanion Function({
@@ -1321,6 +1322,7 @@ typedef $WorkContentSubdivisionsUpdateCompanionBuilder =
       i0.Value<String?> parent,
       i0.Value<int> fromIndex,
       i0.Value<int> toIndex,
+      i0.Value<String?> editionLabel,
     });
 
 class $WorkContentSubdivisionsFilterComposer
@@ -1376,6 +1378,11 @@ class $WorkContentSubdivisionsFilterComposer
     column: $table.toIndex,
     builder: (column) => i0.ColumnFilters(column),
   );
+
+  i0.ColumnFilters<String> get editionLabel => $composableBuilder(
+    column: $table.editionLabel,
+    builder: (column) => i0.ColumnFilters(column),
+  );
 }
 
 class $WorkContentSubdivisionsOrderingComposer
@@ -1426,6 +1433,11 @@ class $WorkContentSubdivisionsOrderingComposer
     column: $table.toIndex,
     builder: (column) => i0.ColumnOrderings(column),
   );
+
+  i0.ColumnOrderings<String> get editionLabel => $composableBuilder(
+    column: $table.editionLabel,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $WorkContentSubdivisionsAnnotationComposer
@@ -1460,6 +1472,11 @@ class $WorkContentSubdivisionsAnnotationComposer
 
   i0.GeneratedColumn<int> get toIndex =>
       $composableBuilder(column: $table.toIndex, builder: (column) => column);
+
+  i0.GeneratedColumn<String> get editionLabel => $composableBuilder(
+    column: $table.editionLabel,
+    builder: (column) => column,
+  );
 }
 
 class $WorkContentSubdivisionsTableManager
@@ -1510,6 +1527,7 @@ class $WorkContentSubdivisionsTableManager
                 i0.Value<String?> parent = const i0.Value.absent(),
                 i0.Value<int> fromIndex = const i0.Value.absent(),
                 i0.Value<int> toIndex = const i0.Value.absent(),
+                i0.Value<String?> editionLabel = const i0.Value.absent(),
               }) => i1.WorkContentSubdivisionsCompanion(
                 workId: workId,
                 node: node,
@@ -1519,6 +1537,7 @@ class $WorkContentSubdivisionsTableManager
                 parent: parent,
                 fromIndex: fromIndex,
                 toIndex: toIndex,
+                editionLabel: editionLabel,
               ),
           createCompanionCallback:
               ({
@@ -1530,6 +1549,7 @@ class $WorkContentSubdivisionsTableManager
                 i0.Value<String?> parent = const i0.Value.absent(),
                 required int fromIndex,
                 required int toIndex,
+                i0.Value<String?> editionLabel = const i0.Value.absent(),
               }) => i1.WorkContentSubdivisionsCompanion.insert(
                 workId: workId,
                 node: node,
@@ -1539,6 +1559,7 @@ class $WorkContentSubdivisionsTableManager
                 parent: parent,
                 fromIndex: fromIndex,
                 toIndex: toIndex,
+                editionLabel: editionLabel,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -4962,6 +4983,17 @@ class WorkContentSubdivisions extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
+  static const i0.VerificationMeta _editionLabelMeta =
+      const i0.VerificationMeta('editionLabel');
+  late final i0.GeneratedColumn<String> editionLabel =
+      i0.GeneratedColumn<String>(
+        'editionLabel',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: false,
+        $customConstraints: '',
+      );
   @override
   List<i0.GeneratedColumn> get $columns => [
     workId,
@@ -4972,6 +5004,7 @@ class WorkContentSubdivisions extends i0.Table
     parent,
     fromIndex,
     toIndex,
+    editionLabel,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5039,6 +5072,15 @@ class WorkContentSubdivisions extends i0.Table
     } else if (isInserting) {
       context.missing(_toIndexMeta);
     }
+    if (data.containsKey('editionLabel')) {
+      context.handle(
+        _editionLabelMeta,
+        editionLabel.isAcceptableOrUnknown(
+          data['editionLabel']!,
+          _editionLabelMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -5085,6 +5127,10 @@ class WorkContentSubdivisions extends i0.Table
         i0.DriftSqlType.int,
         data['${effectivePrefix}toIndex'],
       )!,
+      editionLabel: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}editionLabel'],
+      ),
     );
   }
 
@@ -5109,6 +5155,7 @@ class WorkContentSubdivisions extends i0.Table
     'CHECK(typ <> \'BOOK\' OR parent IS NULL)',
     'CHECK(parent IS NOT NULL OR typ IN (\'BOOK\', \'POEM\', \'PROL\', \'EPIL\'))',
     'CHECK(typ IN (\'VERS\', \'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'LGRP\', \'SPCH\', \'PARA\') OR LENGTH(TRIM(name)) > 0)',
+    'CHECK((editionLabel IS NOT NULL)=(typ IN (\'BOOK\', \'POEM\', \'PROL\', \'EPIL\', \'VERS\')))',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -5124,6 +5171,7 @@ class WorkContentSubdivision extends i0.DataClass
   final String? parent;
   final int fromIndex;
   final int toIndex;
+  final String? editionLabel;
   const WorkContentSubdivision({
     required this.workId,
     required this.node,
@@ -5133,6 +5181,7 @@ class WorkContentSubdivision extends i0.DataClass
     this.parent,
     required this.fromIndex,
     required this.toIndex,
+    this.editionLabel,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -5151,6 +5200,9 @@ class WorkContentSubdivision extends i0.DataClass
     }
     map['fromIndex'] = i0.Variable<int>(fromIndex);
     map['toIndex'] = i0.Variable<int>(toIndex);
+    if (!nullToAbsent || editionLabel != null) {
+      map['editionLabel'] = i0.Variable<String>(editionLabel);
+    }
     return map;
   }
 
@@ -5166,6 +5218,9 @@ class WorkContentSubdivision extends i0.DataClass
           : i0.Value(parent),
       fromIndex: i0.Value(fromIndex),
       toIndex: i0.Value(toIndex),
+      editionLabel: editionLabel == null && nullToAbsent
+          ? const i0.Value.absent()
+          : i0.Value(editionLabel),
     );
   }
 
@@ -5183,6 +5238,7 @@ class WorkContentSubdivision extends i0.DataClass
       parent: serializer.fromJson<String?>(json['parent']),
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
+      editionLabel: serializer.fromJson<String?>(json['editionLabel']),
     );
   }
   @override
@@ -5197,6 +5253,7 @@ class WorkContentSubdivision extends i0.DataClass
       'parent': serializer.toJson<String?>(parent),
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
+      'editionLabel': serializer.toJson<String?>(editionLabel),
     };
   }
 
@@ -5209,6 +5266,7 @@ class WorkContentSubdivision extends i0.DataClass
     i0.Value<String?> parent = const i0.Value.absent(),
     int? fromIndex,
     int? toIndex,
+    i0.Value<String?> editionLabel = const i0.Value.absent(),
   }) => i1.WorkContentSubdivision(
     workId: workId ?? this.workId,
     node: node ?? this.node,
@@ -5218,6 +5276,7 @@ class WorkContentSubdivision extends i0.DataClass
     parent: parent.present ? parent.value : this.parent,
     fromIndex: fromIndex ?? this.fromIndex,
     toIndex: toIndex ?? this.toIndex,
+    editionLabel: editionLabel.present ? editionLabel.value : this.editionLabel,
   );
   WorkContentSubdivision copyWithCompanion(
     i1.WorkContentSubdivisionsCompanion data,
@@ -5231,6 +5290,9 @@ class WorkContentSubdivision extends i0.DataClass
       parent: data.parent.present ? data.parent.value : this.parent,
       fromIndex: data.fromIndex.present ? data.fromIndex.value : this.fromIndex,
       toIndex: data.toIndex.present ? data.toIndex.value : this.toIndex,
+      editionLabel: data.editionLabel.present
+          ? data.editionLabel.value
+          : this.editionLabel,
     );
   }
 
@@ -5244,14 +5306,24 @@ class WorkContentSubdivision extends i0.DataClass
           ..write('name: $name, ')
           ..write('parent: $parent, ')
           ..write('fromIndex: $fromIndex, ')
-          ..write('toIndex: $toIndex')
+          ..write('toIndex: $toIndex, ')
+          ..write('editionLabel: $editionLabel')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(workId, node, typ, cnt, name, parent, fromIndex, toIndex);
+  int get hashCode => Object.hash(
+    workId,
+    node,
+    typ,
+    cnt,
+    name,
+    parent,
+    fromIndex,
+    toIndex,
+    editionLabel,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5263,7 +5335,8 @@ class WorkContentSubdivision extends i0.DataClass
           other.name == this.name &&
           other.parent == this.parent &&
           other.fromIndex == this.fromIndex &&
-          other.toIndex == this.toIndex);
+          other.toIndex == this.toIndex &&
+          other.editionLabel == this.editionLabel);
 }
 
 class WorkContentSubdivisionsCompanion
@@ -5276,6 +5349,7 @@ class WorkContentSubdivisionsCompanion
   final i0.Value<String?> parent;
   final i0.Value<int> fromIndex;
   final i0.Value<int> toIndex;
+  final i0.Value<String?> editionLabel;
   const WorkContentSubdivisionsCompanion({
     this.workId = const i0.Value.absent(),
     this.node = const i0.Value.absent(),
@@ -5285,6 +5359,7 @@ class WorkContentSubdivisionsCompanion
     this.parent = const i0.Value.absent(),
     this.fromIndex = const i0.Value.absent(),
     this.toIndex = const i0.Value.absent(),
+    this.editionLabel = const i0.Value.absent(),
   });
   WorkContentSubdivisionsCompanion.insert({
     required String workId,
@@ -5295,6 +5370,7 @@ class WorkContentSubdivisionsCompanion
     this.parent = const i0.Value.absent(),
     required int fromIndex,
     required int toIndex,
+    this.editionLabel = const i0.Value.absent(),
   }) : workId = i0.Value(workId),
        node = i0.Value(node),
        typ = i0.Value(typ),
@@ -5311,6 +5387,7 @@ class WorkContentSubdivisionsCompanion
     i0.Expression<String>? parent,
     i0.Expression<int>? fromIndex,
     i0.Expression<int>? toIndex,
+    i0.Expression<String>? editionLabel,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
@@ -5321,6 +5398,7 @@ class WorkContentSubdivisionsCompanion
       if (parent != null) 'parent': parent,
       if (fromIndex != null) 'fromIndex': fromIndex,
       if (toIndex != null) 'toIndex': toIndex,
+      if (editionLabel != null) 'editionLabel': editionLabel,
     });
   }
 
@@ -5333,6 +5411,7 @@ class WorkContentSubdivisionsCompanion
     i0.Value<String?>? parent,
     i0.Value<int>? fromIndex,
     i0.Value<int>? toIndex,
+    i0.Value<String?>? editionLabel,
   }) {
     return i1.WorkContentSubdivisionsCompanion(
       workId: workId ?? this.workId,
@@ -5343,6 +5422,7 @@ class WorkContentSubdivisionsCompanion
       parent: parent ?? this.parent,
       fromIndex: fromIndex ?? this.fromIndex,
       toIndex: toIndex ?? this.toIndex,
+      editionLabel: editionLabel ?? this.editionLabel,
     );
   }
 
@@ -5375,6 +5455,9 @@ class WorkContentSubdivisionsCompanion
     if (toIndex.present) {
       map['toIndex'] = i0.Variable<int>(toIndex.value);
     }
+    if (editionLabel.present) {
+      map['editionLabel'] = i0.Variable<String>(editionLabel.value);
+    }
     return map;
   }
 
@@ -5388,7 +5471,8 @@ class WorkContentSubdivisionsCompanion
           ..write('name: $name, ')
           ..write('parent: $parent, ')
           ..write('fromIndex: $fromIndex, ')
-          ..write('toIndex: $toIndex')
+          ..write('toIndex: $toIndex, ')
+          ..write('editionLabel: $editionLabel')
           ..write(')'))
         .toString();
   }
@@ -6788,6 +6872,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
   final String? parent;
   final int fromIndex;
   final int toIndex;
+  final String? editionLabel;
   final int depth;
   final String poem;
   const LibraryWorkContentSubdivisionsHierarchyData({
@@ -6799,6 +6884,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     this.parent,
     required this.fromIndex,
     required this.toIndex,
+    this.editionLabel,
     required this.depth,
     required this.poem,
   });
@@ -6816,6 +6902,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
       parent: serializer.fromJson<String?>(json['parent']),
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
+      editionLabel: serializer.fromJson<String?>(json['editionLabel']),
       depth: serializer.fromJson<int>(json['depth']),
       poem: serializer.fromJson<String>(json['poem']),
     );
@@ -6832,6 +6919,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
       'parent': serializer.toJson<String?>(parent),
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
+      'editionLabel': serializer.toJson<String?>(editionLabel),
       'depth': serializer.toJson<int>(depth),
       'poem': serializer.toJson<String>(poem),
     };
@@ -6846,6 +6934,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     i0.Value<String?> parent = const i0.Value.absent(),
     int? fromIndex,
     int? toIndex,
+    i0.Value<String?> editionLabel = const i0.Value.absent(),
     int? depth,
     String? poem,
   }) => i1.LibraryWorkContentSubdivisionsHierarchyData(
@@ -6857,6 +6946,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     parent: parent.present ? parent.value : this.parent,
     fromIndex: fromIndex ?? this.fromIndex,
     toIndex: toIndex ?? this.toIndex,
+    editionLabel: editionLabel.present ? editionLabel.value : this.editionLabel,
     depth: depth ?? this.depth,
     poem: poem ?? this.poem,
   );
@@ -6871,6 +6961,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
           ..write('parent: $parent, ')
           ..write('fromIndex: $fromIndex, ')
           ..write('toIndex: $toIndex, ')
+          ..write('editionLabel: $editionLabel, ')
           ..write('depth: $depth, ')
           ..write('poem: $poem')
           ..write(')'))
@@ -6887,6 +6978,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
     parent,
     fromIndex,
     toIndex,
+    editionLabel,
     depth,
     poem,
   );
@@ -6902,6 +6994,7 @@ class LibraryWorkContentSubdivisionsHierarchyData extends i0.DataClass {
           other.parent == this.parent &&
           other.fromIndex == this.fromIndex &&
           other.toIndex == this.toIndex &&
+          other.editionLabel == this.editionLabel &&
           other.depth == this.depth &&
           other.poem == this.poem);
 }
@@ -6927,6 +7020,7 @@ class LibraryWorkContentSubdivisionsHierarchy
     parent,
     fromIndex,
     toIndex,
+    editionLabel,
     depth,
     poem,
   ];
@@ -6982,6 +7076,10 @@ class LibraryWorkContentSubdivisionsHierarchy
         i0.DriftSqlType.int,
         data['${effectivePrefix}toIndex'],
       )!,
+      editionLabel: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}editionLabel'],
+      ),
       depth: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}depth'],
@@ -7042,6 +7140,13 @@ class LibraryWorkContentSubdivisionsHierarchy
     false,
     type: i0.DriftSqlType.int,
   );
+  late final i0.GeneratedColumn<String> editionLabel =
+      i0.GeneratedColumn<String>(
+        'editionLabel',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
   late final i0.GeneratedColumn<int> depth = i0.GeneratedColumn<int>(
     'depth',
     aliasedName,
@@ -8364,6 +8469,7 @@ class LibraryWorkIndexe extends i0.DataClass {
   final int cnt;
   final int fromIndex;
   final int toIndex;
+  final String editionLabel;
   final String? title;
   final String? numeralWordIndexes;
   final String startReference;
@@ -8377,6 +8483,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     required this.cnt,
     required this.fromIndex,
     required this.toIndex,
+    required this.editionLabel,
     this.title,
     this.numeralWordIndexes,
     required this.startReference,
@@ -8396,6 +8503,7 @@ class LibraryWorkIndexe extends i0.DataClass {
       cnt: serializer.fromJson<int>(json['cnt']),
       fromIndex: serializer.fromJson<int>(json['fromIndex']),
       toIndex: serializer.fromJson<int>(json['toIndex']),
+      editionLabel: serializer.fromJson<String>(json['editionLabel']),
       title: serializer.fromJson<String?>(json['title']),
       numeralWordIndexes: serializer.fromJson<String?>(
         json['numeralWordIndexes'],
@@ -8416,6 +8524,7 @@ class LibraryWorkIndexe extends i0.DataClass {
       'cnt': serializer.toJson<int>(cnt),
       'fromIndex': serializer.toJson<int>(fromIndex),
       'toIndex': serializer.toJson<int>(toIndex),
+      'editionLabel': serializer.toJson<String>(editionLabel),
       'title': serializer.toJson<String?>(title),
       'numeralWordIndexes': serializer.toJson<String?>(numeralWordIndexes),
       'startReference': serializer.toJson<String>(startReference),
@@ -8432,6 +8541,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     int? cnt,
     int? fromIndex,
     int? toIndex,
+    String? editionLabel,
     i0.Value<String?> title = const i0.Value.absent(),
     i0.Value<String?> numeralWordIndexes = const i0.Value.absent(),
     String? startReference,
@@ -8445,6 +8555,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     cnt: cnt ?? this.cnt,
     fromIndex: fromIndex ?? this.fromIndex,
     toIndex: toIndex ?? this.toIndex,
+    editionLabel: editionLabel ?? this.editionLabel,
     title: title.present ? title.value : this.title,
     numeralWordIndexes: numeralWordIndexes.present
         ? numeralWordIndexes.value
@@ -8463,6 +8574,7 @@ class LibraryWorkIndexe extends i0.DataClass {
           ..write('cnt: $cnt, ')
           ..write('fromIndex: $fromIndex, ')
           ..write('toIndex: $toIndex, ')
+          ..write('editionLabel: $editionLabel, ')
           ..write('title: $title, ')
           ..write('numeralWordIndexes: $numeralWordIndexes, ')
           ..write('startReference: $startReference, ')
@@ -8481,6 +8593,7 @@ class LibraryWorkIndexe extends i0.DataClass {
     cnt,
     fromIndex,
     toIndex,
+    editionLabel,
     title,
     numeralWordIndexes,
     startReference,
@@ -8498,6 +8611,7 @@ class LibraryWorkIndexe extends i0.DataClass {
           other.cnt == this.cnt &&
           other.fromIndex == this.fromIndex &&
           other.toIndex == this.toIndex &&
+          other.editionLabel == this.editionLabel &&
           other.title == this.title &&
           other.numeralWordIndexes == this.numeralWordIndexes &&
           other.startReference == this.startReference &&
@@ -8521,6 +8635,7 @@ class LibraryWorkIndexes
     cnt,
     fromIndex,
     toIndex,
+    editionLabel,
     title,
     numeralWordIndexes,
     startReference,
@@ -8533,7 +8648,7 @@ class LibraryWorkIndexes
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, Titles.name AS title, (SELECT GROUP_CONCAT((SELECT COUNT(*) FROM WorkContents AS Words WHERE Words.workId = Numerals.workId AND Words.idx >= Titles.fromIndex AND Words.idx < Numerals.idx AND Words.tokenType <= 3)) FROM WorkContents AS Numerals WHERE Numerals.workId = Titles.workId AND Numerals.idx BETWEEN Titles.fromIndex AND Titles.toIndex AND Numerals.tokenType = 3) AS numeralWordIndexes, StartToken.sourceReference AS startReference, EndToken.sourceReference AS endReference FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy LEFT JOIN WorkContentSubdivisions AS Titles ON SubdivsHierarchy.workId = Titles.workId AND SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ INNER JOIN WorkContents AS StartToken ON SubdivsHierarchy.workId = StartToken.workId AND SubdivsHierarchy.fromIndex = StartToken.idx INNER JOIN WorkContents AS EndToken ON SubdivsHierarchy.workId = EndToken.workId AND SubdivsHierarchy.toIndex = EndToken.idx WHERE SubdivsHierarchy.typ IN (\'BOOK\', \'POEM\', \'PROL\', \'EPIL\') ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.depth, SubdivsHierarchy.cnt, SubdivsHierarchy.node',
+        'CREATE VIEW "library.WorkIndexes" AS SELECT SubdivsHierarchy.workId, SubdivsHierarchy.parent, SubdivsHierarchy.node, SubdivsHierarchy.depth, SubdivsHierarchy.typ, SubdivsHierarchy.cnt, SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex, COALESCE(SubdivsHierarchy.editionLabel, \'\') AS editionLabel, Titles.name AS title, (SELECT GROUP_CONCAT((SELECT COUNT(*) FROM WorkContents AS Words WHERE Words.workId = Numerals.workId AND Words.idx >= Titles.fromIndex AND Words.idx < Numerals.idx AND Words.tokenType <= 3)) FROM WorkContents AS Numerals WHERE Numerals.workId = Titles.workId AND Numerals.idx BETWEEN Titles.fromIndex AND Titles.toIndex AND Numerals.tokenType = 3) AS numeralWordIndexes, StartToken.sourceReference AS startReference, EndToken.sourceReference AS endReference FROM "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy LEFT JOIN WorkContentSubdivisions AS Titles ON SubdivsHierarchy.workId = Titles.workId AND SubdivsHierarchy.node = Titles.parent AND \'TITL\' = Titles.typ INNER JOIN WorkContents AS StartToken ON SubdivsHierarchy.workId = StartToken.workId AND SubdivsHierarchy.fromIndex = StartToken.idx INNER JOIN WorkContents AS EndToken ON SubdivsHierarchy.workId = EndToken.workId AND SubdivsHierarchy.toIndex = EndToken.idx WHERE SubdivsHierarchy.typ IN (\'BOOK\', \'POEM\', \'PROL\', \'EPIL\') ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.depth, SubdivsHierarchy.cnt, SubdivsHierarchy.node',
   };
   @override
   LibraryWorkIndexes get asDslTable => this;
@@ -8574,6 +8689,10 @@ class LibraryWorkIndexes
       toIndex: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}toIndex'],
+      )!,
+      editionLabel: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}editionLabel'],
       )!,
       title: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -8643,6 +8762,13 @@ class LibraryWorkIndexes
     false,
     type: i0.DriftSqlType.int,
   );
+  late final i0.GeneratedColumn<String> editionLabel =
+      i0.GeneratedColumn<String>(
+        'editionLabel',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      );
   late final i0.GeneratedColumn<String> title = i0.GeneratedColumn<String>(
     'title',
     aliasedName,
@@ -9021,6 +9147,7 @@ class LibraryDrift extends i6.ModularAccessor {
         cnt: row.read<int>('cnt'),
         fromIndex: row.read<int>('fromIndex'),
         toIndex: row.read<int>('toIndex'),
+        editionLabel: row.read<String>('editionLabel'),
         title: row.readNullable<String>('title'),
         numeralWordIndexes: row.readNullable<String>('numeralWordIndexes'),
         startReference: row.read<String>('startReference'),
