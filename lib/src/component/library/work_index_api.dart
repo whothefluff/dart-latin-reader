@@ -158,7 +158,7 @@ class WorkIndexEntry {
       startReference == endReference ? startReference : '$startReference – $endReference';
 
   // Counters are zero-based within their parent.
-  //A book whose TEI n isn't a number is counted
+  // A book whose TEI n isn't a number is labelled by its position.
   String get typeLabel => switch (typ) {
     SubdivisionType.book => 'Book ${int.tryParse(editionLabel) ?? cnt + 1}',
     SubdivisionType.poem => 'Poem $editionLabel',
