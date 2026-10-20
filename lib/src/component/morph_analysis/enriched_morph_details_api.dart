@@ -46,7 +46,9 @@ class EnrichedAnalysis {
   });
 
   final Analysis base;
-  final LnsBasicInfoEntry lns;
+
+  /// `null` when no L&S entry matches [dictionaryRef].
+  final LnsBasicInfoEntry? lns;
 
   // Delegate properties for easier access
   String get form => base.form;
@@ -67,9 +69,9 @@ class EnrichedAnalysis {
   String? get voice => base.voice;
   String? get person => base.person;
   String? get additional => base.additional;
-  String get lnsLemma => lns.lemma;
-  String? get lnsInflection => lns.inflection;
-  String? get lnsPartOfSpeech => lns.partOfSpeech;
+  String? get lnsLemma => lns?.lemma;
+  String? get lnsInflection => lns?.inflection;
+  String? get lnsPartOfSpeech => lns?.partOfSpeech;
 
   @override
   String toString() => 'EnrichedAnalysis{form: $form, item: $item, cnt: $cnt}';
