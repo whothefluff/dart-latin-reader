@@ -105,6 +105,14 @@ void _validateDatabase(File file, int schemaVersion, int dataVersion) {
       expect(count, greaterThan(0), reason: '$table must contain data.');
       stdout.writeln('$table: $count rows');
     }
+    final refsWithoutLnsEntry = db
+        .select('SELECT dictionaryRef FROM LnsRefResolutions WHERE lnsLemma IS NULL ORDER BY 1')
+        .map((row) => row['dictionaryRef'] as String)
+        .toList();
+    stdout.writeln(
+      'Dictionary refs without an L&S entry: ${refsWithoutLnsEntry.length} '
+      '(${refsWithoutLnsEntry.join(', ')})',
+    );
   } finally {
     db.dispose();
   }
