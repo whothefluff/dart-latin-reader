@@ -47,7 +47,9 @@ class EnrichedResult {
   });
 
   final Result base;
-  final LnsBasicInfoEntry lns;
+
+  /// `null` when no L&S entry matches [dictionaryRef].
+  final LnsBasicInfoEntry? lns;
 
   // Delegate properties for easier access
   String get form => base.form;
@@ -62,9 +64,9 @@ class EnrichedResult {
   String? get additional => base.additional;
 
   /// Contains the value as it is actually found in the dictionary
-  String? get lnsLemma => lns.lemma;
-  String? get lnsInflection => lns.inflection;
-  String? get lnsPartOfSpeech => lns.partOfSpeech;
+  String? get lnsLemma => lns?.lemma;
+  String? get lnsInflection => lns?.inflection;
+  String? get lnsPartOfSpeech => lns?.partOfSpeech;
 
   @override
   String toString() => 'EnrichedResult{form: $form, item: $item, cnt: $cnt}';

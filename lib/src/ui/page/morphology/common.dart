@@ -249,9 +249,16 @@ class _MorphEntryCard extends ConsumerWidget {
     avatar: Icon(Icons.translate, color: themeColor.secondary),
     label: const Text('View in Dictionary'),
     onPressed: () async {
-      final lns = await ref.read(lewisAndShortDictionaryProvider.future);
-      if (context.mounted) {
-        await DictionaryEntryRoute(lns.id, firstAnalysis.lnsLemma).push<void>(context);
+      final lemma = firstAnalysis.lnsLemma;
+      if (lemma == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No dictionary entry found for this form.')),
+        );
+      } else {
+        final lns = await ref.read(lewisAndShortDictionaryProvider.future);
+        if (context.mounted) {
+          await DictionaryEntryRoute(lns.id, lemma).push<void>(context);
+        }
       }
     },
   );
