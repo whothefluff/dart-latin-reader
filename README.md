@@ -3,7 +3,9 @@
 A new Flutter project.
 
 To be formatted later:
-- After adding a new work, the query in morph_analysis folder should be run again to see if new assimilations appear
+- After adding a new work, check the dictionary refs that the database build (`tool/build_database_test.dart`) prints
+  as having no L&S entry: the assimilations that match refs to entries are the `LnsRefResolutions` step in
+  `lib/src/component/dictionary/db_util.dart`
 
 ## Getting Started
 
