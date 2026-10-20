@@ -161,6 +161,21 @@ void main() {
       expect(wiktionaryPagesOf(lupus, [lupus]), {'lupus'});
     });
 
+    test(
+      'Wiktionary offers a proper word its capitalized page and an either word both pages, whatever their printed case',
+      () {
+        final (proper, either) = (ProperNounState.proper, ProperNounState.either);
+        final tartareo = _segment(1, 'tartareo', baseNormForm: 'Tartareo', state: proper);
+        final eutyche = _segment(2, 'Eutyche', baseNormForm: 'Eutyche', state: proper);
+        final venantum = _segment(3, 'Venantum', baseNormForm: 'Venantum', state: either);
+        final religio = _segment(4, 'Religio', baseNormForm: 'Religio', state: either);
+        expect(wiktionaryPagesOf(tartareo, [tartareo]), {'Tartareo'});
+        expect(wiktionaryPagesOf(eutyche, [eutyche]), {'Eutyche'});
+        expect(wiktionaryPagesOf(venantum, [venantum]), {'Venantum', 'venantum'});
+        expect(wiktionaryPagesOf(religio, [religio]), {'Religio', 'religio'});
+      },
+    );
+
     test('a capitalized word with no state is looked up capitalized', () {
       final line = [_segment(1, 'dixi'), _segment(2, ','), _segment(3, 'Eutyche')];
       expect(wiktionaryPagesOf(line.last, line), {'Eutyche'});

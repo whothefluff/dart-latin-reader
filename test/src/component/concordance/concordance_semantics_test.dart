@@ -65,6 +65,16 @@ void main() {
     expect(await starts([const FormCriterion('ĀPIS', exactCase: true)], macrons: true), [0]);
   });
 
+  test(
+    "exact case finds a proper word printed lowercase, like Phaedrus's tartareo, only capitalized",
+    () async {
+      await token(db, 0, 'tartareo', proper: ProperNounState.proper);
+      expect(await starts([const FormCriterion('Tartareo', exactCase: true)]), [0]);
+      expect(await starts([const FormCriterion('tartareo', exactCase: true)]), isEmpty);
+      expect(await starts([const FormCriterion('tartareo')]), [0]);
+    },
+  );
+
   test('a host, its enclitic and an expansion all find their own token', () async {
     await token(db, 0, 'populusque', enclitic: 'que');
     await token(db, 1, 'M.', type: 2, proper: ProperNounState.proper, expansion: 'Mārcus');
