@@ -148,6 +148,44 @@ jobs:
           path: ${{ runner.temp }}/generated-code.diff
           if-no-files-found: error
 
+  # Opens each tab of the app on Linux, with this run's database
+  integration:
+    name: Integration tests
+    needs: database
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Install Linux build dependencies and a virtual display
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev xvfb
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Stage database
+        uses: ./.github/actions/stage-database
+
+      - name: Run integration tests
+        env:
+          DATABASE_SHA256: ${{ needs.database.outputs.sha256 }}
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" \
+            flutter test integration_test -d linux --reporter expanded \
+            --dart-define=BUNDLED_DATABASE_ID="$DATABASE_SHA256"
+
   # Each platform needs the checks too, because its publish job must wait for them
   android:
     name: Android
