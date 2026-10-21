@@ -36,6 +36,12 @@ Local builds refill data but never change the tables in an existing `data.db`. D
 
 Your settings live elsewhere, so they survive. Builds from GitHub need nothing.
 
+## Integration tests
+
+`integration_test/app_test.dart` launches the app and opens each tab: the first work at its first page, the first entry of the first dictionary, and the frequency, morphology and concordance tabs. A test fails on any severe log record (every failed provider writes one, so any error shown on a page counts) and on any framework error, such as an overflow.
+
+Run them on a desktop or a device: `flutter test integration_test -d linux` (or `windows`, `macos`, an emulator's id). They use the database your build uses, like the app: the local `data.db`, filled from the CSVs on its first launch (slow). They run with settings of their own, set in the test, so yours are neither read nor changed.
+
 ## Getting the app from GitHub
 
 ### Everyone
