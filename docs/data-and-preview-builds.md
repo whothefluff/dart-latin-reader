@@ -42,6 +42,8 @@ Your settings live elsewhere, so they survive. Builds from GitHub need nothing.
 
 Run them on a desktop or a device: `flutter test integration_test -d linux` (or `windows`, `macos`, an emulator's id). They use the database your build uses, like the app: the local `data.db`, filled from the CSVs on its first launch (slow). They run with settings of their own, set in the test, so yours are neither read nor changed.
 
+GitHub runs them on Linux with the run's database, as **Integration tests**.
+
 ## Getting the app from GitHub
 
 ### Everyone
@@ -108,7 +110,7 @@ Only runs on main update the pre-releases.
 
 ## Owner only: required checks
 
-Set in the branch ruleset for main. Require **Checks**, **Generated code**, **Database**, **Android / Build** and **Windows / Build**. Leave **Linux / Build**, **macOS / Build** and **iOS / Build** off: when they fail, the PR shows it, but they never block the merge.
+Set in the branch ruleset for main. Require **Checks**, **Generated code**, **Database**, **Integration tests**, **Android / Build** and **Windows / Build**. Leave **Linux / Build**, **macOS / Build** and **iOS / Build** off: when they fail, the PR shows it, but they never block the merge.
 
 **Checks** and **Database** have to be on the list: when either fails, the platform builds are skipped, and GitHub counts a skipped required check as passed.
 
@@ -116,6 +118,7 @@ What makes them fail, besides analyze and tests:
 
 - **Checks:** unformatted code. Format the files you change (format on save does it). Don't run `dart format .`: it also reformats generated files, which then fail **Generated code**.
 - **Generated code:** committed generated files that don't match what `flutter pub get` (l10n) and `dart run build_runner build --delete-conflicting-outputs` produce. Run both and commit what changes.
+- **Integration tests:** a tab that fails on the real data (see [Integration tests](#integration-tests)). The job's log has each error with its stack trace.
 
 ## Owner only: signing key and secrets
 
