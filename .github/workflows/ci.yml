@@ -84,6 +84,9 @@ jobs:
       - name: Generate and validate database
         run: flutter test tool/build_database_test.dart --reporter expanded --timeout none
 
+      - name: Check the concordance on the database
+        run: flutter test tool/concordance_corpus_test.dart --reporter expanded --timeout none
+
       - name: Describe database
         id: describe
         run: |
