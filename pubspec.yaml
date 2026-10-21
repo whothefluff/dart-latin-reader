@@ -45,6 +45,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   go_router_builder: any
+  integration_test:
+    sdk: flutter
   riverpod_generator: ^2.6.5
   riverpod_lint: ^2.6.5
 
