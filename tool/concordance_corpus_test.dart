@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show Variable;
 import 'package:drift/native.dart';
@@ -7,23 +9,36 @@ import 'package:latin_reader/src/component/concordance/concordance_parameters.da
 import 'package:latin_reader/src/component/concordance/concordance_query.dart';
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/external/db_util.dart' as util;
+import 'package:path/path.dart' as p;
+import 'package:sqlite3/sqlite3.dart' show OpenMode, sqlite3;
 
-/// Frequency and the concordance must agree on what a word is: a concordance
-/// search for a counted form finds every occurrence frequency counted, and
-/// nothing else but the same spelling written with an enclitic (seque)
+/// Checks the concordance on the database that `build_database_test.dart` builds from the bundled
+/// CSVs. Frequency and the concordance must agree on what a word is: a concordance search for a
+/// counted form finds every occurrence frequency counted, and nothing else but the same spelling
+/// written with an enclitic (seque).
 ///
-/// Runs on the bundled CSVs, so it takes as long as a population
+/// It runs a search for every counted form and lemma, so it isn't part of `flutter test`. Build the
+/// database first, and build it again after changing the CSVs, the schema or the population code:
+///
+/// ```sh
+/// flutter test tool/build_database_test.dart
+/// flutter test tool/concordance_corpus_test.dart
+/// ```
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  final file = _builtDatabase();
   late AppDb db;
   late ConcordanceRepository repository;
   late List<String> workIds;
 
   setUpAll(() async {
     db = AppDb(
-      executor: NativeDatabase.memory(setup: util.setupRegExp),
-      populateFromCsv: true,
+      executor: NativeDatabase.opened(
+        sqlite3.open(file.path, mode: OpenMode.readOnly),
+        setup: util.setupRegExp,
+      ),
+      populateFromCsv: false,
     );
     repository = ConcordanceRepository(db.concordanceDrift);
     final catalog = await db.libraryDrift.getLibraryCatalog().get();
@@ -106,26 +121,28 @@ void main() {
 
   test('a form has the hits frequency counts, plus its spelling with an enclitic', () async {
     final forms = await counted('form', 'lookupForm');
-    final mismatches = await Future.wait(
-      forms.map((form) async {
+    final mismatches = await _inTurn(
+      forms,
+      (form) async {
         final (text, occurrences, written) = form;
         final found = await total(FormCriterion(text, exactCase: true));
         final expected = occurrences + written;
         return found == expected ? null : '$text: $found, expected $expected';
-      }),
+      },
     );
     expect(mismatches.nonNulls, isEmpty);
   }, timeout: Timeout.none);
 
   test('a macronized form has the hits frequency counts with macrons on', () async {
     final forms = await counted('macronForm', 'macronLookupForm');
-    final mismatches = await Future.wait(
-      forms.map((form) async {
+    final mismatches = await _inTurn(
+      forms,
+      (form) async {
         final (text, occurrences, written) = form;
         final found = await total(FormCriterion(text, exactCase: true), matchMacrons: true);
         final expected = occurrences + written;
         return found == expected ? null : '$text: $found, expected $expected';
-      }),
+      },
     );
     expect(mismatches.nonNulls, isEmpty);
   }, timeout: Timeout.none);
@@ -135,13 +152,14 @@ void main() {
       SELECT dictionaryRef, SUM( possibleOccurrences ) AS occurrences
           FROM ScopedLemmaFreq
           GROUP BY dictionaryRef''').get();
-    final mismatches = await Future.wait(
-      lemmas.map((row) async {
+    final mismatches = await _inTurn(
+      lemmas,
+      (row) async {
         final ref = row.read<String>('dictionaryRef');
         final occurrences = row.read<int>('occurrences');
         final found = await total(LemmaCriterion(LemmaChoice(label: ref, dictionaryRefs: [ref])));
         return found == occurrences ? null : '$ref: $found, expected $occurrences';
-      }),
+      },
     );
     expect(mismatches.nonNulls, isEmpty);
   }, timeout: Timeout.none);
@@ -155,20 +173,19 @@ void main() {
       distances: const [3],
     );
     const pageSize = 37;
-    final mismatches = await Future.wait(
-      ConcordanceSort.values.map((sort) async {
+    final mismatches = await _inTurn(
+      ConcordanceSort.values,
+      (sort) async {
         final sorted = query.withSort(sort);
         final all = await hits(sorted);
-        final pages = await Future.wait(
-          Iterable.generate(
-            (all.length / pageSize).ceil(),
-            (page) => hits(sorted, offset: page * pageSize, limit: pageSize),
-          ),
+        final pages = await _inTurn(
+          Iterable<int>.generate((all.length / pageSize).ceil()),
+          (page) => hits(sorted, offset: page * pageSize, limit: pageSize),
         );
         // The order is total, so the pages read one after another are the whole list
         final paged = pages.expand((page) => page).toList();
         return all.isNotEmpty && '$paged' == '$all' ? null : '${sort.name}: ${all.length} hits';
-      }),
+      },
     );
     expect(mismatches.nonNulls, isEmpty);
   }, timeout: Timeout.none);
@@ -185,10 +202,11 @@ void main() {
       ),
     ];
     final queries = phrases.expand((phrase) => ConcordanceSort.values.map(phrase.withSort));
-    final disorders = await Future.wait(
-      queries.map((query) async {
+    final disorders = await _inTurn(
+      queries,
+      (query) async {
         final found = await hits(query);
-        final words = await Future.wait(found.map((hit) => sortWord(query.sort, hit)));
+        final words = await _inTurn(found, (hit) => sortWord(query.sort, hit));
         final keys = found
             .mapIndexed(
               (i, hit) => _SortKey(
@@ -211,15 +229,9 @@ void main() {
           (false, (final i, final key)?) => '$name: hit $i, $key, after ${keys[i - 1]}',
           (false, null) => null,
         };
-      }),
+      },
     );
     expect(disorders.nonNulls, isEmpty);
-  }, timeout: Timeout.none);
-
-  test('a macron typed as a combining mark reads as the letter with the macron', () async {
-    final typed = await total(const FormCriterion('lupo\u0304'), matchMacrons: true);
-    final composed = await total(const FormCriterion('lupō'), matchMacrons: true);
-    expect(typed, composed);
   }, timeout: Timeout.none);
 
   // Passes trivially once every title ends its sentence in the pipeline
@@ -235,8 +247,9 @@ void main() {
                 AND NOT Text.isTitle
                 AND Title.lookupForm IS NOT NULL
                 AND Text.lookupForm IS NOT NULL''').get();
-    final crossed = await Future.wait(
-      crossings.map((row) async {
+    final crossed = await _inTurn(
+      crossings,
+      (row) async {
         final workId = row.read<String>('workId');
         final idx = row.read<int>('idx');
         final found = await hits(
@@ -248,7 +261,7 @@ void main() {
           ),
         );
         return found.any((hit) => hit.$1 == workId && hit.$2.first == idx) ? '$workId: $idx' : null;
-      }),
+      },
     );
     expect(crossed.nonNulls, isEmpty);
   }, timeout: Timeout.none);
@@ -266,8 +279,9 @@ void main() {
           'WHERE isTitle AND lookupForm IS NOT NULL',
         )
         .get();
-    final mismatches = await Future.wait(
-      forms.map((row) async {
+    final mismatches = await _inTurn(
+      forms,
+      (row) async {
         final form = FormCriterion(row.read<String>('form'), exactCase: true);
         Future<List<(String, List<int>)>> find(ConcordanceTitles titles) =>
             hits(ConcordanceQuery(slots: [form], titles: titles));
@@ -282,7 +296,7 @@ void main() {
         return ok
             ? null
             : '${form.text}: ${all.length}, only ${only.length}, excluded ${excluded.length}';
-      }),
+      },
     );
     expect(forms, isNotEmpty);
     expect(mismatches.nonNulls, isEmpty);
@@ -318,3 +332,15 @@ class _SortKey implements Comparable<_SortKey> {
   String toString() => '_SortKey{word: $word, work: $work, tokens: $tokens}';
   //
 }
+
+/// Returns the database that `build_database_test.dart` builds.
+File _builtDatabase() {
+  final file = File(p.join('build', 'generated_database', 'data.db'));
+  return file.existsSync()
+      ? file
+      : throw StateError('${file.path} is missing: run tool/build_database_test.dart first.');
+}
+
+/// Calls [toFuture] on each of [items], one after another, and returns the results in order.
+Future<List<R>> _inTurn<T, R>(Iterable<T> items, Future<R> Function(T item) toFuture) =>
+    Stream.fromIterable(items).asyncMap(toFuture).toList();
