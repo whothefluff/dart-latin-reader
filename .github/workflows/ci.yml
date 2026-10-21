@@ -183,7 +183,7 @@ jobs:
           DATABASE_SHA256: ${{ needs.database.outputs.sha256 }}
         run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" \
-            flutter test integration_test -d linux --reporter expanded \
+            flutter test integration_test -d linux \
             --dart-define=BUNDLED_DATABASE_ID="$DATABASE_SHA256"
 
   # Each platform needs the checks too, because its publish job must wait for them
