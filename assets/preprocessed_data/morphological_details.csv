@@ -3119,7 +3119,9 @@ impugnantur,0,impugno
 impune,0,impune
 impune,1,impunis
 imputare,0,imputo
-in,0,in1
+in,0,eo1
+in,1,in1
+in,2,is
 inane,0,inanis
 inani,0,inanio
 inani,1,inanis
@@ -5972,7 +5974,8 @@ quietis,2,quiesco
 Quietis,3,Quieta
 quieto,0,quiesco
 quietos,0,quiesco
-quin,0,quin
+quin,0,qui2
+quin,1,quin
 quintus,0,quintus1
 Quintus,1,Quintus2
 quippe,0,quippe

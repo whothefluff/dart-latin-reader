@@ -5422,6 +5422,7 @@ facies,1,0,verb,fac,iēs,3rd conjugation -iō,,singular,,,indicative,future,acti
 facile,0,0,adjective,facil,e,"is, -e",neuter,singular,3rd,nominative,,,,
 facile,0,1,adjective,facil,e,"is, -e",neuter,singular,3rd,vocative,,,,
 facile,0,2,adjective,facil,e,"is, -e",neuter,singular,3rd,accusative,,,,
+facile,0,3,adverb,facile,,,,,,,,,,
 facilem,0,0,adjective,facil,em,"is, -e",masculine,singular,3rd,accusative,,,,
 facilem,0,1,adjective,facil,em,"is, -e",feminine,singular,3rd,accusative,,,,
 facili,0,0,adjective,facil,ī,"is, -e",masculine,singular,3rd,dative,,,,
@@ -7562,7 +7563,9 @@ impune,1,2,adjective,impūn,e,"is, -e",neuter,singular,3rd,accusative,,,,
 imputare,0,0,verb,imput,āre,1st conjugation,,singular,,,indicative,present,passive,2nd
 imputare,0,1,verb,imput,āre,1st conjugation,,singular,,,imperative,present,passive,2nd
 imputare,0,2,noun,imput,āre,,neuter,singular,,,infinitive,present,active,
-in,0,0,preposition,in,,,,,,,,,,
+in,0,0,verb,īn,,irregular,,singular,,,indicative,present,active,2nd
+in,1,0,preposition,in,,,,,,,,,,
+in,2,0,pronoun,in,,,masculine,singular,,nominative,,,,
 inane,0,0,adjective,inān,e,"is, -e",neuter,singular,3rd,nominative,,,,
 inane,0,1,adjective,inān,e,"is, -e",neuter,singular,3rd,vocative,,,,
 inane,0,2,adjective,inān,e,"is, -e",neuter,singular,3rd,accusative,,,,
@@ -14823,7 +14826,8 @@ quieto,0,1,adjective,quiēt,ō,"us, -a, -um",neuter,singular,1st & 2nd,dative,pa
 quieto,0,2,adjective,quiēt,ō,"us, -a, -um",masculine,singular,1st & 2nd,ablative,participle,perfect,passive,
 quieto,0,3,adjective,quiēt,ō,"us, -a, -um",neuter,singular,1st & 2nd,ablative,participle,perfect,passive,
 quietos,0,0,adjective,quiēt,ōs,"us, -a, -um",masculine,plural,1st & 2nd,accusative,participle,perfect,passive,
-quin,0,0,conjunction,quīn,,,,,,,,,,
+quin,0,0,pronoun,quīn,,,masculine,singular,,nominative,,,,
+quin,1,0,conjunction,quīn,,,,,,,,,,
 quintus,0,0,adjective,quīnt,us,"us, -a, -um",masculine,singular,1st & 2nd,nominative,,,,
 Quintus,1,0,noun,Quīnt,us,"us, -i",masculine,singular,2nd,nominative,,,,
 quippe,0,0,adverb,quippe,,,,,,,,,,
