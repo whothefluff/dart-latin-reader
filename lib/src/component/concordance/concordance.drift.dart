@@ -3090,11 +3090,11 @@ class ConcordanceLemmas
 class ConcordanceGrammarValue extends i0.DataClass {
   final String partOfSpeech;
   final String feature;
-  final String? value;
+  final String value;
   const ConcordanceGrammarValue({
     required this.partOfSpeech,
     required this.feature,
-    this.value,
+    required this.value,
   });
   factory ConcordanceGrammarValue.fromJson(
     Map<String, dynamic> json, {
@@ -3104,7 +3104,7 @@ class ConcordanceGrammarValue extends i0.DataClass {
     return ConcordanceGrammarValue(
       partOfSpeech: serializer.fromJson<String>(json['partOfSpeech']),
       feature: serializer.fromJson<String>(json['feature']),
-      value: serializer.fromJson<String?>(json['value']),
+      value: serializer.fromJson<String>(json['value']),
     );
   }
   @override
@@ -3113,18 +3113,18 @@ class ConcordanceGrammarValue extends i0.DataClass {
     return <String, dynamic>{
       'partOfSpeech': serializer.toJson<String>(partOfSpeech),
       'feature': serializer.toJson<String>(feature),
-      'value': serializer.toJson<String?>(value),
+      'value': serializer.toJson<String>(value),
     };
   }
 
   i1.ConcordanceGrammarValue copyWith({
     String? partOfSpeech,
     String? feature,
-    i0.Value<String?> value = const i0.Value.absent(),
+    String? value,
   }) => i1.ConcordanceGrammarValue(
     partOfSpeech: partOfSpeech ?? this.partOfSpeech,
     feature: feature ?? this.feature,
-    value: value.present ? value.value : this.value,
+    value: value ?? this.value,
   );
   @override
   String toString() {
@@ -3163,7 +3163,7 @@ class ConcordanceGrammarValues
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "concordance.GrammarValues" AS SELECT partOfSpeech, \'partOfSpeech\' AS feature, partOfSpeech AS value FROM ConcordanceDetailInflections UNION SELECT partOfSpeech, \'gramCase\', gramCase FROM ConcordanceDetailInflections WHERE gramCase IS NOT NULL UNION SELECT partOfSpeech, \'number\', number FROM ConcordanceDetailInflections WHERE number IS NOT NULL UNION SELECT partOfSpeech, \'gender\', gender FROM ConcordanceDetailInflections WHERE gender IS NOT NULL UNION SELECT partOfSpeech, \'declension\', declension FROM ConcordanceDetailInflections WHERE declension IS NOT NULL UNION SELECT partOfSpeech, \'person\', person FROM ConcordanceDetailInflections WHERE person IS NOT NULL UNION SELECT partOfSpeech, \'verbForm\', verbForm FROM ConcordanceDetailInflections WHERE verbForm IS NOT NULL UNION SELECT partOfSpeech, \'tense\', tense FROM ConcordanceDetailInflections WHERE tense IS NOT NULL UNION SELECT partOfSpeech, \'voice\', voice FROM ConcordanceDetailInflections WHERE voice IS NOT NULL',
+        'CREATE VIEW "concordance.GrammarValues" AS SELECT partOfSpeech, \'partOfSpeech\' AS feature, partOfSpeech AS value FROM ConcordanceDetailInflections UNION SELECT partOfSpeech, \'gramCase\', COALESCE(gramCase, \'\') FROM ConcordanceDetailInflections WHERE gramCase IS NOT NULL UNION SELECT partOfSpeech, \'number\', COALESCE(number, \'\') FROM ConcordanceDetailInflections WHERE number IS NOT NULL UNION SELECT partOfSpeech, \'gender\', COALESCE(gender, \'\') FROM ConcordanceDetailInflections WHERE gender IS NOT NULL UNION SELECT partOfSpeech, \'declension\', COALESCE(declension, \'\') FROM ConcordanceDetailInflections WHERE declension IS NOT NULL UNION SELECT partOfSpeech, \'person\', COALESCE(person, \'\') FROM ConcordanceDetailInflections WHERE person IS NOT NULL UNION SELECT partOfSpeech, \'verbForm\', COALESCE(verbForm, \'\') FROM ConcordanceDetailInflections WHERE verbForm IS NOT NULL UNION SELECT partOfSpeech, \'tense\', COALESCE(tense, \'\') FROM ConcordanceDetailInflections WHERE tense IS NOT NULL UNION SELECT partOfSpeech, \'voice\', COALESCE(voice, \'\') FROM ConcordanceDetailInflections WHERE voice IS NOT NULL',
   };
   @override
   ConcordanceGrammarValues get asDslTable => this;
@@ -3185,7 +3185,7 @@ class ConcordanceGrammarValues
       value: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}value'],
-      ),
+      )!,
     );
   }
 
@@ -3205,7 +3205,7 @@ class ConcordanceGrammarValues
   late final i0.GeneratedColumn<String> value = i0.GeneratedColumn<String>(
     'value',
     aliasedName,
-    true,
+    false,
     type: i0.DriftSqlType.string,
   );
   @override
@@ -3271,7 +3271,7 @@ class ConcordanceDrift extends i2.ModularAccessor {
       (i0.QueryRow row) => i4.GrammarValueRow.fromSql(
         partOfSpeech: row.read<String>('partOfSpeech'),
         feature: row.read<String>('feature'),
-        value: row.readNullable<String>('value'),
+        value: row.read<String>('value'),
       ),
     );
   }

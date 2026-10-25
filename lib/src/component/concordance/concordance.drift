@@ -108,6 +108,7 @@ searchConcordanceLemmas WITH LemmaChoice.fromSql:
 
 -- Every value a grammatical feature takes, per part of speech. 
 -- Combined values are stored as such (masculine/feminine/neuter)
+-- COALESCE is only for Drift's typing (the WHERE clauses leave no NULL)
 CREATE VIEW "concordance.GrammarValues" AS
     SELECT partOfSpeech, 
            'partOfSpeech' AS feature, 
@@ -116,49 +117,49 @@ CREATE VIEW "concordance.GrammarValues" AS
     UNION
     SELECT partOfSpeech, 
            'gramCase', 
-           gramCase
+           COALESCE( gramCase, '' )
         FROM ConcordanceDetailInflections
         WHERE gramCase IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'number', 
-           number
+           COALESCE( number, '' )
         FROM ConcordanceDetailInflections
         WHERE number IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'gender', 
-           gender
+           COALESCE( gender, '' )
         FROM ConcordanceDetailInflections
         WHERE gender IS NOT NULL
     UNION
     SELECT partOfSpeech,
            'declension',
-           declension
+           COALESCE( declension, '' )
         FROM ConcordanceDetailInflections
         WHERE declension IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'person', 
-           person
+           COALESCE( person, '' )
         FROM ConcordanceDetailInflections
         WHERE person IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'verbForm', 
-           verbForm
+           COALESCE( verbForm, '' )
         FROM ConcordanceDetailInflections
         WHERE verbForm IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'tense', 
-           tense
+           COALESCE( tense, '' )
         FROM ConcordanceDetailInflections
         WHERE tense IS NOT NULL
     UNION
     SELECT partOfSpeech, 
            'voice', 
-           voice
+           COALESCE( voice, '' )
         FROM ConcordanceDetailInflections
         WHERE voice IS NOT NULL;
 
