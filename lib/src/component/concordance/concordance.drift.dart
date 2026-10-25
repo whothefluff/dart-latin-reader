@@ -3244,7 +3244,7 @@ class ConcordanceDrift extends i2.ModularAccessor {
     required int limit,
   }) {
     return customSelect(
-      'SELECT COALESCE(lnsLemma, dictionaryRef) AS label, GROUP_CONCAT(dictionaryRef) AS dictionaryRefs, MIN(lnsPartOfSpeech) AS partOfSpeech, MIN(lnsInflection) AS inflection FROM "concordance.Lemmas" GROUP BY COALESCE(lnsLemma, dictionaryRef) HAVING MAX(dictionaryRef LIKE ?1 || \'%\' OR lnsLemma LIKE ?1 || \'%\') ORDER BY COALESCE(lnsLemma, dictionaryRef) <> ?1, LENGTH(COALESCE(lnsLemma, dictionaryRef)), COALESCE(lnsLemma, dictionaryRef) LIMIT ?2',
+      'SELECT COALESCE(lnsLemma, dictionaryRef) AS label, COALESCE(GROUP_CONCAT(dictionaryRef), \'\') AS dictionaryRefs, MIN(lnsPartOfSpeech) AS partOfSpeech, MIN(lnsInflection) AS inflection FROM "concordance.Lemmas" GROUP BY COALESCE(lnsLemma, dictionaryRef) HAVING MAX(dictionaryRef LIKE ?1 || \'%\' OR lnsLemma LIKE ?1 || \'%\') ORDER BY COALESCE(lnsLemma, dictionaryRef) <> ?1, LENGTH(COALESCE(lnsLemma, dictionaryRef)), COALESCE(lnsLemma, dictionaryRef) LIMIT ?2',
       variables: [i0.Variable<String>(prefix), i0.Variable<int>(limit)],
       readsFrom: {
         concordanceDetails,
@@ -3255,7 +3255,7 @@ class ConcordanceDrift extends i2.ModularAccessor {
     ).map(
       (i0.QueryRow row) => i3.LemmaChoice.fromSql(
         label: row.read<String>('label'),
-        dictionaryRefs: row.readNullable<String>('dictionaryRefs'),
+        dictionaryRefs: row.read<String>('dictionaryRefs'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         inflection: row.readNullable<String>('inflection'),
       ),

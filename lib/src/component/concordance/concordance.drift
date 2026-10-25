@@ -94,7 +94,7 @@ CREATE VIEW "concordance.Lemmas" AS
 -- its dictionaryRefs: filtering before grouping would keep only the ones that match
 searchConcordanceLemmas WITH LemmaChoice.fromSql:
     SELECT COALESCE( lnsLemma, dictionaryRef ) AS label,
-           GROUP_CONCAT( dictionaryRef ) AS dictionaryRefs,
+           COALESCE( GROUP_CONCAT( dictionaryRef ), '' ) AS dictionaryRefs, -- COALESCE required because of Drift typing
            MIN( lnsPartOfSpeech ) AS partOfSpeech,
            MIN( lnsInflection ) AS inflection
         FROM "concordance.Lemmas"
