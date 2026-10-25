@@ -79,11 +79,11 @@ class GrammarValueRow {
     required this.value,
   });
 
-  final String? partOfSpeech;
+  final String partOfSpeech;
 
   /// A [GrammarFeature] name
-  final String? feature;
-  final String? value;
+  final String feature;
+  final String value;
 
   @override
   String toString() => 'GrammarValueRow{$partOfSpeech, $feature: $value}';
@@ -116,13 +116,9 @@ class GrammarValues {
   static Map<String, Map<GrammarFeature, Set<String>>> _index(Iterable<GrammarValueRow> rows) {
     final features = GrammarFeature.values.asNameMap();
     final known = rows.where(
-      (row) =>
-          row.partOfSpeech != null &&
-          row.value != null &&
-          features.containsKey(row.feature) &&
-          row.feature != GrammarFeature.partOfSpeech.name,
+      (row) => features.containsKey(row.feature) && row.feature != GrammarFeature.partOfSpeech.name,
     );
-    final parts = rows.map((row) => row.partOfSpeech).nonNulls.toSet();
+    final parts = rows.map((row) => row.partOfSpeech).toSet();
     return Map.fromEntries(
       parts.map(
         (part) => MapEntry(
@@ -133,7 +129,7 @@ class GrammarValues {
           ).map(
             (feature, values) => MapEntry(
               feature,
-              values.expand((row) => row.value!.split('/')).toSet(),
+              values.expand((row) => row.value.split('/')).toSet(),
             ),
           ),
         ),
