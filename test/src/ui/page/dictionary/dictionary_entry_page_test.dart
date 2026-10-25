@@ -138,7 +138,7 @@ void main() {
 
       expect(copied, ['sense 1', 'sense 2']);
       expect(_expanded(tester), [false, false]);
-      expect(find.text('Sense copied'), findsWidgets);
+      expect(find.byType(SnackBar), findsWidgets);
     });
 
     testWidgets('opens the first sense when set to', (tester) async {
