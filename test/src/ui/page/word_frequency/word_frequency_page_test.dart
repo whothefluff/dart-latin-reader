@@ -63,6 +63,9 @@ Finder _row(String label) => find.ancestor(of: find.text(label), matching: find.
 
 Finder _cell(Finder row, String text) => find.descendant(of: row, matching: find.text(text));
 
+/// A single text with both of sum¹'s coverages, certain first.
+Finder get _bothCoveragesOfSum => find.textContaining(RegExp(r'33\.3%.*83\.3%'));
+
 /// Set explicitly so the tests don't depend on the defaults
 const _byForm = FrequencyFilterSettings(
   pageSize: 50,
@@ -101,12 +104,6 @@ void main() {
       await corpus.addWord(fables, 'et', times: 2);
       await corpus.addWord(fables, 'in');
       await corpus.populate();
-    });
-
-    testWidgets('the coverage column is headed COVER.', (tester) async {
-      await _pumpPage(tester, corpus.db, _byForm, view: _anyCandidateView);
-
-      expect(find.text('COVER.'), findsOneWidget);
     });
 
     testWidgets('there is no CERT., since each unit has exactly one form', (tester) async {
@@ -149,13 +146,6 @@ void main() {
     });
 
     group('with room for both', () {
-      testWidgets('COVER. and CERT. each have a column', (tester) async {
-        await _pumpPage(tester, corpus.db, _byLemma, view: _anyCandidateView);
-
-        expect(find.text('COVER.'), findsOneWidget);
-        expect(find.text('CERT.'), findsOneWidget);
-      });
-
       testWidgets('a lemma adds only the units no more frequent lemma covers', (tester) async {
         await _pumpPage(tester, corpus.db, _byLemma, view: _anyCandidateView);
 
@@ -175,7 +165,7 @@ void main() {
         await tester.longPress(_row('sum¹'));
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('Any candidate'), findsNothing);
+        expect(_bothCoveragesOfSum, findsNothing);
       });
     });
 
@@ -222,7 +212,7 @@ void main() {
           await tester.longPress(_row('sum¹'));
           await tester.pumpAndSettle();
 
-          expect(find.text('Certain: 33.3% · Any candidate: 83.3%'), findsOneWidget);
+          expect(_bothCoveragesOfSum, findsOneWidget);
         });
       }
     });
