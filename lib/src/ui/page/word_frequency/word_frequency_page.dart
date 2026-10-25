@@ -1269,10 +1269,10 @@ Future<void> _openFrequencyMorphology(
     (c) => c.morphForm,
   ).map((form, matches) => MapEntry(form, matches.map((c) => c.morphItem).toSet()));
   final batches = await Future.wait(
-    countedItemsByForm.keys.map(
-      (form) async => (await ref.read(
-        morphologicalAnalysisKeysProvider(form).future,
-      )).where((k) => countedItemsByForm[form]!.contains(k.item)),
+    countedItemsByForm.entries.map(
+      (formAndItems) async => (await ref.read(
+        morphologicalAnalysisKeysProvider(formAndItems.key).future,
+      )).where((k) => formAndItems.value.contains(k.item)),
     ),
   );
   if (context.mounted) {
