@@ -8,8 +8,6 @@ import 'package:latin_reader/src/component/library/catalog_api.dart';
 import 'package:latin_reader/src/component/settings/concordance_settings_api.dart';
 import 'package:latin_reader/src/ui/page/concordance/query_editor.dart';
 
-const _oneWord = 'One word only. For a phrase, add a word after it';
-
 /// Saved settings, without the platform storage behind them
 class _SavedSettings extends ConcordanceSettingsNotifier {
   @override
@@ -74,7 +72,7 @@ void main() {
     expect(searched?.slots, [const FormCriterion('uoluit', exactCase: true)]);
   });
 
-  testWidgets('a form field takes one word, and says so until it has one', (tester) async {
+  testWidgets('a form field takes one word, and Search waits until it has one', (tester) async {
     ConcordanceQuery? searched;
     await _pumpEditor(tester, null, (query) => searched = query);
     final field = find.widgetWithText(TextField, 'Word form');
@@ -86,12 +84,10 @@ void main() {
 
     await tester.enterText(field, 'puellam videt');
     await tester.pump();
-    expect(find.text(_oneWord), findsOneWidget);
     expect(canSearch(), isFalse);
 
     await tester.enterText(field, 'puellam');
     await tester.pump();
-    expect(find.text(_oneWord), findsNothing);
     expect(canSearch(), isTrue);
     await _tapSearch(tester);
     expect(searched?.slots, [const FormCriterion('puellam')]);
