@@ -294,14 +294,14 @@ class LemmaChoice {
   }) : dictionaryRefs = ValueList(dictionaryRefs.toSet().sorted((a, b) => a.compareTo(b)));
 
   LemmaChoice.fromSql({
-    required String? label,
-    required String? dictionaryRefs,
+    required String label,
+    required String dictionaryRefs,
     String? partOfSpeech,
     String? inflection,
   }) : this(
-         label: label ?? '',
+         label: label,
          // same separator as GROUP_CONCAT's default
-         dictionaryRefs: (dictionaryRefs ?? '').split(',').where((ref) => ref.isNotEmpty),
+         dictionaryRefs: dictionaryRefs.split(','),
          partOfSpeech: partOfSpeech,
          inflection: inflection,
        );
