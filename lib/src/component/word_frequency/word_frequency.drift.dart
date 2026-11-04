@@ -208,6 +208,7 @@ typedef $ResolvedFreqMorphFormsCreateCompanionBuilder =
       required String morphForm,
       required int morphItem,
       required String dictionaryRef,
+      required String sublemma,
     });
 typedef $ResolvedFreqMorphFormsUpdateCompanionBuilder =
     i1.ResolvedFreqMorphFormsCompanion Function({
@@ -217,6 +218,7 @@ typedef $ResolvedFreqMorphFormsUpdateCompanionBuilder =
       i0.Value<String> morphForm,
       i0.Value<int> morphItem,
       i0.Value<String> dictionaryRef,
+      i0.Value<String> sublemma,
     });
 
 class $ResolvedFreqMorphFormsFilterComposer
@@ -255,6 +257,11 @@ class $ResolvedFreqMorphFormsFilterComposer
 
   i0.ColumnFilters<String> get dictionaryRef => $composableBuilder(
     column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -297,6 +304,11 @@ class $ResolvedFreqMorphFormsOrderingComposer
     column: $table.dictionaryRef,
     builder: (column) => i0.ColumnOrderings(column),
   );
+
+  i0.ColumnOrderings<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $ResolvedFreqMorphFormsAnnotationComposer
@@ -329,6 +341,9 @@ class $ResolvedFreqMorphFormsAnnotationComposer
     column: $table.dictionaryRef,
     builder: (column) => column,
   );
+
+  i0.GeneratedColumn<String> get sublemma =>
+      $composableBuilder(column: $table.sublemma, builder: (column) => column);
 }
 
 class $ResolvedFreqMorphFormsTableManager
@@ -377,6 +392,7 @@ class $ResolvedFreqMorphFormsTableManager
                 i0.Value<String> morphForm = const i0.Value.absent(),
                 i0.Value<int> morphItem = const i0.Value.absent(),
                 i0.Value<String> dictionaryRef = const i0.Value.absent(),
+                i0.Value<String> sublemma = const i0.Value.absent(),
               }) => i1.ResolvedFreqMorphFormsCompanion(
                 workId: workId,
                 form: form,
@@ -384,6 +400,7 @@ class $ResolvedFreqMorphFormsTableManager
                 morphForm: morphForm,
                 morphItem: morphItem,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
               ),
           createCompanionCallback:
               ({
@@ -393,6 +410,7 @@ class $ResolvedFreqMorphFormsTableManager
                 required String morphForm,
                 required int morphItem,
                 required String dictionaryRef,
+                required String sublemma,
               }) => i1.ResolvedFreqMorphFormsCompanion.insert(
                 workId: workId,
                 form: form,
@@ -400,6 +418,7 @@ class $ResolvedFreqMorphFormsTableManager
                 morphForm: morphForm,
                 morphItem: morphItem,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -436,6 +455,7 @@ typedef $ScopedFormLemmaFreqCreateCompanionBuilder =
       required String form,
       required String macronForm,
       required String dictionaryRef,
+      required String sublemma,
       required int possibleOccurrences,
       required int singleCandidateOccurrences,
     });
@@ -445,6 +465,7 @@ typedef $ScopedFormLemmaFreqUpdateCompanionBuilder =
       i0.Value<String> form,
       i0.Value<String> macronForm,
       i0.Value<String> dictionaryRef,
+      i0.Value<String> sublemma,
       i0.Value<int> possibleOccurrences,
       i0.Value<int> singleCandidateOccurrences,
     });
@@ -475,6 +496,11 @@ class $ScopedFormLemmaFreqFilterComposer
 
   i0.ColumnFilters<String> get dictionaryRef => $composableBuilder(
     column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -518,6 +544,11 @@ class $ScopedFormLemmaFreqOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<int> get possibleOccurrences => $composableBuilder(
     column: $table.possibleOccurrences,
     builder: (column) => i0.ColumnOrderings(column),
@@ -553,6 +584,9 @@ class $ScopedFormLemmaFreqAnnotationComposer
     column: $table.dictionaryRef,
     builder: (column) => column,
   );
+
+  i0.GeneratedColumn<String> get sublemma =>
+      $composableBuilder(column: $table.sublemma, builder: (column) => column);
 
   i0.GeneratedColumn<int> get possibleOccurrences => $composableBuilder(
     column: $table.possibleOccurrences,
@@ -606,6 +640,7 @@ class $ScopedFormLemmaFreqTableManager
                 i0.Value<String> form = const i0.Value.absent(),
                 i0.Value<String> macronForm = const i0.Value.absent(),
                 i0.Value<String> dictionaryRef = const i0.Value.absent(),
+                i0.Value<String> sublemma = const i0.Value.absent(),
                 i0.Value<int> possibleOccurrences = const i0.Value.absent(),
                 i0.Value<int> singleCandidateOccurrences =
                     const i0.Value.absent(),
@@ -614,6 +649,7 @@ class $ScopedFormLemmaFreqTableManager
                 form: form,
                 macronForm: macronForm,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
                 possibleOccurrences: possibleOccurrences,
                 singleCandidateOccurrences: singleCandidateOccurrences,
               ),
@@ -623,6 +659,7 @@ class $ScopedFormLemmaFreqTableManager
                 required String form,
                 required String macronForm,
                 required String dictionaryRef,
+                required String sublemma,
                 required int possibleOccurrences,
                 required int singleCandidateOccurrences,
               }) => i1.ScopedFormLemmaFreqCompanion.insert(
@@ -630,6 +667,7 @@ class $ScopedFormLemmaFreqTableManager
                 form: form,
                 macronForm: macronForm,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
                 possibleOccurrences: possibleOccurrences,
                 singleCandidateOccurrences: singleCandidateOccurrences,
               ),
@@ -666,6 +704,7 @@ typedef $ScopedLemmaFreqCreateCompanionBuilder =
     i1.ScopedLemmaFreqCompanion Function({
       required String workId,
       required String dictionaryRef,
+      required String sublemma,
       required int possibleOccurrences,
       required int singleCandidateOccurrences,
     });
@@ -673,6 +712,7 @@ typedef $ScopedLemmaFreqUpdateCompanionBuilder =
     i1.ScopedLemmaFreqCompanion Function({
       i0.Value<String> workId,
       i0.Value<String> dictionaryRef,
+      i0.Value<String> sublemma,
       i0.Value<int> possibleOccurrences,
       i0.Value<int> singleCandidateOccurrences,
     });
@@ -693,6 +733,11 @@ class $ScopedLemmaFreqFilterComposer
 
   i0.ColumnFilters<String> get dictionaryRef => $composableBuilder(
     column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -726,6 +771,11 @@ class $ScopedLemmaFreqOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<int> get possibleOccurrences => $composableBuilder(
     column: $table.possibleOccurrences,
     builder: (column) => i0.ColumnOrderings(column),
@@ -753,6 +803,9 @@ class $ScopedLemmaFreqAnnotationComposer
     column: $table.dictionaryRef,
     builder: (column) => column,
   );
+
+  i0.GeneratedColumn<String> get sublemma =>
+      $composableBuilder(column: $table.sublemma, builder: (column) => column);
 
   i0.GeneratedColumn<int> get possibleOccurrences => $composableBuilder(
     column: $table.possibleOccurrences,
@@ -804,12 +857,14 @@ class $ScopedLemmaFreqTableManager
               ({
                 i0.Value<String> workId = const i0.Value.absent(),
                 i0.Value<String> dictionaryRef = const i0.Value.absent(),
+                i0.Value<String> sublemma = const i0.Value.absent(),
                 i0.Value<int> possibleOccurrences = const i0.Value.absent(),
                 i0.Value<int> singleCandidateOccurrences =
                     const i0.Value.absent(),
               }) => i1.ScopedLemmaFreqCompanion(
                 workId: workId,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
                 possibleOccurrences: possibleOccurrences,
                 singleCandidateOccurrences: singleCandidateOccurrences,
               ),
@@ -817,11 +872,13 @@ class $ScopedLemmaFreqTableManager
               ({
                 required String workId,
                 required String dictionaryRef,
+                required String sublemma,
                 required int possibleOccurrences,
                 required int singleCandidateOccurrences,
               }) => i1.ScopedLemmaFreqCompanion.insert(
                 workId: workId,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
                 possibleOccurrences: possibleOccurrences,
                 singleCandidateOccurrences: singleCandidateOccurrences,
               ),
@@ -1370,6 +1427,7 @@ typedef $ScopedLookupLemmasCreateCompanionBuilder =
       required String macronLookupForm,
       required int uncertaintyBitMask,
       required String dictionaryRef,
+      required String sublemma,
     });
 typedef $ScopedLookupLemmasUpdateCompanionBuilder =
     i1.ScopedLookupLemmasCompanion Function({
@@ -1379,6 +1437,7 @@ typedef $ScopedLookupLemmasUpdateCompanionBuilder =
       i0.Value<String> macronLookupForm,
       i0.Value<int> uncertaintyBitMask,
       i0.Value<String> dictionaryRef,
+      i0.Value<String> sublemma,
     });
 
 class $ScopedLookupLemmasFilterComposer
@@ -1417,6 +1476,11 @@ class $ScopedLookupLemmasFilterComposer
 
   i0.ColumnFilters<String> get dictionaryRef => $composableBuilder(
     column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -1459,6 +1523,11 @@ class $ScopedLookupLemmasOrderingComposer
     column: $table.dictionaryRef,
     builder: (column) => i0.ColumnOrderings(column),
   );
+
+  i0.ColumnOrderings<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $ScopedLookupLemmasAnnotationComposer
@@ -1497,6 +1566,9 @@ class $ScopedLookupLemmasAnnotationComposer
     column: $table.dictionaryRef,
     builder: (column) => column,
   );
+
+  i0.GeneratedColumn<String> get sublemma =>
+      $composableBuilder(column: $table.sublemma, builder: (column) => column);
 }
 
 class $ScopedLookupLemmasTableManager
@@ -1542,6 +1614,7 @@ class $ScopedLookupLemmasTableManager
                 i0.Value<String> macronLookupForm = const i0.Value.absent(),
                 i0.Value<int> uncertaintyBitMask = const i0.Value.absent(),
                 i0.Value<String> dictionaryRef = const i0.Value.absent(),
+                i0.Value<String> sublemma = const i0.Value.absent(),
               }) => i1.ScopedLookupLemmasCompanion(
                 workId: workId,
                 lookupForm: lookupForm,
@@ -1549,6 +1622,7 @@ class $ScopedLookupLemmasTableManager
                 macronLookupForm: macronLookupForm,
                 uncertaintyBitMask: uncertaintyBitMask,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
               ),
           createCompanionCallback:
               ({
@@ -1558,6 +1632,7 @@ class $ScopedLookupLemmasTableManager
                 required String macronLookupForm,
                 required int uncertaintyBitMask,
                 required String dictionaryRef,
+                required String sublemma,
               }) => i1.ScopedLookupLemmasCompanion.insert(
                 workId: workId,
                 lookupForm: lookupForm,
@@ -1565,6 +1640,7 @@ class $ScopedLookupLemmasTableManager
                 macronLookupForm: macronLookupForm,
                 uncertaintyBitMask: uncertaintyBitMask,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -1997,6 +2073,17 @@ class ResolvedFreqMorphForms extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _sublemmaMeta = const i0.VerificationMeta(
+    'sublemma',
+  );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [
     workId,
@@ -2005,6 +2092,7 @@ class ResolvedFreqMorphForms extends i0.Table
     morphForm,
     morphItem,
     dictionaryRef,
+    sublemma,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2069,6 +2157,14 @@ class ResolvedFreqMorphForms extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryRefMeta);
     }
+    if (data.containsKey('sublemma')) {
+      context.handle(
+        _sublemmaMeta,
+        sublemma.isAcceptableOrUnknown(data['sublemma']!, _sublemmaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sublemmaMeta);
+    }
     return context;
   }
 
@@ -2111,6 +2207,10 @@ class ResolvedFreqMorphForms extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
       )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
+      )!,
     );
   }
 
@@ -2139,6 +2239,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
   final String morphForm;
   final int morphItem;
   final String dictionaryRef;
+  final String sublemma;
   const ResolvedFreqMorphForm({
     required this.workId,
     required this.form,
@@ -2146,6 +2247,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
     required this.morphForm,
     required this.morphItem,
     required this.dictionaryRef,
+    required this.sublemma,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -2156,6 +2258,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
     map['morphForm'] = i0.Variable<String>(morphForm);
     map['morphItem'] = i0.Variable<int>(morphItem);
     map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
+    map['sublemma'] = i0.Variable<String>(sublemma);
     return map;
   }
 
@@ -2167,6 +2270,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
       morphForm: i0.Value(morphForm),
       morphItem: i0.Value(morphItem),
       dictionaryRef: i0.Value(dictionaryRef),
+      sublemma: i0.Value(sublemma),
     );
   }
 
@@ -2182,6 +2286,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
       morphForm: serializer.fromJson<String>(json['morphForm']),
       morphItem: serializer.fromJson<int>(json['morphItem']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
     );
   }
   @override
@@ -2194,6 +2299,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
       'morphForm': serializer.toJson<String>(morphForm),
       'morphItem': serializer.toJson<int>(morphItem),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
     };
   }
 
@@ -2204,6 +2310,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
     String? morphForm,
     int? morphItem,
     String? dictionaryRef,
+    String? sublemma,
   }) => i1.ResolvedFreqMorphForm(
     workId: workId ?? this.workId,
     form: form ?? this.form,
@@ -2211,6 +2318,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
     morphForm: morphForm ?? this.morphForm,
     morphItem: morphItem ?? this.morphItem,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
   );
   ResolvedFreqMorphForm copyWithCompanion(
     i1.ResolvedFreqMorphFormsCompanion data,
@@ -2226,6 +2334,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
       dictionaryRef: data.dictionaryRef.present
           ? data.dictionaryRef.value
           : this.dictionaryRef,
+      sublemma: data.sublemma.present ? data.sublemma.value : this.sublemma,
     );
   }
 
@@ -2237,7 +2346,8 @@ class ResolvedFreqMorphForm extends i0.DataClass
           ..write('macronForm: $macronForm, ')
           ..write('morphForm: $morphForm, ')
           ..write('morphItem: $morphItem, ')
-          ..write('dictionaryRef: $dictionaryRef')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma')
           ..write(')'))
         .toString();
   }
@@ -2250,6 +2360,7 @@ class ResolvedFreqMorphForm extends i0.DataClass
     morphForm,
     morphItem,
     dictionaryRef,
+    sublemma,
   );
   @override
   bool operator ==(Object other) =>
@@ -2260,7 +2371,8 @@ class ResolvedFreqMorphForm extends i0.DataClass
           other.macronForm == this.macronForm &&
           other.morphForm == this.morphForm &&
           other.morphItem == this.morphItem &&
-          other.dictionaryRef == this.dictionaryRef);
+          other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma);
 }
 
 class ResolvedFreqMorphFormsCompanion
@@ -2271,6 +2383,7 @@ class ResolvedFreqMorphFormsCompanion
   final i0.Value<String> morphForm;
   final i0.Value<int> morphItem;
   final i0.Value<String> dictionaryRef;
+  final i0.Value<String> sublemma;
   const ResolvedFreqMorphFormsCompanion({
     this.workId = const i0.Value.absent(),
     this.form = const i0.Value.absent(),
@@ -2278,6 +2391,7 @@ class ResolvedFreqMorphFormsCompanion
     this.morphForm = const i0.Value.absent(),
     this.morphItem = const i0.Value.absent(),
     this.dictionaryRef = const i0.Value.absent(),
+    this.sublemma = const i0.Value.absent(),
   });
   ResolvedFreqMorphFormsCompanion.insert({
     required String workId,
@@ -2286,12 +2400,14 @@ class ResolvedFreqMorphFormsCompanion
     required String morphForm,
     required int morphItem,
     required String dictionaryRef,
+    required String sublemma,
   }) : workId = i0.Value(workId),
        form = i0.Value(form),
        macronForm = i0.Value(macronForm),
        morphForm = i0.Value(morphForm),
        morphItem = i0.Value(morphItem),
-       dictionaryRef = i0.Value(dictionaryRef);
+       dictionaryRef = i0.Value(dictionaryRef),
+       sublemma = i0.Value(sublemma);
   static i0.Insertable<i1.ResolvedFreqMorphForm> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? form,
@@ -2299,6 +2415,7 @@ class ResolvedFreqMorphFormsCompanion
     i0.Expression<String>? morphForm,
     i0.Expression<int>? morphItem,
     i0.Expression<String>? dictionaryRef,
+    i0.Expression<String>? sublemma,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
@@ -2307,6 +2424,7 @@ class ResolvedFreqMorphFormsCompanion
       if (morphForm != null) 'morphForm': morphForm,
       if (morphItem != null) 'morphItem': morphItem,
       if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
+      if (sublemma != null) 'sublemma': sublemma,
     });
   }
 
@@ -2317,6 +2435,7 @@ class ResolvedFreqMorphFormsCompanion
     i0.Value<String>? morphForm,
     i0.Value<int>? morphItem,
     i0.Value<String>? dictionaryRef,
+    i0.Value<String>? sublemma,
   }) {
     return i1.ResolvedFreqMorphFormsCompanion(
       workId: workId ?? this.workId,
@@ -2325,6 +2444,7 @@ class ResolvedFreqMorphFormsCompanion
       morphForm: morphForm ?? this.morphForm,
       morphItem: morphItem ?? this.morphItem,
       dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+      sublemma: sublemma ?? this.sublemma,
     );
   }
 
@@ -2349,6 +2469,9 @@ class ResolvedFreqMorphFormsCompanion
     if (dictionaryRef.present) {
       map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
     }
+    if (sublemma.present) {
+      map['sublemma'] = i0.Variable<String>(sublemma.value);
+    }
     return map;
   }
 
@@ -2360,7 +2483,8 @@ class ResolvedFreqMorphFormsCompanion
           ..write('macronForm: $macronForm, ')
           ..write('morphForm: $morphForm, ')
           ..write('morphItem: $morphItem, ')
-          ..write('dictionaryRef: $dictionaryRef')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma')
           ..write(')'))
         .toString();
   }
@@ -2368,7 +2492,7 @@ class ResolvedFreqMorphFormsCompanion
 
 i0.Index get resolvedFreqMorphFormsLemma => i0.Index(
   'ResolvedFreqMorphForms_Lemma',
-  'CREATE INDEX ResolvedFreqMorphForms_Lemma ON ResolvedFreqMorphForms (workId, dictionaryRef)',
+  'CREATE INDEX ResolvedFreqMorphForms_Lemma ON ResolvedFreqMorphForms (workId, dictionaryRef, sublemma)',
 );
 
 class ScopedFormLemmaFreq extends i0.Table
@@ -2421,6 +2545,17 @@ class ScopedFormLemmaFreq extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _sublemmaMeta = const i0.VerificationMeta(
+    'sublemma',
+  );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _possibleOccurrencesMeta =
       const i0.VerificationMeta('possibleOccurrences');
   late final i0.GeneratedColumn<int> possibleOccurrences =
@@ -2450,6 +2585,7 @@ class ScopedFormLemmaFreq extends i0.Table
     form,
     macronForm,
     dictionaryRef,
+    sublemma,
     possibleOccurrences,
     singleCandidateOccurrences,
   ];
@@ -2500,6 +2636,14 @@ class ScopedFormLemmaFreq extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryRefMeta);
     }
+    if (data.containsKey('sublemma')) {
+      context.handle(
+        _sublemmaMeta,
+        sublemma.isAcceptableOrUnknown(data['sublemma']!, _sublemmaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sublemmaMeta);
+    }
     if (data.containsKey('possibleOccurrences')) {
       context.handle(
         _possibleOccurrencesMeta,
@@ -2531,6 +2675,7 @@ class ScopedFormLemmaFreq extends i0.Table
     form,
     macronForm,
     dictionaryRef,
+    sublemma,
   };
   @override
   i1.ScopedFormLemmaFreqData map(
@@ -2555,6 +2700,10 @@ class ScopedFormLemmaFreq extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
       )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
+      )!,
       possibleOccurrences: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}possibleOccurrences'],
@@ -2577,7 +2726,7 @@ class ScopedFormLemmaFreq extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(workId, form, macronForm, dictionaryRef)',
+    'PRIMARY KEY(workId, form, macronForm, dictionaryRef, sublemma)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -2589,6 +2738,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
   final String form;
   final String macronForm;
   final String dictionaryRef;
+  final String sublemma;
   final int possibleOccurrences;
   final int singleCandidateOccurrences;
   const ScopedFormLemmaFreqData({
@@ -2596,6 +2746,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
     required this.form,
     required this.macronForm,
     required this.dictionaryRef,
+    required this.sublemma,
     required this.possibleOccurrences,
     required this.singleCandidateOccurrences,
   });
@@ -2606,6 +2757,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
     map['form'] = i0.Variable<String>(form);
     map['macronForm'] = i0.Variable<String>(macronForm);
     map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
+    map['sublemma'] = i0.Variable<String>(sublemma);
     map['possibleOccurrences'] = i0.Variable<int>(possibleOccurrences);
     map['singleCandidateOccurrences'] = i0.Variable<int>(
       singleCandidateOccurrences,
@@ -2619,6 +2771,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
       form: i0.Value(form),
       macronForm: i0.Value(macronForm),
       dictionaryRef: i0.Value(dictionaryRef),
+      sublemma: i0.Value(sublemma),
       possibleOccurrences: i0.Value(possibleOccurrences),
       singleCandidateOccurrences: i0.Value(singleCandidateOccurrences),
     );
@@ -2634,6 +2787,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
       form: serializer.fromJson<String>(json['form']),
       macronForm: serializer.fromJson<String>(json['macronForm']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
       possibleOccurrences: serializer.fromJson<int>(
         json['possibleOccurrences'],
       ),
@@ -2650,6 +2804,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
       'form': serializer.toJson<String>(form),
       'macronForm': serializer.toJson<String>(macronForm),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
       'possibleOccurrences': serializer.toJson<int>(possibleOccurrences),
       'singleCandidateOccurrences': serializer.toJson<int>(
         singleCandidateOccurrences,
@@ -2662,6 +2817,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
     String? form,
     String? macronForm,
     String? dictionaryRef,
+    String? sublemma,
     int? possibleOccurrences,
     int? singleCandidateOccurrences,
   }) => i1.ScopedFormLemmaFreqData(
@@ -2669,6 +2825,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
     form: form ?? this.form,
     macronForm: macronForm ?? this.macronForm,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
     possibleOccurrences: possibleOccurrences ?? this.possibleOccurrences,
     singleCandidateOccurrences:
         singleCandidateOccurrences ?? this.singleCandidateOccurrences,
@@ -2685,6 +2842,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
       dictionaryRef: data.dictionaryRef.present
           ? data.dictionaryRef.value
           : this.dictionaryRef,
+      sublemma: data.sublemma.present ? data.sublemma.value : this.sublemma,
       possibleOccurrences: data.possibleOccurrences.present
           ? data.possibleOccurrences.value
           : this.possibleOccurrences,
@@ -2701,6 +2859,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
           ..write('form: $form, ')
           ..write('macronForm: $macronForm, ')
           ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma, ')
           ..write('possibleOccurrences: $possibleOccurrences, ')
           ..write('singleCandidateOccurrences: $singleCandidateOccurrences')
           ..write(')'))
@@ -2713,6 +2872,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
     form,
     macronForm,
     dictionaryRef,
+    sublemma,
     possibleOccurrences,
     singleCandidateOccurrences,
   );
@@ -2724,6 +2884,7 @@ class ScopedFormLemmaFreqData extends i0.DataClass
           other.form == this.form &&
           other.macronForm == this.macronForm &&
           other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma &&
           other.possibleOccurrences == this.possibleOccurrences &&
           other.singleCandidateOccurrences == this.singleCandidateOccurrences);
 }
@@ -2734,6 +2895,7 @@ class ScopedFormLemmaFreqCompanion
   final i0.Value<String> form;
   final i0.Value<String> macronForm;
   final i0.Value<String> dictionaryRef;
+  final i0.Value<String> sublemma;
   final i0.Value<int> possibleOccurrences;
   final i0.Value<int> singleCandidateOccurrences;
   const ScopedFormLemmaFreqCompanion({
@@ -2741,6 +2903,7 @@ class ScopedFormLemmaFreqCompanion
     this.form = const i0.Value.absent(),
     this.macronForm = const i0.Value.absent(),
     this.dictionaryRef = const i0.Value.absent(),
+    this.sublemma = const i0.Value.absent(),
     this.possibleOccurrences = const i0.Value.absent(),
     this.singleCandidateOccurrences = const i0.Value.absent(),
   });
@@ -2749,12 +2912,14 @@ class ScopedFormLemmaFreqCompanion
     required String form,
     required String macronForm,
     required String dictionaryRef,
+    required String sublemma,
     required int possibleOccurrences,
     required int singleCandidateOccurrences,
   }) : workId = i0.Value(workId),
        form = i0.Value(form),
        macronForm = i0.Value(macronForm),
        dictionaryRef = i0.Value(dictionaryRef),
+       sublemma = i0.Value(sublemma),
        possibleOccurrences = i0.Value(possibleOccurrences),
        singleCandidateOccurrences = i0.Value(singleCandidateOccurrences);
   static i0.Insertable<i1.ScopedFormLemmaFreqData> custom({
@@ -2762,6 +2927,7 @@ class ScopedFormLemmaFreqCompanion
     i0.Expression<String>? form,
     i0.Expression<String>? macronForm,
     i0.Expression<String>? dictionaryRef,
+    i0.Expression<String>? sublemma,
     i0.Expression<int>? possibleOccurrences,
     i0.Expression<int>? singleCandidateOccurrences,
   }) {
@@ -2770,6 +2936,7 @@ class ScopedFormLemmaFreqCompanion
       if (form != null) 'form': form,
       if (macronForm != null) 'macronForm': macronForm,
       if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
+      if (sublemma != null) 'sublemma': sublemma,
       if (possibleOccurrences != null)
         'possibleOccurrences': possibleOccurrences,
       if (singleCandidateOccurrences != null)
@@ -2782,6 +2949,7 @@ class ScopedFormLemmaFreqCompanion
     i0.Value<String>? form,
     i0.Value<String>? macronForm,
     i0.Value<String>? dictionaryRef,
+    i0.Value<String>? sublemma,
     i0.Value<int>? possibleOccurrences,
     i0.Value<int>? singleCandidateOccurrences,
   }) {
@@ -2790,6 +2958,7 @@ class ScopedFormLemmaFreqCompanion
       form: form ?? this.form,
       macronForm: macronForm ?? this.macronForm,
       dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+      sublemma: sublemma ?? this.sublemma,
       possibleOccurrences: possibleOccurrences ?? this.possibleOccurrences,
       singleCandidateOccurrences:
           singleCandidateOccurrences ?? this.singleCandidateOccurrences,
@@ -2811,6 +2980,9 @@ class ScopedFormLemmaFreqCompanion
     if (dictionaryRef.present) {
       map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
     }
+    if (sublemma.present) {
+      map['sublemma'] = i0.Variable<String>(sublemma.value);
+    }
     if (possibleOccurrences.present) {
       map['possibleOccurrences'] = i0.Variable<int>(possibleOccurrences.value);
     }
@@ -2829,6 +3001,7 @@ class ScopedFormLemmaFreqCompanion
           ..write('form: $form, ')
           ..write('macronForm: $macronForm, ')
           ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma, ')
           ..write('possibleOccurrences: $possibleOccurrences, ')
           ..write('singleCandidateOccurrences: $singleCandidateOccurrences')
           ..write(')'))
@@ -2869,6 +3042,17 @@ class ScopedLemmaFreq extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _sublemmaMeta = const i0.VerificationMeta(
+    'sublemma',
+  );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   static const i0.VerificationMeta _possibleOccurrencesMeta =
       const i0.VerificationMeta('possibleOccurrences');
   late final i0.GeneratedColumn<int> possibleOccurrences =
@@ -2896,6 +3080,7 @@ class ScopedLemmaFreq extends i0.Table
   List<i0.GeneratedColumn> get $columns => [
     workId,
     dictionaryRef,
+    sublemma,
     possibleOccurrences,
     singleCandidateOccurrences,
   ];
@@ -2930,6 +3115,14 @@ class ScopedLemmaFreq extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryRefMeta);
     }
+    if (data.containsKey('sublemma')) {
+      context.handle(
+        _sublemmaMeta,
+        sublemma.isAcceptableOrUnknown(data['sublemma']!, _sublemmaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sublemmaMeta);
+    }
     if (data.containsKey('possibleOccurrences')) {
       context.handle(
         _possibleOccurrencesMeta,
@@ -2956,7 +3149,7 @@ class ScopedLemmaFreq extends i0.Table
   }
 
   @override
-  Set<i0.GeneratedColumn> get $primaryKey => {workId, dictionaryRef};
+  Set<i0.GeneratedColumn> get $primaryKey => {workId, dictionaryRef, sublemma};
   @override
   i1.ScopedLemmaFreqData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2968,6 +3161,10 @@ class ScopedLemmaFreq extends i0.Table
       dictionaryRef: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
+      )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
       )!,
       possibleOccurrences: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
@@ -2991,7 +3188,7 @@ class ScopedLemmaFreq extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(workId, dictionaryRef)',
+    'PRIMARY KEY(workId, dictionaryRef, sublemma)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -3001,11 +3198,13 @@ class ScopedLemmaFreqData extends i0.DataClass
     implements i0.Insertable<i1.ScopedLemmaFreqData> {
   final String workId;
   final String dictionaryRef;
+  final String sublemma;
   final int possibleOccurrences;
   final int singleCandidateOccurrences;
   const ScopedLemmaFreqData({
     required this.workId,
     required this.dictionaryRef,
+    required this.sublemma,
     required this.possibleOccurrences,
     required this.singleCandidateOccurrences,
   });
@@ -3014,6 +3213,7 @@ class ScopedLemmaFreqData extends i0.DataClass
     final map = <String, i0.Expression>{};
     map['workId'] = i0.Variable<String>(workId);
     map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
+    map['sublemma'] = i0.Variable<String>(sublemma);
     map['possibleOccurrences'] = i0.Variable<int>(possibleOccurrences);
     map['singleCandidateOccurrences'] = i0.Variable<int>(
       singleCandidateOccurrences,
@@ -3025,6 +3225,7 @@ class ScopedLemmaFreqData extends i0.DataClass
     return i1.ScopedLemmaFreqCompanion(
       workId: i0.Value(workId),
       dictionaryRef: i0.Value(dictionaryRef),
+      sublemma: i0.Value(sublemma),
       possibleOccurrences: i0.Value(possibleOccurrences),
       singleCandidateOccurrences: i0.Value(singleCandidateOccurrences),
     );
@@ -3038,6 +3239,7 @@ class ScopedLemmaFreqData extends i0.DataClass
     return ScopedLemmaFreqData(
       workId: serializer.fromJson<String>(json['workId']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
       possibleOccurrences: serializer.fromJson<int>(
         json['possibleOccurrences'],
       ),
@@ -3052,6 +3254,7 @@ class ScopedLemmaFreqData extends i0.DataClass
     return <String, dynamic>{
       'workId': serializer.toJson<String>(workId),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
       'possibleOccurrences': serializer.toJson<int>(possibleOccurrences),
       'singleCandidateOccurrences': serializer.toJson<int>(
         singleCandidateOccurrences,
@@ -3062,11 +3265,13 @@ class ScopedLemmaFreqData extends i0.DataClass
   i1.ScopedLemmaFreqData copyWith({
     String? workId,
     String? dictionaryRef,
+    String? sublemma,
     int? possibleOccurrences,
     int? singleCandidateOccurrences,
   }) => i1.ScopedLemmaFreqData(
     workId: workId ?? this.workId,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
     possibleOccurrences: possibleOccurrences ?? this.possibleOccurrences,
     singleCandidateOccurrences:
         singleCandidateOccurrences ?? this.singleCandidateOccurrences,
@@ -3077,6 +3282,7 @@ class ScopedLemmaFreqData extends i0.DataClass
       dictionaryRef: data.dictionaryRef.present
           ? data.dictionaryRef.value
           : this.dictionaryRef,
+      sublemma: data.sublemma.present ? data.sublemma.value : this.sublemma,
       possibleOccurrences: data.possibleOccurrences.present
           ? data.possibleOccurrences.value
           : this.possibleOccurrences,
@@ -3091,6 +3297,7 @@ class ScopedLemmaFreqData extends i0.DataClass
     return (StringBuffer('ScopedLemmaFreqData(')
           ..write('workId: $workId, ')
           ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma, ')
           ..write('possibleOccurrences: $possibleOccurrences, ')
           ..write('singleCandidateOccurrences: $singleCandidateOccurrences')
           ..write(')'))
@@ -3101,6 +3308,7 @@ class ScopedLemmaFreqData extends i0.DataClass
   int get hashCode => Object.hash(
     workId,
     dictionaryRef,
+    sublemma,
     possibleOccurrences,
     singleCandidateOccurrences,
   );
@@ -3110,6 +3318,7 @@ class ScopedLemmaFreqData extends i0.DataClass
       (other is i1.ScopedLemmaFreqData &&
           other.workId == this.workId &&
           other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma &&
           other.possibleOccurrences == this.possibleOccurrences &&
           other.singleCandidateOccurrences == this.singleCandidateOccurrences);
 }
@@ -3118,32 +3327,38 @@ class ScopedLemmaFreqCompanion
     extends i0.UpdateCompanion<i1.ScopedLemmaFreqData> {
   final i0.Value<String> workId;
   final i0.Value<String> dictionaryRef;
+  final i0.Value<String> sublemma;
   final i0.Value<int> possibleOccurrences;
   final i0.Value<int> singleCandidateOccurrences;
   const ScopedLemmaFreqCompanion({
     this.workId = const i0.Value.absent(),
     this.dictionaryRef = const i0.Value.absent(),
+    this.sublemma = const i0.Value.absent(),
     this.possibleOccurrences = const i0.Value.absent(),
     this.singleCandidateOccurrences = const i0.Value.absent(),
   });
   ScopedLemmaFreqCompanion.insert({
     required String workId,
     required String dictionaryRef,
+    required String sublemma,
     required int possibleOccurrences,
     required int singleCandidateOccurrences,
   }) : workId = i0.Value(workId),
        dictionaryRef = i0.Value(dictionaryRef),
+       sublemma = i0.Value(sublemma),
        possibleOccurrences = i0.Value(possibleOccurrences),
        singleCandidateOccurrences = i0.Value(singleCandidateOccurrences);
   static i0.Insertable<i1.ScopedLemmaFreqData> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? dictionaryRef,
+    i0.Expression<String>? sublemma,
     i0.Expression<int>? possibleOccurrences,
     i0.Expression<int>? singleCandidateOccurrences,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
       if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
+      if (sublemma != null) 'sublemma': sublemma,
       if (possibleOccurrences != null)
         'possibleOccurrences': possibleOccurrences,
       if (singleCandidateOccurrences != null)
@@ -3154,12 +3369,14 @@ class ScopedLemmaFreqCompanion
   i1.ScopedLemmaFreqCompanion copyWith({
     i0.Value<String>? workId,
     i0.Value<String>? dictionaryRef,
+    i0.Value<String>? sublemma,
     i0.Value<int>? possibleOccurrences,
     i0.Value<int>? singleCandidateOccurrences,
   }) {
     return i1.ScopedLemmaFreqCompanion(
       workId: workId ?? this.workId,
       dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+      sublemma: sublemma ?? this.sublemma,
       possibleOccurrences: possibleOccurrences ?? this.possibleOccurrences,
       singleCandidateOccurrences:
           singleCandidateOccurrences ?? this.singleCandidateOccurrences,
@@ -3174,6 +3391,9 @@ class ScopedLemmaFreqCompanion
     }
     if (dictionaryRef.present) {
       map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
+    }
+    if (sublemma.present) {
+      map['sublemma'] = i0.Variable<String>(sublemma.value);
     }
     if (possibleOccurrences.present) {
       map['possibleOccurrences'] = i0.Variable<int>(possibleOccurrences.value);
@@ -3191,6 +3411,7 @@ class ScopedLemmaFreqCompanion
     return (StringBuffer('ScopedLemmaFreqCompanion(')
           ..write('workId: $workId, ')
           ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma, ')
           ..write('possibleOccurrences: $possibleOccurrences, ')
           ..write('singleCandidateOccurrences: $singleCandidateOccurrences')
           ..write(')'))
@@ -4295,6 +4516,17 @@ class ScopedLookupLemmas extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _sublemmaMeta = const i0.VerificationMeta(
+    'sublemma',
+  );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
   List<i0.GeneratedColumn> get $columns => [
     workId,
@@ -4303,6 +4535,7 @@ class ScopedLookupLemmas extends i0.Table
     macronLookupForm,
     uncertaintyBitMask,
     dictionaryRef,
+    sublemma,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4376,6 +4609,14 @@ class ScopedLookupLemmas extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryRefMeta);
     }
+    if (data.containsKey('sublemma')) {
+      context.handle(
+        _sublemmaMeta,
+        sublemma.isAcceptableOrUnknown(data['sublemma']!, _sublemmaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sublemmaMeta);
+    }
     return context;
   }
 
@@ -4387,6 +4628,7 @@ class ScopedLookupLemmas extends i0.Table
     macronLookupForm,
     uncertaintyBitMask,
     dictionaryRef,
+    sublemma,
   };
   @override
   i1.ScopedLookupLemma map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -4416,6 +4658,10 @@ class ScopedLookupLemmas extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
       )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
+      )!,
     );
   }
 
@@ -4430,7 +4676,7 @@ class ScopedLookupLemmas extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(workId, lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef)',
+    'PRIMARY KEY(workId, lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef, sublemma)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -4444,6 +4690,7 @@ class ScopedLookupLemma extends i0.DataClass
   final String macronLookupForm;
   final int uncertaintyBitMask;
   final String dictionaryRef;
+  final String sublemma;
   const ScopedLookupLemma({
     required this.workId,
     required this.lookupForm,
@@ -4451,6 +4698,7 @@ class ScopedLookupLemma extends i0.DataClass
     required this.macronLookupForm,
     required this.uncertaintyBitMask,
     required this.dictionaryRef,
+    required this.sublemma,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -4461,6 +4709,7 @@ class ScopedLookupLemma extends i0.DataClass
     map['macronLookupForm'] = i0.Variable<String>(macronLookupForm);
     map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
     map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
+    map['sublemma'] = i0.Variable<String>(sublemma);
     return map;
   }
 
@@ -4472,6 +4721,7 @@ class ScopedLookupLemma extends i0.DataClass
       macronLookupForm: i0.Value(macronLookupForm),
       uncertaintyBitMask: i0.Value(uncertaintyBitMask),
       dictionaryRef: i0.Value(dictionaryRef),
+      sublemma: i0.Value(sublemma),
     );
   }
 
@@ -4487,6 +4737,7 @@ class ScopedLookupLemma extends i0.DataClass
       macronLookupForm: serializer.fromJson<String>(json['macronLookupForm']),
       uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
     );
   }
   @override
@@ -4499,6 +4750,7 @@ class ScopedLookupLemma extends i0.DataClass
       'macronLookupForm': serializer.toJson<String>(macronLookupForm),
       'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
     };
   }
 
@@ -4509,6 +4761,7 @@ class ScopedLookupLemma extends i0.DataClass
     String? macronLookupForm,
     int? uncertaintyBitMask,
     String? dictionaryRef,
+    String? sublemma,
   }) => i1.ScopedLookupLemma(
     workId: workId ?? this.workId,
     lookupForm: lookupForm ?? this.lookupForm,
@@ -4516,6 +4769,7 @@ class ScopedLookupLemma extends i0.DataClass
     macronLookupForm: macronLookupForm ?? this.macronLookupForm,
     uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
   );
   ScopedLookupLemma copyWithCompanion(i1.ScopedLookupLemmasCompanion data) {
     return ScopedLookupLemma(
@@ -4535,6 +4789,7 @@ class ScopedLookupLemma extends i0.DataClass
       dictionaryRef: data.dictionaryRef.present
           ? data.dictionaryRef.value
           : this.dictionaryRef,
+      sublemma: data.sublemma.present ? data.sublemma.value : this.sublemma,
     );
   }
 
@@ -4546,7 +4801,8 @@ class ScopedLookupLemma extends i0.DataClass
           ..write('alsoLowercase: $alsoLowercase, ')
           ..write('macronLookupForm: $macronLookupForm, ')
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
-          ..write('dictionaryRef: $dictionaryRef')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma')
           ..write(')'))
         .toString();
   }
@@ -4559,6 +4815,7 @@ class ScopedLookupLemma extends i0.DataClass
     macronLookupForm,
     uncertaintyBitMask,
     dictionaryRef,
+    sublemma,
   );
   @override
   bool operator ==(Object other) =>
@@ -4569,7 +4826,8 @@ class ScopedLookupLemma extends i0.DataClass
           other.alsoLowercase == this.alsoLowercase &&
           other.macronLookupForm == this.macronLookupForm &&
           other.uncertaintyBitMask == this.uncertaintyBitMask &&
-          other.dictionaryRef == this.dictionaryRef);
+          other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma);
 }
 
 class ScopedLookupLemmasCompanion
@@ -4580,6 +4838,7 @@ class ScopedLookupLemmasCompanion
   final i0.Value<String> macronLookupForm;
   final i0.Value<int> uncertaintyBitMask;
   final i0.Value<String> dictionaryRef;
+  final i0.Value<String> sublemma;
   const ScopedLookupLemmasCompanion({
     this.workId = const i0.Value.absent(),
     this.lookupForm = const i0.Value.absent(),
@@ -4587,6 +4846,7 @@ class ScopedLookupLemmasCompanion
     this.macronLookupForm = const i0.Value.absent(),
     this.uncertaintyBitMask = const i0.Value.absent(),
     this.dictionaryRef = const i0.Value.absent(),
+    this.sublemma = const i0.Value.absent(),
   });
   ScopedLookupLemmasCompanion.insert({
     required String workId,
@@ -4595,12 +4855,14 @@ class ScopedLookupLemmasCompanion
     required String macronLookupForm,
     required int uncertaintyBitMask,
     required String dictionaryRef,
+    required String sublemma,
   }) : workId = i0.Value(workId),
        lookupForm = i0.Value(lookupForm),
        alsoLowercase = i0.Value(alsoLowercase),
        macronLookupForm = i0.Value(macronLookupForm),
        uncertaintyBitMask = i0.Value(uncertaintyBitMask),
-       dictionaryRef = i0.Value(dictionaryRef);
+       dictionaryRef = i0.Value(dictionaryRef),
+       sublemma = i0.Value(sublemma);
   static i0.Insertable<i1.ScopedLookupLemma> custom({
     i0.Expression<String>? workId,
     i0.Expression<String>? lookupForm,
@@ -4608,6 +4870,7 @@ class ScopedLookupLemmasCompanion
     i0.Expression<String>? macronLookupForm,
     i0.Expression<int>? uncertaintyBitMask,
     i0.Expression<String>? dictionaryRef,
+    i0.Expression<String>? sublemma,
   }) {
     return i0.RawValuesInsertable({
       if (workId != null) 'workId': workId,
@@ -4616,6 +4879,7 @@ class ScopedLookupLemmasCompanion
       if (macronLookupForm != null) 'macronLookupForm': macronLookupForm,
       if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
       if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
+      if (sublemma != null) 'sublemma': sublemma,
     });
   }
 
@@ -4626,6 +4890,7 @@ class ScopedLookupLemmasCompanion
     i0.Value<String>? macronLookupForm,
     i0.Value<int>? uncertaintyBitMask,
     i0.Value<String>? dictionaryRef,
+    i0.Value<String>? sublemma,
   }) {
     return i1.ScopedLookupLemmasCompanion(
       workId: workId ?? this.workId,
@@ -4634,6 +4899,7 @@ class ScopedLookupLemmasCompanion
       macronLookupForm: macronLookupForm ?? this.macronLookupForm,
       uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
       dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+      sublemma: sublemma ?? this.sublemma,
     );
   }
 
@@ -4658,6 +4924,9 @@ class ScopedLookupLemmasCompanion
     if (dictionaryRef.present) {
       map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
     }
+    if (sublemma.present) {
+      map['sublemma'] = i0.Variable<String>(sublemma.value);
+    }
     return map;
   }
 
@@ -4669,7 +4938,8 @@ class ScopedLookupLemmasCompanion
           ..write('alsoLowercase: $alsoLowercase, ')
           ..write('macronLookupForm: $macronLookupForm, ')
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
-          ..write('dictionaryRef: $dictionaryRef')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma')
           ..write(')'))
         .toString();
   }
@@ -4686,7 +4956,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'WITH Page AS (SELECT form, SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY form ORDER BY occurrences DESC, form LIMIT ?1 OFFSET ?2) SELECT Page.form, Page.occurrences, (SELECT GROUP_CONCAT(DISTINCT ScopedFormLemmaFreq.dictionaryRef) FROM ScopedFormLemmaFreq WHERE ScopedFormLemmaFreq.form = Page.form AND ScopedFormLemmaFreq.workId IN ($expandedworkIds)) AS possibleLemmas FROM Page ORDER BY Page.occurrences DESC, Page.form',
+      'WITH Page AS (SELECT form, SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY form ORDER BY occurrences DESC, form LIMIT ?1 OFFSET ?2) SELECT Page.form, Page.occurrences, (SELECT json_group_array(DISTINCT json_array(ScopedFormLemmaFreq.dictionaryRef, ScopedFormLemmaFreq.sublemma)) FROM ScopedFormLemmaFreq WHERE ScopedFormLemmaFreq.form = Page.form AND ScopedFormLemmaFreq.workId IN ($expandedworkIds)) AS possibleLemmas FROM Page ORDER BY Page.occurrences DESC, Page.form',
       variables: [
         i0.Variable<int>(limit),
         i0.Variable<int>(offset),
@@ -4697,7 +4967,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       (i0.QueryRow row) => i3.FormFrequencyRow.fromFormSql(
         form: row.read<String>('form'),
         occurrences: row.readNullable<int>('occurrences'),
-        possibleLemmas: row.readNullable<String>('possibleLemmas'),
+        possibleLemmas: row.read<String>('possibleLemmas'),
       ),
     );
   }
@@ -4711,7 +4981,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'WITH Page AS (SELECT form, SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY form ORDER BY occurrences ASC, form LIMIT ?1 OFFSET ?2) SELECT Page.form, Page.occurrences, (SELECT GROUP_CONCAT(DISTINCT ScopedFormLemmaFreq.dictionaryRef) FROM ScopedFormLemmaFreq WHERE ScopedFormLemmaFreq.form = Page.form AND ScopedFormLemmaFreq.workId IN ($expandedworkIds)) AS possibleLemmas FROM Page ORDER BY Page.occurrences ASC, Page.form',
+      'WITH Page AS (SELECT form, SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY form ORDER BY occurrences ASC, form LIMIT ?1 OFFSET ?2) SELECT Page.form, Page.occurrences, (SELECT json_group_array(DISTINCT json_array(ScopedFormLemmaFreq.dictionaryRef, ScopedFormLemmaFreq.sublemma)) FROM ScopedFormLemmaFreq WHERE ScopedFormLemmaFreq.form = Page.form AND ScopedFormLemmaFreq.workId IN ($expandedworkIds)) AS possibleLemmas FROM Page ORDER BY Page.occurrences ASC, Page.form',
       variables: [
         i0.Variable<int>(limit),
         i0.Variable<int>(offset),
@@ -4722,7 +4992,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
       (i0.QueryRow row) => i3.FormFrequencyRow.fromFormSql(
         form: row.read<String>('form'),
         occurrences: row.readNullable<int>('occurrences'),
-        possibleLemmas: row.readNullable<String>('possibleLemmas'),
+        possibleLemmas: row.read<String>('possibleLemmas'),
       ),
     );
   }
@@ -4736,7 +5006,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'WITH Page AS (SELECT macronForm, MIN(form) AS form, SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY macronForm ORDER BY occurrences DESC, macronForm LIMIT ?1 OFFSET ?2) SELECT Page.macronForm, Page.form, Page.occurrences, (SELECT GROUP_CONCAT(DISTINCT ScopedFormLemmaFreq.dictionaryRef) FROM ScopedFormLemmaFreq WHERE ScopedFormLemmaFreq.macronForm = Page.macronForm AND ScopedFormLemmaFreq.workId IN ($expandedworkIds)) AS possibleLemmas FROM Page ORDER BY Page.occurrences DESC, Page.macronForm',
+      'WITH Page AS (SELECT macronForm, MIN(form) AS form, SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY macronForm ORDER BY occurrences DESC, macronForm LIMIT ?1 OFFSET ?2) SELECT Page.macronForm, Page.form, Page.occurrences, (SELECT json_group_array(DISTINCT json_array(ScopedFormLemmaFreq.dictionaryRef, ScopedFormLemmaFreq.sublemma)) FROM ScopedFormLemmaFreq WHERE ScopedFormLemmaFreq.macronForm = Page.macronForm AND ScopedFormLemmaFreq.workId IN ($expandedworkIds)) AS possibleLemmas FROM Page ORDER BY Page.occurrences DESC, Page.macronForm',
       variables: [
         i0.Variable<int>(limit),
         i0.Variable<int>(offset),
@@ -4748,7 +5018,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
         macronForm: row.read<String>('macronForm'),
         form: row.readNullable<String>('form'),
         occurrences: row.readNullable<int>('occurrences'),
-        possibleLemmas: row.readNullable<String>('possibleLemmas'),
+        possibleLemmas: row.read<String>('possibleLemmas'),
       ),
     );
   }
@@ -4762,7 +5032,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'WITH Page AS (SELECT macronForm, MIN(form) AS form, SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY macronForm ORDER BY occurrences ASC, macronForm LIMIT ?1 OFFSET ?2) SELECT Page.macronForm, Page.form, Page.occurrences, (SELECT GROUP_CONCAT(DISTINCT ScopedFormLemmaFreq.dictionaryRef) FROM ScopedFormLemmaFreq WHERE ScopedFormLemmaFreq.macronForm = Page.macronForm AND ScopedFormLemmaFreq.workId IN ($expandedworkIds)) AS possibleLemmas FROM Page ORDER BY Page.occurrences ASC, Page.macronForm',
+      'WITH Page AS (SELECT macronForm, MIN(form) AS form, SUM(occurrences) AS occurrences FROM ScopedFormFreq WHERE workId IN ($expandedworkIds) GROUP BY macronForm ORDER BY occurrences ASC, macronForm LIMIT ?1 OFFSET ?2) SELECT Page.macronForm, Page.form, Page.occurrences, (SELECT json_group_array(DISTINCT json_array(ScopedFormLemmaFreq.dictionaryRef, ScopedFormLemmaFreq.sublemma)) FROM ScopedFormLemmaFreq WHERE ScopedFormLemmaFreq.macronForm = Page.macronForm AND ScopedFormLemmaFreq.workId IN ($expandedworkIds)) AS possibleLemmas FROM Page ORDER BY Page.occurrences ASC, Page.macronForm',
       variables: [
         i0.Variable<int>(limit),
         i0.Variable<int>(offset),
@@ -4774,7 +5044,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
         macronForm: row.read<String>('macronForm'),
         form: row.readNullable<String>('form'),
         occurrences: row.readNullable<int>('occurrences'),
-        possibleLemmas: row.readNullable<String>('possibleLemmas'),
+        possibleLemmas: row.read<String>('possibleLemmas'),
       ),
     );
   }
@@ -4788,7 +5058,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedvar1 = $expandVar($arrayStartIndex, var1.length);
     $arrayStartIndex += var1.length;
     return customSelect(
-      'SELECT dictionaryRef, SUM(possibleOccurrences) AS possibleOccurrences, SUM(singleCandidateOccurrences) AS singleCandidateOccurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedvar1) GROUP BY dictionaryRef ORDER BY possibleOccurrences DESC, dictionaryRef LIMIT ?1 OFFSET ?2',
+      'SELECT dictionaryRef, sublemma, SUM(possibleOccurrences) AS possibleOccurrences, SUM(singleCandidateOccurrences) AS singleCandidateOccurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedvar1) GROUP BY dictionaryRef, sublemma ORDER BY possibleOccurrences DESC, dictionaryRef, sublemma LIMIT ?1 OFFSET ?2',
       variables: [
         i0.Variable<int>(limit),
         i0.Variable<int>(offset),
@@ -4798,6 +5068,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     ).map(
       (i0.QueryRow row) => i3.LemmaFrequencyRow.fromLemmaSql(
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         possibleOccurrences: row.readNullable<int>('possibleOccurrences'),
         singleCandidateOccurrences: row.readNullable<int>(
           'singleCandidateOccurrences',
@@ -4815,7 +5086,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedvar1 = $expandVar($arrayStartIndex, var1.length);
     $arrayStartIndex += var1.length;
     return customSelect(
-      'SELECT dictionaryRef, SUM(possibleOccurrences) AS possibleOccurrences, SUM(singleCandidateOccurrences) AS singleCandidateOccurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedvar1) GROUP BY dictionaryRef ORDER BY possibleOccurrences ASC, dictionaryRef LIMIT ?1 OFFSET ?2',
+      'SELECT dictionaryRef, sublemma, SUM(possibleOccurrences) AS possibleOccurrences, SUM(singleCandidateOccurrences) AS singleCandidateOccurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedvar1) GROUP BY dictionaryRef, sublemma ORDER BY possibleOccurrences ASC, dictionaryRef, sublemma LIMIT ?1 OFFSET ?2',
       variables: [
         i0.Variable<int>(limit),
         i0.Variable<int>(offset),
@@ -4825,6 +5096,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     ).map(
       (i0.QueryRow row) => i3.LemmaFrequencyRow.fromLemmaSql(
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         possibleOccurrences: row.readNullable<int>('possibleOccurrences'),
         singleCandidateOccurrences: row.readNullable<int>(
           'singleCandidateOccurrences',
@@ -4880,7 +5152,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedvar1 = $expandVar($arrayStartIndex, var1.length);
     $arrayStartIndex += var1.length;
     return customSelect(
-      'SELECT COUNT(DISTINCT dictionaryRef) AS totalLemmas FROM ScopedLemmaFreq WHERE workId IN ($expandedvar1)',
+      'SELECT COUNT(*) AS totalLemmas FROM (SELECT DISTINCT dictionaryRef, sublemma FROM ScopedLemmaFreq WHERE workId IN ($expandedvar1))',
       variables: [for (var $ in var1) i0.Variable<String>($)],
       readsFrom: {scopedLemmaFreq},
     ).map((i0.QueryRow row) => row.read<int>('totalLemmas'));
@@ -4929,7 +5201,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'WITH Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef), LookupMaxCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask, MAX(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask), Steps AS (SELECT LookupMaxCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMaxCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMaxCounts.workId AND ScopedLookupFreq.lookupForm = LookupMaxCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMaxCounts.alsoLowercase AND ScopedLookupFreq.macronLookupForm = LookupMaxCounts.macronLookupForm AND ScopedLookupFreq.uncertaintyBitMask = LookupMaxCounts.uncertaintyBitMask GROUP BY LookupMaxCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
+      'WITH Lemmas AS (SELECT dictionaryRef, sublemma, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef, sublemma), LookupMaxCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask, MAX(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef AND Lemmas.sublemma = ScopedLookupLemmas.sublemma WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask), Steps AS (SELECT LookupMaxCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMaxCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMaxCounts.workId AND ScopedLookupFreq.lookupForm = LookupMaxCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMaxCounts.alsoLowercase AND ScopedLookupFreq.macronLookupForm = LookupMaxCounts.macronLookupForm AND ScopedLookupFreq.uncertaintyBitMask = LookupMaxCounts.uncertaintyBitMask GROUP BY LookupMaxCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
       variables: [for (var $ in workIds) i0.Variable<String>($)],
       readsFrom: {scopedLemmaFreq, scopedLookupLemmas, scopedLookupFreq},
     ).map(
@@ -4947,7 +5219,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'WITH Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef), LookupMinCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask, MIN(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask), Steps AS (SELECT LookupMinCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMinCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMinCounts.workId AND ScopedLookupFreq.lookupForm = LookupMinCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMinCounts.alsoLowercase AND ScopedLookupFreq.macronLookupForm = LookupMinCounts.macronLookupForm AND ScopedLookupFreq.uncertaintyBitMask = LookupMinCounts.uncertaintyBitMask GROUP BY LookupMinCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
+      'WITH Lemmas AS (SELECT dictionaryRef, sublemma, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) GROUP BY dictionaryRef, sublemma), LookupMinCounts AS (SELECT ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask, MIN(Lemmas.occurrences) AS occurrences FROM ScopedLookupLemmas INNER JOIN Lemmas ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef AND Lemmas.sublemma = ScopedLookupLemmas.sublemma WHERE ScopedLookupLemmas.workId IN ($expandedworkIds) GROUP BY ScopedLookupLemmas.workId, ScopedLookupLemmas.lookupForm, ScopedLookupLemmas.alsoLowercase, ScopedLookupLemmas.macronLookupForm, ScopedLookupLemmas.uncertaintyBitMask), Steps AS (SELECT LookupMinCounts.occurrences AS minOccurrences, SUM(ScopedLookupFreq.occurrences) AS units FROM LookupMinCounts INNER JOIN ScopedLookupFreq ON ScopedLookupFreq.workId = LookupMinCounts.workId AND ScopedLookupFreq.lookupForm = LookupMinCounts.lookupForm AND ScopedLookupFreq.alsoLowercase = LookupMinCounts.alsoLowercase AND ScopedLookupFreq.macronLookupForm = LookupMinCounts.macronLookupForm AND ScopedLookupFreq.uncertaintyBitMask = LookupMinCounts.uncertaintyBitMask GROUP BY LookupMinCounts.occurrences) SELECT minOccurrences, SUM(units)OVER (ORDER BY minOccurrences DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS coveredUnits FROM Steps ORDER BY minOccurrences DESC',
       variables: [for (var $ in workIds) i0.Variable<String>($)],
       readsFrom: {scopedLemmaFreq, scopedLookupLemmas, scopedLookupFreq},
     ).map(
@@ -4971,7 +5243,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     );
     $arrayStartIndex += lookupForms.length;
     return customSelect(
-      'WITH Candidates AS (SELECT DISTINCT lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef FROM ScopedLookupLemmas WHERE workId IN ($expandedworkIds) AND lookupForm IN ($expandedlookupForms)), Lemmas AS (SELECT dictionaryRef, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) AND dictionaryRef IN (SELECT dictionaryRef FROM Candidates) GROUP BY dictionaryRef) SELECT Candidates.lookupForm, Candidates.alsoLowercase, Candidates.macronLookupForm, Candidates.uncertaintyBitMask, MAX(Lemmas.occurrences) AS occurrences FROM Candidates INNER JOIN Lemmas ON Lemmas.dictionaryRef = Candidates.dictionaryRef GROUP BY Candidates.lookupForm, Candidates.alsoLowercase, Candidates.macronLookupForm, Candidates.uncertaintyBitMask',
+      'WITH Candidates AS (SELECT DISTINCT lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef, sublemma FROM ScopedLookupLemmas WHERE workId IN ($expandedworkIds) AND lookupForm IN ($expandedlookupForms)), Lemmas AS (SELECT dictionaryRef, sublemma, SUM(possibleOccurrences) AS occurrences FROM ScopedLemmaFreq WHERE workId IN ($expandedworkIds) AND (dictionaryRef, sublemma) IN (SELECT dictionaryRef, sublemma FROM Candidates) GROUP BY dictionaryRef, sublemma) SELECT Candidates.lookupForm, Candidates.alsoLowercase, Candidates.macronLookupForm, Candidates.uncertaintyBitMask, MAX(Lemmas.occurrences) AS occurrences FROM Candidates INNER JOIN Lemmas ON Lemmas.dictionaryRef = Candidates.dictionaryRef AND Lemmas.sublemma = Candidates.sublemma GROUP BY Candidates.lookupForm, Candidates.alsoLowercase, Candidates.macronLookupForm, Candidates.uncertaintyBitMask',
       variables: [
         for (var $ in workIds) i0.Variable<String>($),
         for (var $ in lookupForms) i0.Variable<String>($),
@@ -4996,7 +5268,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'SELECT DISTINCT form, morphForm, morphItem, dictionaryRef FROM ResolvedFreqMorphForms WHERE workId IN ($expandedworkIds) AND form = ?1 ORDER BY morphForm, morphItem',
+      'SELECT DISTINCT form, morphForm, morphItem, dictionaryRef, sublemma FROM ResolvedFreqMorphForms WHERE workId IN ($expandedworkIds) AND form = ?1 ORDER BY morphForm, morphItem',
       variables: [
         i0.Variable<String>(form),
         for (var $ in workIds) i0.Variable<String>($),
@@ -5008,6 +5280,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
       ),
     );
   }
@@ -5021,7 +5294,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'SELECT DISTINCT form, morphForm, morphItem, dictionaryRef FROM ResolvedFreqMorphForms WHERE workId IN ($expandedworkIds) AND form = ?1 AND macronForm = ?2 ORDER BY morphForm, morphItem',
+      'SELECT DISTINCT form, morphForm, morphItem, dictionaryRef, sublemma FROM ResolvedFreqMorphForms WHERE workId IN ($expandedworkIds) AND form = ?1 AND macronForm = ?2 ORDER BY morphForm, morphItem',
       variables: [
         i0.Variable<String>(form),
         i0.Variable<String>(macronForm),
@@ -5034,6 +5307,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
       ),
     );
   }
@@ -5041,14 +5315,16 @@ class WordFrequencyDrift extends i2.ModularAccessor {
   i0.Selectable<i6.FrequencyMorphCandidate> getLemmaMorphIdentities({
     required List<String> workIds,
     required String dictionaryRef,
+    required String sublemma,
   }) {
-    var $arrayStartIndex = 2;
+    var $arrayStartIndex = 3;
     final expandedworkIds = $expandVar($arrayStartIndex, workIds.length);
     $arrayStartIndex += workIds.length;
     return customSelect(
-      'SELECT DISTINCT form, morphForm, morphItem, dictionaryRef FROM ResolvedFreqMorphForms WHERE workId IN ($expandedworkIds) AND dictionaryRef = ?1 ORDER BY morphForm, morphItem',
+      'SELECT DISTINCT form, morphForm, morphItem, dictionaryRef, sublemma FROM ResolvedFreqMorphForms WHERE workId IN ($expandedworkIds) AND dictionaryRef = ?1 AND sublemma = ?2 ORDER BY morphForm, morphItem',
       variables: [
         i0.Variable<String>(dictionaryRef),
+        i0.Variable<String>(sublemma),
         for (var $ in workIds) i0.Variable<String>($),
       ],
       readsFrom: {resolvedFreqMorphForms},
@@ -5058,6 +5334,7 @@ class WordFrequencyDrift extends i2.ModularAccessor {
         morphForm: row.read<String>('morphForm'),
         morphItem: row.read<int>('morphItem'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
       ),
     );
   }

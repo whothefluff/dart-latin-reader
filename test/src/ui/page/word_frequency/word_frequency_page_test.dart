@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:latin_reader/src/component/concordance/concordance_query.dart';
+import 'package:latin_reader/src/component/library/proper_noun_state.dart';
+import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
 import 'package:latin_reader/src/component/settings/frequency_filter_settings_api.dart';
 import 'package:latin_reader/src/component/settings/frequency_settings_api.dart';
 import 'package:latin_reader/src/external/database.dart';
 import 'package:latin_reader/src/ui/page/word_frequency/word_frequency_page.dart';
+import 'package:latin_reader/src/ui/widget/lemma_text.dart';
 
 import '../../../component/word_frequency/frequency_corpus.dart';
 
@@ -51,6 +56,53 @@ Future<void> _pumpPage(
   );
   await tester.pumpAndSettle();
 }
+
+/// Stands in for a page that the frequency page opens, to tell where it went
+class _Opened extends StatelessWidget {
+  const _Opened(this.state);
+
+  final GoRouterState state;
+
+  @override
+  Widget build(context) => const Scaffold();
+  //
+}
+
+/// Shows the page in a router, with stand-ins for the pages that a row opens
+Future<void> _pumpRoutedPage(
+  WidgetTester tester,
+  AppDb db,
+  FrequencyFilterSettings filters, {
+  required FrequencySettings view,
+}) async {
+  final router = GoRouter(
+    initialLocation: '/word-frequency',
+    routes: [
+      GoRoute(path: '/word-frequency', builder: (_, _) => const WordFrequencyPage()),
+      GoRoute(
+        path: '/dictionaries/:dictionaryId/entries/:lemma',
+        builder: (_, state) => _Opened(state),
+      ),
+      GoRoute(path: '/morph-detail/:keys', builder: (_, state) => _Opened(state)),
+      GoRoute(path: '/concordance/hits', builder: (_, state) => _Opened(state)),
+    ],
+  );
+  addTearDown(router.dispose);
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        dbProvider.overrideWith((_) => db),
+        frequencyFilterSettingsNotifierProvider.overrideWith(() => _InMemoryFilters(filters)),
+        frequencyViewSettingsNotifierProvider.overrideWith(() => _InMemoryView(view)),
+      ],
+      child: MaterialApp.router(routerConfig: router),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Returns the route of the page that the frequency page opened.
+GoRouterState _opened(WidgetTester tester) => tester.widget<_Opened>(find.byType(_Opened)).state;
 
 void _usePhone(WidgetTester tester) {
   tester.view
@@ -215,6 +267,100 @@ void main() {
           expect(_bothCoveragesOfSum, findsOneWidget);
         });
       }
+    });
+  });
+
+  group('rows with sublemmas', () {
+    // bonīs may be bonus or its sublemma bonae, Cybeleia only Cybele's sublemma Cybeleius
+    setUp(() async {
+      await corpus.addWord(fables, 'bonis', times: 2, macronizedWord: 'bonīs');
+      await corpus.addWord(fables, 'Cybeleia', properNounState: ProperNounState.proper);
+      await corpus.addAnalysis('bonis', 'bonus', macronizedForm: 'bonīs');
+      await corpus.addAnalysis('bonis', 'bonus', sublemma: 'bonae', macronizedForm: 'bonīs');
+      await corpus.addAnalysis('Cybeleia', 'Cybele', sublemma: 'Cybeleius');
+      await corpus.addLnsEntry('bonus', 'bonus');
+      await corpus.addLnsEntry('Cybele', 'Cybele');
+      await corpus.populate();
+    });
+
+    testWidgets('by lemma, a sublemma opens its entry in the dictionary', (tester) async {
+      await _pumpRoutedPage(
+        tester,
+        corpus.db,
+        _byLemma,
+        view: _anyCandidateView.copyWith(formTapAction: FormTapAction.openDictionary),
+      );
+
+      await tester.tap(find.text(lemmaLabel('Cybele', 'Cybeleius')));
+      await tester.pumpAndSettle();
+
+      expect(_opened(tester).pathParameters['lemma'], 'Cybele');
+    });
+
+    testWidgets('by lemma, a sublemma searches the concordance for itself', (
+      tester,
+    ) async {
+      await _pumpRoutedPage(
+        tester,
+        corpus.db,
+        _byLemma,
+        view: _anyCandidateView.copyWith(formTapAction: FormTapAction.openConcordance),
+      );
+
+      await tester.tap(find.text(lemmaLabel('bonus', 'bonae')));
+      await tester.pumpAndSettle();
+
+      final query = ConcordanceQuery.fromJson(_opened(tester).uri.queryParameters['search']!);
+      expect(
+        query.slots.single,
+        isA<LemmaCriterion>()
+            .having((criterion) => criterion.lemma.dictionaryRefs, 'dictionaryRefs', ['bonus'])
+            .having((criterion) => criterion.lemma.sublemma, 'sublemma', 'bonae'),
+      );
+    });
+
+    for (final showMacrons in [true, false]) {
+      testWidgets(
+        "by form, morphology offers the form's lemmas and opens the chosen one's analyses "
+        '(macrons: $showMacrons)',
+        (tester) async {
+          await _pumpRoutedPage(
+            tester,
+            corpus.db,
+            _byForm.copyWith(showMacrons: showMacrons),
+            view: _anyCandidateView.copyWith(formTapAction: FormTapAction.openMorphology),
+          );
+
+          await tester.tap(find.text(showMacrons ? 'bonīs' : 'bonis'));
+          await tester.pumpAndSettle();
+
+          expect(find.widgetWithText(ListTile, lemmaLabel('bonus', '')), findsOneWidget);
+
+          await tester.tap(find.widgetWithText(ListTile, lemmaLabel('bonus', 'bonae')));
+          await tester.pumpAndSettle();
+
+          expect(
+            AnalysisKeys.fromJson(_opened(tester).pathParameters['keys']!),
+            AnalysisKeys(const [AnalysisKey(form: 'bonis', item: 1, cnt: 0)]),
+          );
+        },
+      );
+    }
+
+    testWidgets('by form, the dictionary opens the one entry of both lemmas, with no choice', (
+      tester,
+    ) async {
+      await _pumpRoutedPage(
+        tester,
+        corpus.db,
+        _byForm,
+        view: _anyCandidateView.copyWith(formTapAction: FormTapAction.openDictionary),
+      );
+
+      await tester.tap(find.text('bonīs'));
+      await tester.pumpAndSettle();
+
+      expect(_opened(tester).pathParameters['lemma'], 'bonus');
     });
   });
 }

@@ -20,7 +20,8 @@ Future<AppDb> _romaAndRomani() async {
   final db = _EmptyDb();
   addTearDown(db.close);
   await db.customStatement(
-    "INSERT INTO MorphologicalDetails VALUES ( 'Roma', 0, 'Roma' ), ( 'Romani', 0, 'Romanus' )",
+    "INSERT INTO MorphologicalDetails VALUES ( 'Roma', 0, 'Roma', '' ), "
+    "( 'Romani', 0, 'Romanus', '' )",
   );
   await db.customStatement(
     '''

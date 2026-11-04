@@ -169,6 +169,7 @@ class Result {
     this.macronizedForm,
     this.partOfSpeech,
     required this.dictionaryRef,
+    required this.sublemma,
     this.additional,
     required this.item,
     required this.cnt,
@@ -178,6 +179,9 @@ class Result {
   final String? macronizedForm;
   final String? partOfSpeech;
   final String dictionaryRef;
+
+  /// The sublemma, or '' for the entry's own lemma.
+  final String sublemma;
   final String? additional;
   final int item;
   final int cnt;

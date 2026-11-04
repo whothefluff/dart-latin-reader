@@ -229,9 +229,9 @@ class _ResolvedFreqMorphFormsProviderElement
 }
 
 String _$resolvedFreqMorphFormsOfLemmaHash() =>
-    r'75f55cbe2959c76174ba7c24bb6d65b91e128187';
+    r'd133076d44d921d1f17680fa55cb36251abf2d7c';
 
-/// Returns the stored morphological matches for [dictionaryRef] in [workIds].
+/// Returns the stored morphological matches for [lemma] in [workIds].
 ///
 /// Results may include several inflected forms of the lemma.
 ///
@@ -240,37 +240,37 @@ String _$resolvedFreqMorphFormsOfLemmaHash() =>
 const resolvedFreqMorphFormsOfLemmaProvider =
     ResolvedFreqMorphFormsOfLemmaFamily();
 
-/// Returns the stored morphological matches for [dictionaryRef] in [workIds].
+/// Returns the stored morphological matches for [lemma] in [workIds].
 ///
 /// Results may include several inflected forms of the lemma.
 ///
 /// Copied from [resolvedFreqMorphFormsOfLemma].
 class ResolvedFreqMorphFormsOfLemmaFamily
     extends Family<AsyncValue<FrequencyMorphCandidates>> {
-  /// Returns the stored morphological matches for [dictionaryRef] in [workIds].
+  /// Returns the stored morphological matches for [lemma] in [workIds].
   ///
   /// Results may include several inflected forms of the lemma.
   ///
   /// Copied from [resolvedFreqMorphFormsOfLemma].
   const ResolvedFreqMorphFormsOfLemmaFamily();
 
-  /// Returns the stored morphological matches for [dictionaryRef] in [workIds].
+  /// Returns the stored morphological matches for [lemma] in [workIds].
   ///
   /// Results may include several inflected forms of the lemma.
   ///
   /// Copied from [resolvedFreqMorphFormsOfLemma].
   ResolvedFreqMorphFormsOfLemmaProvider call(
     WorkIds workIds,
-    String dictionaryRef,
+    ({String dictionaryRef, String sublemma}) lemma,
   ) {
-    return ResolvedFreqMorphFormsOfLemmaProvider(workIds, dictionaryRef);
+    return ResolvedFreqMorphFormsOfLemmaProvider(workIds, lemma);
   }
 
   @override
   ResolvedFreqMorphFormsOfLemmaProvider getProviderOverride(
     covariant ResolvedFreqMorphFormsOfLemmaProvider provider,
   ) {
-    return call(provider.workIds, provider.dictionaryRef);
+    return call(provider.workIds, provider.lemma);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -288,24 +288,26 @@ class ResolvedFreqMorphFormsOfLemmaFamily
   String? get name => r'resolvedFreqMorphFormsOfLemmaProvider';
 }
 
-/// Returns the stored morphological matches for [dictionaryRef] in [workIds].
+/// Returns the stored morphological matches for [lemma] in [workIds].
 ///
 /// Results may include several inflected forms of the lemma.
 ///
 /// Copied from [resolvedFreqMorphFormsOfLemma].
 class ResolvedFreqMorphFormsOfLemmaProvider
     extends AutoDisposeFutureProvider<FrequencyMorphCandidates> {
-  /// Returns the stored morphological matches for [dictionaryRef] in [workIds].
+  /// Returns the stored morphological matches for [lemma] in [workIds].
   ///
   /// Results may include several inflected forms of the lemma.
   ///
   /// Copied from [resolvedFreqMorphFormsOfLemma].
-  ResolvedFreqMorphFormsOfLemmaProvider(WorkIds workIds, String dictionaryRef)
-    : this._internal(
+  ResolvedFreqMorphFormsOfLemmaProvider(
+    WorkIds workIds,
+    ({String dictionaryRef, String sublemma}) lemma,
+  ) : this._internal(
         (ref) => resolvedFreqMorphFormsOfLemma(
           ref as ResolvedFreqMorphFormsOfLemmaRef,
           workIds,
-          dictionaryRef,
+          lemma,
         ),
         from: resolvedFreqMorphFormsOfLemmaProvider,
         name: r'resolvedFreqMorphFormsOfLemmaProvider',
@@ -316,7 +318,7 @@ class ResolvedFreqMorphFormsOfLemmaProvider
         allTransitiveDependencies:
             ResolvedFreqMorphFormsOfLemmaFamily._allTransitiveDependencies,
         workIds: workIds,
-        dictionaryRef: dictionaryRef,
+        lemma: lemma,
       );
 
   ResolvedFreqMorphFormsOfLemmaProvider._internal(
@@ -327,11 +329,11 @@ class ResolvedFreqMorphFormsOfLemmaProvider
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.workIds,
-    required this.dictionaryRef,
+    required this.lemma,
   }) : super.internal();
 
   final WorkIds workIds;
-  final String dictionaryRef;
+  final ({String dictionaryRef, String sublemma}) lemma;
 
   @override
   Override overrideWith(
@@ -350,7 +352,7 @@ class ResolvedFreqMorphFormsOfLemmaProvider
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         workIds: workIds,
-        dictionaryRef: dictionaryRef,
+        lemma: lemma,
       ),
     );
   }
@@ -364,14 +366,14 @@ class ResolvedFreqMorphFormsOfLemmaProvider
   bool operator ==(Object other) {
     return other is ResolvedFreqMorphFormsOfLemmaProvider &&
         other.workIds == workIds &&
-        other.dictionaryRef == dictionaryRef;
+        other.lemma == lemma;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, workIds.hashCode);
-    hash = _SystemHash.combine(hash, dictionaryRef.hashCode);
+    hash = _SystemHash.combine(hash, lemma.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -384,8 +386,8 @@ mixin ResolvedFreqMorphFormsOfLemmaRef
   /// The parameter `workIds` of this provider.
   WorkIds get workIds;
 
-  /// The parameter `dictionaryRef` of this provider.
-  String get dictionaryRef;
+  /// The parameter `lemma` of this provider.
+  ({String dictionaryRef, String sublemma}) get lemma;
 }
 
 class _ResolvedFreqMorphFormsOfLemmaProviderElement
@@ -397,8 +399,8 @@ class _ResolvedFreqMorphFormsOfLemmaProviderElement
   WorkIds get workIds =>
       (origin as ResolvedFreqMorphFormsOfLemmaProvider).workIds;
   @override
-  String get dictionaryRef =>
-      (origin as ResolvedFreqMorphFormsOfLemmaProvider).dictionaryRef;
+  ({String dictionaryRef, String sublemma}) get lemma =>
+      (origin as ResolvedFreqMorphFormsOfLemmaProvider).lemma;
 }
 
 // ignore_for_file: type=lint

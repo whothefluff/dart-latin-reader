@@ -11,10 +11,11 @@ final operations = [
     },
     insert: (AppDb db) async {
       await db.customStatement('''
-        INSERT INTO ConcordanceDetails( form, item, dictionaryRef )
+        INSERT INTO ConcordanceDetails( form, item, dictionaryRef, sublemma )
             SELECT DISTINCT Details.form,
                             Details.item,
-                            Details.dictionaryRef
+                            Details.dictionaryRef,
+                            Details.sublemma
                 FROM CountableWordCandidateAnalyses AS Candidate
                 INNER JOIN MorphologicalDetails AS Details
                     ON Details.form = Candidate.form

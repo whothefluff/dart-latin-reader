@@ -290,6 +290,29 @@ void main() {
       );
     });
 
+    test("a sublemma's tokens are colored by its own count, not the entry's own lemma's", () async {
+      // Here bonos has only bonus as a candidate, and bonae only the sublemma bonae
+      await corpus.addWord(fables, 'bonos', times: 4);
+      await corpus.addWord(fables, 'bonae');
+      await corpus.addAnalysis('bonos', 'bonus');
+      await corpus.addAnalysis('bonae', 'bonus', sublemma: 'bonae');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'bonos',
+        'bonae',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 20,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(bands.bandOf(_common('bonos')), FrequencyBand.common);
+      expect(bands.bandOf(_common('bonae')), FrequencyBand.uncommon);
+    });
+
     test('a lemma whose analyses all make a certain short vowel long is not a candidate', () async {
       // est is sum1 (est) or edo1 (ēst), and its e is certainly short, so only edit counts for edo1
       await corpus.addWord(fables, 'est', times: 4);
@@ -446,6 +469,31 @@ void main() {
       );
 
       expect(bands.bandOf(_common('est')), FrequencyBand.common);
+    });
+
+    test('each candidate lemma is ruled out by its own spellings', () async {
+      // bona's a is certainly short: bonus, spelled bonā, is ruled out, and its sublemma bonum,
+      // whose plural is bona, stays. So only bonos counts for bonus.
+      await corpus.addWord(fables, 'bona', times: 4);
+      await corpus.addWord(fables, 'bonos');
+      await corpus.addAnalysis('bona', 'bonus', macronizedForm: 'bonā');
+      await corpus.addAnalysis('bona', 'bonus', sublemma: 'bonum', macronizedForm: 'bona');
+      await corpus.addAnalysis('bonos', 'bonus');
+      await corpus.populate();
+
+      final frequencies = await _readFrequencies(corpus.db, fables, FrequencyScope.work, [
+        'bona',
+        'bonos',
+      ]);
+      final bands = frequencies.bandsFor(
+        commonPercent: 50,
+        uncommonPercent: 20,
+        markCommon: true,
+        markUncommon: true,
+      );
+
+      expect(bands.bandOf(_common('bona')), FrequencyBand.common);
+      expect(bands.bandOf(_common('bonos')), FrequencyBand.uncommon);
     });
 
     test('only macrons are compared, not the letters that carry them', () async {

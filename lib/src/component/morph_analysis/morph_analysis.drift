@@ -5,6 +5,7 @@ CREATE TABLE "MorphologicalDetails"(
     "form" TEXT NOT NULL,
     "item" INTEGER NOT NULL CHECK( item >= 0 ),
     "dictionaryRef" TEXT NOT NULL,
+    "sublemma" TEXT NOT NULL, -- '': the entry's own lemma
     PRIMARY KEY( form, item )
 ) 
 STRICT, 
@@ -99,6 +100,7 @@ CREATE VIEW "morphology.Peek" AS
                 ELSE Infl.partOfSpeech
            END AS partOfSpeech,
            MorphologicalDetails.dictionaryRef AS dictionaryRef,
+           MorphologicalDetails.sublemma AS sublemma,
            CASE Infl.partOfSpeech
                 WHEN 'adjective' THEN COALESCE( IIF( Infl.verbForm IS NULL AND Infl.segmentsInfo IN ( 'irregular', 'indeclinable' ),
                                                      Infl.segmentsInfo,
@@ -222,6 +224,7 @@ CREATE VIEW "morphology.Analyses" WITH Analysis AS
            Infl.cnt,
            Infl.macronizedForm,
            MorphologicalDetails.dictionaryRef,
+           MorphologicalDetails.sublemma,
            Infl.partOfSpeech,
            Infl.stem,
            Infl.suffix,

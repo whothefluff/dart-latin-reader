@@ -149,16 +149,19 @@ void main() {
 
   test("a lemma has as many hits as frequency's possible occurrences", () async {
     final lemmas = await db.customSelect('''
-      SELECT dictionaryRef, SUM( possibleOccurrences ) AS occurrences
+      SELECT dictionaryRef, sublemma, SUM( possibleOccurrences ) AS occurrences
           FROM ScopedLemmaFreq
-          GROUP BY dictionaryRef''').get();
+          GROUP BY dictionaryRef, sublemma''').get();
     final mismatches = await _inTurn(
       lemmas,
       (row) async {
         final ref = row.read<String>('dictionaryRef');
+        final sublemma = row.read<String>('sublemma');
         final occurrences = row.read<int>('occurrences');
-        final found = await total(LemmaCriterion(LemmaChoice(label: ref, dictionaryRefs: [ref])));
-        return found == occurrences ? null : '$ref: $found, expected $occurrences';
+        final found = await total(
+          LemmaCriterion(LemmaChoice(entryRef: ref, dictionaryRefs: [ref], sublemma: sublemma)),
+        );
+        return found == occurrences ? null : '($ref, $sublemma): $found, expected $occurrences';
       },
     );
     expect(mismatches.nonNulls, isEmpty);

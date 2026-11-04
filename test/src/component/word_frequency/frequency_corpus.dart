@@ -8,6 +8,7 @@ import 'package:latin_reader/src/external/db_util.dart' as util;
 
 const fables = '00000000-0000-0000-0000-00000000000f';
 const letters = '00000000-0000-0000-0000-00000000000e';
+const lewisAndShort = '00000000-0000-0000-0000-00000000000d';
 
 class _EmptyDb extends AppDb {
   _EmptyDb() : super(executor: NativeDatabase.memory(setup: util.setupRegExp));
@@ -67,14 +68,20 @@ class FrequencyCorpus {
     ),
   );
 
-  /// An analysis of [form] as [dictionaryRef], spelled [macronizedForm] when given
-  Future<void> addAnalysis(String form, String dictionaryRef, {String? macronizedForm}) async {
+  /// Adds an analysis of [form] under [dictionaryRef] and [sublemma] ('' for the entry's own
+  /// lemma), spelled [macronizedForm] when given.
+  Future<void> addAnalysis(
+    String form,
+    String dictionaryRef, {
+    String sublemma = '',
+    String? macronizedForm,
+  }) async {
     await db.customStatement(
       '''
-      INSERT INTO MorphologicalDetails( form, item, dictionaryRef )
-          SELECT ?, COUNT( * ), ? FROM MorphologicalDetails WHERE form = ?
+      INSERT INTO MorphologicalDetails( form, item, dictionaryRef, sublemma )
+          SELECT ?, COUNT( * ), ?, ? FROM MorphologicalDetails WHERE form = ?
       ''',
-      [form, dictionaryRef, form],
+      [form, dictionaryRef, sublemma, form],
     );
     if (macronizedForm != null) {
       await db.customStatement(
@@ -85,6 +92,28 @@ class FrequencyCorpus {
         [form, macronizedForm, form],
       );
     }
+  }
+
+  /// Adds the Lewis & Short entry [entryKey], and resolves [dictionaryRef] to it.
+  Future<void> addLnsEntry(String dictionaryRef, String entryKey) async {
+    await db.customStatement(
+      '''
+      INSERT OR IGNORE INTO Dictionaries( id, name, language, publisher, publicationDate )
+          VALUES ( ?, 'Lewis & Short', 'Latin', '', '1879-01-01' )
+      ''',
+      [lewisAndShort],
+    );
+    await db.customStatement(
+      '''
+      INSERT OR IGNORE INTO DictionaryEntries( dictionary, lemma, idx )
+          SELECT ?, ?, COUNT( * ) FROM DictionaryEntries
+      ''',
+      [lewisAndShort, entryKey],
+    );
+    await db.customStatement(
+      'INSERT INTO LnsRefResolutions( dictionaryRef, lnsLemma ) VALUES ( ?, ? )',
+      [dictionaryRef, entryKey],
+    );
   }
 
   Future<void> populate() => db.transaction(

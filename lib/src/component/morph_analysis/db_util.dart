@@ -30,6 +30,7 @@ final operations = [
                   form: Value(row[0].toString()),
                   item: Value(row[1] as int),
                   dictionaryRef: Value(row[2].toString()),
+                  sublemma: Value(row[3].toString()),
                 ),
               ),
           mode: InsertMode.insertOrRollback,
@@ -134,7 +135,8 @@ final operations = [
                             Word.uncertaintyBitMask,
                             Details.form AS morphForm,
                             Details.item AS morphItem,
-                            Details.dictionaryRef
+                            Details.dictionaryRef,
+                            Details.sublemma
                          FROM CountableWords AS Word
                          INNER JOIN MorphologicalDetails AS Details
                              ON Details.form = Word.lookupForm
@@ -154,6 +156,7 @@ final operations = [
                             a.idx,
                             a.componentOrdinal,
                             a.dictionaryRef,
+                            a.sublemma,
                             Infl.form IS NOT NULL -- no inflections, nothing to contradict
                             AND LENGTH( Infl.macronizedForm )
                                 = LENGTH( a.macronLookupForm ) -- else letters don't line up
@@ -181,9 +184,10 @@ final operations = [
                      SELECT workId,
                             idx,
                             componentOrdinal,
-                            dictionaryRef
+                            dictionaryRef,
+                            sublemma
                          FROM Spellings
-                         GROUP BY workId, idx, componentOrdinal, dictionaryRef
+                         GROUP BY workId, idx, componentOrdinal, dictionaryRef, sublemma
                          HAVING MIN( contradictsText ) = 1
                  ),
                  WordsWithEveryLemmaRuledOut AS (
@@ -196,6 +200,7 @@ final operations = [
                                 AND r.idx = a.idx
                                 AND r.componentOrdinal = a.componentOrdinal
                                 AND r.dictionaryRef = a.dictionaryRef
+                                AND r.sublemma = a.sublemma
                          GROUP BY a.workId, a.idx, a.componentOrdinal
                          HAVING COUNT( r.dictionaryRef ) = COUNT( * )
                  )
@@ -210,7 +215,8 @@ final operations = [
                                            WHERE r.workId = a.workId
                                                  AND r.idx = a.idx
                                                  AND r.componentOrdinal = a.componentOrdinal
-                                                 AND r.dictionaryRef = a.dictionaryRef )
+                                                 AND r.dictionaryRef = a.dictionaryRef
+                                                 AND r.sublemma = a.sublemma )
                           OR EXISTS ( SELECT 1 -- a word never loses every lemma
                                           FROM WordsWithEveryLemmaRuledOut AS w
                                           WHERE w.workId = a.workId

@@ -70,12 +70,13 @@ Future<void> token(
   ],
 );
 
-/// Analysis [item] of [form] as [reference], with inflection [count], spelled [macronizedForm]
-/// (as [form] when absent)
+/// Adds analysis [item] of [form] under [reference] and [sublemma] ('' for the entry's own lemma),
+/// with inflection [count], spelled [macronizedForm] (as [form] when absent).
 Future<void> analysis(
   AppDb db,
   String form,
   String reference, {
+  String sublemma = '',
   int item = 0,
   int count = 0,
   String? macronizedForm,
@@ -87,10 +88,11 @@ Future<void> analysis(
   String? verbForm,
   String? person,
 }) async {
-  await db.customStatement('INSERT OR IGNORE INTO MorphologicalDetails VALUES (?, ?, ?)', [
+  await db.customStatement('INSERT OR IGNORE INTO MorphologicalDetails VALUES (?, ?, ?, ?)', [
     form,
     item,
     reference,
+    sublemma,
   ]);
   await db.customStatement(
     '''

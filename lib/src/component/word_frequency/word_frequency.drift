@@ -25,13 +25,14 @@ CREATE TABLE "ResolvedFreqMorphForms"(
     "morphForm" TEXT NOT NULL,
     "morphItem" INTEGER NOT NULL,
     "dictionaryRef" TEXT NOT NULL,
+    "sublemma" TEXT NOT NULL,
     PRIMARY KEY( workId, form, macronForm, morphForm, morphItem )
 )
 STRICT,
 WITHOUT ROWID;
 
 CREATE INDEX "ResolvedFreqMorphForms_Lemma"
-    ON ResolvedFreqMorphForms( workId, dictionaryRef );
+    ON ResolvedFreqMorphForms( workId, dictionaryRef, sublemma );
 
 -- Candidate-lemma counts for each work, plain form, and macronized form.
 -- possibleOccurrences counts units that have this lemma as a candidate.
@@ -42,10 +43,11 @@ CREATE TABLE "ScopedFormLemmaFreq"(
     "form" TEXT NOT NULL,
     "macronForm" TEXT NOT NULL,
     "dictionaryRef" TEXT NOT NULL,
+    "sublemma" TEXT NOT NULL,
     "possibleOccurrences" INTEGER NOT NULL CHECK( possibleOccurrences > 0 ),
     "singleCandidateOccurrences" INTEGER NOT NULL
         CHECK( singleCandidateOccurrences BETWEEN 0 AND possibleOccurrences ),
-    PRIMARY KEY( workId, form, macronForm, dictionaryRef )
+    PRIMARY KEY( workId, form, macronForm, dictionaryRef, sublemma )
 )
 STRICT,
 WITHOUT ROWID;
@@ -56,10 +58,11 @@ CREATE INDEX "ScopedFormLemmaFreq_MacronForm"
 CREATE TABLE "ScopedLemmaFreq"(
     "workId" TEXT NOT NULL,
     "dictionaryRef" TEXT NOT NULL,
+    "sublemma" TEXT NOT NULL,
     "possibleOccurrences" INTEGER NOT NULL CHECK( possibleOccurrences > 0 ),
     "singleCandidateOccurrences" INTEGER NOT NULL
         CHECK( singleCandidateOccurrences BETWEEN 0 AND possibleOccurrences ),
-    PRIMARY KEY( workId, dictionaryRef )
+    PRIMARY KEY( workId, dictionaryRef, sublemma )
 )
 STRICT,
 WITHOUT ROWID;
@@ -104,7 +107,8 @@ CREATE TABLE "ScopedLookupLemmas"(
     "macronLookupForm" TEXT NOT NULL,
     "uncertaintyBitMask" INTEGER NOT NULL,
     "dictionaryRef" TEXT NOT NULL,
-    PRIMARY KEY( workId, lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef )
+    "sublemma" TEXT NOT NULL,
+    PRIMARY KEY( workId, lookupForm, alsoLowercase, macronLookupForm, uncertaintyBitMask, dictionaryRef, sublemma )
 )
 STRICT,
 WITHOUT ROWID;
@@ -123,7 +127,7 @@ getFormFrequenciesDesc WITH FormFrequencyRow.fromFormSql:
                        LIMIT :limit OFFSET :offset )
     SELECT Page.form,
            Page.occurrences,
-           ( SELECT GROUP_CONCAT( DISTINCT ScopedFormLemmaFreq.dictionaryRef )
+           ( SELECT json_group_array( DISTINCT json_array( ScopedFormLemmaFreq.dictionaryRef, ScopedFormLemmaFreq.sublemma ) )
                  FROM ScopedFormLemmaFreq
                  WHERE ScopedFormLemmaFreq.form = Page.form
                        AND ScopedFormLemmaFreq.workId IN :workIds ) AS possibleLemmas
@@ -140,7 +144,7 @@ getFormFrequenciesAsc WITH FormFrequencyRow.fromFormSql:
                        LIMIT :limit OFFSET :offset )
     SELECT Page.form,
            Page.occurrences,
-           ( SELECT GROUP_CONCAT( DISTINCT ScopedFormLemmaFreq.dictionaryRef )
+           ( SELECT json_group_array( DISTINCT json_array( ScopedFormLemmaFreq.dictionaryRef, ScopedFormLemmaFreq.sublemma ) )
                  FROM ScopedFormLemmaFreq
                  WHERE ScopedFormLemmaFreq.form = Page.form
                        AND ScopedFormLemmaFreq.workId IN :workIds ) AS possibleLemmas
@@ -160,7 +164,7 @@ getMacronFormFrequenciesDesc WITH FormFrequencyRow.fromMacronFormSql:
     SELECT Page.macronForm,
            Page.form,
            Page.occurrences,
-           ( SELECT GROUP_CONCAT( DISTINCT ScopedFormLemmaFreq.dictionaryRef )
+           ( SELECT json_group_array( DISTINCT json_array( ScopedFormLemmaFreq.dictionaryRef, ScopedFormLemmaFreq.sublemma ) )
                  FROM ScopedFormLemmaFreq
                  WHERE ScopedFormLemmaFreq.macronForm = Page.macronForm
                        AND ScopedFormLemmaFreq.workId IN :workIds ) AS possibleLemmas
@@ -179,7 +183,7 @@ getMacronFormFrequenciesAsc WITH FormFrequencyRow.fromMacronFormSql:
     SELECT Page.macronForm,
            Page.form,
            Page.occurrences,
-           ( SELECT GROUP_CONCAT( DISTINCT ScopedFormLemmaFreq.dictionaryRef )
+           ( SELECT json_group_array( DISTINCT json_array( ScopedFormLemmaFreq.dictionaryRef, ScopedFormLemmaFreq.sublemma ) )
                  FROM ScopedFormLemmaFreq
                  WHERE ScopedFormLemmaFreq.macronForm = Page.macronForm
                        AND ScopedFormLemmaFreq.workId IN :workIds ) AS possibleLemmas
@@ -189,22 +193,24 @@ getMacronFormFrequenciesAsc WITH FormFrequencyRow.fromMacronFormSql:
 -- Lemma frequency (macron toggle is a no-op since counts can't differ)
 getLemmaFrequenciesDesc WITH LemmaFrequencyRow.fromLemmaSql:
     SELECT dictionaryRef,
+           sublemma,
            SUM( possibleOccurrences ) AS possibleOccurrences,
            SUM( singleCandidateOccurrences ) AS singleCandidateOccurrences
         FROM ScopedLemmaFreq
         WHERE workId IN ?
-        GROUP BY dictionaryRef
-        ORDER BY possibleOccurrences DESC, dictionaryRef
+        GROUP BY dictionaryRef, sublemma
+        ORDER BY possibleOccurrences DESC, dictionaryRef, sublemma
         LIMIT :limit OFFSET :offset;
 
 getLemmaFrequenciesAsc WITH LemmaFrequencyRow.fromLemmaSql:
     SELECT dictionaryRef,
+           sublemma,
            SUM( possibleOccurrences ) AS possibleOccurrences,
            SUM( singleCandidateOccurrences ) AS singleCandidateOccurrences
         FROM ScopedLemmaFreq
         WHERE workId IN ?
-        GROUP BY dictionaryRef
-        ORDER BY possibleOccurrences ASC, dictionaryRef
+        GROUP BY dictionaryRef, sublemma
+        ORDER BY possibleOccurrences ASC, dictionaryRef, sublemma
         LIMIT :limit OFFSET :offset;
 
 -- Totals (additive); populusque counts as +2
@@ -221,7 +227,7 @@ getTotalForms: SELECT COUNT( DISTINCT form ) AS totalForms FROM ScopedFormFreq W
 
 getTotalMacronForms: SELECT COUNT( DISTINCT macronForm ) AS totalMacronForms FROM ScopedFormFreq WHERE workId IN ?;
 
-getTotalLemmas: SELECT COUNT( DISTINCT dictionaryRef ) AS totalLemmas FROM ScopedLemmaFreq WHERE workId IN ?;
+getTotalLemmas: SELECT COUNT( * ) AS totalLemmas FROM ( SELECT DISTINCT dictionaryRef, sublemma FROM ScopedLemmaFreq WHERE workId IN ? );
 
 -- Group equal counts before accumulating coverage, so ties share a step
 getFormCoverageSteps WITH TextCoverageStep:
@@ -256,10 +262,11 @@ getMacronFormCoverageSteps WITH TextCoverageStep:
 -- Lookups without candidates remain uncovered
 getAnyCandidateLemmaCoverageSteps WITH TextCoverageStep:
     WITH Lemmas AS ( SELECT dictionaryRef,
+                            sublemma,
                             SUM( possibleOccurrences ) AS occurrences
                          FROM ScopedLemmaFreq
                          WHERE workId IN :workIds
-                         GROUP BY dictionaryRef ),
+                         GROUP BY dictionaryRef, sublemma ),
          LookupMaxCounts AS ( SELECT ScopedLookupLemmas.workId,
                                      ScopedLookupLemmas.lookupForm,
                                      ScopedLookupLemmas.alsoLowercase,
@@ -269,6 +276,7 @@ getAnyCandidateLemmaCoverageSteps WITH TextCoverageStep:
                                   FROM ScopedLookupLemmas
                                   INNER JOIN Lemmas
                                       ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef
+                                         AND Lemmas.sublemma = ScopedLookupLemmas.sublemma
                                   WHERE ScopedLookupLemmas.workId IN :workIds
                                   GROUP BY ScopedLookupLemmas.workId,
                                            ScopedLookupLemmas.lookupForm,
@@ -293,10 +301,11 @@ getAnyCandidateLemmaCoverageSteps WITH TextCoverageStep:
 -- The least frequent candidate sets the threshold where all candidates are included
 getAllCandidateLemmasCoverageSteps WITH TextCoverageStep:
     WITH Lemmas AS ( SELECT dictionaryRef,
+                            sublemma,
                             SUM( possibleOccurrences ) AS occurrences
                          FROM ScopedLemmaFreq
                          WHERE workId IN :workIds
-                         GROUP BY dictionaryRef ),
+                         GROUP BY dictionaryRef, sublemma ),
          LookupMinCounts AS ( SELECT ScopedLookupLemmas.workId,
                                      ScopedLookupLemmas.lookupForm,
                                      ScopedLookupLemmas.alsoLowercase,
@@ -306,6 +315,7 @@ getAllCandidateLemmasCoverageSteps WITH TextCoverageStep:
                                   FROM ScopedLookupLemmas
                                   INNER JOIN Lemmas
                                       ON Lemmas.dictionaryRef = ScopedLookupLemmas.dictionaryRef
+                                         AND Lemmas.sublemma = ScopedLookupLemmas.sublemma
                                   WHERE ScopedLookupLemmas.workId IN :workIds
                                   GROUP BY ScopedLookupLemmas.workId,
                                            ScopedLookupLemmas.lookupForm,
@@ -333,16 +343,18 @@ getLookupBestCounts WITH LookupCount:
                                          alsoLowercase,
                                          macronLookupForm,
                                          uncertaintyBitMask,
-                                         dictionaryRef
+                                         dictionaryRef,
+                                         sublemma
                              FROM ScopedLookupLemmas
                              WHERE workId IN :workIds
                                    AND lookupForm IN :lookupForms ),
          Lemmas AS ( SELECT dictionaryRef,
+                            sublemma,
                             SUM( possibleOccurrences ) AS occurrences
                          FROM ScopedLemmaFreq
                          WHERE workId IN :workIds
-                               AND dictionaryRef IN ( SELECT dictionaryRef FROM Candidates )
-                         GROUP BY dictionaryRef )
+                               AND ( dictionaryRef, sublemma ) IN ( SELECT dictionaryRef, sublemma FROM Candidates )
+                         GROUP BY dictionaryRef, sublemma )
         SELECT Candidates.lookupForm,
                Candidates.alsoLowercase,
                Candidates.macronLookupForm,
@@ -351,6 +363,7 @@ getLookupBestCounts WITH LookupCount:
             FROM Candidates
             INNER JOIN Lemmas
                 ON Lemmas.dictionaryRef = Candidates.dictionaryRef
+                   AND Lemmas.sublemma = Candidates.sublemma
             GROUP BY Candidates.lookupForm,
                      Candidates.alsoLowercase,
                      Candidates.macronLookupForm,
@@ -362,7 +375,8 @@ getFormMorphIdentities WITH FrequencyMorphCandidate:
     SELECT DISTINCT form,
                     morphForm,
                     morphItem,
-                    dictionaryRef
+                    dictionaryRef,
+                    sublemma
         FROM ResolvedFreqMorphForms
         WHERE workId IN :workIds
               AND form = :form
@@ -373,7 +387,8 @@ getMacronFormMorphIdentities WITH FrequencyMorphCandidate:
     SELECT DISTINCT form,
                     morphForm,
                     morphItem,
-                    dictionaryRef
+                    dictionaryRef,
+                    sublemma
         FROM ResolvedFreqMorphForms
         WHERE workId IN :workIds
               AND form = :form
@@ -385,8 +400,10 @@ getLemmaMorphIdentities WITH FrequencyMorphCandidate:
     SELECT DISTINCT form,
                     morphForm,
                     morphItem,
-                    dictionaryRef
+                    dictionaryRef,
+                    sublemma
         FROM ResolvedFreqMorphForms
         WHERE workId IN :workIds
               AND dictionaryRef = :dictionaryRef
+              AND sublemma = :sublemma
         ORDER BY morphForm, morphItem;

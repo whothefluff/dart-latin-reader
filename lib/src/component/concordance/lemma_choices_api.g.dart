@@ -29,22 +29,34 @@ class _SystemHash {
   }
 }
 
-/// Lemmas starting with [prefix], exact match first, then shortest first
+/// Returns the lemma choices whose 1) dictionaryRef, 2) Lewis & Short entry key or 3) sublemma
+/// starts with [prefix].
+/// An exact match comes first, then the shortest, comparing the sublemma, or the
+/// [LemmaChoice.entryRef] of the entry's own lemma.
 ///
 /// Copied from [lemmaChoices].
 @ProviderFor(lemmaChoices)
 const lemmaChoicesProvider = LemmaChoicesFamily();
 
-/// Lemmas starting with [prefix], exact match first, then shortest first
+/// Returns the lemma choices whose 1) dictionaryRef, 2) Lewis & Short entry key or 3) sublemma
+/// starts with [prefix].
+/// An exact match comes first, then the shortest, comparing the sublemma, or the
+/// [LemmaChoice.entryRef] of the entry's own lemma.
 ///
 /// Copied from [lemmaChoices].
 class LemmaChoicesFamily extends Family<AsyncValue<LemmaChoices>> {
-  /// Lemmas starting with [prefix], exact match first, then shortest first
+  /// Returns the lemma choices whose 1) dictionaryRef, 2) Lewis & Short entry key or 3) sublemma
+  /// starts with [prefix].
+  /// An exact match comes first, then the shortest, comparing the sublemma, or the
+  /// [LemmaChoice.entryRef] of the entry's own lemma.
   ///
   /// Copied from [lemmaChoices].
   const LemmaChoicesFamily();
 
-  /// Lemmas starting with [prefix], exact match first, then shortest first
+  /// Returns the lemma choices whose 1) dictionaryRef, 2) Lewis & Short entry key or 3) sublemma
+  /// starts with [prefix].
+  /// An exact match comes first, then the shortest, comparing the sublemma, or the
+  /// [LemmaChoice.entryRef] of the entry's own lemma.
   ///
   /// Copied from [lemmaChoices].
   LemmaChoicesProvider call(String prefix) {
@@ -73,11 +85,17 @@ class LemmaChoicesFamily extends Family<AsyncValue<LemmaChoices>> {
   String? get name => r'lemmaChoicesProvider';
 }
 
-/// Lemmas starting with [prefix], exact match first, then shortest first
+/// Returns the lemma choices whose 1) dictionaryRef, 2) Lewis & Short entry key or 3) sublemma
+/// starts with [prefix].
+/// An exact match comes first, then the shortest, comparing the sublemma, or the
+/// [LemmaChoice.entryRef] of the entry's own lemma.
 ///
 /// Copied from [lemmaChoices].
 class LemmaChoicesProvider extends AutoDisposeFutureProvider<LemmaChoices> {
-  /// Lemmas starting with [prefix], exact match first, then shortest first
+  /// Returns the lemma choices whose 1) dictionaryRef, 2) Lewis & Short entry key or 3) sublemma
+  /// starts with [prefix].
+  /// An exact match comes first, then the shortest, comparing the sublemma, or the
+  /// [LemmaChoice.entryRef] of the entry's own lemma.
   ///
   /// Copied from [lemmaChoices].
   LemmaChoicesProvider(String prefix)

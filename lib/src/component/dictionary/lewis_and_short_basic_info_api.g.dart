@@ -6,7 +6,7 @@ part of 'lewis_and_short_basic_info_api.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lnsBasicInfoHash() => r'96e5a5980b63441913f59ff5c9bbceec5b2b7c26';
+String _$lnsBasicInfoHash() => r'098eb3d1f9160ff7287fd3d5438355c789db1d53';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -39,15 +39,15 @@ class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfoByRef>> {
   const LnsBasicInfoFamily();
 
   /// See also [lnsBasicInfo].
-  LnsBasicInfoProvider call(PossibleLemmas lnsRefs) {
-    return LnsBasicInfoProvider(lnsRefs);
+  LnsBasicInfoProvider call(DictionaryRefs dictionaryRefs) {
+    return LnsBasicInfoProvider(dictionaryRefs);
   }
 
   @override
   LnsBasicInfoProvider getProviderOverride(
     covariant LnsBasicInfoProvider provider,
   ) {
-    return call(provider.lnsRefs);
+    return call(provider.dictionaryRefs);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -69,9 +69,9 @@ class LnsBasicInfoFamily extends Family<AsyncValue<LnsBasicInfoByRef>> {
 class LnsBasicInfoProvider
     extends AutoDisposeFutureProvider<LnsBasicInfoByRef> {
   /// See also [lnsBasicInfo].
-  LnsBasicInfoProvider(PossibleLemmas lnsRefs)
+  LnsBasicInfoProvider(DictionaryRefs dictionaryRefs)
     : this._internal(
-        (ref) => lnsBasicInfo(ref as LnsBasicInfoRef, lnsRefs),
+        (ref) => lnsBasicInfo(ref as LnsBasicInfoRef, dictionaryRefs),
         from: lnsBasicInfoProvider,
         name: r'lnsBasicInfoProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -80,7 +80,7 @@ class LnsBasicInfoProvider
         dependencies: LnsBasicInfoFamily._dependencies,
         allTransitiveDependencies:
             LnsBasicInfoFamily._allTransitiveDependencies,
-        lnsRefs: lnsRefs,
+        dictionaryRefs: dictionaryRefs,
       );
 
   LnsBasicInfoProvider._internal(
@@ -90,10 +90,10 @@ class LnsBasicInfoProvider
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.lnsRefs,
+    required this.dictionaryRefs,
   }) : super.internal();
 
-  final PossibleLemmas lnsRefs;
+  final DictionaryRefs dictionaryRefs;
 
   @override
   Override overrideWith(
@@ -108,7 +108,7 @@ class LnsBasicInfoProvider
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        lnsRefs: lnsRefs,
+        dictionaryRefs: dictionaryRefs,
       ),
     );
   }
@@ -120,13 +120,14 @@ class LnsBasicInfoProvider
 
   @override
   bool operator ==(Object other) {
-    return other is LnsBasicInfoProvider && other.lnsRefs == lnsRefs;
+    return other is LnsBasicInfoProvider &&
+        other.dictionaryRefs == dictionaryRefs;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, lnsRefs.hashCode);
+    hash = _SystemHash.combine(hash, dictionaryRefs.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -135,8 +136,8 @@ class LnsBasicInfoProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin LnsBasicInfoRef on AutoDisposeFutureProviderRef<LnsBasicInfoByRef> {
-  /// The parameter `lnsRefs` of this provider.
-  PossibleLemmas get lnsRefs;
+  /// The parameter `dictionaryRefs` of this provider.
+  DictionaryRefs get dictionaryRefs;
 }
 
 class _LnsBasicInfoProviderElement
@@ -145,7 +146,8 @@ class _LnsBasicInfoProviderElement
   _LnsBasicInfoProviderElement(super.provider);
 
   @override
-  PossibleLemmas get lnsRefs => (origin as LnsBasicInfoProvider).lnsRefs;
+  DictionaryRefs get dictionaryRefs =>
+      (origin as LnsBasicInfoProvider).dictionaryRefs;
 }
 
 // ignore_for_file: type=lint

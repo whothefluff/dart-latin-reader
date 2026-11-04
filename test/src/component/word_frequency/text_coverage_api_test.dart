@@ -309,6 +309,23 @@ void main() {
       expect(coverage.unitsCovered(atLeast: 2), 5);
     });
 
+    test('the lemmas of one entry are covered apart, with any candidate and with all', () async {
+      // Here bonos has only bonus as a candidate, and bonae only the sublemma bonae
+      await corpus.addWord(fables, 'bonos', times: 3);
+      await corpus.addWord(fables, 'bonae');
+      await corpus.addAnalysis('bonos', 'bonus');
+      await corpus.addAnalysis('bonae', 'bonus', sublemma: 'bonae');
+      await corpus.populate();
+
+      final any = await _readCoverage(corpus.db, [fables], CoverageBasis.anyCandidateLemma);
+      final certain = await _readCoverage(corpus.db, [fables], CoverageBasis.allCandidateLemmas);
+
+      expect(any.unitsCovered(atLeast: 3), 3);
+      expect(any.unitsCovered(atLeast: 1), 4);
+      expect(certain.unitsCovered(atLeast: 3), 3);
+      expect(certain.unitsCovered(atLeast: 1), 4);
+    });
+
     test('a detached enclitic is a unit of its own', () async {
       // The host is looked up as populusque; que is counted separately.
       await corpus.addWord(fables, 'populusque', enclitic: 'que');

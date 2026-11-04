@@ -18,12 +18,12 @@ part 'lewis_and_short_basic_info_api.g.dart';
 //infrastructure
 
 @riverpod
-Future<LnsBasicInfoByRef> lnsBasicInfo(Ref ref, PossibleLemmas lnsRefs) async {
-  log.info(() => '@riverpod - using $lnsRefs');
+Future<LnsBasicInfoByRef> lnsBasicInfo(Ref ref, DictionaryRefs dictionaryRefs) async {
+  log.info(() => '@riverpod - using $dictionaryRefs');
   ref.cacheFor(const Duration(minutes: 2));
   final db = await ref.watch(dbProvider.future);
   final repo = DictionaryRepository(db.dictionaryDrift);
-  return GetLnsBasicInfoUseCase(repo, lnsRefs).invoke();
+  return GetLnsBasicInfoUseCase(repo, dictionaryRefs).invoke();
 }
 
 class DictionaryRepository implements IDictionaryRepository {
@@ -120,10 +120,9 @@ class LnsBasicInfoEntry {
   //
 }
 
-/// These are **not _necessarily_** L&S lemmas, although they will often match
 @immutable
-extension type const PossibleLemmas._(ValueList<String> unm) implements ValueList<String> {
-  PossibleLemmas(
+extension type const DictionaryRefs._(ValueList<String> unm) implements ValueList<String> {
+  DictionaryRefs(
     Iterable<String> iter,
   ) : this._(ValueList(iter));
 }

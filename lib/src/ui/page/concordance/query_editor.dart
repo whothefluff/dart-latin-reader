@@ -709,7 +709,7 @@ class _LemmaFieldState extends ConsumerState<_LemmaField> {
   //
   late final _controller = TextEditingController(
     text: switch (widget.lemma) {
-      final lemma? => lemmaText(lemma.label),
+      final lemma? => lemmaLabel(lemma.entryRef, lemma.sublemma),
       null => '',
     },
   );
@@ -728,7 +728,7 @@ class _LemmaFieldState extends ConsumerState<_LemmaField> {
     return RawAutocomplete<LemmaChoice>(
       textEditingController: _controller,
       focusNode: _focusNode,
-      displayStringForOption: (choice) => lemmaText(choice.label),
+      displayStringForOption: (choice) => lemmaLabel(choice.entryRef, choice.sublemma),
       optionsBuilder: (value) async => value.text.trim().isEmpty
           ? const <LemmaChoice>[]
           : await ref.read(lemmaChoicesProvider(value.text).future),
@@ -769,7 +769,7 @@ class _LemmaFieldState extends ConsumerState<_LemmaField> {
                   .map(
                     (choice) => ListTile(
                       dense: true,
-                      title: Text(lemmaText(choice.label)),
+                      title: Text(lemmaLabel(choice.entryRef, choice.sublemma)),
                       subtitle: Text(lemmaDetails(choice)),
                       onTap: () => onSelected(choice),
                     ),

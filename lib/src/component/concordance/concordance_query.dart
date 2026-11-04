@@ -282,26 +282,29 @@ final class GrammarCriterion extends ConcordanceCriterion {
   //
 }
 
-/// A lemma as the user picks it: one dictionary entry, which may stand for
-/// several dictionaryRefs of the analyses (ad-tingo and attingo are attingo)
+/// A lemma as the user picks it: its dictionaryRefs, which can be several that resolve to one
+/// entry (ad-tingo and attingo to attingo), and its sublemma.
 @immutable
 class LemmaChoice {
   LemmaChoice({
-    required this.label,
+    required this.entryRef,
     required Iterable<String> dictionaryRefs,
+    required this.sublemma,
     this.partOfSpeech,
     this.inflection,
   }) : dictionaryRefs = ValueList(dictionaryRefs.toSet().sorted((a, b) => a.compareTo(b)));
 
   LemmaChoice.fromSql({
-    required String label,
+    required String entryRef,
     required String dictionaryRefs,
+    required String sublemma,
     String? partOfSpeech,
     String? inflection,
   }) : this(
-         label: label,
+         entryRef: entryRef,
          // same separator as GROUP_CONCAT's default
          dictionaryRefs: dictionaryRefs.split(','),
+         sublemma: sublemma,
          partOfSpeech: partOfSpeech,
          inflection: inflection,
        );
@@ -309,38 +312,47 @@ class LemmaChoice {
   LemmaChoice.fromJsonMap(
     Map<String, Object?> map,
   ) : this(
-        label: map['label']! as String,
+        entryRef: map['entryRef']! as String,
         dictionaryRefs: (map['refs']! as List).cast<String>(),
+        sublemma: map['sublemma']! as String,
         partOfSpeech: map['pos'] as String?,
         inflection: map['inflection'] as String?,
       );
 
-  /// The Lewis & Short lemma, or the analyses' dictionaryRef when there's no
-  /// entry for it. Homograph digits included (sum1)
-  final String label;
+  /// The Lewis & Short entry key of the choice's dictionaryRefs, such as sum1, or the
+  /// dictionaryRef itself when it has no entry.
+  final String entryRef;
 
   final ValueList<String> dictionaryRefs;
+
+  /// The sublemma, or '' for the entry's own lemma.
+  final String sublemma;
 
   /// From the dictionary entry, to tell homographs apart
   final String? partOfSpeech;
   final String? inflection;
 
   Map<String, Object?> toJsonMap() => {
-    'label': label,
+    'entryRef': entryRef,
     'refs': dictionaryRefs.toList(),
+    'sublemma': sublemma,
     'pos': ?partOfSpeech,
     'inflection': ?inflection,
   };
 
   @override
-  String toString() => 'LemmaChoice{label: $label, refs: $dictionaryRefs}';
+  String toString() =>
+      'LemmaChoice{entryRef: $entryRef, refs: $dictionaryRefs, sublemma: $sublemma}';
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is LemmaChoice && other.dictionaryRefs == dictionaryRefs);
+      identical(this, other) ||
+      (other is LemmaChoice &&
+          other.dictionaryRefs == dictionaryRefs &&
+          other.sublemma == sublemma);
 
   @override
-  int get hashCode => dictionaryRefs.hashCode;
+  int get hashCode => Object.hash(dictionaryRefs, sublemma);
   //
 }
 

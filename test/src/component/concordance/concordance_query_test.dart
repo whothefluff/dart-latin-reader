@@ -13,4 +13,12 @@ void main() {
     expect(const FormCriterion(' ').isPhrase, isFalse);
     expect(const FormCriterion(' ').isComplete, isFalse);
   });
+
+  test("an entry's own lemma and its sublemma are two lemmas", () {
+    LemmaChoice ofBonus(String sublemma) =>
+        LemmaChoice(entryRef: 'bonus', dictionaryRefs: const ['bonus'], sublemma: sublemma);
+
+    expect(ofBonus('bonae'), ofBonus('bonae'));
+    expect(ofBonus('bonae'), isNot(ofBonus('')));
+  });
 }

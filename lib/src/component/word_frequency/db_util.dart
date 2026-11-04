@@ -62,7 +62,8 @@ const _countUnits = '''WITH TokenComponents( ordinal ) AS ( VALUES (0), (1) ),
                      SELECT Unit.*,
                             Details.form AS morphForm,
                             Details.item AS morphItem,
-                            Details.dictionaryRef
+                            Details.dictionaryRef,
+                            Details.sublemma
                          FROM CountUnits AS Unit
                          INNER JOIN CountableWordCandidateAnalyses AS Candidate
                              ON Candidate.workId = Unit.workId
@@ -101,14 +102,15 @@ final operations = [
     },
     insert: (AppDb db) async {
       await db.customStatement('''
-        INSERT INTO ResolvedFreqMorphForms( workId, form, macronForm, morphForm, morphItem, dictionaryRef )
+        INSERT INTO ResolvedFreqMorphForms( workId, form, macronForm, morphForm, morphItem, dictionaryRef, sublemma )
             $_countUnits
                 SELECT DISTINCT workId,
                                 form,
                                 macronForm,
                                 morphForm,
                                 morphItem,
-                                dictionaryRef
+                                dictionaryRef,
+                                sublemma
                     FROM CandidateAnalyses
       ''');
     },
@@ -123,7 +125,7 @@ final operations = [
       // Several analyses pointing to the same lemma therefore count once.
       // candidateCount = 1 means the stored analyses offer only one candidate lemma.
       await db.customStatement('''
-        INSERT INTO ScopedFormLemmaFreq( workId, form, macronForm, dictionaryRef,
+        INSERT INTO ScopedFormLemmaFreq( workId, form, macronForm, dictionaryRef, sublemma,
                                          possibleOccurrences, singleCandidateOccurrences )
             $_countUnits,
                  UnitLemmas AS ( SELECT DISTINCT workId,
@@ -131,7 +133,8 @@ final operations = [
                                                  componentOrdinal,
                                                  form,
                                                  macronForm,
-                                                 dictionaryRef
+                                                 dictionaryRef,
+                                                 sublemma
                                      FROM CandidateAnalyses ),
                  Counted AS ( SELECT UnitLemmas.*,
                                      COUNT( * ) OVER ( PARTITION BY workId, sourceIdx, componentOrdinal ) AS candidateCount
@@ -140,10 +143,11 @@ final operations = [
                        form,
                        macronForm,
                        dictionaryRef,
+                       sublemma,
                        COUNT( * ),
                        SUM( CASE WHEN candidateCount = 1 THEN 1 ELSE 0 END )
                     FROM Counted
-                    GROUP BY workId, form, macronForm, dictionaryRef
+                    GROUP BY workId, form, macronForm, dictionaryRef, sublemma
       ''');
     },
   ),
@@ -157,13 +161,14 @@ final operations = [
       // Each counted unit has one form and one macronized form, so it contributes
       // at most once to a given lemma's total.
       await db.customStatement('''
-        INSERT INTO ScopedLemmaFreq( workId, dictionaryRef, possibleOccurrences, singleCandidateOccurrences )
+        INSERT INTO ScopedLemmaFreq( workId, dictionaryRef, sublemma, possibleOccurrences, singleCandidateOccurrences )
             SELECT workId,
                    dictionaryRef,
+                   sublemma,
                    SUM( possibleOccurrences ),
                    SUM( singleCandidateOccurrences )
                 FROM ScopedFormLemmaFreq
-                GROUP BY workId, dictionaryRef
+                GROUP BY workId, dictionaryRef, sublemma
       ''');
     },
   ),
@@ -253,14 +258,15 @@ final operations = [
       // several analyses can point to the same lemma
       await db.customStatement('''
         INSERT INTO ScopedLookupLemmas( workId, lookupForm, alsoLowercase, macronLookupForm,
-                                        uncertaintyBitMask, dictionaryRef )
+                                        uncertaintyBitMask, dictionaryRef, sublemma )
             $_countUnits
                 SELECT DISTINCT workId,
                                 lookupForm,
                                 properNounState IS 2,
                                 macronLookupForm,
                                 uncertaintyBitMask,
-                                dictionaryRef
+                                dictionaryRef,
+                                sublemma
                     FROM CandidateAnalyses
       ''');
     },

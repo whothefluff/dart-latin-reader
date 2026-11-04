@@ -21,7 +21,7 @@ Future<Iterable<U>> enrichWithLns<T, U>({
   required U Function(T item, LnsBasicInfoEntry? lns) createEnriched,
 }) async {
   final dictRefs = items.map(getDictRef).toSet();
-  final resolved = await ref.watch(lnsBasicInfoProvider(PossibleLemmas(dictRefs)).future);
+  final resolved = await ref.watch(lnsBasicInfoProvider(DictionaryRefs(dictRefs)).future);
   return _zipWithLns(
     items: items,
     getLemma: getDictRef,

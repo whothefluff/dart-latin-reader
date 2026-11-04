@@ -17,12 +17,14 @@ typedef $ConcordanceDetailsCreateCompanionBuilder =
       required String form,
       required int item,
       required String dictionaryRef,
+      required String sublemma,
     });
 typedef $ConcordanceDetailsUpdateCompanionBuilder =
     i1.ConcordanceDetailsCompanion Function({
       i0.Value<String> form,
       i0.Value<int> item,
       i0.Value<String> dictionaryRef,
+      i0.Value<String> sublemma,
     });
 
 class $ConcordanceDetailsFilterComposer
@@ -46,6 +48,11 @@ class $ConcordanceDetailsFilterComposer
 
   i0.ColumnFilters<String> get dictionaryRef => $composableBuilder(
     column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -73,6 +80,11 @@ class $ConcordanceDetailsOrderingComposer
     column: $table.dictionaryRef,
     builder: (column) => i0.ColumnOrderings(column),
   );
+
+  i0.ColumnOrderings<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $ConcordanceDetailsAnnotationComposer
@@ -94,6 +106,9 @@ class $ConcordanceDetailsAnnotationComposer
     column: $table.dictionaryRef,
     builder: (column) => column,
   );
+
+  i0.GeneratedColumn<String> get sublemma =>
+      $composableBuilder(column: $table.sublemma, builder: (column) => column);
 }
 
 class $ConcordanceDetailsTableManager
@@ -136,20 +151,24 @@ class $ConcordanceDetailsTableManager
                 i0.Value<String> form = const i0.Value.absent(),
                 i0.Value<int> item = const i0.Value.absent(),
                 i0.Value<String> dictionaryRef = const i0.Value.absent(),
+                i0.Value<String> sublemma = const i0.Value.absent(),
               }) => i1.ConcordanceDetailsCompanion(
                 form: form,
                 item: item,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
               ),
           createCompanionCallback:
               ({
                 required String form,
                 required int item,
                 required String dictionaryRef,
+                required String sublemma,
               }) => i1.ConcordanceDetailsCompanion.insert(
                 form: form,
                 item: item,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -969,8 +988,24 @@ class ConcordanceDetails extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _sublemmaMeta = const i0.VerificationMeta(
+    'sublemma',
+  );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
-  List<i0.GeneratedColumn> get $columns => [form, item, dictionaryRef];
+  List<i0.GeneratedColumn> get $columns => [
+    form,
+    item,
+    dictionaryRef,
+    sublemma,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1010,6 +1045,14 @@ class ConcordanceDetails extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryRefMeta);
     }
+    if (data.containsKey('sublemma')) {
+      context.handle(
+        _sublemmaMeta,
+        sublemma.isAcceptableOrUnknown(data['sublemma']!, _sublemmaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sublemmaMeta);
+    }
     return context;
   }
 
@@ -1030,6 +1073,10 @@ class ConcordanceDetails extends i0.Table
       dictionaryRef: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
+      )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
       )!,
     );
   }
@@ -1054,10 +1101,12 @@ class ConcordanceDetail extends i0.DataClass
   final String form;
   final int item;
   final String dictionaryRef;
+  final String sublemma;
   const ConcordanceDetail({
     required this.form,
     required this.item,
     required this.dictionaryRef,
+    required this.sublemma,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -1065,6 +1114,7 @@ class ConcordanceDetail extends i0.DataClass
     map['form'] = i0.Variable<String>(form);
     map['item'] = i0.Variable<int>(item);
     map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
+    map['sublemma'] = i0.Variable<String>(sublemma);
     return map;
   }
 
@@ -1073,6 +1123,7 @@ class ConcordanceDetail extends i0.DataClass
       form: i0.Value(form),
       item: i0.Value(item),
       dictionaryRef: i0.Value(dictionaryRef),
+      sublemma: i0.Value(sublemma),
     );
   }
 
@@ -1085,6 +1136,7 @@ class ConcordanceDetail extends i0.DataClass
       form: serializer.fromJson<String>(json['form']),
       item: serializer.fromJson<int>(json['item']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
     );
   }
   @override
@@ -1094,6 +1146,7 @@ class ConcordanceDetail extends i0.DataClass
       'form': serializer.toJson<String>(form),
       'item': serializer.toJson<int>(item),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
     };
   }
 
@@ -1101,10 +1154,12 @@ class ConcordanceDetail extends i0.DataClass
     String? form,
     int? item,
     String? dictionaryRef,
+    String? sublemma,
   }) => i1.ConcordanceDetail(
     form: form ?? this.form,
     item: item ?? this.item,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
   );
   ConcordanceDetail copyWithCompanion(i1.ConcordanceDetailsCompanion data) {
     return ConcordanceDetail(
@@ -1113,6 +1168,7 @@ class ConcordanceDetail extends i0.DataClass
       dictionaryRef: data.dictionaryRef.present
           ? data.dictionaryRef.value
           : this.dictionaryRef,
+      sublemma: data.sublemma.present ? data.sublemma.value : this.sublemma,
     );
   }
 
@@ -1121,20 +1177,22 @@ class ConcordanceDetail extends i0.DataClass
     return (StringBuffer('ConcordanceDetail(')
           ..write('form: $form, ')
           ..write('item: $item, ')
-          ..write('dictionaryRef: $dictionaryRef')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(form, item, dictionaryRef);
+  int get hashCode => Object.hash(form, item, dictionaryRef, sublemma);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.ConcordanceDetail &&
           other.form == this.form &&
           other.item == this.item &&
-          other.dictionaryRef == this.dictionaryRef);
+          other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma);
 }
 
 class ConcordanceDetailsCompanion
@@ -1142,27 +1200,33 @@ class ConcordanceDetailsCompanion
   final i0.Value<String> form;
   final i0.Value<int> item;
   final i0.Value<String> dictionaryRef;
+  final i0.Value<String> sublemma;
   const ConcordanceDetailsCompanion({
     this.form = const i0.Value.absent(),
     this.item = const i0.Value.absent(),
     this.dictionaryRef = const i0.Value.absent(),
+    this.sublemma = const i0.Value.absent(),
   });
   ConcordanceDetailsCompanion.insert({
     required String form,
     required int item,
     required String dictionaryRef,
+    required String sublemma,
   }) : form = i0.Value(form),
        item = i0.Value(item),
-       dictionaryRef = i0.Value(dictionaryRef);
+       dictionaryRef = i0.Value(dictionaryRef),
+       sublemma = i0.Value(sublemma);
   static i0.Insertable<i1.ConcordanceDetail> custom({
     i0.Expression<String>? form,
     i0.Expression<int>? item,
     i0.Expression<String>? dictionaryRef,
+    i0.Expression<String>? sublemma,
   }) {
     return i0.RawValuesInsertable({
       if (form != null) 'form': form,
       if (item != null) 'item': item,
       if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
+      if (sublemma != null) 'sublemma': sublemma,
     });
   }
 
@@ -1170,11 +1234,13 @@ class ConcordanceDetailsCompanion
     i0.Value<String>? form,
     i0.Value<int>? item,
     i0.Value<String>? dictionaryRef,
+    i0.Value<String>? sublemma,
   }) {
     return i1.ConcordanceDetailsCompanion(
       form: form ?? this.form,
       item: item ?? this.item,
       dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+      sublemma: sublemma ?? this.sublemma,
     );
   }
 
@@ -1190,6 +1256,9 @@ class ConcordanceDetailsCompanion
     if (dictionaryRef.present) {
       map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
     }
+    if (sublemma.present) {
+      map['sublemma'] = i0.Variable<String>(sublemma.value);
+    }
     return map;
   }
 
@@ -1198,7 +1267,8 @@ class ConcordanceDetailsCompanion
     return (StringBuffer('ConcordanceDetailsCompanion(')
           ..write('form: $form, ')
           ..write('item: $item, ')
-          ..write('dictionaryRef: $dictionaryRef')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma')
           ..write(')'))
         .toString();
   }
@@ -2596,6 +2666,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
   final String form;
   final int item;
   final String dictionaryRef;
+  final String sublemma;
   final String? partOfSpeech;
   final String? gramCase;
   final String? number;
@@ -2609,6 +2680,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
     required this.form,
     required this.item,
     required this.dictionaryRef,
+    required this.sublemma,
     this.partOfSpeech,
     this.gramCase,
     this.number,
@@ -2628,6 +2700,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
       form: serializer.fromJson<String>(json['form']),
       item: serializer.fromJson<int>(json['item']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
       gramCase: serializer.fromJson<String?>(json['gramCase']),
       number: serializer.fromJson<String?>(json['number']),
@@ -2646,6 +2719,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
       'form': serializer.toJson<String>(form),
       'item': serializer.toJson<int>(item),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
       'gramCase': serializer.toJson<String?>(gramCase),
       'number': serializer.toJson<String?>(number),
@@ -2662,6 +2736,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
     String? form,
     int? item,
     String? dictionaryRef,
+    String? sublemma,
     i0.Value<String?> partOfSpeech = const i0.Value.absent(),
     i0.Value<String?> gramCase = const i0.Value.absent(),
     i0.Value<String?> number = const i0.Value.absent(),
@@ -2675,6 +2750,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
     form: form ?? this.form,
     item: item ?? this.item,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
     partOfSpeech: partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
     gramCase: gramCase.present ? gramCase.value : this.gramCase,
     number: number.present ? number.value : this.number,
@@ -2691,6 +2767,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
           ..write('form: $form, ')
           ..write('item: $item, ')
           ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma, ')
           ..write('partOfSpeech: $partOfSpeech, ')
           ..write('gramCase: $gramCase, ')
           ..write('number: $number, ')
@@ -2709,6 +2786,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
     form,
     item,
     dictionaryRef,
+    sublemma,
     partOfSpeech,
     gramCase,
     number,
@@ -2726,6 +2804,7 @@ class ConcordanceAnalysesWithOptionalInflection extends i0.DataClass {
           other.form == this.form &&
           other.item == this.item &&
           other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma &&
           other.partOfSpeech == this.partOfSpeech &&
           other.gramCase == this.gramCase &&
           other.number == this.number &&
@@ -2756,6 +2835,7 @@ class ConcordanceAnalysesWithOptionalInflections
     form,
     item,
     dictionaryRef,
+    sublemma,
     partOfSpeech,
     gramCase,
     number,
@@ -2773,7 +2853,7 @@ class ConcordanceAnalysesWithOptionalInflections
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "concordance.AnalysesWithOptionalInflections" AS SELECT Details.form, Details.item, Details.dictionaryRef, Infl.partOfSpeech, Infl.gramCase, Infl.number, Infl.gender, Infl.declension, Infl.person, Infl.verbForm, Infl.tense, Infl.voice FROM ConcordanceDetails AS Details LEFT OUTER JOIN ConcordanceDetailInflections AS Infl ON Infl.form = Details.form AND Infl.item = Details.item',
+        'CREATE VIEW "concordance.AnalysesWithOptionalInflections" AS SELECT Details.form, Details.item, Details.dictionaryRef, Details.sublemma, Infl.partOfSpeech, Infl.gramCase, Infl.number, Infl.gender, Infl.declension, Infl.person, Infl.verbForm, Infl.tense, Infl.voice FROM ConcordanceDetails AS Details LEFT OUTER JOIN ConcordanceDetailInflections AS Infl ON Infl.form = Details.form AND Infl.item = Details.item',
   };
   @override
   ConcordanceAnalysesWithOptionalInflections get asDslTable => this;
@@ -2795,6 +2875,10 @@ class ConcordanceAnalysesWithOptionalInflections
       dictionaryRef: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
+      )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
       )!,
       partOfSpeech: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -2854,6 +2938,12 @@ class ConcordanceAnalysesWithOptionalInflections
         false,
         type: i0.DriftSqlType.string,
       );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> partOfSpeech =
       i0.GeneratedColumn<String>(
         'partOfSpeech',
@@ -2925,11 +3015,13 @@ class ConcordanceAnalysesWithOptionalInflections
 
 class ConcordanceLemma extends i0.DataClass {
   final String dictionaryRef;
+  final String sublemma;
   final String? lnsLemma;
   final String? lnsPartOfSpeech;
   final String? lnsInflection;
   const ConcordanceLemma({
     required this.dictionaryRef,
+    required this.sublemma,
     this.lnsLemma,
     this.lnsPartOfSpeech,
     this.lnsInflection,
@@ -2941,6 +3033,7 @@ class ConcordanceLemma extends i0.DataClass {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return ConcordanceLemma(
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
       lnsLemma: serializer.fromJson<String?>(json['lnsLemma']),
       lnsPartOfSpeech: serializer.fromJson<String?>(json['lnsPartOfSpeech']),
       lnsInflection: serializer.fromJson<String?>(json['lnsInflection']),
@@ -2951,6 +3044,7 @@ class ConcordanceLemma extends i0.DataClass {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
       'lnsLemma': serializer.toJson<String?>(lnsLemma),
       'lnsPartOfSpeech': serializer.toJson<String?>(lnsPartOfSpeech),
       'lnsInflection': serializer.toJson<String?>(lnsInflection),
@@ -2959,11 +3053,13 @@ class ConcordanceLemma extends i0.DataClass {
 
   i1.ConcordanceLemma copyWith({
     String? dictionaryRef,
+    String? sublemma,
     i0.Value<String?> lnsLemma = const i0.Value.absent(),
     i0.Value<String?> lnsPartOfSpeech = const i0.Value.absent(),
     i0.Value<String?> lnsInflection = const i0.Value.absent(),
   }) => i1.ConcordanceLemma(
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
     lnsLemma: lnsLemma.present ? lnsLemma.value : this.lnsLemma,
     lnsPartOfSpeech: lnsPartOfSpeech.present
         ? lnsPartOfSpeech.value
@@ -2976,6 +3072,7 @@ class ConcordanceLemma extends i0.DataClass {
   String toString() {
     return (StringBuffer('ConcordanceLemma(')
           ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma, ')
           ..write('lnsLemma: $lnsLemma, ')
           ..write('lnsPartOfSpeech: $lnsPartOfSpeech, ')
           ..write('lnsInflection: $lnsInflection')
@@ -2984,13 +3081,19 @@ class ConcordanceLemma extends i0.DataClass {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(dictionaryRef, lnsLemma, lnsPartOfSpeech, lnsInflection);
+  int get hashCode => Object.hash(
+    dictionaryRef,
+    sublemma,
+    lnsLemma,
+    lnsPartOfSpeech,
+    lnsInflection,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.ConcordanceLemma &&
           other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma &&
           other.lnsLemma == this.lnsLemma &&
           other.lnsPartOfSpeech == this.lnsPartOfSpeech &&
           other.lnsInflection == this.lnsInflection);
@@ -3006,6 +3109,7 @@ class ConcordanceLemmas
   @override
   List<i0.GeneratedColumn> get $columns => [
     dictionaryRef,
+    sublemma,
     lnsLemma,
     lnsPartOfSpeech,
     lnsInflection,
@@ -3017,7 +3121,7 @@ class ConcordanceLemmas
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "concordance.Lemmas" AS SELECT DISTINCT Details.dictionaryRef, Resolved.lemma AS lnsLemma, Resolved.partOfSpeech AS lnsPartOfSpeech, Resolved.inflection AS lnsInflection FROM ConcordanceDetails AS Details LEFT OUTER JOIN "dictionary.ResolvedLnsRefs" AS Resolved ON Resolved.dictionaryRef = Details.dictionaryRef',
+        'CREATE VIEW "concordance.Lemmas" AS SELECT DISTINCT Details.dictionaryRef, Details.sublemma, Resolved.lemma AS lnsLemma, Resolved.partOfSpeech AS lnsPartOfSpeech, Resolved.inflection AS lnsInflection FROM ConcordanceDetails AS Details LEFT OUTER JOIN "dictionary.ResolvedLnsRefs" AS Resolved ON Resolved.dictionaryRef = Details.dictionaryRef',
   };
   @override
   ConcordanceLemmas get asDslTable => this;
@@ -3028,6 +3132,10 @@ class ConcordanceLemmas
       dictionaryRef: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
+      )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
       )!,
       lnsLemma: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -3051,6 +3159,12 @@ class ConcordanceLemmas
         false,
         type: i0.DriftSqlType.string,
       );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> lnsLemma = i0.GeneratedColumn<String>(
     'lnsLemma',
     aliasedName,
@@ -3244,7 +3358,7 @@ class ConcordanceDrift extends i2.ModularAccessor {
     required int limit,
   }) {
     return customSelect(
-      'SELECT COALESCE(lnsLemma, dictionaryRef) AS label, COALESCE(GROUP_CONCAT(dictionaryRef), \'\') AS dictionaryRefs, MIN(lnsPartOfSpeech) AS partOfSpeech, MIN(lnsInflection) AS inflection FROM "concordance.Lemmas" GROUP BY COALESCE(lnsLemma, dictionaryRef) HAVING MAX(dictionaryRef LIKE ?1 || \'%\' OR lnsLemma LIKE ?1 || \'%\') ORDER BY COALESCE(lnsLemma, dictionaryRef) <> ?1, LENGTH(COALESCE(lnsLemma, dictionaryRef)), COALESCE(lnsLemma, dictionaryRef) LIMIT ?2',
+      'SELECT COALESCE(lnsLemma, dictionaryRef) AS entryRef, sublemma, COALESCE(GROUP_CONCAT(dictionaryRef), \'\') AS dictionaryRefs, MIN(lnsPartOfSpeech) AS partOfSpeech, MIN(lnsInflection) AS inflection FROM "concordance.Lemmas" GROUP BY COALESCE(lnsLemma, dictionaryRef), sublemma HAVING MAX(dictionaryRef LIKE ?1 || \'%\' OR lnsLemma LIKE ?1 || \'%\' OR sublemma LIKE ?1 || \'%\') ORDER BY IIF(sublemma = \'\', COALESCE(lnsLemma, dictionaryRef), sublemma) <> ?1, LENGTH(IIF(sublemma = \'\', COALESCE(lnsLemma, dictionaryRef), sublemma)), IIF(sublemma = \'\', COALESCE(lnsLemma, dictionaryRef), sublemma), COALESCE(lnsLemma, dictionaryRef) LIMIT ?2',
       variables: [i0.Variable<String>(prefix), i0.Variable<int>(limit)],
       readsFrom: {
         concordanceDetails,
@@ -3254,8 +3368,9 @@ class ConcordanceDrift extends i2.ModularAccessor {
       },
     ).map(
       (i0.QueryRow row) => i3.LemmaChoice.fromSql(
-        label: row.read<String>('label'),
+        entryRef: row.read<String>('entryRef'),
         dictionaryRefs: row.read<String>('dictionaryRefs'),
+        sublemma: row.read<String>('sublemma'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         inflection: row.readNullable<String>('inflection'),
       ),
@@ -3293,7 +3408,7 @@ class ConcordanceDrift extends i2.ModularAccessor {
     );
     $arrayStartIndex += isTitleValues.length;
     return customSelect(
-      'WITH WorkOrder AS (SELECT CAST(Work."key" AS INTEGER) AS position, Work.value AS workId FROM json_each(?1)AS Work), Criteria AS MATERIALIZED (SELECT CAST(Word."key" AS INTEGER) + 1 AS slot, IFNULL(json_extract(Word.value, \'\$.distance\'), 1000000) AS distance, CAST(json_extract(Word.value, \'\$.spellings\') AS TEXT) AS spellings, CAST(json_extract(Word.value, \'\$.macronSpellings\') AS TEXT) AS macronSpellings, CAST(json_extract(Word.value, \'\$.lemma\') AS TEXT) AS lemma, CAST(json_extract(Word.value, \'\$.partOfSpeech\') AS TEXT) AS partOfSpeech, CAST(json_extract(Word.value, \'\$.gramCase\') AS TEXT) AS gramCase, CAST(json_extract(Word.value, \'\$.number\') AS TEXT) AS number, CAST(json_extract(Word.value, \'\$.gender\') AS TEXT) AS gender, CAST(json_extract(Word.value, \'\$.declension\') AS TEXT) AS declension, CAST(json_extract(Word.value, \'\$.person\') AS TEXT) AS person, CAST(json_extract(Word.value, \'\$.verbForm\') AS TEXT) AS verbForm, CAST(json_extract(Word.value, \'\$.tense\') AS TEXT) AS tense, CAST(json_extract(Word.value, \'\$.voice\') AS TEXT) AS voice FROM json_each(?2)AS Word), Spellings AS MATERIALIZED (SELECT Criteria.slot, Spelling.value AS form FROM Criteria,json_each(Criteria.spellings)AS Spelling), MacronSpellings AS MATERIALIZED (SELECT Criteria.slot, Spelling.value AS form FROM Criteria,json_each(Criteria.macronSpellings)AS Spelling), LemmaRefs AS MATERIALIZED (SELECT Criteria.slot, Ref.value AS dictionaryRef FROM Criteria,json_each(Criteria.lemma)AS Ref), Analysed AS MATERIALIZED (SELECT Criteria.slot, Analyses.form, Analyses.item FROM Criteria CROSS JOIN "concordance.AnalysesWithOptionalInflections" AS Analyses WHERE Criteria.spellings IS NULL AND(Criteria.lemma IS NULL OR Analyses.dictionaryRef IN (SELECT dictionaryRef FROM LemmaRefs WHERE LemmaRefs.slot = Criteria.slot))AND(Criteria.partOfSpeech IS NULL OR Analyses.partOfSpeech = Criteria.partOfSpeech)AND(Criteria.gramCase IS NULL OR instr(\'/\' || Analyses.gramCase || \'/\', \'/\' || Criteria.gramCase || \'/\') > 0)AND(Criteria.number IS NULL OR instr(\'/\' || Analyses.number || \'/\', \'/\' || Criteria.number || \'/\') > 0)AND(Criteria.gender IS NULL OR instr(\'/\' || Analyses.gender || \'/\', \'/\' || Criteria.gender || \'/\') > 0)AND(Criteria.declension IS NULL OR Analyses.declension = Criteria.declension)AND(Criteria.person IS NULL OR instr(\'/\' || Analyses.person || \'/\', \'/\' || Criteria.person || \'/\') > 0)AND(Criteria.verbForm IS NULL OR instr(\'/\' || Analyses.verbForm || \'/\', \'/\' || Criteria.verbForm || \'/\') > 0)AND(Criteria.tense IS NULL OR instr(\'/\' || Analyses.tense || \'/\', \'/\' || Criteria.tense || \'/\') > 0)AND(Criteria.voice IS NULL OR instr(\'/\' || Analyses.voice || \'/\', \'/\' || Criteria.voice || \'/\') > 0)), Slot1Matches AS (SELECT WorkOrder.position, Spelled.workId, Spelled.idx FROM WorkOrder CROSS JOIN WorkContents AS Spelled WHERE Spelled.workId = WorkOrder.workId AND +Spelled.idx BETWEEN ?3 AND ?4 AND(Spelled.lookupForm IN (SELECT form FROM Spellings WHERE slot = 1) OR Spelled.enclitic IN (SELECT form FROM Spellings WHERE slot = 1) OR(Spelled.enclitic IS NOT NULL AND Spelled.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 1)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 1) OR Spelled.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 1) OR Spelled.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 1) OR(Spelled.enclitic IS NOT NULL AND Spelled.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 1)))UNION SELECT WorkOrder.position, Candidate.workId, Candidate.idx FROM WorkOrder CROSS JOIN Analysed CROSS JOIN ConcordanceCountableWordCandidateAnalyses AS Candidate WHERE Analysed.slot = 1 AND Candidate.form = Analysed.form AND Candidate.item = Analysed.item AND Candidate.workId = WorkOrder.workId AND Candidate.idx BETWEEN ?3 AND ?4), Hits AS (SELECT Slot1Matches.position, t1.workId, t1.sentenceIdx, t1.sourceReference AS reference, t1.isTitle, t1.idx AS firstIdx, COALESCE(t3.idx, t2.idx, t1.idx) AS lastIdx, t1.wordIdx AS firstWordIdx, COALESCE(t3.wordIdx, t2.wordIdx, t1.wordIdx) AS lastWordIdx, t1.idx AS slot1Idx, t2.idx AS slot2Idx, t3.idx AS slot3Idx FROM Slot1Matches CROSS JOIN WorkContents AS t1 LEFT OUTER JOIN WorkContents AS t2 ON EXISTS (SELECT * FROM Criteria WHERE slot = 2) AND t2.workId = t1.workId AND t2.sentenceIdx = t1.sentenceIdx AND t2.isTitle = t1.isTitle AND t2.wordIdx BETWEEN t1.wordIdx + 1 AND t1.wordIdx + (SELECT distance FROM Criteria WHERE slot = 2) AND t2.idx BETWEEN ?3 AND ?4 AND(t2.lookupForm IN (SELECT form FROM Spellings WHERE slot = 2) OR t2.enclitic IN (SELECT form FROM Spellings WHERE slot = 2) OR(t2.enclitic IS NOT NULL AND t2.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 2))OR EXISTS (SELECT * FROM ConcordanceCountableWordCandidateAnalyses AS Candidate WHERE Candidate.workId = t2.workId AND Candidate.idx = t2.idx AND (+Candidate.form, Candidate.item) IN (SELECT form, item FROM Analysed WHERE slot = 2)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 2) OR t2.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 2) OR t2.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 2) OR(t2.enclitic IS NOT NULL AND t2.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 2)))LEFT OUTER JOIN WorkContents AS t3 ON EXISTS (SELECT * FROM Criteria WHERE slot = 3) AND t3.workId = t2.workId AND t3.sentenceIdx = t2.sentenceIdx AND t3.isTitle = t2.isTitle AND t3.wordIdx BETWEEN t2.wordIdx + 1 AND t2.wordIdx + (SELECT distance FROM Criteria WHERE slot = 3) AND t3.idx BETWEEN ?3 AND ?4 AND(t3.lookupForm IN (SELECT form FROM Spellings WHERE slot = 3) OR t3.enclitic IN (SELECT form FROM Spellings WHERE slot = 3) OR(t3.enclitic IS NOT NULL AND t3.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 3))OR EXISTS (SELECT * FROM ConcordanceCountableWordCandidateAnalyses AS Candidate WHERE Candidate.workId = t3.workId AND Candidate.idx = t3.idx AND (+Candidate.form, Candidate.item) IN (SELECT form, item FROM Analysed WHERE slot = 3)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 3) OR t3.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 3) OR t3.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 3) OR(t3.enclitic IS NOT NULL AND t3.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 3)))WHERE t1.workId = Slot1Matches.workId AND t1.idx = Slot1Matches.idx AND t1.isTitle IN ($expandedisTitleValues) AND(t2.idx IS NOT NULL OR NOT EXISTS (SELECT * FROM Criteria WHERE slot = 2))AND(t3.idx IS NOT NULL OR NOT EXISTS (SELECT * FROM Criteria WHERE slot = 3))), Sorted AS (SELECT Hits.*, (SELECT LOWER(Neighbour.normForm) FROM WorkContents AS Neighbour WHERE ?5 <> 0 AND Neighbour.workId = Hits.workId AND Neighbour.sentenceIdx = Hits.sentenceIdx AND Neighbour.isTitle = Hits.isTitle AND Neighbour.wordIdx = ?5 + IIF(?5 > 0, Hits.lastWordIdx, Hits.firstWordIdx)) AS sortKey FROM Hits), Page AS (SELECT Sorted.*, COUNT(*)OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS totalHits FROM Sorted ORDER BY Sorted.sortKey IS NULL, Sorted.sortKey, Sorted.position, Sorted.firstIdx, Sorted.lastIdx, Sorted.slot2Idx, Sorted.slot3Idx LIMIT ?6 OFFSET ?7) SELECT Page.*, Context.idx AS contextIdx, Context.word AS contextWord, Context.macronizedWord AS contextMacronizedWord, Context.sourceReference AS contextReference FROM Page CROSS JOIN WorkContents AS Context WHERE Context.workId = Page.workId AND Context.idx BETWEEN Page.firstIdx - 12 AND Page.lastIdx + 12 ORDER BY Page.sortKey IS NULL, Page.sortKey, Page.position, Page.firstIdx, Page.lastIdx, Page.slot2Idx, Page.slot3Idx, Context.idx',
+      'WITH WorkOrder AS (SELECT CAST(Work."key" AS INTEGER) AS position, Work.value AS workId FROM json_each(?1)AS Work), Criteria AS MATERIALIZED (SELECT CAST(Word."key" AS INTEGER) + 1 AS slot, IFNULL(json_extract(Word.value, \'\$.distance\'), 1000000) AS distance, CAST(json_extract(Word.value, \'\$.spellings\') AS TEXT) AS spellings, CAST(json_extract(Word.value, \'\$.macronSpellings\') AS TEXT) AS macronSpellings, CAST(json_extract(Word.value, \'\$.dictionaryRefs\') AS TEXT) AS dictionaryRefs, CAST(json_extract(Word.value, \'\$.sublemma\') AS TEXT) AS sublemma, CAST(json_extract(Word.value, \'\$.partOfSpeech\') AS TEXT) AS partOfSpeech, CAST(json_extract(Word.value, \'\$.gramCase\') AS TEXT) AS gramCase, CAST(json_extract(Word.value, \'\$.number\') AS TEXT) AS number, CAST(json_extract(Word.value, \'\$.gender\') AS TEXT) AS gender, CAST(json_extract(Word.value, \'\$.declension\') AS TEXT) AS declension, CAST(json_extract(Word.value, \'\$.person\') AS TEXT) AS person, CAST(json_extract(Word.value, \'\$.verbForm\') AS TEXT) AS verbForm, CAST(json_extract(Word.value, \'\$.tense\') AS TEXT) AS tense, CAST(json_extract(Word.value, \'\$.voice\') AS TEXT) AS voice FROM json_each(?2)AS Word), Spellings AS MATERIALIZED (SELECT Criteria.slot, Spelling.value AS form FROM Criteria,json_each(Criteria.spellings)AS Spelling), MacronSpellings AS MATERIALIZED (SELECT Criteria.slot, Spelling.value AS form FROM Criteria,json_each(Criteria.macronSpellings)AS Spelling), LemmaRefs AS MATERIALIZED (SELECT Criteria.slot, Ref.value AS dictionaryRef FROM Criteria,json_each(Criteria.dictionaryRefs)AS Ref), Analysed AS MATERIALIZED (SELECT Criteria.slot, Analyses.form, Analyses.item FROM Criteria CROSS JOIN "concordance.AnalysesWithOptionalInflections" AS Analyses WHERE Criteria.spellings IS NULL AND(Criteria.dictionaryRefs IS NULL OR(Analyses.dictionaryRef IN (SELECT dictionaryRef FROM LemmaRefs WHERE LemmaRefs.slot = Criteria.slot) AND Analyses.sublemma = Criteria.sublemma))AND(Criteria.partOfSpeech IS NULL OR Analyses.partOfSpeech = Criteria.partOfSpeech)AND(Criteria.gramCase IS NULL OR instr(\'/\' || Analyses.gramCase || \'/\', \'/\' || Criteria.gramCase || \'/\') > 0)AND(Criteria.number IS NULL OR instr(\'/\' || Analyses.number || \'/\', \'/\' || Criteria.number || \'/\') > 0)AND(Criteria.gender IS NULL OR instr(\'/\' || Analyses.gender || \'/\', \'/\' || Criteria.gender || \'/\') > 0)AND(Criteria.declension IS NULL OR Analyses.declension = Criteria.declension)AND(Criteria.person IS NULL OR instr(\'/\' || Analyses.person || \'/\', \'/\' || Criteria.person || \'/\') > 0)AND(Criteria.verbForm IS NULL OR instr(\'/\' || Analyses.verbForm || \'/\', \'/\' || Criteria.verbForm || \'/\') > 0)AND(Criteria.tense IS NULL OR instr(\'/\' || Analyses.tense || \'/\', \'/\' || Criteria.tense || \'/\') > 0)AND(Criteria.voice IS NULL OR instr(\'/\' || Analyses.voice || \'/\', \'/\' || Criteria.voice || \'/\') > 0)), Slot1Matches AS (SELECT WorkOrder.position, Spelled.workId, Spelled.idx FROM WorkOrder CROSS JOIN WorkContents AS Spelled WHERE Spelled.workId = WorkOrder.workId AND +Spelled.idx BETWEEN ?3 AND ?4 AND(Spelled.lookupForm IN (SELECT form FROM Spellings WHERE slot = 1) OR Spelled.enclitic IN (SELECT form FROM Spellings WHERE slot = 1) OR(Spelled.enclitic IS NOT NULL AND Spelled.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 1)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 1) OR Spelled.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 1) OR Spelled.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 1) OR(Spelled.enclitic IS NOT NULL AND Spelled.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 1)))UNION SELECT WorkOrder.position, Candidate.workId, Candidate.idx FROM WorkOrder CROSS JOIN Analysed CROSS JOIN ConcordanceCountableWordCandidateAnalyses AS Candidate WHERE Analysed.slot = 1 AND Candidate.form = Analysed.form AND Candidate.item = Analysed.item AND Candidate.workId = WorkOrder.workId AND Candidate.idx BETWEEN ?3 AND ?4), Hits AS (SELECT Slot1Matches.position, t1.workId, t1.sentenceIdx, t1.sourceReference AS reference, t1.isTitle, t1.idx AS firstIdx, COALESCE(t3.idx, t2.idx, t1.idx) AS lastIdx, t1.wordIdx AS firstWordIdx, COALESCE(t3.wordIdx, t2.wordIdx, t1.wordIdx) AS lastWordIdx, t1.idx AS slot1Idx, t2.idx AS slot2Idx, t3.idx AS slot3Idx FROM Slot1Matches CROSS JOIN WorkContents AS t1 LEFT OUTER JOIN WorkContents AS t2 ON EXISTS (SELECT * FROM Criteria WHERE slot = 2) AND t2.workId = t1.workId AND t2.sentenceIdx = t1.sentenceIdx AND t2.isTitle = t1.isTitle AND t2.wordIdx BETWEEN t1.wordIdx + 1 AND t1.wordIdx + (SELECT distance FROM Criteria WHERE slot = 2) AND t2.idx BETWEEN ?3 AND ?4 AND(t2.lookupForm IN (SELECT form FROM Spellings WHERE slot = 2) OR t2.enclitic IN (SELECT form FROM Spellings WHERE slot = 2) OR(t2.enclitic IS NOT NULL AND t2.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 2))OR EXISTS (SELECT * FROM ConcordanceCountableWordCandidateAnalyses AS Candidate WHERE Candidate.workId = t2.workId AND Candidate.idx = t2.idx AND (+Candidate.form, Candidate.item) IN (SELECT form, item FROM Analysed WHERE slot = 2)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 2) OR t2.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 2) OR t2.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 2) OR(t2.enclitic IS NOT NULL AND t2.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 2)))LEFT OUTER JOIN WorkContents AS t3 ON EXISTS (SELECT * FROM Criteria WHERE slot = 3) AND t3.workId = t2.workId AND t3.sentenceIdx = t2.sentenceIdx AND t3.isTitle = t2.isTitle AND t3.wordIdx BETWEEN t2.wordIdx + 1 AND t2.wordIdx + (SELECT distance FROM Criteria WHERE slot = 3) AND t3.idx BETWEEN ?3 AND ?4 AND(t3.lookupForm IN (SELECT form FROM Spellings WHERE slot = 3) OR t3.enclitic IN (SELECT form FROM Spellings WHERE slot = 3) OR(t3.enclitic IS NOT NULL AND t3.baseNormForm IN (SELECT form FROM Spellings WHERE slot = 3))OR EXISTS (SELECT * FROM ConcordanceCountableWordCandidateAnalyses AS Candidate WHERE Candidate.workId = t3.workId AND Candidate.idx = t3.idx AND (+Candidate.form, Candidate.item) IN (SELECT form, item FROM Analysed WHERE slot = 3)))AND(NOT EXISTS (SELECT * FROM MacronSpellings WHERE slot = 3) OR t3.macronLookupForm IN (SELECT form FROM MacronSpellings WHERE slot = 3) OR t3.enclitic IN (SELECT form FROM MacronSpellings WHERE slot = 3) OR(t3.enclitic IS NOT NULL AND t3.macronBaseNormForm IN (SELECT form FROM MacronSpellings WHERE slot = 3)))WHERE t1.workId = Slot1Matches.workId AND t1.idx = Slot1Matches.idx AND t1.isTitle IN ($expandedisTitleValues) AND(t2.idx IS NOT NULL OR NOT EXISTS (SELECT * FROM Criteria WHERE slot = 2))AND(t3.idx IS NOT NULL OR NOT EXISTS (SELECT * FROM Criteria WHERE slot = 3))), Sorted AS (SELECT Hits.*, (SELECT LOWER(Neighbour.normForm) FROM WorkContents AS Neighbour WHERE ?5 <> 0 AND Neighbour.workId = Hits.workId AND Neighbour.sentenceIdx = Hits.sentenceIdx AND Neighbour.isTitle = Hits.isTitle AND Neighbour.wordIdx = ?5 + IIF(?5 > 0, Hits.lastWordIdx, Hits.firstWordIdx)) AS sortKey FROM Hits), Page AS (SELECT Sorted.*, COUNT(*)OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS totalHits FROM Sorted ORDER BY Sorted.sortKey IS NULL, Sorted.sortKey, Sorted.position, Sorted.firstIdx, Sorted.lastIdx, Sorted.slot2Idx, Sorted.slot3Idx LIMIT ?6 OFFSET ?7) SELECT Page.*, Context.idx AS contextIdx, Context.word AS contextWord, Context.macronizedWord AS contextMacronizedWord, Context.sourceReference AS contextReference FROM Page CROSS JOIN WorkContents AS Context WHERE Context.workId = Page.workId AND Context.idx BETWEEN Page.firstIdx - 12 AND Page.lastIdx + 12 ORDER BY Page.sortKey IS NULL, Page.sortKey, Page.position, Page.firstIdx, Page.lastIdx, Page.slot2Idx, Page.slot3Idx, Context.idx',
       variables: [
         i0.Variable<String>(works),
         i0.Variable<String>(phrase),

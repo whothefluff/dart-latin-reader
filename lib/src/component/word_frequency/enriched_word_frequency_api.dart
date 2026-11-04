@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../logger.dart';
 import '../../external/provider_ext.dart';
+import 'lemma.dart';
 import 'text_coverage_api.dart' show TextCoverage, textCoverageProvider;
 import 'word_frequency_api.dart';
 
@@ -37,9 +38,8 @@ Future<EnrichedFrequencyReport> enrichedFrequencyReport(
         (r) => EnrichedFrequencyRow(
           base: r,
           possibleLemmas: switch (r) {
-            // for lemmas, displayForm *is* the dictionaryRef
-            LemmaFrequencyRow() => [r.displayForm],
-            FormFrequencyRow(:final possibleLemmas) => possibleLemmas?.split(','),
+            LemmaFrequencyRow(:final lemma) => Lemmas([lemma]),
+            FormFrequencyRow(:final possibleLemmas) => possibleLemmas,
           },
         ),
       ),
@@ -62,19 +62,16 @@ extension type const EnrichedFrequencyRows._(UnmodifiableListView<EnrichedFreque
 class EnrichedFrequencyRow {
   const EnrichedFrequencyRow({
     required this.base,
-    this.possibleLemmas,
+    required this.possibleLemmas,
   });
 
   final FrequencyRow base;
-  final List<String>? possibleLemmas;
+  final Lemmas possibleLemmas;
 
-  String get displayForm => base.displayForm;
-  String get lookupForm => base.lookupForm;
   int get occurrences => base.occurrences;
-  String? get lemmaDisplay => possibleLemmas?.join(', ');
 
   @override
-  String toString() => 'EnrichedFrequencyRow{form: $displayForm, lemmas: $lemmaDisplay}';
+  String toString() => 'EnrichedFrequencyRow{base: $base, lemmas: $possibleLemmas}';
 
   @override
   bool operator ==(Object other) =>
@@ -110,8 +107,7 @@ class EnrichedFrequencyReport {
   int get offset => base.offset;
 
   /// Distinct candidate lemmas among [rows]
-  int get representedLemmas =>
-      rows.expand((r) => r.possibleLemmas ?? const <String>[]).toSet().length;
+  int get representedLemmas => rows.expand((r) => r.possibleLemmas).toSet().length;
 
   @override
   String toString() =>

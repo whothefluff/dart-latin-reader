@@ -56,6 +56,7 @@ class EnrichedAnalysis {
   int get cnt => base.cnt;
   String get macronizedForm => base.macronizedForm;
   String get dictionaryRef => base.dictionaryRef;
+  String get sublemma => base.sublemma;
   String get partOfSpeech => base.partOfSpeech;
   String get stem => base.stem;
   String? get suffix => base.suffix;
