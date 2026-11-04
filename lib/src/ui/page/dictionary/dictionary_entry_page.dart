@@ -28,7 +28,7 @@ class DictionaryEntryPage extends ConsumerWidget {
   @override
   Widget build(context, ref) => SafeBodyScaffold(
     appBar: AppBar(
-      title: Text(lemmaText(lemma)),
+      title: Text(entryRefText(lemma)),
       actions: [
         IconButton(
           tooltip: 'Dictionary settings',

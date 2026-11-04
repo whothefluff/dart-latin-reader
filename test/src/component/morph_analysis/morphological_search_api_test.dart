@@ -45,8 +45,8 @@ Future<AppDb> _roses() async {
   final db = _EmptyDb();
   addTearDown(db.close);
   await db.customStatement(
-    "INSERT INTO MorphologicalDetails VALUES ( 'rosa', 0, 'rosa' ), ( 'rosae', 0, 'rosa' ), "
-    "( 'rosarum', 0, 'rosa' )",
+    "INSERT INTO MorphologicalDetails VALUES ( 'rosa', 0, 'rosa', '' ), "
+    "( 'rosae', 0, 'rosa', '' ), ( 'rosarum', 0, 'rosa', '' )",
   );
   await db.customStatement(
     '''
@@ -68,7 +68,8 @@ Future<AppDb> _numeralAndIrregular() async {
   final db = _EmptyDb();
   addTearDown(db.close);
   await db.customStatement(
-    "INSERT INTO MorphologicalDetails VALUES ( 'tres', 0, 'tres' ), ( 'nequam', 0, 'nequam' )",
+    "INSERT INTO MorphologicalDetails VALUES ( 'tres', 0, 'tres', '' ), "
+    "( 'nequam', 0, 'nequam', '' )",
   );
   await db.customStatement(
     '''
@@ -89,8 +90,8 @@ Future<AppDb> _servusJusAndIam() async {
   final db = _EmptyDb();
   addTearDown(db.close);
   await db.customStatement(
-    "INSERT INTO MorphologicalDetails VALUES ( 'servus', 0, 'servus' ), ( 'jus', 0, 'jus1' ), "
-    "( 'iam', 0, 'jam' )",
+    "INSERT INTO MorphologicalDetails VALUES ( 'servus', 0, 'servus', '' ), "
+    "( 'jus', 0, 'jus1', '' ), ( 'iam', 0, 'jam', '' )",
   );
   await db.customStatement(
     '''

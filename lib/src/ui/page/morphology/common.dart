@@ -16,7 +16,8 @@ import '../../widget/show_loading.dart';
 
 // Called from limited and controlled places
 // ignore: avoid_annotating_with_dynamic
-({String title, String dictRef, String? pos, String? add}) Function(dynamic r) consolidatedForm() =>
+({String title, String dictRef, String sublemma, String? pos, String? add}) Function(dynamic r)
+consolidatedForm() =>
     (r) => (
       // Same
       // ignore: avoid_dynamic_calls
@@ -24,6 +25,9 @@ import '../../widget/show_loading.dart';
       // Same
       // ignore: avoid_dynamic_calls
       dictRef: r.dictionaryRef,
+      // Same
+      // ignore: avoid_dynamic_calls
+      sublemma: r.sublemma,
       // Same
       // ignore: avoid_dynamic_calls
       pos: r.partOfSpeech,
@@ -80,7 +84,7 @@ class _MorphDataSlidesState extends State<_MorphDataSlides> with TickerProviderS
   //
   /// Each entry will correspond to a slide
   // dart format off
-  late final Map<({String? add, String dictRef, String? pos, String title}),
+  late final Map<({String? add, String dictRef, String? pos, String sublemma, String title}),
                   List<EnrichedAnalysis>>
       _groupedAnalyses;
   // dart format on
@@ -226,7 +230,7 @@ class _MorphEntryCard extends ConsumerWidget {
       crossAxisAlignment: _cardContentAlignment,
       children: [
         ..._styledGroup(textStyle, [
-          Text(_lexicalForm(firstAnalysis)),
+          Text(_lemmaHeading(firstAnalysis)),
           Text(firstAnalysis.partOfSpeech),
           ?_additional(firstAnalysis),
         ]),
@@ -263,8 +267,12 @@ class _MorphEntryCard extends ConsumerWidget {
     },
   );
 
-  String _lexicalForm(EnrichedAnalysis analysis) =>
-      '${lemmaText(analysis.dictionaryRef)}${analysis.lnsInflection != null ? ', ${analysis.lnsInflection}' : ''}';
+  /// Returns the lemma's label and, for the entry's own lemma, its L&S inflection. A sublemma
+  /// doesn't take the entry's inflection (Ciceronianus isn't "ōnis, m.").
+  String _lemmaHeading(EnrichedAnalysis analysis) => [
+    lemmaLabel(analysis.dictionaryRef, analysis.sublemma),
+    if (analysis.sublemma.isEmpty) ?analysis.lnsInflection,
+  ].join(', ');
 
   Text? _additional(EnrichedAnalysis analysis) =>
       analysis.additional != null ? Text(analysis.additional!) : null;
@@ -355,7 +363,7 @@ class _GroupedAnalysisData {
   ];
 
   void _computeGroupedProperties() {
-    // The card already groups analyses by displayed form, dictionary reference,
+    // The card already groups analyses by displayed form, dictionary reference, sublemma,
     // part of speech, and additional information. Compare the remaining displayed
     // properties to show identical readings only once.
     const equality = MapEquality<String, String>();

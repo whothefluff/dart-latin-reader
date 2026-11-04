@@ -98,7 +98,7 @@ Future<void> _search(WidgetTester tester, String text) async {
 }
 
 /// Row text, including the trailing space for the empty inflection.
-String _title(String lemma) => '${lemmaText(lemma)} ';
+String _title(String lemma) => '${entryRefText(lemma)} ';
 
 Finder _row(String lemma) => find.descendant(
   of: find.byType(ListView),

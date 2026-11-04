@@ -185,6 +185,7 @@ class Analysis {
     required this.cnt,
     required this.macronizedForm,
     required this.dictionaryRef,
+    required this.sublemma,
     required this.partOfSpeech,
     required this.stem,
     this.suffix,
@@ -205,6 +206,9 @@ class Analysis {
   final int cnt;
   final String macronizedForm;
   final String dictionaryRef;
+
+  /// The sublemma, or '' for the entry's own lemma.
+  final String sublemma;
   final String partOfSpeech;
   final String stem;
   final String? suffix;

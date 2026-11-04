@@ -55,10 +55,16 @@ const List<String> _grammarOrder = [
   'active', 'passive',
 ];
 
-/// What the dictionary says of [lemma], to tell homographs apart
+/// Returns the part of speech and inflection that Lewis & Short gives [lemma]'s entry, to tell
+/// homographs apart, or "Not in Lewis & Short" when it gives neither. A sublemma gets none
+/// (Ciceronianus isn't "ōnis, m.").
 String lemmaDetails(LemmaChoice lemma) {
   final details = [lemma.partOfSpeech, lemma.inflection].nonNulls.join(' · ');
-  return details.isEmpty ? 'Not in Lewis & Short' : details;
+  return switch (lemma.sublemma) {
+    '' when details.isEmpty => 'Not in Lewis & Short',
+    '' => details,
+    _ => '',
+  };
 }
 
 /// "All authors & works", or "2 sources, 7 works"
@@ -95,10 +101,11 @@ String describePhrase(ConcordanceQuery query) => query.slots
       final distance = i == 0 ? null : _distanceText(query.distanceBefore(i));
       return switch (slot) {
         final FormCriterion form => '“${form.text.trim()}”${_notes(_formNotes(form, distance))}',
-        LemmaCriterion(:final lemma) => '${lemmaText(lemma.label)}${_notes(['lemma', ?distance])}',
+        LemmaCriterion(:final lemma) =>
+          '${lemmaLabel(lemma.entryRef, lemma.sublemma)}${_notes(['lemma', ?distance])}',
         GrammarCriterion(:final grammar, :final lemma) =>
           '${_grammarText(grammar)}'
-              '${lemma == null ? '' : ' of ${lemmaText(lemma.label)}'}'
+              '${lemma == null ? '' : ' of ${lemmaLabel(lemma.entryRef, lemma.sublemma)}'}'
               '${_notes(['grammar', ?distance])}',
       };
     })

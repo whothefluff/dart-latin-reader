@@ -9,6 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../logger.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'lemma.dart';
 import 'resolved_freq_morph_form_api.dart' show WorkIds;
 import 'text_coverage_api.dart' show CoverageBasis;
 import 'word_frequency.drift.dart';
@@ -237,68 +238,63 @@ extension type const FrequencyRows._(UnmodifiableListView<FrequencyRow> unm)
 
 @immutable
 sealed class FrequencyRow {
-  const FrequencyRow({
-    required this.displayForm,
-    required this.lookupForm,
-  });
-
-  final String displayForm;
-  final String lookupForm;
+  const FrequencyRow();
 
   /// The form's occurrence count, or the lemma's possible occurrence count
   int get occurrences;
-
-  @override
-  String toString() => 'FrequencyRow{form: $displayForm, occurrences: $occurrences}';
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is FrequencyRow &&
-          other.runtimeType == runtimeType &&
-          other.displayForm == displayForm &&
-          other.lookupForm == lookupForm);
-
-  @override
-  int get hashCode => Object.hash(runtimeType, displayForm, lookupForm);
   //
 }
 
 /// A word form and its occurrence count in the selected works
 final class FormFrequencyRow extends FrequencyRow {
   const FormFrequencyRow({
-    required super.displayForm,
-    required super.lookupForm,
+    required this.displayForm,
+    required this.lookupForm,
     required this.occurrences,
-    this.possibleLemmas,
+    required this.possibleLemmas,
   });
 
-  const FormFrequencyRow.fromFormSql({
+  FormFrequencyRow.fromFormSql({
     required String form,
     required int? occurrences,
-    String? possibleLemmas,
+    required String possibleLemmas,
   }) : this(
          displayForm: form,
          lookupForm: form,
          occurrences: occurrences ?? 0,
-         possibleLemmas: possibleLemmas,
+         possibleLemmas: Lemmas.fromSql(possibleLemmas),
        );
 
-  const FormFrequencyRow.fromMacronFormSql({
+  FormFrequencyRow.fromMacronFormSql({
     required String macronForm,
     required String? form,
     required int? occurrences,
-    String? possibleLemmas,
+    required String possibleLemmas,
   }) : this(
          displayForm: macronForm,
          lookupForm: form ?? '',
          occurrences: occurrences ?? 0,
-         possibleLemmas: possibleLemmas,
+         possibleLemmas: Lemmas.fromSql(possibleLemmas),
        );
 
+  final String displayForm;
+  final String lookupForm;
   @override
   final int occurrences;
-  final String? possibleLemmas;
+  final Lemmas possibleLemmas;
+
+  @override
+  String toString() => 'FormFrequencyRow{form: $displayForm, occurrences: $occurrences}';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FormFrequencyRow &&
+          other.displayForm == displayForm &&
+          other.lookupForm == lookupForm);
+
+  @override
+  int get hashCode => Object.hash(displayForm, lookupForm);
   //
 }
 
@@ -306,11 +302,14 @@ final class FormFrequencyRow extends FrequencyRow {
 final class LemmaFrequencyRow extends FrequencyRow {
   const LemmaFrequencyRow.fromLemmaSql({
     required String dictionaryRef,
+    required String sublemma,
     required int? possibleOccurrences,
     required int? singleCandidateOccurrences,
-  }) : possibleOccurrences = possibleOccurrences ?? 0,
-       singleCandidateOccurrences = singleCandidateOccurrences ?? 0,
-       super(displayForm: dictionaryRef, lookupForm: dictionaryRef);
+  }) : lemma = (dictionaryRef: dictionaryRef, sublemma: sublemma),
+       possibleOccurrences = possibleOccurrences ?? 0,
+       singleCandidateOccurrences = singleCandidateOccurrences ?? 0;
+
+  final Lemma lemma;
 
   /// Occurrences that could belong to this lemma.
   /// The same occurrence can count towards several lemmas.
@@ -321,6 +320,16 @@ final class LemmaFrequencyRow extends FrequencyRow {
 
   @override
   int get occurrences => possibleOccurrences;
+
+  @override
+  String toString() => 'LemmaFrequencyRow{lemma: $lemma, occurrences: $occurrences}';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is LemmaFrequencyRow && other.lemma == lemma);
+
+  @override
+  int get hashCode => lemma.hashCode;
   //
 }
 

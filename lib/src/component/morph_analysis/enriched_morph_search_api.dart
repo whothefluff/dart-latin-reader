@@ -60,6 +60,7 @@ class EnrichedResult {
   /// Contains the value as it is found in the morphological analysis (which
   /// does not match the dictionary perfectly)
   String get dictionaryRef => base.dictionaryRef;
+  String get sublemma => base.sublemma;
   String? get partOfSpeech => base.partOfSpeech;
   String? get additional => base.additional;
 

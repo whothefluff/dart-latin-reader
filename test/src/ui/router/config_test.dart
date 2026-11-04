@@ -13,19 +13,31 @@ void main() {
     final query = ConcordanceQuery(
       slots: [
         const FormCriterion('rosā', exactCase: true, exactLetters: true),
-        LemmaCriterion(LemmaChoice(label: 'sum1', dictionaryRefs: const ['sum1', 'esum'])),
+        LemmaCriterion(
+          LemmaChoice(entryRef: 'sum1', dictionaryRefs: const ['sum1', 'esum'], sublemma: ''),
+        ),
         GrammarCriterion(
           GrammarFilter(const {
             GrammarFeature.partOfSpeech: 'adjective',
             GrammarFeature.declension: '1st & 2nd',
           }),
+          lemma: LemmaChoice(
+            entryRef: 'Dardanus1',
+            dictionaryRefs: const ['Dardanus1'],
+            sublemma: 'Dardanius',
+          ),
         ),
       ],
       distances: const [null, 3],
       matchMacrons: true,
     );
     final hits = Uri.parse(ConcordanceHitsRoute(search: query.toJson(), offset: 50).location);
-    expect(ConcordanceQuery.fromJson(hits.queryParameters['search']!), query);
+    final read = ConcordanceQuery.fromJson(hits.queryParameters['search']!);
+    expect(read, query);
+    expect(
+      read.slots.last,
+      isA<GrammarCriterion>().having((grammar) => grammar.lemma?.sublemma, 'sublemma', 'Dardanius'),
+    );
     expect(hits.queryParameters['offset'], '50');
   });
 }

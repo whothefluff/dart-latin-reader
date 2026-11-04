@@ -19,6 +19,7 @@ import '../../../component/settings/frequency_settings_api.dart'
 import '../../../component/word_frequency/active_frequency_filter_api.dart';
 import '../../../component/word_frequency/enriched_word_frequency_api.dart';
 import '../../../component/word_frequency/frequency_offset_api.dart';
+import '../../../component/word_frequency/lemma.dart';
 import '../../../component/word_frequency/library_selection_api.dart';
 import '../../../component/word_frequency/resolved_freq_morph_form_api.dart';
 import '../../../component/word_frequency/text_coverage_api.dart' show TextCoverage;
@@ -870,7 +871,7 @@ class _TableRow extends StatelessWidget {
       fontFeatures: const [FontFeature.tabularFigures()],
     );
     final count = formats.count;
-    final lemmas = row.possibleLemmas?.map(lemmaText).join(', ');
+    final lemmas = row.possibleLemmas.map(_labelOf).join(', ');
     final base = row.base;
     final anyCandidate = formats.coverage(coverage, row.occurrences);
     final certainCoverage = this.certainCoverage;
@@ -880,7 +881,7 @@ class _TableRow extends StatelessWidget {
     final line = _TableLine(
       layout: layout,
       rank: Text('${count.format(rank)}.', style: numberStyle?.copyWith(color: muted)),
-      main: layout.lemmaUnderForm && lemmas != null
+      main: layout.lemmaUnderForm && lemmas.isNotEmpty
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -890,7 +891,10 @@ class _TableRow extends StatelessWidget {
             )
           : Text(_rowLabel(row), style: textTheme.bodyLarge),
       lemma: layout.lemmaColumn
-          ? Text(lemmas ?? '—', style: textTheme.bodyMedium?.copyWith(color: muted))
+          ? Text(
+              lemmas.isEmpty ? '—' : lemmas,
+              style: textTheme.bodyMedium?.copyWith(color: muted),
+            )
           : null,
       coverage: Text(
         layout.certainInCoverageColumn && certain != null ? certain : anyCandidate,
@@ -1085,11 +1089,14 @@ class _TableLine extends StatelessWidget {
 
 enum _RowDestination { morphology, dictionary, concordance }
 
-/// The row's form, or its lemma when grouping by lemma (displayForm is then a dictionaryRef)
+/// Returns the row's form, or its lemma's label when grouping by lemma.
 String _rowLabel(EnrichedFrequencyRow row) => switch (row.base) {
-  LemmaFrequencyRow(:final displayForm) => lemmaText(displayForm),
+  LemmaFrequencyRow(:final lemma) => _labelOf(lemma),
   FormFrequencyRow(:final displayForm) => displayForm,
 };
+
+/// Returns how the report names [lemma].
+String _labelOf(Lemma lemma) => lemmaLabel(lemma.dictionaryRef, lemma.sublemma);
 
 Future<void> _onRowTapped(
   BuildContext context,
@@ -1116,15 +1123,15 @@ Future<void> _onRowTapped(
     );
   }
   if (choice != null && context.mounted) {
-    switch ((filter.groupByLemma, choice)) {
-      case (true, _RowDestination.morphology || _RowDestination.dictionary):
-        await _goToDictionaryForLemma(context, ref, row.displayForm);
-      case (false, _RowDestination.morphology):
-        await _goToMorphologyForForm(context, ref, filter, row);
-      case (false, _RowDestination.dictionary):
-        await _goToDictionaryForForm(context, ref, row);
+    switch ((row.base, choice)) {
       case (_, _RowDestination.concordance):
         await _goToConcordance(context, ref, filter, row);
+      case (LemmaFrequencyRow(:final lemma), _):
+        await _goToDictionaryForLemma(context, ref, lemma.dictionaryRef);
+      case (final FormFrequencyRow form, _RowDestination.morphology):
+        await _goToMorphologyForForm(context, ref, filter, form);
+      case (FormFrequencyRow(), _RowDestination.dictionary):
+        await _goToDictionaryForForm(context, ref, row);
     }
   }
 }
@@ -1158,11 +1165,11 @@ Future<_RowDestination?> _askDestination(
   ),
 );
 
-/// Searches the concordance for the row, in the works of the report
+/// Searches the concordance for the row, in the works of the report.
 ///
-/// A form is searched exactly as counted (its capitalization, and its macrons
-/// when the report shows them, a lemma by its own dictionaryRef), so the hits
-/// are the occurrences the row counts
+/// A form is searched with its capitalization and, when the report shows them, its macrons,
+/// and a lemma by its own dictionaryRef and sublemma. So the hits are the occurrences that the
+/// row counts.
 Future<void> _goToConcordance(
   BuildContext context,
   WidgetRef ref,
@@ -1170,8 +1177,8 @@ Future<void> _goToConcordance(
   EnrichedFrequencyRow row,
 ) async {
   final criterion = switch (row.base) {
-    LemmaFrequencyRow(displayForm: final dictionaryRef) => LemmaCriterion(
-      await _lemmaChoice(ref, dictionaryRef),
+    LemmaFrequencyRow(:final lemma) => LemmaCriterion(
+      await _lemmaChoice(ref, lemma),
     ),
     FormFrequencyRow(:final displayForm, :final lookupForm) => FormCriterion(
       filter.showMacrons ? displayForm : lookupForm,
@@ -1189,13 +1196,17 @@ Future<void> _goToConcordance(
   }
 }
 
-/// [dictionaryRef] alone, labelled by its Lewis & Short entry when it has one
-Future<LemmaChoice> _lemmaChoice(WidgetRef ref, String dictionaryRef) async {
-  final resolved = await ref.read(lnsBasicInfoProvider(PossibleLemmas([dictionaryRef])).future);
-  final entry = resolved[dictionaryRef];
+/// Returns the choice of [lemma] alone, by its own dictionaryRef and sublemma, under its
+/// Lewis & Short entry key or, without one, the dictionaryRef.
+Future<LemmaChoice> _lemmaChoice(WidgetRef ref, Lemma lemma) async {
+  final resolved = await ref.read(
+    lnsBasicInfoProvider(DictionaryRefs([lemma.dictionaryRef])).future,
+  );
+  final entry = resolved[lemma.dictionaryRef];
   return LemmaChoice(
-    label: entry?.lemma ?? dictionaryRef,
-    dictionaryRefs: [dictionaryRef],
+    entryRef: entry?.lemma ?? lemma.dictionaryRef,
+    dictionaryRefs: [lemma.dictionaryRef],
+    sublemma: lemma.sublemma,
     partOfSpeech: entry?.partOfSpeech,
     inflection: entry?.inflection,
   );
@@ -1205,27 +1216,27 @@ Future<void> _goToMorphologyForForm(
   BuildContext context,
   WidgetRef ref,
   FrequencyFilter filter,
-  EnrichedFrequencyRow row,
+  FormFrequencyRow form,
 ) async {
   final candidates = await ref.read(
     resolvedFreqMorphFormsProvider(
       filter.workIds,
-      row.lookupForm,
-      macronForm: filter.showMacrons ? row.displayForm : null,
+      form.lookupForm,
+      macronForm: filter.showMacrons ? form.displayForm : null,
     ).future,
   );
   if (context.mounted) {
     if (candidates.isEmpty) {
       _notFound(context, message: 'No morphology is available for this form.');
     } else {
-      final lemmas = candidates.map((c) => c.dictionaryRef).toSet().toList()..sort();
-      final chosen = await _pickLemma(context, lemmas);
+      final lemmas = candidates.map((c) => c.lemma).toSet().sorted(_byDictionaryRefThenSublemma);
+      final chosen = await _pickLemma(context, lemmas, _labelOf);
       if (chosen != null && context.mounted) {
         /// Opens the morphological analyses identified by the supplied candidates
         await _openFrequencyMorphology(
           context,
           ref,
-          candidates.where((c) => c.dictionaryRef == chosen),
+          candidates.where((c) => c.lemma == chosen),
         );
       }
     }
@@ -1240,14 +1251,16 @@ Future<void> _goToMorphologyForLemma(
   BuildContext context,
   WidgetRef ref,
   FrequencyFilter filter,
-  String dictionaryRef,
+  Lemma lemma,
 ) async {
   final candidates = await ref.read(
-    resolvedFreqMorphFormsOfLemmaProvider(WorkIds(filter.workIds), dictionaryRef).future,
+    resolvedFreqMorphFormsOfLemmaProvider(WorkIds(filter.workIds), lemma).future,
   );
   if (context.mounted) {
     // Lemmas are counted under every form they appear as, so we need this variable
-    final citation = dictionaryRef.replaceAll(RegExp(r'\d+$'), '');
+    final citation = lemma.sublemma.isEmpty
+        ? lemma.dictionaryRef.replaceAll(RegExp(r'\d+$'), '')
+        : lemma.sublemma;
     final own = candidates.where((c) => c.morphForm.toLowerCase() == citation.toLowerCase());
     if (own.isEmpty) {
       _notFound(context, message: 'No morphology is available for $citation.');
@@ -1290,18 +1303,18 @@ Future<void> _goToDictionaryForForm(
   WidgetRef ref,
   EnrichedFrequencyRow row,
 ) async {
-  final refs = row.possibleLemmas ?? const <String>[];
+  final refs = row.possibleLemmas.map((lemma) => lemma.dictionaryRef).toSet();
   if (refs.isEmpty) {
     _notFound(context);
   } else {
-    final resolved = await ref.read(lnsBasicInfoProvider(PossibleLemmas(refs.toSet())).future);
+    final resolved = await ref.read(lnsBasicInfoProvider(DictionaryRefs(refs)).future);
     if (context.mounted) {
-      final lemmas = resolved.values.map((e) => e.lemma).toSet().toList()..sort();
-      if (lemmas.isEmpty) {
+      final entryKeys = resolved.values.map((e) => e.lemma).toSet().toList()..sort();
+      if (entryKeys.isEmpty) {
         _notFound(context);
       } else {
         final lns = await ref.read(lewisAndShortDictionaryProvider.future);
-        final chosen = context.mounted ? await _pickLemma(context, lemmas) : null;
+        final chosen = context.mounted ? await _pickLemma(context, entryKeys, entryRefText) : null;
         if (chosen != null && context.mounted) {
           await DictionaryEntryRoute(lns.id, chosen).push<void>(context);
         }
@@ -1310,26 +1323,33 @@ Future<void> _goToDictionaryForForm(
   }
 }
 
-Future<String?> _pickLemma(BuildContext context, List<String> lemmas) => lemmas.length == 1
+Future<T?> _pickLemma<T>(BuildContext context, List<T> lemmas, String Function(T) labelOf) =>
+    lemmas.length == 1
     ? Future.value(lemmas.first)
-    : showDialog<String>(
+    : showDialog<T>(
         context: context,
         builder: (context) => SimpleDialog(
           title: const Text('Which lemma?'),
           children: lemmas
               .map(
-                (l) => ListTile(title: Text(lemmaText(l)), onTap: () => Navigator.pop(context, l)),
+                (l) => ListTile(title: Text(labelOf(l)), onTap: () => Navigator.pop(context, l)),
               )
               .toList(),
         ),
       );
+
+/// Orders lemmas by dictionaryRef, then by sublemma. The entry's own lemma comes first, since its
+/// sublemma is ''.
+int _byDictionaryRefThenSublemma(Lemma a, Lemma b) => a.dictionaryRef == b.dictionaryRef
+    ? a.sublemma.compareTo(b.sublemma)
+    : a.dictionaryRef.compareTo(b.dictionaryRef);
 
 Future<void> _goToDictionaryForLemma(
   BuildContext context,
   WidgetRef ref,
   String dictionaryRef,
 ) async {
-  final resolved = await ref.read(lnsBasicInfoProvider(PossibleLemmas([dictionaryRef])).future);
+  final resolved = await ref.read(lnsBasicInfoProvider(DictionaryRefs([dictionaryRef])).future);
   if (context.mounted) {
     final entry = resolved[dictionaryRef];
     if (entry == null) {

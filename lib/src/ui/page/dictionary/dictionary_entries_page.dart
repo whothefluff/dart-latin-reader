@@ -78,7 +78,7 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
     ),
     trailing: IconButton(
       icon: const Icon(Icons.list),
-      tooltip: 'Browse the dictionary around ${lemmaText(entry.lemma)}',
+      tooltip: 'Browse the dictionary around ${entryRefText(entry.lemma)}',
       onPressed: () => _showInList(controller, entry),
     ),
     onTap: () async {
@@ -266,7 +266,7 @@ Text _entryTitle(Entry entry, TextStyle? titleStyle, TextStyle subtitleStyle) =>
   TextSpan(
     children: [
       TextSpan(
-        text: lemmaText(entry.lemma),
+        text: entryRefText(entry.lemma),
         style: titleStyle,
       ),
       const TextSpan(text: ' '),

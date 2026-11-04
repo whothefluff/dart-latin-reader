@@ -7,7 +7,7 @@ part of 'enriched_word_frequency_api.dart';
 // **************************************************************************
 
 String _$enrichedFrequencyReportHash() =>
-    r'1eb6c76cf0c7bbd75b3e6380bc713414913feae4';
+    r'044619913a39417d35100e41c406e78325046e93';
 
 /// Copied from Dart SDK
 class _SystemHash {

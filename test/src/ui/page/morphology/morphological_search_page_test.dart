@@ -9,23 +9,28 @@ import 'package:latin_reader/src/component/morph_analysis/enriched_morph_search_
 import 'package:latin_reader/src/component/morph_analysis/morphological_details_api.dart';
 import 'package:latin_reader/src/component/morph_analysis/morphological_search_api.dart';
 import 'package:latin_reader/src/ui/page/morphology/morphological_search_page.dart';
+import 'package:latin_reader/src/ui/widget/lemma_text.dart';
 
 EnrichedResult _result(
   String form, {
   int item = 0,
+  String macronizedForm = 'amō',
+  String dictionaryRef = 'amo',
+  String sublemma = '',
   required String partOfSpeech,
   String? additional,
 }) => EnrichedResult(
   base: Result(
     form: form,
-    macronizedForm: 'amō',
+    macronizedForm: macronizedForm,
     partOfSpeech: partOfSpeech,
-    dictionaryRef: 'amo',
+    dictionaryRef: dictionaryRef,
+    sublemma: sublemma,
     additional: additional,
     item: item,
     cnt: 0,
   ),
-  lns: const LnsBasicInfoEntry(lemma: 'amo'),
+  lns: LnsBasicInfoEntry(lemma: dictionaryRef),
 );
 
 /// Three analyses: `amo` and `amoque` show the same reading, the third a different one
@@ -35,8 +40,21 @@ final _amo = EnrichedResults([
   _result('amo', item: 1, partOfSpeech: 'noun', additional: '2nd declension'),
 ]);
 
+/// Latinis as two nouns under Latium, one of the entry's own lemma and one of its sublemma Latini.
+final _latinis = EnrichedResults([
+  _result('Latinis', macronizedForm: 'Latīnīs', dictionaryRef: 'Latium', partOfSpeech: 'noun'),
+  _result(
+    'Latinis',
+    item: 1,
+    macronizedForm: 'Latīnīs',
+    dictionaryRef: 'Latium',
+    sublemma: 'Latini',
+    partOfSpeech: 'noun',
+  ),
+]);
+
 /// Shows the page in a router, to check where picking a reading goes. Searching `amo` returns
-/// what [amo] returns
+/// what [amo] returns, and searching `Latinis` returns [_latinis]
 Future<GoRouter> _pumpPage(
   WidgetTester tester, {
   required FutureOr<EnrichedResults> Function() amo,
@@ -56,6 +74,7 @@ Future<GoRouter> _pumpPage(
       overrides: [
         enrichedMorphologicalSearchProvider('').overrideWith((_) => EnrichedResults(const [])),
         enrichedMorphologicalSearchProvider('amo').overrideWith((_) => amo()),
+        enrichedMorphologicalSearchProvider('Latinis').overrideWith((_) => _latinis),
       ],
       child: MaterialApp.router(routerConfig: router),
     ),
@@ -125,6 +144,21 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(_openedKeys(router), AnalysisKeys(const [AnalysisKey(form: 'amo', item: 1, cnt: 0)]));
+    });
+
+    testWidgets('two lemmas with one form and part of speech are two suggestions', (tester) async {
+      final router = await _pumpPage(tester, amo: () => _amo);
+      await _search(tester, 'Latinis');
+
+      expect(find.byType(ListTile), findsNWidgets(2));
+
+      await tester.tap(find.textContaining(lemmaLabel('Latium', 'Latini')));
+      await tester.pumpAndSettle();
+
+      expect(
+        _openedKeys(router),
+        AnalysisKeys(const [AnalysisKey(form: 'Latinis', item: 1, cnt: 0)]),
+      );
     });
 
     testWidgets('results that arrive after the text changed are not shown', (tester) async {

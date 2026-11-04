@@ -22,7 +22,8 @@ Future<AppDb> _numeralAndIrregular() async {
   final db = _EmptyDb();
   addTearDown(db.close);
   await db.customStatement(
-    "INSERT INTO MorphologicalDetails VALUES ( 'tres', 0, 'tres' ), ( 'nequam', 0, 'nequam' )",
+    "INSERT INTO MorphologicalDetails VALUES ( 'tres', 0, 'tres', '' ), "
+    "( 'nequam', 0, 'nequam', '' )",
   );
   await db.customStatement(
     '''
@@ -39,7 +40,8 @@ Future<AppDb> _venereTwice() async {
   final db = _EmptyDb();
   addTearDown(db.close);
   await db.customStatement(
-    "INSERT INTO MorphologicalDetails VALUES ( 'Venere', 0, 'Venus' ), ( 'venere', 0, 'venio' )",
+    "INSERT INTO MorphologicalDetails VALUES ( 'Venere', 0, 'Venus', '' ), "
+    "( 'venere', 0, 'venio', '' )",
   );
   await db.customStatement(
     '''
@@ -58,9 +60,9 @@ Future<AppDb> _magnoque() async {
   addTearDown(db.close);
   await db.customStatement(
     '''
-    INSERT INTO MorphologicalDetails VALUES ( 'Magnoque', 0, 'magnus' ),
-                                            ( '-que', 0, 'que' ),
-                                            ( 'magno', 0, 'magnus' )
+    INSERT INTO MorphologicalDetails VALUES ( 'Magnoque', 0, 'magnus', '' ),
+                                            ( '-que', 0, 'que', '' ),
+                                            ( 'magno', 0, 'magnus', '' )
     ''',
   );
   await db.customStatement(

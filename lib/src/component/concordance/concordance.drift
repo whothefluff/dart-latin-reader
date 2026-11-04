@@ -7,12 +7,13 @@ CREATE TABLE "ConcordanceDetails"(
     "form" TEXT NOT NULL,
     "item" INTEGER NOT NULL,
     "dictionaryRef" TEXT NOT NULL,
+    "sublemma" TEXT NOT NULL, -- '': the entry's own lemma
     PRIMARY KEY( form, item )
 )
 STRICT,
 WITHOUT ROWID;
 
--- Lemma criteria go from the lemma to its analyses
+-- Finds analyses by dictionaryRef
 CREATE INDEX "ConcordanceDetails_DictRef"
     ON ConcordanceDetails( dictionaryRef );
 
@@ -65,6 +66,7 @@ CREATE VIEW "concordance.AnalysesWithOptionalInflections" AS
     SELECT Details.form,
            Details.item,
            Details.dictionaryRef,
+           Details.sublemma,
            Infl.partOfSpeech,
            Infl.gramCase,
            Infl.number,
@@ -79,10 +81,11 @@ CREATE VIEW "concordance.AnalysesWithOptionalInflections" AS
             ON Infl.form = Details.form
                AND Infl.item = Details.item;
 
--- Lemmas that have forms in the corpus, with their Lewis & Short entry when there is one.
--- Several dictionaryRefs can share an entry (ad-tingo, attingo)
+-- Each dictionaryRef and sublemma that the corpus has forms of, with the Lewis & Short entry of
+-- the dictionaryRef when it has one.
 CREATE VIEW "concordance.Lemmas" AS
     SELECT DISTINCT Details.dictionaryRef,
+                    Details.sublemma,
                     Resolved.lemma AS lnsLemma,
                     Resolved.partOfSpeech AS lnsPartOfSpeech,
                     Resolved.inflection AS lnsInflection
@@ -90,19 +93,25 @@ CREATE VIEW "concordance.Lemmas" AS
         LEFT OUTER JOIN "dictionary.ResolvedLnsRefs" AS Resolved
             ON Resolved.dictionaryRef = Details.dictionaryRef;
 
--- Lemmas whose dictionaryRef or entry starts with :prefix, one per entry, with all
--- its dictionaryRefs: filtering before grouping would keep only the ones that match
+-- Lemma choices whose dictionaryRef, entry key or sublemma starts with :prefix: one per entryRef
+-- (the entry key, or the dictionaryRef without an entry) and sublemma, with all its
+-- dictionaryRefs, which filtering before grouping would cut to the ones that match. They rank by
+-- the sublemma, or the entryRef for the entry's own lemma, then by the entryRef, so the two
+-- Dardanias come in their entries' order.
 searchConcordanceLemmas WITH LemmaChoice.fromSql:
-    SELECT COALESCE( lnsLemma, dictionaryRef ) AS label,
+    SELECT COALESCE( lnsLemma, dictionaryRef ) AS entryRef,
+           sublemma,
            COALESCE( GROUP_CONCAT( dictionaryRef ), '' ) AS dictionaryRefs, -- COALESCE required because of Drift typing
            MIN( lnsPartOfSpeech ) AS partOfSpeech,
            MIN( lnsInflection ) AS inflection
         FROM "concordance.Lemmas"
-        GROUP BY COALESCE( lnsLemma, dictionaryRef )
+        GROUP BY COALESCE( lnsLemma, dictionaryRef ), sublemma
         HAVING MAX( dictionaryRef LIKE :prefix || '%'
-                    OR lnsLemma LIKE :prefix || '%' )
-        ORDER BY COALESCE( lnsLemma, dictionaryRef ) <> :prefix, -- exact match first
-                 LENGTH( COALESCE( lnsLemma, dictionaryRef ) ),
+                    OR lnsLemma LIKE :prefix || '%'
+                    OR sublemma LIKE :prefix || '%' )
+        ORDER BY IIF( sublemma = '', COALESCE( lnsLemma, dictionaryRef ), sublemma ) <> :prefix, -- exact match first
+                 LENGTH( IIF( sublemma = '', COALESCE( lnsLemma, dictionaryRef ), sublemma ) ),
+                 IIF( sublemma = '', COALESCE( lnsLemma, dictionaryRef ), sublemma ),
                  COALESCE( lnsLemma, dictionaryRef )
         LIMIT :limit;
 
@@ -179,7 +188,8 @@ getConcordanceGrammarValues WITH GrammarValueRow.fromSql: SELECT partOfSpeech,
 --   spellings        a form as the match columns may have it (Cum: ["cum", "Cum"])
 --   macronSpellings  the same with its macrons, when they have to match too
 -- or, for a lemma or grammar word, any of
---   lemma            the dictionaryRefs of a lemma (any lemma when absent)
+--   dictionaryRefs   the dictionaryRefs of a lemma (any lemma when absent)
+--   sublemma         the lemma's sublemma, '' for the entry's own lemma (with dictionaryRefs)
 --   partOfSpeech, gramCase, number, gender, declension, person, verbForm, tense, voice
 -- :works is a JSON array of the works to search, in the order hits are sorted by. :fromIdx and
 -- :toIdx limit it to a part of a work. :isTitleValues are the isTitle values a hit may have
@@ -203,7 +213,8 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                                            IFNULL( json_extract( Word.value, '$.distance' ), 1000000 ) AS distance,
                                            CAST( json_extract( Word.value, '$.spellings' ) AS TEXT ) AS spellings,
                                            CAST( json_extract( Word.value, '$.macronSpellings' ) AS TEXT ) AS macronSpellings,
-                                           CAST( json_extract( Word.value, '$.lemma' ) AS TEXT ) AS lemma,
+                                           CAST( json_extract( Word.value, '$.dictionaryRefs' ) AS TEXT ) AS dictionaryRefs,
+                                           CAST( json_extract( Word.value, '$.sublemma' ) AS TEXT ) AS sublemma,
                                            CAST( json_extract( Word.value, '$.partOfSpeech' ) AS TEXT ) AS partOfSpeech,
                                            CAST( json_extract( Word.value, '$.gramCase' ) AS TEXT ) AS gramCase,
                                            CAST( json_extract( Word.value, '$.number' ) AS TEXT ) AS number,
@@ -222,7 +233,7 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                                                FROM Criteria, json_each( Criteria.macronSpellings ) AS Spelling ),
          LemmaRefs AS MATERIALIZED ( SELECT Criteria.slot, 
                                             Ref.value AS dictionaryRef
-                                         FROM Criteria, json_each( Criteria.lemma ) AS Ref ),
+                                         FROM Criteria, json_each( Criteria.dictionaryRefs ) AS Ref ),
          -- Every analysis an analysed word can have
          -- A combined value (masculine/feminine/neuter) has each of its values, but a
          -- declension is one value (1st & 2nd isn't 1st)
@@ -232,10 +243,11 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                                         FROM Criteria
                                         CROSS JOIN "concordance.AnalysesWithOptionalInflections" AS Analyses
                                         WHERE Criteria.spellings IS NULL
-                                              AND ( Criteria.lemma IS NULL
-                                                    OR Analyses.dictionaryRef IN ( SELECT dictionaryRef
-                                                                                       FROM LemmaRefs
-                                                                                       WHERE LemmaRefs.slot = Criteria.slot ) )
+                                              AND ( Criteria.dictionaryRefs IS NULL
+                                                    OR ( Analyses.dictionaryRef IN ( SELECT dictionaryRef
+                                                                                         FROM LemmaRefs
+                                                                                         WHERE LemmaRefs.slot = Criteria.slot )
+                                                         AND Analyses.sublemma = Criteria.sublemma ) )
                                               AND ( Criteria.partOfSpeech IS NULL
                                                     OR Analyses.partOfSpeech = Criteria.partOfSpeech )
                                               AND ( Criteria.gramCase IS NULL

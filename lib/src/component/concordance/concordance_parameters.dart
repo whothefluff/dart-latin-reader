@@ -168,9 +168,13 @@ Map<String, Object> _spelled(
   };
 }
 
-/// The lemma (any when null) and the values of [grammar], by feature name
+/// Returns the lemma (any when null), as its dictionaryRefs and its sublemma, and the values of
+/// [grammar], by feature name.
 Map<String, Object> _analysed(LemmaChoice? lemma, GrammarFilter grammar) => {
-  if (lemma != null) 'lemma': [...lemma.dictionaryRefs],
+  if (lemma != null) ...{
+    'dictionaryRefs': [...lemma.dictionaryRefs],
+    'sublemma': lemma.sublemma,
+  },
   ...grammar.values.map((feature, value) => MapEntry(feature.name, value)),
 };
 

@@ -17,7 +17,10 @@ part 'lemma_choices_api.g.dart';
 
 //infrastructure
 
-/// Lemmas starting with [prefix], exact match first, then shortest first
+/// Returns the lemma choices whose 1) dictionaryRef, 2) Lewis & Short entry key or 3) sublemma
+/// starts with [prefix].
+/// An exact match comes first, then the shortest, comparing the sublemma, or the
+/// [LemmaChoice.entryRef] of the entry's own lemma.
 @riverpod
 Future<LemmaChoices> lemmaChoices(Ref ref, String prefix) async {
   log.info(() => '@riverpod - using $prefix');
@@ -36,7 +39,9 @@ class ConcordanceRepository implements IConcordanceRepository {
 
   @override
   Future<LemmaChoices> searchLemmas(prefix, limit) async {
-    log.fine('reading lemmas starting with "$prefix" from db');
+    // dart format off
+    log.fine('reading lemma choices whose dictionaryRef, entry key or sublemma starts with "$prefix"');
+    // dart format on
     return LemmaChoices(await _db.searchConcordanceLemmas(prefix: prefix, limit: limit).get());
   }
 

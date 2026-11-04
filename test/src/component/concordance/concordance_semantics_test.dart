@@ -11,8 +11,10 @@ import 'package:latin_reader/src/core/semivowel_search.dart';
 
 import 'concordance_fixture.dart';
 
-LemmaCriterion _lemma(String reference) =>
-    LemmaCriterion(LemmaChoice(label: reference, dictionaryRefs: [reference]));
+/// Returns the lemma criterion of [reference] and [sublemma] ('' for the entry's own lemma).
+LemmaCriterion _lemma(String reference, {String sublemma = ''}) => LemmaCriterion(
+  LemmaChoice(entryRef: reference, dictionaryRefs: [reference], sublemma: sublemma),
+);
 
 const _neither = SemivowelSearchRules(iFindsJ: false, uFindsV: false);
 const _iFindsJ = SemivowelSearchRules(iFindsJ: true, uFindsV: false);
@@ -145,9 +147,65 @@ void main() {
       lemmas.ConcordanceRepository(db.concordanceDrift),
       'flos-',
     ).invoke();
-    expect(choices.single.label, 'rosa1');
+    expect(choices.single.entryRef, 'rosa1');
     expect(choices.single.dictionaryRefs, unorderedEquals(['rosa', 'flos-rosa']));
     expect(await starts([LemmaCriterion(choices.single)]), [0, 1]);
+  });
+
+  test('the lemmas of one entry find their own tokens, also with a grammar criterion', () async {
+    // bonis may be bonus or its sublemma bonae, bonos only bonus, bonae only bonae
+    await token(db, 0, 'bonis');
+    await token(db, 1, 'bonos');
+    await token(db, 2, 'bonae');
+    await analysis(db, 'bonis', 'bonus', pos: 'adjective');
+    await analysis(db, 'bonis', 'bonus', sublemma: 'bonae', item: 1);
+    await analysis(db, 'bonos', 'bonus', pos: 'adjective');
+    await analysis(db, 'bonae', 'bonus', sublemma: 'bonae');
+    expect(await starts([_lemma('bonus')]), [0, 1]);
+    expect(await starts([_lemma('bonus', sublemma: 'bonae')]), [0, 2]);
+    final noun = GrammarFilter(const {GrammarFeature.partOfSpeech: 'noun'});
+    expect(await starts([GrammarCriterion(noun, lemma: _lemma('bonus').lemma)]), isEmpty);
+  });
+
+  test('typing a sublemma suggests it, with its own tokens alone', () async {
+    await token(db, 0, 'Cybeles', proper: ProperNounState.proper);
+    await token(db, 1, 'Cybeleia', proper: ProperNounState.proper);
+    await analysis(db, 'Cybeles', 'Cybele');
+    await analysis(db, 'Cybeleia', 'Cybele', sublemma: 'Cybeleius', pos: 'adjective');
+    await resolution(db, 'Cybele', 'Cybele');
+    await populateConcordanceTables(db);
+    final choices = await lemmas.SearchLemmaChoicesUseCase(
+      lemmas.ConcordanceRepository(db.concordanceDrift),
+      'Cybeleius',
+    ).invoke();
+    expect(choices.map((choice) => (choice.entryRef, choice.sublemma)), [('Cybele', 'Cybeleius')]);
+    expect(await starts([LemmaCriterion(choices.single)]), [1]);
+  });
+
+  test('suggestions rank by sublemma or else entryRef, and equal sublemmas by entryRef', () async {
+    await token(db, 0, 'Dardani', proper: ProperNounState.proper);
+    await token(db, 1, 'Dardaniae', proper: ProperNounState.proper);
+    await token(db, 2, 'Dardanius', proper: ProperNounState.proper);
+    await token(db, 3, 'Dardanum', proper: ProperNounState.proper);
+    await analysis(db, 'Dardani', 'Dardani');
+    await analysis(db, 'Dardaniae', 'Dardanus1', sublemma: 'Dardania');
+    await analysis(db, 'Dardaniae', 'Dardani', sublemma: 'Dardania', item: 1);
+    await analysis(db, 'Dardanius', 'Dardanus1', sublemma: 'Dardanius', pos: 'adjective');
+    await analysis(db, 'Dardanum', 'Dardanus1');
+    await resolution(db, 'Dardani', 'Dardani');
+    await resolution(db, 'Dardanus1', 'Dardanus1');
+    await populateConcordanceTables(db);
+    final choices = await lemmas.SearchLemmaChoicesUseCase(
+      lemmas.ConcordanceRepository(db.concordanceDrift),
+      'Dardan',
+    ).invoke();
+    expect(choices.map((choice) => (choice.entryRef, choice.sublemma)), [
+      ('Dardani', ''),
+      ('Dardani', 'Dardania'),
+      ('Dardanus1', 'Dardania'),
+      ('Dardanus1', 'Dardanius'),
+      ('Dardanus1', ''),
+    ]);
   });
 
   test("a lemma matches each token's own analyses, not frequency's pooled ones", () async {

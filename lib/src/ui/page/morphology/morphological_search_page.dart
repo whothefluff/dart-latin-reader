@@ -62,7 +62,7 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
     final theme = Theme.of(context);
     final colorTheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final dictRefStyle = textTheme.bodyMedium!.copyWith(color: colorTheme.primary);
+    final lemmaLabelStyle = textTheme.bodyMedium!.copyWith(color: colorTheme.primary);
     return SafeBodyScaffold(
       appBar: AppBar(
         title: Row(
@@ -96,7 +96,10 @@ class _MorphologyPageState extends ConsumerState<MorphologicalSearchPage> {
                           TextSpan(
                             text: '${result.title} ',
                             children: [
-                              TextSpan(text: lemmaText(result.dictRef), style: dictRefStyle),
+                              TextSpan(
+                                text: lemmaLabel(result.dictRef, result.sublemma),
+                                style: lemmaLabelStyle,
+                              ),
                             ],
                           ),
                         ),

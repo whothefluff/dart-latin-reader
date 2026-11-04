@@ -11,6 +11,7 @@ import '../../../logger.dart';
 import '../../core/value_list.dart';
 import '../../external/database.dart';
 import '../../external/provider_ext.dart';
+import 'lemma.dart';
 import 'word_frequency.drift.dart';
 
 part 'resolved_freq_morph_form_api.g.dart';
@@ -35,20 +36,20 @@ Future<FrequencyMorphCandidates> resolvedFreqMorphForms(
   return GetFormMorphCandidatesUseCase(repo, workIds, form, macronForm).invoke();
 }
 
-/// Returns the stored morphological matches for [dictionaryRef] in [workIds].
+/// Returns the stored morphological matches for [lemma] in [workIds].
 ///
 /// Results may include several inflected forms of the lemma.
 @riverpod
 Future<FrequencyMorphCandidates> resolvedFreqMorphFormsOfLemma(
   Ref ref,
   WorkIds workIds,
-  String dictionaryRef,
+  Lemma lemma,
 ) async {
-  log.info(() => '@riverpod - using $dictionaryRef in ${workIds.length} works');
+  log.info(() => '@riverpod - using $lemma in ${workIds.length} works');
   ref.cacheFor(const Duration(minutes: 5));
   final db = await ref.watch(dbProvider.future);
   final repo = WordFrequencyRepository(db.wordFrequencyDrift);
-  return GetLemmaMorphCandidatesUseCase(repo, workIds, dictionaryRef).invoke();
+  return GetLemmaMorphCandidatesUseCase(repo, workIds, lemma).invoke();
 }
 
 class WordFrequencyRepository implements IWordFrequencyRepository {
@@ -70,10 +71,16 @@ class WordFrequencyRepository implements IWordFrequencyRepository {
   }
 
   @override
-  Future<FrequencyMorphCandidates> getCandidatesOfLemma(workIds, dictionaryRef) async {
-    log.fine(() => 'reading the morph identities of lemma "$dictionaryRef" from db');
+  Future<FrequencyMorphCandidates> getCandidatesOfLemma(workIds, lemma) async {
+    log.fine(() => 'reading the morph identities of lemma $lemma from db');
     return FrequencyMorphCandidates(
-      await _db.getLemmaMorphIdentities(workIds: workIds, dictionaryRef: dictionaryRef).get(),
+      await _db
+          .getLemmaMorphIdentities(
+            workIds: workIds,
+            dictionaryRef: lemma.dictionaryRef,
+            sublemma: lemma.sublemma,
+          )
+          .get(),
     );
   }
 
@@ -92,7 +99,7 @@ abstract interface class IWordFrequencyRepository {
 
   Future<FrequencyMorphCandidates> getCandidatesOfLemma(
     WorkIds workIds,
-    String dictionaryRef,
+    Lemma lemma,
   );
   //
 }
@@ -120,16 +127,16 @@ class GetLemmaMorphCandidatesUseCase implements IGetLemmaMorphCandidatesUseCase 
   GetLemmaMorphCandidatesUseCase(
     this._repository,
     this._workIds,
-    this._dictionaryRef,
+    this._lemma,
   );
 
   final IWordFrequencyRepository _repository;
   final WorkIds _workIds;
-  final String _dictionaryRef;
+  final Lemma _lemma;
 
   @override
   Future<FrequencyMorphCandidates> invoke() async =>
-      _repository.getCandidatesOfLemma(_workIds, _dictionaryRef);
+      _repository.getCandidatesOfLemma(_workIds, _lemma);
   //
 }
 
@@ -170,11 +177,12 @@ class FrequencyMorphCandidate {
     required this.form,
     required this.morphForm,
     required this.morphItem,
-    required this.dictionaryRef,
-  });
+    required String dictionaryRef,
+    required String sublemma,
+  }) : lemma = (dictionaryRef: dictionaryRef, sublemma: sublemma);
 
   final int morphItem;
-  final String dictionaryRef;
+  final Lemma lemma;
 
   /// The plain form counted in the report.
   /// When counting `populus` from `populusque`, this is `populus`
@@ -197,9 +205,9 @@ class FrequencyMorphCandidate {
           other.form == form &&
           other.morphForm == morphForm &&
           other.morphItem == morphItem &&
-          other.dictionaryRef == dictionaryRef);
+          other.lemma == lemma);
 
   @override
-  int get hashCode => Object.hash(morphForm, morphItem, dictionaryRef);
+  int get hashCode => Object.hash(morphForm, morphItem, lemma);
   //
 }

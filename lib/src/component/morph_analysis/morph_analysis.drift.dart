@@ -14,12 +14,14 @@ typedef $MorphologicalDetailsCreateCompanionBuilder =
       required String form,
       required int item,
       required String dictionaryRef,
+      required String sublemma,
     });
 typedef $MorphologicalDetailsUpdateCompanionBuilder =
     i1.MorphologicalDetailsCompanion Function({
       i0.Value<String> form,
       i0.Value<int> item,
       i0.Value<String> dictionaryRef,
+      i0.Value<String> sublemma,
     });
 
 class $MorphologicalDetailsFilterComposer
@@ -43,6 +45,11 @@ class $MorphologicalDetailsFilterComposer
 
   i0.ColumnFilters<String> get dictionaryRef => $composableBuilder(
     column: $table.dictionaryRef,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -70,6 +77,11 @@ class $MorphologicalDetailsOrderingComposer
     column: $table.dictionaryRef,
     builder: (column) => i0.ColumnOrderings(column),
   );
+
+  i0.ColumnOrderings<String> get sublemma => $composableBuilder(
+    column: $table.sublemma,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
 }
 
 class $MorphologicalDetailsAnnotationComposer
@@ -91,6 +103,9 @@ class $MorphologicalDetailsAnnotationComposer
     column: $table.dictionaryRef,
     builder: (column) => column,
   );
+
+  i0.GeneratedColumn<String> get sublemma =>
+      $composableBuilder(column: $table.sublemma, builder: (column) => column);
 }
 
 class $MorphologicalDetailsTableManager
@@ -133,20 +148,24 @@ class $MorphologicalDetailsTableManager
                 i0.Value<String> form = const i0.Value.absent(),
                 i0.Value<int> item = const i0.Value.absent(),
                 i0.Value<String> dictionaryRef = const i0.Value.absent(),
+                i0.Value<String> sublemma = const i0.Value.absent(),
               }) => i1.MorphologicalDetailsCompanion(
                 form: form,
                 item: item,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
               ),
           createCompanionCallback:
               ({
                 required String form,
                 required int item,
                 required String dictionaryRef,
+                required String sublemma,
               }) => i1.MorphologicalDetailsCompanion.insert(
                 form: form,
                 item: item,
                 dictionaryRef: dictionaryRef,
+                sublemma: sublemma,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -1114,8 +1133,24 @@ class MorphologicalDetails extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _sublemmaMeta = const i0.VerificationMeta(
+    'sublemma',
+  );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
   @override
-  List<i0.GeneratedColumn> get $columns => [form, item, dictionaryRef];
+  List<i0.GeneratedColumn> get $columns => [
+    form,
+    item,
+    dictionaryRef,
+    sublemma,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1155,6 +1190,14 @@ class MorphologicalDetails extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryRefMeta);
     }
+    if (data.containsKey('sublemma')) {
+      context.handle(
+        _sublemmaMeta,
+        sublemma.isAcceptableOrUnknown(data['sublemma']!, _sublemmaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sublemmaMeta);
+    }
     return context;
   }
 
@@ -1175,6 +1218,10 @@ class MorphologicalDetails extends i0.Table
       dictionaryRef: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
+      )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
       )!,
     );
   }
@@ -1199,10 +1246,12 @@ class MorphologicalDetail extends i0.DataClass
   final String form;
   final int item;
   final String dictionaryRef;
+  final String sublemma;
   const MorphologicalDetail({
     required this.form,
     required this.item,
     required this.dictionaryRef,
+    required this.sublemma,
   });
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
@@ -1210,6 +1259,7 @@ class MorphologicalDetail extends i0.DataClass
     map['form'] = i0.Variable<String>(form);
     map['item'] = i0.Variable<int>(item);
     map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
+    map['sublemma'] = i0.Variable<String>(sublemma);
     return map;
   }
 
@@ -1218,6 +1268,7 @@ class MorphologicalDetail extends i0.DataClass
       form: i0.Value(form),
       item: i0.Value(item),
       dictionaryRef: i0.Value(dictionaryRef),
+      sublemma: i0.Value(sublemma),
     );
   }
 
@@ -1230,6 +1281,7 @@ class MorphologicalDetail extends i0.DataClass
       form: serializer.fromJson<String>(json['form']),
       item: serializer.fromJson<int>(json['item']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
     );
   }
   @override
@@ -1239,6 +1291,7 @@ class MorphologicalDetail extends i0.DataClass
       'form': serializer.toJson<String>(form),
       'item': serializer.toJson<int>(item),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
     };
   }
 
@@ -1246,10 +1299,12 @@ class MorphologicalDetail extends i0.DataClass
     String? form,
     int? item,
     String? dictionaryRef,
+    String? sublemma,
   }) => i1.MorphologicalDetail(
     form: form ?? this.form,
     item: item ?? this.item,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
   );
   MorphologicalDetail copyWithCompanion(i1.MorphologicalDetailsCompanion data) {
     return MorphologicalDetail(
@@ -1258,6 +1313,7 @@ class MorphologicalDetail extends i0.DataClass
       dictionaryRef: data.dictionaryRef.present
           ? data.dictionaryRef.value
           : this.dictionaryRef,
+      sublemma: data.sublemma.present ? data.sublemma.value : this.sublemma,
     );
   }
 
@@ -1266,20 +1322,22 @@ class MorphologicalDetail extends i0.DataClass
     return (StringBuffer('MorphologicalDetail(')
           ..write('form: $form, ')
           ..write('item: $item, ')
-          ..write('dictionaryRef: $dictionaryRef')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(form, item, dictionaryRef);
+  int get hashCode => Object.hash(form, item, dictionaryRef, sublemma);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.MorphologicalDetail &&
           other.form == this.form &&
           other.item == this.item &&
-          other.dictionaryRef == this.dictionaryRef);
+          other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma);
 }
 
 class MorphologicalDetailsCompanion
@@ -1287,27 +1345,33 @@ class MorphologicalDetailsCompanion
   final i0.Value<String> form;
   final i0.Value<int> item;
   final i0.Value<String> dictionaryRef;
+  final i0.Value<String> sublemma;
   const MorphologicalDetailsCompanion({
     this.form = const i0.Value.absent(),
     this.item = const i0.Value.absent(),
     this.dictionaryRef = const i0.Value.absent(),
+    this.sublemma = const i0.Value.absent(),
   });
   MorphologicalDetailsCompanion.insert({
     required String form,
     required int item,
     required String dictionaryRef,
+    required String sublemma,
   }) : form = i0.Value(form),
        item = i0.Value(item),
-       dictionaryRef = i0.Value(dictionaryRef);
+       dictionaryRef = i0.Value(dictionaryRef),
+       sublemma = i0.Value(sublemma);
   static i0.Insertable<i1.MorphologicalDetail> custom({
     i0.Expression<String>? form,
     i0.Expression<int>? item,
     i0.Expression<String>? dictionaryRef,
+    i0.Expression<String>? sublemma,
   }) {
     return i0.RawValuesInsertable({
       if (form != null) 'form': form,
       if (item != null) 'item': item,
       if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
+      if (sublemma != null) 'sublemma': sublemma,
     });
   }
 
@@ -1315,11 +1379,13 @@ class MorphologicalDetailsCompanion
     i0.Value<String>? form,
     i0.Value<int>? item,
     i0.Value<String>? dictionaryRef,
+    i0.Value<String>? sublemma,
   }) {
     return i1.MorphologicalDetailsCompanion(
       form: form ?? this.form,
       item: item ?? this.item,
       dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+      sublemma: sublemma ?? this.sublemma,
     );
   }
 
@@ -1335,6 +1401,9 @@ class MorphologicalDetailsCompanion
     if (dictionaryRef.present) {
       map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
     }
+    if (sublemma.present) {
+      map['sublemma'] = i0.Variable<String>(sublemma.value);
+    }
     return map;
   }
 
@@ -1343,7 +1412,8 @@ class MorphologicalDetailsCompanion
     return (StringBuffer('MorphologicalDetailsCompanion(')
           ..write('form: $form, ')
           ..write('item: $item, ')
-          ..write('dictionaryRef: $dictionaryRef')
+          ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma')
           ..write(')'))
         .toString();
   }
@@ -3125,6 +3195,7 @@ class MorphologyPeekData extends i0.DataClass {
   final String form;
   final String? partOfSpeech;
   final String dictionaryRef;
+  final String sublemma;
   final String? additional;
   final int item;
   final int cnt;
@@ -3132,6 +3203,7 @@ class MorphologyPeekData extends i0.DataClass {
     required this.form,
     this.partOfSpeech,
     required this.dictionaryRef,
+    required this.sublemma,
     this.additional,
     required this.item,
     required this.cnt,
@@ -3145,6 +3217,7 @@ class MorphologyPeekData extends i0.DataClass {
       form: serializer.fromJson<String>(json['form']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
+      sublemma: serializer.fromJson<String>(json['sublemma']),
       additional: serializer.fromJson<String?>(json['additional']),
       item: serializer.fromJson<int>(json['item']),
       cnt: serializer.fromJson<int>(json['cnt']),
@@ -3157,6 +3230,7 @@ class MorphologyPeekData extends i0.DataClass {
       'form': serializer.toJson<String>(form),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
+      'sublemma': serializer.toJson<String>(sublemma),
       'additional': serializer.toJson<String?>(additional),
       'item': serializer.toJson<int>(item),
       'cnt': serializer.toJson<int>(cnt),
@@ -3167,6 +3241,7 @@ class MorphologyPeekData extends i0.DataClass {
     String? form,
     i0.Value<String?> partOfSpeech = const i0.Value.absent(),
     String? dictionaryRef,
+    String? sublemma,
     i0.Value<String?> additional = const i0.Value.absent(),
     int? item,
     int? cnt,
@@ -3174,6 +3249,7 @@ class MorphologyPeekData extends i0.DataClass {
     form: form ?? this.form,
     partOfSpeech: partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
+    sublemma: sublemma ?? this.sublemma,
     additional: additional.present ? additional.value : this.additional,
     item: item ?? this.item,
     cnt: cnt ?? this.cnt,
@@ -3184,6 +3260,7 @@ class MorphologyPeekData extends i0.DataClass {
           ..write('form: $form, ')
           ..write('partOfSpeech: $partOfSpeech, ')
           ..write('dictionaryRef: $dictionaryRef, ')
+          ..write('sublemma: $sublemma, ')
           ..write('additional: $additional, ')
           ..write('item: $item, ')
           ..write('cnt: $cnt')
@@ -3192,8 +3269,15 @@ class MorphologyPeekData extends i0.DataClass {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(form, partOfSpeech, dictionaryRef, additional, item, cnt);
+  int get hashCode => Object.hash(
+    form,
+    partOfSpeech,
+    dictionaryRef,
+    sublemma,
+    additional,
+    item,
+    cnt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3201,6 +3285,7 @@ class MorphologyPeekData extends i0.DataClass {
           other.form == this.form &&
           other.partOfSpeech == this.partOfSpeech &&
           other.dictionaryRef == this.dictionaryRef &&
+          other.sublemma == this.sublemma &&
           other.additional == this.additional &&
           other.item == this.item &&
           other.cnt == this.cnt);
@@ -3218,6 +3303,7 @@ class MorphologyPeek
     form,
     partOfSpeech,
     dictionaryRef,
+    sublemma,
     additional,
     item,
     cnt,
@@ -3229,7 +3315,7 @@ class MorphologyPeek
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "morphology.Peek" AS SELECT Infl.form AS form, CASE WHEN Infl.partOfSpeech IN (\'adjective\', \'noun\') AND Infl.verbForm IS NOT NULL THEN NULL ELSE Infl.partOfSpeech END AS partOfSpeech, MorphologicalDetails.dictionaryRef AS dictionaryRef, CASE Infl.partOfSpeech WHEN \'adjective\' THEN COALESCE(IIF(Infl.verbForm IS NULL AND Infl.segmentsInfo IN (\'irregular\', \'indeclinable\'), Infl.segmentsInfo, NULL), Infl.verbForm) WHEN \'adverb\' THEN IIF(Infl.suffix IS NOT NULL, \'-\' || Infl.suffix || \' suffix\', NULL) WHEN \'conjunction\' THEN NULL WHEN \'interjection\' THEN NULL WHEN \'irregular\' THEN Infl.segmentsInfo WHEN \'noun\' THEN COALESCE(Infl.verbForm, Infl.declension || \' declension\') WHEN \'numeral\' THEN NULL WHEN \'preposition\' THEN NULL WHEN \'pronoun\' THEN NULL WHEN \'verb\' THEN Infl.segmentsInfo END AS additional, Infl.item AS item, Infl.cnt AS cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item ORDER BY Infl.form, Infl.item, Infl.cnt',
+        'CREATE VIEW "morphology.Peek" AS SELECT Infl.form AS form, CASE WHEN Infl.partOfSpeech IN (\'adjective\', \'noun\') AND Infl.verbForm IS NOT NULL THEN NULL ELSE Infl.partOfSpeech END AS partOfSpeech, MorphologicalDetails.dictionaryRef AS dictionaryRef, MorphologicalDetails.sublemma AS sublemma, CASE Infl.partOfSpeech WHEN \'adjective\' THEN COALESCE(IIF(Infl.verbForm IS NULL AND Infl.segmentsInfo IN (\'irregular\', \'indeclinable\'), Infl.segmentsInfo, NULL), Infl.verbForm) WHEN \'adverb\' THEN IIF(Infl.suffix IS NOT NULL, \'-\' || Infl.suffix || \' suffix\', NULL) WHEN \'conjunction\' THEN NULL WHEN \'interjection\' THEN NULL WHEN \'irregular\' THEN Infl.segmentsInfo WHEN \'noun\' THEN COALESCE(Infl.verbForm, Infl.declension || \' declension\') WHEN \'numeral\' THEN NULL WHEN \'preposition\' THEN NULL WHEN \'pronoun\' THEN NULL WHEN \'verb\' THEN Infl.segmentsInfo END AS additional, Infl.item AS item, Infl.cnt AS cnt FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item ORDER BY Infl.form, Infl.item, Infl.cnt',
   };
   @override
   MorphologyPeek get asDslTable => this;
@@ -3248,6 +3334,10 @@ class MorphologyPeek
       dictionaryRef: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
+      )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
       )!,
       additional: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -3284,6 +3374,12 @@ class MorphologyPeek
         false,
         type: i0.DriftSqlType.string,
       );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> additional = i0.GeneratedColumn<String>(
     'additional',
     aliasedName,
@@ -3506,6 +3602,7 @@ class MorphologyAnalyses extends i0.ViewInfo<i1.MorphologyAnalyses, i2.Analysis>
     cnt,
     macronizedForm,
     dictionaryRef,
+    sublemma,
     partOfSpeech,
     stem,
     suffix,
@@ -3527,7 +3624,7 @@ class MorphologyAnalyses extends i0.ViewInfo<i1.MorphologyAnalyses, i2.Analysis>
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "morphology.Analyses" AS SELECT Infl.form, Infl.item, Infl.cnt, Infl.macronizedForm, MorphologicalDetails.dictionaryRef, Infl.partOfSpeech, Infl.stem, Infl.suffix, Infl.segmentsInfo, Infl.gender, Infl.number, Infl.declension, Infl.gramCase, Infl.verbForm, Infl.tense, Infl.voice, Infl.person, Peek.additional FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item INNER JOIN "morphology.Peek" AS Peek ON Infl.form = Peek.form AND Infl.item = Peek.item AND Infl.cnt = Peek.cnt',
+        'CREATE VIEW "morphology.Analyses" AS SELECT Infl.form, Infl.item, Infl.cnt, Infl.macronizedForm, MorphologicalDetails.dictionaryRef, MorphologicalDetails.sublemma, Infl.partOfSpeech, Infl.stem, Infl.suffix, Infl.segmentsInfo, Infl.gender, Infl.number, Infl.declension, Infl.gramCase, Infl.verbForm, Infl.tense, Infl.voice, Infl.person, Peek.additional FROM MorphologicalDetailInflections AS Infl INNER JOIN MorphologicalDetails ON Infl.form = MorphologicalDetails.form AND Infl.item = MorphologicalDetails.item INNER JOIN "morphology.Peek" AS Peek ON Infl.form = Peek.form AND Infl.item = Peek.item AND Infl.cnt = Peek.cnt',
   };
   @override
   MorphologyAnalyses get asDslTable => this;
@@ -3554,6 +3651,10 @@ class MorphologyAnalyses extends i0.ViewInfo<i1.MorphologyAnalyses, i2.Analysis>
       dictionaryRef: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
+      )!,
+      sublemma: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}sublemma'],
       )!,
       partOfSpeech: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -3642,6 +3743,12 @@ class MorphologyAnalyses extends i0.ViewInfo<i1.MorphologyAnalyses, i2.Analysis>
         false,
         type: i0.DriftSqlType.string,
       );
+  late final i0.GeneratedColumn<String> sublemma = i0.GeneratedColumn<String>(
+    'sublemma',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
   late final i0.GeneratedColumn<String> partOfSpeech =
       i0.GeneratedColumn<String>(
         'partOfSpeech',
@@ -3761,6 +3868,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
         macronizedForm: row.readNullable<String>('macronizedForm'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         additional: row.readNullable<String>('additional'),
         item: row.read<int>('item'),
         cnt: row.read<int>('cnt'),
@@ -3783,6 +3891,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
         macronizedForm: row.readNullable<String>('macronizedForm'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         additional: row.readNullable<String>('additional'),
         item: row.read<int>('item'),
         cnt: row.read<int>('cnt'),
@@ -3807,6 +3916,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
         macronizedForm: row.readNullable<String>('macronizedForm'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         additional: row.readNullable<String>('additional'),
         item: row.read<int>('item'),
         cnt: row.read<int>('cnt'),
@@ -3831,6 +3941,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
         macronizedForm: row.readNullable<String>('macronizedForm'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         additional: row.readNullable<String>('additional'),
         item: row.read<int>('item'),
         cnt: row.read<int>('cnt'),
@@ -3855,6 +3966,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
         macronizedForm: row.readNullable<String>('macronizedForm'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         additional: row.readNullable<String>('additional'),
         item: row.read<int>('item'),
         cnt: row.read<int>('cnt'),
@@ -3879,6 +3991,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
         macronizedForm: row.readNullable<String>('macronizedForm'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         additional: row.readNullable<String>('additional'),
         item: row.read<int>('item'),
         cnt: row.read<int>('cnt'),
@@ -3902,6 +4015,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
         macronizedForm: row.readNullable<String>('macronizedForm'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         additional: row.readNullable<String>('additional'),
         item: row.read<int>('item'),
         cnt: row.read<int>('cnt'),
@@ -3925,6 +4039,7 @@ class MorphAnalysisDrift extends i3.ModularAccessor {
         macronizedForm: row.readNullable<String>('macronizedForm'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         dictionaryRef: row.read<String>('dictionaryRef'),
+        sublemma: row.read<String>('sublemma'),
         additional: row.readNullable<String>('additional'),
         item: row.read<int>('item'),
         cnt: row.read<int>('cnt'),
