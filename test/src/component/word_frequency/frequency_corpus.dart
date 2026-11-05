@@ -105,13 +105,13 @@ class FrequencyCorpus {
     );
     await db.customStatement(
       '''
-      INSERT OR IGNORE INTO DictionaryEntries( dictionary, lemma, idx )
+      INSERT OR IGNORE INTO DictionaryEntries( dictionary, key, idx )
           SELECT ?, ?, COUNT( * ) FROM DictionaryEntries
       ''',
       [lewisAndShort, entryKey],
     );
     await db.customStatement(
-      'INSERT INTO LnsRefResolutions( dictionaryRef, lnsLemma ) VALUES ( ?, ? )',
+      'INSERT INTO LnsRefResolutions( dictionaryRef, lnsEntryKey ) VALUES ( ?, ? )',
       [dictionaryRef, entryKey],
     );
   }

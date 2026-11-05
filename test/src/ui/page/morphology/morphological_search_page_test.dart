@@ -30,7 +30,7 @@ EnrichedResult _result(
     item: item,
     cnt: 0,
   ),
-  lns: LnsBasicInfoEntry(lemma: dictionaryRef),
+  lns: LnsBasicInfoEntry(key: dictionaryRef),
 );
 
 /// Three analyses: `amo` and `amoque` show the same reading, the third a different one

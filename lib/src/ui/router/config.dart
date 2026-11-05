@@ -118,7 +118,7 @@ class SettingsRoute extends GoRouteData with _$SettingsRoute {
           routes: [
             TypedGoRoute<DictionaryEntriesRoute>(
               path: ':dictionaryId',
-              routes: [TypedGoRoute<DictionaryEntryRoute>(path: 'entries/:lemma')],
+              routes: [TypedGoRoute<DictionaryEntryRoute>(path: 'entries/:entryKey')],
             ),
           ],
         ),
@@ -304,15 +304,15 @@ class DictionaryEntriesRoute extends GoRouteData with _$DictionaryEntriesRoute {
 class DictionaryEntryRoute extends GoRouteData with _$DictionaryEntryRoute {
   const DictionaryEntryRoute(
     this.dictionaryId,
-    this.lemma,
+    this.entryKey,
   );
 
   final String dictionaryId;
-  final String lemma;
+  final String entryKey;
 
   @override
   Page<void> buildPage(context, state) =>
-      MaterialPage(child: DictionaryEntryPage(dictionaryId, lemma));
+      MaterialPage(child: DictionaryEntryPage(dictionaryId, entryKey));
   //
 }
 

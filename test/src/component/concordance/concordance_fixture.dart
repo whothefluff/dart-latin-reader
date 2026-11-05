@@ -116,15 +116,15 @@ Future<void> analysis(
   );
 }
 
-/// [reference] resolves to the L&S entry [lemma]
-Future<void> resolution(AppDb db, String reference, String lemma) async {
-  await db.customStatement('INSERT INTO LnsRefResolutions VALUES (?, ?)', [reference, lemma]);
+/// [reference] resolves to the L&S entry [entryKey]
+Future<void> resolution(AppDb db, String reference, String entryKey) async {
+  await db.customStatement('INSERT INTO LnsRefResolutions VALUES (?, ?)', [reference, entryKey]);
   await db.customStatement(
     '''
-    INSERT OR IGNORE INTO DictionaryEntries(dictionary, lemma, idx)
+    INSERT OR IGNORE INTO DictionaryEntries(dictionary, key, idx)
     SELECT ?, ?, COUNT(*) FROM DictionaryEntries
   ''',
-    [dictionary, lemma],
+    [dictionary, entryKey],
   );
 }
 

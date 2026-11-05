@@ -34,16 +34,16 @@ class DictionaryRepository implements IDictionaryRepository {
   final DictionaryDrift _db;
 
   @override
-  Future<LnsBasicInfoByRef> getLnsInfoFor(lemmas) async {
-    log.fine('reading L&S info for dictionary refs $lemmas from db');
-    final dbData = await _db.getBasicLnsInfo(lemmas.toSet().toList()).get();
+  Future<LnsBasicInfoByRef> getLnsInfoFor(dictionaryRefs) async {
+    log.fine('reading L&S info for dictionary refs $dictionaryRefs from db');
+    final dbData = await _db.getBasicLnsInfo(dictionaryRefs.toSet().toList()).get();
     return LnsBasicInfoByRef(
       Map.fromEntries(
         dbData.map(
           (row) => MapEntry(
             row.dictionaryRef,
             LnsBasicInfoEntry(
-              lemma: row.lemma,
+              key: row.key,
               inflection: row.inflection,
               partOfSpeech: row.partOfSpeech,
             ),
@@ -60,7 +60,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
 abstract interface class IDictionaryRepository {
   //
-  Future<LnsBasicInfoByRef> getLnsInfoFor(Iterable<String> lemmas);
+  Future<LnsBasicInfoByRef> getLnsInfoFor(Iterable<String> dictionaryRefs);
   //
 }
 
@@ -99,24 +99,25 @@ extension type const LnsBasicInfoByRef._(UnmodifiableMapView<String, LnsBasicInf
 @immutable
 class LnsBasicInfoEntry {
   const LnsBasicInfoEntry({
-    required this.lemma,
+    required this.key,
     this.inflection,
     this.partOfSpeech,
   });
 
-  final String lemma;
+  /// The key of the entry that a dictionaryRef resolves to: attingo for ad-tingo.
+  final String key;
   final String? inflection;
   final String? partOfSpeech;
 
   @override
-  String toString() => 'LnsBasicInfoEntry{lemma: $lemma}';
+  String toString() => 'LnsBasicInfoEntry{key: $key}';
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is LnsBasicInfoEntry && other.lemma == lemma);
+      identical(this, other) || (other is LnsBasicInfoEntry && other.key == key);
 
   @override
-  int get hashCode => lemma.hashCode;
+  int get hashCode => key.hashCode;
   //
 }
 

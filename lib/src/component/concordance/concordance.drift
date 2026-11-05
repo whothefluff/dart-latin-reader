@@ -86,7 +86,7 @@ CREATE VIEW "concordance.AnalysesWithOptionalInflections" AS
 CREATE VIEW "concordance.Lemmas" AS
     SELECT DISTINCT Details.dictionaryRef,
                     Details.sublemma,
-                    Resolved.lemma AS lnsLemma,
+                    Resolved.key AS lnsEntryKey,
                     Resolved.partOfSpeech AS lnsPartOfSpeech,
                     Resolved.inflection AS lnsInflection
         FROM ConcordanceDetails AS Details
@@ -99,20 +99,20 @@ CREATE VIEW "concordance.Lemmas" AS
 -- the sublemma, or the entryRef for the entry's own lemma, then by the entryRef, so the two
 -- Dardanias come in their entries' order.
 searchConcordanceLemmas WITH LemmaChoice.fromSql:
-    SELECT COALESCE( lnsLemma, dictionaryRef ) AS entryRef,
+    SELECT COALESCE( lnsEntryKey, dictionaryRef ) AS entryRef,
            sublemma,
            COALESCE( GROUP_CONCAT( dictionaryRef ), '' ) AS dictionaryRefs, -- COALESCE required because of Drift typing
            MIN( lnsPartOfSpeech ) AS partOfSpeech,
            MIN( lnsInflection ) AS inflection
         FROM "concordance.Lemmas"
-        GROUP BY COALESCE( lnsLemma, dictionaryRef ), sublemma
+        GROUP BY COALESCE( lnsEntryKey, dictionaryRef ), sublemma
         HAVING MAX( dictionaryRef LIKE :prefix || '%'
-                    OR lnsLemma LIKE :prefix || '%'
+                    OR lnsEntryKey LIKE :prefix || '%'
                     OR sublemma LIKE :prefix || '%' )
-        ORDER BY IIF( sublemma = '', COALESCE( lnsLemma, dictionaryRef ), sublemma ) <> :prefix, -- exact match first
-                 LENGTH( IIF( sublemma = '', COALESCE( lnsLemma, dictionaryRef ), sublemma ) ),
-                 IIF( sublemma = '', COALESCE( lnsLemma, dictionaryRef ), sublemma ),
-                 COALESCE( lnsLemma, dictionaryRef )
+        ORDER BY IIF( sublemma = '', COALESCE( lnsEntryKey, dictionaryRef ), sublemma ) <> :prefix, -- exact match first
+                 LENGTH( IIF( sublemma = '', COALESCE( lnsEntryKey, dictionaryRef ), sublemma ) ),
+                 IIF( sublemma = '', COALESCE( lnsEntryKey, dictionaryRef ), sublemma ),
+                 COALESCE( lnsEntryKey, dictionaryRef )
         LIMIT :limit;
 
 -- Every value a grammatical feature takes, per part of speech. 

@@ -78,12 +78,12 @@ class _DictionaryEntriesPageState extends ConsumerState<DictionaryEntriesPage> {
     ),
     trailing: IconButton(
       icon: const Icon(Icons.list),
-      tooltip: 'Browse the dictionary around ${entryRefText(entry.lemma)}',
+      tooltip: 'Browse the dictionary around ${entryRefText(entry.key)}',
       onPressed: () => _showInList(controller, entry),
     ),
     onTap: () async {
       _showInList(controller, entry);
-      await DictionaryEntryRoute(entry.dictionary, entry.lemma).push<void>(context);
+      await DictionaryEntryRoute(entry.dictionary, entry.key).push<void>(context);
       if (mounted) {
         _highlight(entry); // the first highlight may have expired behind the definition page
       }
@@ -191,7 +191,7 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
   //
   static const _prototypeEntry = Entry(
     dictionary: '',
-    lemma: 'a',
+    key: 'a',
     inflection: 'a',
     partOfSpeech: null,
     numberOfSenses: 0,
@@ -251,7 +251,7 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
         tileColor: color,
         title: title,
         onTap: () async {
-          await DictionaryEntryRoute(widget.dictId, entry.lemma).push<void>(context);
+          await DictionaryEntryRoute(widget.dictId, entry.key).push<void>(context);
         },
       ),
       child: _entryTitle(entry, titleStyle, subtitleStyle),
@@ -261,12 +261,12 @@ class _ScrollableEntriesState extends ConsumerState<ScrollableEntries> {
   //
 }
 
-/// The lemma followed by its inflection
+/// The entry key followed by its inflection
 Text _entryTitle(Entry entry, TextStyle? titleStyle, TextStyle subtitleStyle) => Text.rich(
   TextSpan(
     children: [
       TextSpan(
-        text: entryRefText(entry.lemma),
+        text: entryRefText(entry.key),
         style: titleStyle,
       ),
       const TextSpan(text: ' '),

@@ -80,7 +80,7 @@ Future<void> _pumpRoutedPage(
     routes: [
       GoRoute(path: '/word-frequency', builder: (_, _) => const WordFrequencyPage()),
       GoRoute(
-        path: '/dictionaries/:dictionaryId/entries/:lemma',
+        path: '/dictionaries/:dictionaryId/entries/:entryKey',
         builder: (_, state) => _Opened(state),
       ),
       GoRoute(path: '/morph-detail/:keys', builder: (_, state) => _Opened(state)),
@@ -294,7 +294,7 @@ void main() {
       await tester.tap(find.text(lemmaLabel('Cybele', 'Cybeleius')));
       await tester.pumpAndSettle();
 
-      expect(_opened(tester).pathParameters['lemma'], 'Cybele');
+      expect(_opened(tester).pathParameters['entryKey'], 'Cybele');
     });
 
     testWidgets('by lemma, a sublemma searches the concordance for itself', (
@@ -360,7 +360,7 @@ void main() {
       await tester.tap(find.text('bonīs'));
       await tester.pumpAndSettle();
 
-      expect(_opened(tester).pathParameters['lemma'], 'bonus');
+      expect(_opened(tester).pathParameters['entryKey'], 'bonus');
     });
   });
 }

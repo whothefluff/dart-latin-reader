@@ -106,7 +106,7 @@ void _validateDatabase(File file, int schemaVersion, int dataVersion) {
       stdout.writeln('$table: $count rows');
     }
     final refsWithoutLnsEntry = db
-        .select('SELECT dictionaryRef FROM LnsRefResolutions WHERE lnsLemma IS NULL ORDER BY 1')
+        .select('SELECT dictionaryRef FROM LnsRefResolutions WHERE lnsEntryKey IS NULL ORDER BY 1')
         .map((row) => row['dictionaryRef'] as String)
         .toList();
     stdout.writeln(

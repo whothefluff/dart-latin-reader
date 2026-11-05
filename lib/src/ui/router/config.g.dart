@@ -99,7 +99,7 @@ RouteBase get $mainRoute => StatefulShellRouteData.$route(
               factory: _$DictionaryEntriesRoute._fromState,
               routes: [
                 GoRouteData.$route(
-                  path: 'entries/:lemma',
+                  path: 'entries/:entryKey',
 
                   factory: _$DictionaryEntryRoute._fromState,
                 ),
@@ -388,14 +388,14 @@ mixin _$DictionaryEntryRoute on GoRouteData {
   static DictionaryEntryRoute _fromState(GoRouterState state) =>
       DictionaryEntryRoute(
         state.pathParameters['dictionaryId']!,
-        state.pathParameters['lemma']!,
+        state.pathParameters['entryKey']!,
       );
 
   DictionaryEntryRoute get _self => this as DictionaryEntryRoute;
 
   @override
   String get location => GoRouteData.$location(
-    '/dictionaries/${Uri.encodeComponent(_self.dictionaryId)}/entries/${Uri.encodeComponent(_self.lemma)}',
+    '/dictionaries/${Uri.encodeComponent(_self.dictionaryId)}/entries/${Uri.encodeComponent(_self.entryKey)}',
   );
 
   @override

@@ -18,17 +18,17 @@ import '../settings/settings_shell_page.dart' show SettingsTab;
 class DictionaryEntryPage extends ConsumerWidget {
   const DictionaryEntryPage(
     this.dictionary,
-    this.lemma, {
+    this.entryKey, {
     super.key,
   });
 
   final String dictionary;
-  final String lemma;
+  final String entryKey;
 
   @override
   Widget build(context, ref) => SafeBodyScaffold(
     appBar: AppBar(
-      title: Text(entryRefText(lemma)),
+      title: Text(entryRefText(entryKey)),
       actions: [
         IconButton(
           tooltip: 'Dictionary settings',
@@ -42,13 +42,13 @@ class DictionaryEntryPage extends ConsumerWidget {
   );
 
   Widget entriesList(WidgetRef ref, BuildContext context) => ref
-      .watch(dictionaryEntrySensesProvider(dictionary, lemma))
+      .watch(dictionaryEntrySensesProvider(dictionary, entryKey))
       .when(
         data: (senses) => SingleChildScrollView(
           child: _senses(ref, senses),
         ),
         loading: showLoading,
-        error: showError(ref, dictionaryEntrySensesProvider(dictionary, lemma)),
+        error: showError(ref, dictionaryEntrySensesProvider(dictionary, entryKey)),
       );
 
   _Senses _senses(WidgetRef ref, List<EntrySense> senses) {

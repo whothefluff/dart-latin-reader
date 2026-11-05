@@ -214,7 +214,7 @@ typedef $DictionariesProcessedTableManager =
 typedef $DictionaryEntriesCreateCompanionBuilder =
     i1.DictionaryEntriesCompanion Function({
       required String dictionary,
-      required String lemma,
+      required String key,
       i0.Value<String?> partOfSpeech,
       i0.Value<String?> inflection,
       required int idx,
@@ -222,7 +222,7 @@ typedef $DictionaryEntriesCreateCompanionBuilder =
 typedef $DictionaryEntriesUpdateCompanionBuilder =
     i1.DictionaryEntriesCompanion Function({
       i0.Value<String> dictionary,
-      i0.Value<String> lemma,
+      i0.Value<String> key,
       i0.Value<String?> partOfSpeech,
       i0.Value<String?> inflection,
       i0.Value<int> idx,
@@ -242,8 +242,8 @@ class $DictionaryEntriesFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<String> get lemma => $composableBuilder(
-    column: $table.lemma,
+  i0.ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -277,8 +277,8 @@ class $DictionaryEntriesOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
-  i0.ColumnOrderings<String> get lemma => $composableBuilder(
-    column: $table.lemma,
+  i0.ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
     builder: (column) => i0.ColumnOrderings(column),
   );
 
@@ -312,8 +312,8 @@ class $DictionaryEntriesAnnotationComposer
     builder: (column) => column,
   );
 
-  i0.GeneratedColumn<String> get lemma =>
-      $composableBuilder(column: $table.lemma, builder: (column) => column);
+  i0.GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
 
   i0.GeneratedColumn<String> get partOfSpeech => $composableBuilder(
     column: $table.partOfSpeech,
@@ -367,13 +367,13 @@ class $DictionaryEntriesTableManager
           updateCompanionCallback:
               ({
                 i0.Value<String> dictionary = const i0.Value.absent(),
-                i0.Value<String> lemma = const i0.Value.absent(),
+                i0.Value<String> key = const i0.Value.absent(),
                 i0.Value<String?> partOfSpeech = const i0.Value.absent(),
                 i0.Value<String?> inflection = const i0.Value.absent(),
                 i0.Value<int> idx = const i0.Value.absent(),
               }) => i1.DictionaryEntriesCompanion(
                 dictionary: dictionary,
-                lemma: lemma,
+                key: key,
                 partOfSpeech: partOfSpeech,
                 inflection: inflection,
                 idx: idx,
@@ -381,13 +381,13 @@ class $DictionaryEntriesTableManager
           createCompanionCallback:
               ({
                 required String dictionary,
-                required String lemma,
+                required String key,
                 i0.Value<String?> partOfSpeech = const i0.Value.absent(),
                 i0.Value<String?> inflection = const i0.Value.absent(),
                 required int idx,
               }) => i1.DictionaryEntriesCompanion.insert(
                 dictionary: dictionary,
-                lemma: lemma,
+                key: key,
                 partOfSpeech: partOfSpeech,
                 inflection: inflection,
                 idx: idx,
@@ -594,7 +594,7 @@ typedef $DictionaryAlphabetsProcessedTableManager =
 typedef $DictEntrySensesCreateCompanionBuilder =
     i1.DictEntrySensesCompanion Function({
       required String dictionary,
-      required String lemma,
+      required String entryKey,
       required String lvl,
       required String prettyLevel,
       required String content,
@@ -602,7 +602,7 @@ typedef $DictEntrySensesCreateCompanionBuilder =
 typedef $DictEntrySensesUpdateCompanionBuilder =
     i1.DictEntrySensesCompanion Function({
       i0.Value<String> dictionary,
-      i0.Value<String> lemma,
+      i0.Value<String> entryKey,
       i0.Value<String> lvl,
       i0.Value<String> prettyLevel,
       i0.Value<String> content,
@@ -622,8 +622,8 @@ class $DictEntrySensesFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<String> get lemma => $composableBuilder(
-    column: $table.lemma,
+  i0.ColumnFilters<String> get entryKey => $composableBuilder(
+    column: $table.entryKey,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -657,8 +657,8 @@ class $DictEntrySensesOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
-  i0.ColumnOrderings<String> get lemma => $composableBuilder(
-    column: $table.lemma,
+  i0.ColumnOrderings<String> get entryKey => $composableBuilder(
+    column: $table.entryKey,
     builder: (column) => i0.ColumnOrderings(column),
   );
 
@@ -692,8 +692,8 @@ class $DictEntrySensesAnnotationComposer
     builder: (column) => column,
   );
 
-  i0.GeneratedColumn<String> get lemma =>
-      $composableBuilder(column: $table.lemma, builder: (column) => column);
+  i0.GeneratedColumn<String> get entryKey =>
+      $composableBuilder(column: $table.entryKey, builder: (column) => column);
 
   i0.GeneratedColumn<String> get lvl =>
       $composableBuilder(column: $table.lvl, builder: (column) => column);
@@ -745,13 +745,13 @@ class $DictEntrySensesTableManager
           updateCompanionCallback:
               ({
                 i0.Value<String> dictionary = const i0.Value.absent(),
-                i0.Value<String> lemma = const i0.Value.absent(),
+                i0.Value<String> entryKey = const i0.Value.absent(),
                 i0.Value<String> lvl = const i0.Value.absent(),
                 i0.Value<String> prettyLevel = const i0.Value.absent(),
                 i0.Value<String> content = const i0.Value.absent(),
               }) => i1.DictEntrySensesCompanion(
                 dictionary: dictionary,
-                lemma: lemma,
+                entryKey: entryKey,
                 lvl: lvl,
                 prettyLevel: prettyLevel,
                 content: content,
@@ -759,13 +759,13 @@ class $DictEntrySensesTableManager
           createCompanionCallback:
               ({
                 required String dictionary,
-                required String lemma,
+                required String entryKey,
                 required String lvl,
                 required String prettyLevel,
                 required String content,
               }) => i1.DictEntrySensesCompanion.insert(
                 dictionary: dictionary,
-                lemma: lemma,
+                entryKey: entryKey,
                 lvl: lvl,
                 prettyLevel: prettyLevel,
                 content: content,
@@ -802,7 +802,7 @@ typedef $DictEntrySensesProcessedTableManager =
 typedef $DictEntrySenseQuotesCreateCompanionBuilder =
     i1.DictEntrySenseQuotesCompanion Function({
       required String dictionary,
-      required String lemma,
+      required String entryKey,
       required String lvl,
       required int seq,
       required String content,
@@ -811,7 +811,7 @@ typedef $DictEntrySenseQuotesCreateCompanionBuilder =
 typedef $DictEntrySenseQuotesUpdateCompanionBuilder =
     i1.DictEntrySenseQuotesCompanion Function({
       i0.Value<String> dictionary,
-      i0.Value<String> lemma,
+      i0.Value<String> entryKey,
       i0.Value<String> lvl,
       i0.Value<int> seq,
       i0.Value<String> content,
@@ -832,8 +832,8 @@ class $DictEntrySenseQuotesFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<String> get lemma => $composableBuilder(
-    column: $table.lemma,
+  i0.ColumnFilters<String> get entryKey => $composableBuilder(
+    column: $table.entryKey,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -872,8 +872,8 @@ class $DictEntrySenseQuotesOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
-  i0.ColumnOrderings<String> get lemma => $composableBuilder(
-    column: $table.lemma,
+  i0.ColumnOrderings<String> get entryKey => $composableBuilder(
+    column: $table.entryKey,
     builder: (column) => i0.ColumnOrderings(column),
   );
 
@@ -912,8 +912,8 @@ class $DictEntrySenseQuotesAnnotationComposer
     builder: (column) => column,
   );
 
-  i0.GeneratedColumn<String> get lemma =>
-      $composableBuilder(column: $table.lemma, builder: (column) => column);
+  i0.GeneratedColumn<String> get entryKey =>
+      $composableBuilder(column: $table.entryKey, builder: (column) => column);
 
   i0.GeneratedColumn<String> get lvl =>
       $composableBuilder(column: $table.lvl, builder: (column) => column);
@@ -968,14 +968,14 @@ class $DictEntrySenseQuotesTableManager
           updateCompanionCallback:
               ({
                 i0.Value<String> dictionary = const i0.Value.absent(),
-                i0.Value<String> lemma = const i0.Value.absent(),
+                i0.Value<String> entryKey = const i0.Value.absent(),
                 i0.Value<String> lvl = const i0.Value.absent(),
                 i0.Value<int> seq = const i0.Value.absent(),
                 i0.Value<String> content = const i0.Value.absent(),
                 i0.Value<String?> translation = const i0.Value.absent(),
               }) => i1.DictEntrySenseQuotesCompanion(
                 dictionary: dictionary,
-                lemma: lemma,
+                entryKey: entryKey,
                 lvl: lvl,
                 seq: seq,
                 content: content,
@@ -984,14 +984,14 @@ class $DictEntrySenseQuotesTableManager
           createCompanionCallback:
               ({
                 required String dictionary,
-                required String lemma,
+                required String entryKey,
                 required String lvl,
                 required int seq,
                 required String content,
                 i0.Value<String?> translation = const i0.Value.absent(),
               }) => i1.DictEntrySenseQuotesCompanion.insert(
                 dictionary: dictionary,
-                lemma: lemma,
+                entryKey: entryKey,
                 lvl: lvl,
                 seq: seq,
                 content: content,
@@ -1029,12 +1029,12 @@ typedef $DictEntrySenseQuotesProcessedTableManager =
 typedef $LnsRefResolutionsCreateCompanionBuilder =
     i1.LnsRefResolutionsCompanion Function({
       required String dictionaryRef,
-      i0.Value<String?> lnsLemma,
+      i0.Value<String?> lnsEntryKey,
     });
 typedef $LnsRefResolutionsUpdateCompanionBuilder =
     i1.LnsRefResolutionsCompanion Function({
       i0.Value<String> dictionaryRef,
-      i0.Value<String?> lnsLemma,
+      i0.Value<String?> lnsEntryKey,
     });
 
 class $LnsRefResolutionsFilterComposer
@@ -1051,8 +1051,8 @@ class $LnsRefResolutionsFilterComposer
     builder: (column) => i0.ColumnFilters(column),
   );
 
-  i0.ColumnFilters<String> get lnsLemma => $composableBuilder(
-    column: $table.lnsLemma,
+  i0.ColumnFilters<String> get lnsEntryKey => $composableBuilder(
+    column: $table.lnsEntryKey,
     builder: (column) => i0.ColumnFilters(column),
   );
 }
@@ -1071,8 +1071,8 @@ class $LnsRefResolutionsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
-  i0.ColumnOrderings<String> get lnsLemma => $composableBuilder(
-    column: $table.lnsLemma,
+  i0.ColumnOrderings<String> get lnsEntryKey => $composableBuilder(
+    column: $table.lnsEntryKey,
     builder: (column) => i0.ColumnOrderings(column),
   );
 }
@@ -1091,8 +1091,10 @@ class $LnsRefResolutionsAnnotationComposer
     builder: (column) => column,
   );
 
-  i0.GeneratedColumn<String> get lnsLemma =>
-      $composableBuilder(column: $table.lnsLemma, builder: (column) => column);
+  i0.GeneratedColumn<String> get lnsEntryKey => $composableBuilder(
+    column: $table.lnsEntryKey,
+    builder: (column) => column,
+  );
 }
 
 class $LnsRefResolutionsTableManager
@@ -1133,18 +1135,18 @@ class $LnsRefResolutionsTableManager
           updateCompanionCallback:
               ({
                 i0.Value<String> dictionaryRef = const i0.Value.absent(),
-                i0.Value<String?> lnsLemma = const i0.Value.absent(),
+                i0.Value<String?> lnsEntryKey = const i0.Value.absent(),
               }) => i1.LnsRefResolutionsCompanion(
                 dictionaryRef: dictionaryRef,
-                lnsLemma: lnsLemma,
+                lnsEntryKey: lnsEntryKey,
               ),
           createCompanionCallback:
               ({
                 required String dictionaryRef,
-                i0.Value<String?> lnsLemma = const i0.Value.absent(),
+                i0.Value<String?> lnsEntryKey = const i0.Value.absent(),
               }) => i1.LnsRefResolutionsCompanion.insert(
                 dictionaryRef: dictionaryRef,
-                lnsLemma: lnsLemma,
+                lnsEntryKey: lnsEntryKey,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), i0.BaseReferences(db, table, e)))
@@ -1766,11 +1768,9 @@ class DictionaryEntries extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
-  static const i0.VerificationMeta _lemmaMeta = const i0.VerificationMeta(
-    'lemma',
-  );
-  late final i0.GeneratedColumn<String> lemma = i0.GeneratedColumn<String>(
-    'lemma',
+  static const i0.VerificationMeta _keyMeta = const i0.VerificationMeta('key');
+  late final i0.GeneratedColumn<String> key = i0.GeneratedColumn<String>(
+    'key',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
@@ -1811,7 +1811,7 @@ class DictionaryEntries extends i0.Table
   @override
   List<i0.GeneratedColumn> get $columns => [
     dictionary,
-    lemma,
+    key,
     partOfSpeech,
     inflection,
     idx,
@@ -1836,13 +1836,13 @@ class DictionaryEntries extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryMeta);
     }
-    if (data.containsKey('lemma')) {
+    if (data.containsKey('key')) {
       context.handle(
-        _lemmaMeta,
-        lemma.isAcceptableOrUnknown(data['lemma']!, _lemmaMeta),
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
       );
     } else if (isInserting) {
-      context.missing(_lemmaMeta);
+      context.missing(_keyMeta);
     }
     if (data.containsKey('partOfSpeech')) {
       context.handle(
@@ -1874,7 +1874,7 @@ class DictionaryEntries extends i0.Table
   Set<i0.GeneratedColumn> get $primaryKey => {dictionary, idx};
   @override
   List<Set<i0.GeneratedColumn>> get uniqueKeys => [
-    {lemma, dictionary},
+    {key, dictionary},
   ];
   @override
   i1.DictionaryEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -1884,9 +1884,9 @@ class DictionaryEntries extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionary'],
       )!,
-      lemma: attachedDatabase.typeMapping.read(
+      key: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}lemma'],
+        data['${effectivePrefix}key'],
       )!,
       partOfSpeech: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -1916,7 +1916,7 @@ class DictionaryEntries extends i0.Table
   List<String> get customConstraints => const [
     'PRIMARY KEY(dictionary, idx)',
     'FOREIGN KEY(dictionary)REFERENCES Dictionaries(id)',
-    'UNIQUE(lemma, dictionary)',
+    'UNIQUE("key", dictionary)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -1925,15 +1925,15 @@ class DictionaryEntries extends i0.Table
 class DictionaryEntry extends i0.DataClass
     implements i0.Insertable<i1.DictionaryEntry> {
   final String dictionary;
-  final String lemma;
+  final String key;
 
-  ///not primary key but should still used to join with DictEntrySenses
+  /// headword + homograph disambiguation number
   final String? partOfSpeech;
   final String? inflection;
   final int idx;
   const DictionaryEntry({
     required this.dictionary,
-    required this.lemma,
+    required this.key,
     this.partOfSpeech,
     this.inflection,
     required this.idx,
@@ -1942,7 +1942,7 @@ class DictionaryEntry extends i0.DataClass
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
     map['dictionary'] = i0.Variable<String>(dictionary);
-    map['lemma'] = i0.Variable<String>(lemma);
+    map['key'] = i0.Variable<String>(key);
     if (!nullToAbsent || partOfSpeech != null) {
       map['partOfSpeech'] = i0.Variable<String>(partOfSpeech);
     }
@@ -1956,7 +1956,7 @@ class DictionaryEntry extends i0.DataClass
   i1.DictionaryEntriesCompanion toCompanion(bool nullToAbsent) {
     return i1.DictionaryEntriesCompanion(
       dictionary: i0.Value(dictionary),
-      lemma: i0.Value(lemma),
+      key: i0.Value(key),
       partOfSpeech: partOfSpeech == null && nullToAbsent
           ? const i0.Value.absent()
           : i0.Value(partOfSpeech),
@@ -1974,7 +1974,7 @@ class DictionaryEntry extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return DictionaryEntry(
       dictionary: serializer.fromJson<String>(json['dictionary']),
-      lemma: serializer.fromJson<String>(json['lemma']),
+      key: serializer.fromJson<String>(json['key']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
       inflection: serializer.fromJson<String?>(json['inflection']),
       idx: serializer.fromJson<int>(json['idx']),
@@ -1985,7 +1985,7 @@ class DictionaryEntry extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'dictionary': serializer.toJson<String>(dictionary),
-      'lemma': serializer.toJson<String>(lemma),
+      'key': serializer.toJson<String>(key),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
       'inflection': serializer.toJson<String?>(inflection),
       'idx': serializer.toJson<int>(idx),
@@ -1994,13 +1994,13 @@ class DictionaryEntry extends i0.DataClass
 
   i1.DictionaryEntry copyWith({
     String? dictionary,
-    String? lemma,
+    String? key,
     i0.Value<String?> partOfSpeech = const i0.Value.absent(),
     i0.Value<String?> inflection = const i0.Value.absent(),
     int? idx,
   }) => i1.DictionaryEntry(
     dictionary: dictionary ?? this.dictionary,
-    lemma: lemma ?? this.lemma,
+    key: key ?? this.key,
     partOfSpeech: partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
     inflection: inflection.present ? inflection.value : this.inflection,
     idx: idx ?? this.idx,
@@ -2010,7 +2010,7 @@ class DictionaryEntry extends i0.DataClass
       dictionary: data.dictionary.present
           ? data.dictionary.value
           : this.dictionary,
-      lemma: data.lemma.present ? data.lemma.value : this.lemma,
+      key: data.key.present ? data.key.value : this.key,
       partOfSpeech: data.partOfSpeech.present
           ? data.partOfSpeech.value
           : this.partOfSpeech,
@@ -2025,7 +2025,7 @@ class DictionaryEntry extends i0.DataClass
   String toString() {
     return (StringBuffer('DictionaryEntry(')
           ..write('dictionary: $dictionary, ')
-          ..write('lemma: $lemma, ')
+          ..write('key: $key, ')
           ..write('partOfSpeech: $partOfSpeech, ')
           ..write('inflection: $inflection, ')
           ..write('idx: $idx')
@@ -2035,13 +2035,13 @@ class DictionaryEntry extends i0.DataClass
 
   @override
   int get hashCode =>
-      Object.hash(dictionary, lemma, partOfSpeech, inflection, idx);
+      Object.hash(dictionary, key, partOfSpeech, inflection, idx);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.DictionaryEntry &&
           other.dictionary == this.dictionary &&
-          other.lemma == this.lemma &&
+          other.key == this.key &&
           other.partOfSpeech == this.partOfSpeech &&
           other.inflection == this.inflection &&
           other.idx == this.idx);
@@ -2050,36 +2050,36 @@ class DictionaryEntry extends i0.DataClass
 class DictionaryEntriesCompanion
     extends i0.UpdateCompanion<i1.DictionaryEntry> {
   final i0.Value<String> dictionary;
-  final i0.Value<String> lemma;
+  final i0.Value<String> key;
   final i0.Value<String?> partOfSpeech;
   final i0.Value<String?> inflection;
   final i0.Value<int> idx;
   const DictionaryEntriesCompanion({
     this.dictionary = const i0.Value.absent(),
-    this.lemma = const i0.Value.absent(),
+    this.key = const i0.Value.absent(),
     this.partOfSpeech = const i0.Value.absent(),
     this.inflection = const i0.Value.absent(),
     this.idx = const i0.Value.absent(),
   });
   DictionaryEntriesCompanion.insert({
     required String dictionary,
-    required String lemma,
+    required String key,
     this.partOfSpeech = const i0.Value.absent(),
     this.inflection = const i0.Value.absent(),
     required int idx,
   }) : dictionary = i0.Value(dictionary),
-       lemma = i0.Value(lemma),
+       key = i0.Value(key),
        idx = i0.Value(idx);
   static i0.Insertable<i1.DictionaryEntry> custom({
     i0.Expression<String>? dictionary,
-    i0.Expression<String>? lemma,
+    i0.Expression<String>? key,
     i0.Expression<String>? partOfSpeech,
     i0.Expression<String>? inflection,
     i0.Expression<int>? idx,
   }) {
     return i0.RawValuesInsertable({
       if (dictionary != null) 'dictionary': dictionary,
-      if (lemma != null) 'lemma': lemma,
+      if (key != null) 'key': key,
       if (partOfSpeech != null) 'partOfSpeech': partOfSpeech,
       if (inflection != null) 'inflection': inflection,
       if (idx != null) 'idx': idx,
@@ -2088,14 +2088,14 @@ class DictionaryEntriesCompanion
 
   i1.DictionaryEntriesCompanion copyWith({
     i0.Value<String>? dictionary,
-    i0.Value<String>? lemma,
+    i0.Value<String>? key,
     i0.Value<String?>? partOfSpeech,
     i0.Value<String?>? inflection,
     i0.Value<int>? idx,
   }) {
     return i1.DictionaryEntriesCompanion(
       dictionary: dictionary ?? this.dictionary,
-      lemma: lemma ?? this.lemma,
+      key: key ?? this.key,
       partOfSpeech: partOfSpeech ?? this.partOfSpeech,
       inflection: inflection ?? this.inflection,
       idx: idx ?? this.idx,
@@ -2108,8 +2108,8 @@ class DictionaryEntriesCompanion
     if (dictionary.present) {
       map['dictionary'] = i0.Variable<String>(dictionary.value);
     }
-    if (lemma.present) {
-      map['lemma'] = i0.Variable<String>(lemma.value);
+    if (key.present) {
+      map['key'] = i0.Variable<String>(key.value);
     }
     if (partOfSpeech.present) {
       map['partOfSpeech'] = i0.Variable<String>(partOfSpeech.value);
@@ -2127,7 +2127,7 @@ class DictionaryEntriesCompanion
   String toString() {
     return (StringBuffer('DictionaryEntriesCompanion(')
           ..write('dictionary: $dictionary, ')
-          ..write('lemma: $lemma, ')
+          ..write('key: $key, ')
           ..write('partOfSpeech: $partOfSpeech, ')
           ..write('inflection: $inflection, ')
           ..write('idx: $idx')
@@ -2440,11 +2440,11 @@ class DictEntrySenses extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
-  static const i0.VerificationMeta _lemmaMeta = const i0.VerificationMeta(
-    'lemma',
+  static const i0.VerificationMeta _entryKeyMeta = const i0.VerificationMeta(
+    'entryKey',
   );
-  late final i0.GeneratedColumn<String> lemma = i0.GeneratedColumn<String>(
-    'lemma',
+  late final i0.GeneratedColumn<String> entryKey = i0.GeneratedColumn<String>(
+    'entryKey',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
@@ -2486,7 +2486,7 @@ class DictEntrySenses extends i0.Table
   @override
   List<i0.GeneratedColumn> get $columns => [
     dictionary,
-    lemma,
+    entryKey,
     lvl,
     prettyLevel,
     content,
@@ -2511,13 +2511,13 @@ class DictEntrySenses extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryMeta);
     }
-    if (data.containsKey('lemma')) {
+    if (data.containsKey('entryKey')) {
       context.handle(
-        _lemmaMeta,
-        lemma.isAcceptableOrUnknown(data['lemma']!, _lemmaMeta),
+        _entryKeyMeta,
+        entryKey.isAcceptableOrUnknown(data['entryKey']!, _entryKeyMeta),
       );
     } else if (isInserting) {
-      context.missing(_lemmaMeta);
+      context.missing(_entryKeyMeta);
     }
     if (data.containsKey('lvl')) {
       context.handle(
@@ -2550,7 +2550,7 @@ class DictEntrySenses extends i0.Table
   }
 
   @override
-  Set<i0.GeneratedColumn> get $primaryKey => {dictionary, lemma, lvl};
+  Set<i0.GeneratedColumn> get $primaryKey => {dictionary, entryKey, lvl};
   @override
   i1.DictEntrySense map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2559,9 +2559,9 @@ class DictEntrySenses extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionary'],
       )!,
-      lemma: attachedDatabase.typeMapping.read(
+      entryKey: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}lemma'],
+        data['${effectivePrefix}entryKey'],
       )!,
       lvl: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -2589,8 +2589,8 @@ class DictEntrySenses extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(dictionary, lemma, lvl)',
-    'FOREIGN KEY(lemma, dictionary)REFERENCES DictionaryEntries(lemma, dictionary)',
+    'PRIMARY KEY(dictionary, entryKey, lvl)',
+    'FOREIGN KEY(entryKey, dictionary)REFERENCES DictionaryEntries("key", dictionary)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -2599,13 +2599,13 @@ class DictEntrySenses extends i0.Table
 class DictEntrySense extends i0.DataClass
     implements i0.Insertable<i1.DictEntrySense> {
   final String dictionary;
-  final String lemma;
+  final String entryKey;
   final String lvl;
   final String prettyLevel;
   final String content;
   const DictEntrySense({
     required this.dictionary,
-    required this.lemma,
+    required this.entryKey,
     required this.lvl,
     required this.prettyLevel,
     required this.content,
@@ -2614,7 +2614,7 @@ class DictEntrySense extends i0.DataClass
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
     map['dictionary'] = i0.Variable<String>(dictionary);
-    map['lemma'] = i0.Variable<String>(lemma);
+    map['entryKey'] = i0.Variable<String>(entryKey);
     map['lvl'] = i0.Variable<String>(lvl);
     map['prettyLevel'] = i0.Variable<String>(prettyLevel);
     map['content'] = i0.Variable<String>(content);
@@ -2624,7 +2624,7 @@ class DictEntrySense extends i0.DataClass
   i1.DictEntrySensesCompanion toCompanion(bool nullToAbsent) {
     return i1.DictEntrySensesCompanion(
       dictionary: i0.Value(dictionary),
-      lemma: i0.Value(lemma),
+      entryKey: i0.Value(entryKey),
       lvl: i0.Value(lvl),
       prettyLevel: i0.Value(prettyLevel),
       content: i0.Value(content),
@@ -2638,7 +2638,7 @@ class DictEntrySense extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return DictEntrySense(
       dictionary: serializer.fromJson<String>(json['dictionary']),
-      lemma: serializer.fromJson<String>(json['lemma']),
+      entryKey: serializer.fromJson<String>(json['entryKey']),
       lvl: serializer.fromJson<String>(json['lvl']),
       prettyLevel: serializer.fromJson<String>(json['prettyLevel']),
       content: serializer.fromJson<String>(json['content']),
@@ -2649,7 +2649,7 @@ class DictEntrySense extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'dictionary': serializer.toJson<String>(dictionary),
-      'lemma': serializer.toJson<String>(lemma),
+      'entryKey': serializer.toJson<String>(entryKey),
       'lvl': serializer.toJson<String>(lvl),
       'prettyLevel': serializer.toJson<String>(prettyLevel),
       'content': serializer.toJson<String>(content),
@@ -2658,13 +2658,13 @@ class DictEntrySense extends i0.DataClass
 
   i1.DictEntrySense copyWith({
     String? dictionary,
-    String? lemma,
+    String? entryKey,
     String? lvl,
     String? prettyLevel,
     String? content,
   }) => i1.DictEntrySense(
     dictionary: dictionary ?? this.dictionary,
-    lemma: lemma ?? this.lemma,
+    entryKey: entryKey ?? this.entryKey,
     lvl: lvl ?? this.lvl,
     prettyLevel: prettyLevel ?? this.prettyLevel,
     content: content ?? this.content,
@@ -2674,7 +2674,7 @@ class DictEntrySense extends i0.DataClass
       dictionary: data.dictionary.present
           ? data.dictionary.value
           : this.dictionary,
-      lemma: data.lemma.present ? data.lemma.value : this.lemma,
+      entryKey: data.entryKey.present ? data.entryKey.value : this.entryKey,
       lvl: data.lvl.present ? data.lvl.value : this.lvl,
       prettyLevel: data.prettyLevel.present
           ? data.prettyLevel.value
@@ -2687,7 +2687,7 @@ class DictEntrySense extends i0.DataClass
   String toString() {
     return (StringBuffer('DictEntrySense(')
           ..write('dictionary: $dictionary, ')
-          ..write('lemma: $lemma, ')
+          ..write('entryKey: $entryKey, ')
           ..write('lvl: $lvl, ')
           ..write('prettyLevel: $prettyLevel, ')
           ..write('content: $content')
@@ -2696,13 +2696,14 @@ class DictEntrySense extends i0.DataClass
   }
 
   @override
-  int get hashCode => Object.hash(dictionary, lemma, lvl, prettyLevel, content);
+  int get hashCode =>
+      Object.hash(dictionary, entryKey, lvl, prettyLevel, content);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.DictEntrySense &&
           other.dictionary == this.dictionary &&
-          other.lemma == this.lemma &&
+          other.entryKey == this.entryKey &&
           other.lvl == this.lvl &&
           other.prettyLevel == this.prettyLevel &&
           other.content == this.content);
@@ -2710,38 +2711,38 @@ class DictEntrySense extends i0.DataClass
 
 class DictEntrySensesCompanion extends i0.UpdateCompanion<i1.DictEntrySense> {
   final i0.Value<String> dictionary;
-  final i0.Value<String> lemma;
+  final i0.Value<String> entryKey;
   final i0.Value<String> lvl;
   final i0.Value<String> prettyLevel;
   final i0.Value<String> content;
   const DictEntrySensesCompanion({
     this.dictionary = const i0.Value.absent(),
-    this.lemma = const i0.Value.absent(),
+    this.entryKey = const i0.Value.absent(),
     this.lvl = const i0.Value.absent(),
     this.prettyLevel = const i0.Value.absent(),
     this.content = const i0.Value.absent(),
   });
   DictEntrySensesCompanion.insert({
     required String dictionary,
-    required String lemma,
+    required String entryKey,
     required String lvl,
     required String prettyLevel,
     required String content,
   }) : dictionary = i0.Value(dictionary),
-       lemma = i0.Value(lemma),
+       entryKey = i0.Value(entryKey),
        lvl = i0.Value(lvl),
        prettyLevel = i0.Value(prettyLevel),
        content = i0.Value(content);
   static i0.Insertable<i1.DictEntrySense> custom({
     i0.Expression<String>? dictionary,
-    i0.Expression<String>? lemma,
+    i0.Expression<String>? entryKey,
     i0.Expression<String>? lvl,
     i0.Expression<String>? prettyLevel,
     i0.Expression<String>? content,
   }) {
     return i0.RawValuesInsertable({
       if (dictionary != null) 'dictionary': dictionary,
-      if (lemma != null) 'lemma': lemma,
+      if (entryKey != null) 'entryKey': entryKey,
       if (lvl != null) 'lvl': lvl,
       if (prettyLevel != null) 'prettyLevel': prettyLevel,
       if (content != null) 'content': content,
@@ -2750,14 +2751,14 @@ class DictEntrySensesCompanion extends i0.UpdateCompanion<i1.DictEntrySense> {
 
   i1.DictEntrySensesCompanion copyWith({
     i0.Value<String>? dictionary,
-    i0.Value<String>? lemma,
+    i0.Value<String>? entryKey,
     i0.Value<String>? lvl,
     i0.Value<String>? prettyLevel,
     i0.Value<String>? content,
   }) {
     return i1.DictEntrySensesCompanion(
       dictionary: dictionary ?? this.dictionary,
-      lemma: lemma ?? this.lemma,
+      entryKey: entryKey ?? this.entryKey,
       lvl: lvl ?? this.lvl,
       prettyLevel: prettyLevel ?? this.prettyLevel,
       content: content ?? this.content,
@@ -2770,8 +2771,8 @@ class DictEntrySensesCompanion extends i0.UpdateCompanion<i1.DictEntrySense> {
     if (dictionary.present) {
       map['dictionary'] = i0.Variable<String>(dictionary.value);
     }
-    if (lemma.present) {
-      map['lemma'] = i0.Variable<String>(lemma.value);
+    if (entryKey.present) {
+      map['entryKey'] = i0.Variable<String>(entryKey.value);
     }
     if (lvl.present) {
       map['lvl'] = i0.Variable<String>(lvl.value);
@@ -2789,7 +2790,7 @@ class DictEntrySensesCompanion extends i0.UpdateCompanion<i1.DictEntrySense> {
   String toString() {
     return (StringBuffer('DictEntrySensesCompanion(')
           ..write('dictionary: $dictionary, ')
-          ..write('lemma: $lemma, ')
+          ..write('entryKey: $entryKey, ')
           ..write('lvl: $lvl, ')
           ..write('prettyLevel: $prettyLevel, ')
           ..write('content: $content')
@@ -2815,11 +2816,11 @@ class DictEntrySenseQuotes extends i0.Table
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
-  static const i0.VerificationMeta _lemmaMeta = const i0.VerificationMeta(
-    'lemma',
+  static const i0.VerificationMeta _entryKeyMeta = const i0.VerificationMeta(
+    'entryKey',
   );
-  late final i0.GeneratedColumn<String> lemma = i0.GeneratedColumn<String>(
-    'lemma',
+  late final i0.GeneratedColumn<String> entryKey = i0.GeneratedColumn<String>(
+    'entryKey',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
@@ -2870,7 +2871,7 @@ class DictEntrySenseQuotes extends i0.Table
   @override
   List<i0.GeneratedColumn> get $columns => [
     dictionary,
-    lemma,
+    entryKey,
     lvl,
     seq,
     content,
@@ -2896,13 +2897,13 @@ class DictEntrySenseQuotes extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryMeta);
     }
-    if (data.containsKey('lemma')) {
+    if (data.containsKey('entryKey')) {
       context.handle(
-        _lemmaMeta,
-        lemma.isAcceptableOrUnknown(data['lemma']!, _lemmaMeta),
+        _entryKeyMeta,
+        entryKey.isAcceptableOrUnknown(data['entryKey']!, _entryKeyMeta),
       );
     } else if (isInserting) {
-      context.missing(_lemmaMeta);
+      context.missing(_entryKeyMeta);
     }
     if (data.containsKey('lvl')) {
       context.handle(
@@ -2941,7 +2942,7 @@ class DictEntrySenseQuotes extends i0.Table
   }
 
   @override
-  Set<i0.GeneratedColumn> get $primaryKey => {dictionary, lemma, lvl, seq};
+  Set<i0.GeneratedColumn> get $primaryKey => {dictionary, entryKey, lvl, seq};
   @override
   i1.DictEntrySenseQuote map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2950,9 +2951,9 @@ class DictEntrySenseQuotes extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionary'],
       )!,
-      lemma: attachedDatabase.typeMapping.read(
+      entryKey: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}lemma'],
+        data['${effectivePrefix}entryKey'],
       )!,
       lvl: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -2984,8 +2985,8 @@ class DictEntrySenseQuotes extends i0.Table
   bool get isStrict => true;
   @override
   List<String> get customConstraints => const [
-    'PRIMARY KEY(dictionary, lemma, lvl, seq)',
-    'FOREIGN KEY(dictionary, lemma, lvl)REFERENCES DictEntrySenses(dictionary, lemma, lvl)',
+    'PRIMARY KEY(dictionary, entryKey, lvl, seq)',
+    'FOREIGN KEY(dictionary, entryKey, lvl)REFERENCES DictEntrySenses(dictionary, entryKey, lvl)',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -2994,14 +2995,14 @@ class DictEntrySenseQuotes extends i0.Table
 class DictEntrySenseQuote extends i0.DataClass
     implements i0.Insertable<i1.DictEntrySenseQuote> {
   final String dictionary;
-  final String lemma;
+  final String entryKey;
   final String lvl;
   final int seq;
   final String content;
   final String? translation;
   const DictEntrySenseQuote({
     required this.dictionary,
-    required this.lemma,
+    required this.entryKey,
     required this.lvl,
     required this.seq,
     required this.content,
@@ -3011,7 +3012,7 @@ class DictEntrySenseQuote extends i0.DataClass
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
     map['dictionary'] = i0.Variable<String>(dictionary);
-    map['lemma'] = i0.Variable<String>(lemma);
+    map['entryKey'] = i0.Variable<String>(entryKey);
     map['lvl'] = i0.Variable<String>(lvl);
     map['seq'] = i0.Variable<int>(seq);
     map['content'] = i0.Variable<String>(content);
@@ -3024,7 +3025,7 @@ class DictEntrySenseQuote extends i0.DataClass
   i1.DictEntrySenseQuotesCompanion toCompanion(bool nullToAbsent) {
     return i1.DictEntrySenseQuotesCompanion(
       dictionary: i0.Value(dictionary),
-      lemma: i0.Value(lemma),
+      entryKey: i0.Value(entryKey),
       lvl: i0.Value(lvl),
       seq: i0.Value(seq),
       content: i0.Value(content),
@@ -3041,7 +3042,7 @@ class DictEntrySenseQuote extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return DictEntrySenseQuote(
       dictionary: serializer.fromJson<String>(json['dictionary']),
-      lemma: serializer.fromJson<String>(json['lemma']),
+      entryKey: serializer.fromJson<String>(json['entryKey']),
       lvl: serializer.fromJson<String>(json['lvl']),
       seq: serializer.fromJson<int>(json['seq']),
       content: serializer.fromJson<String>(json['content']),
@@ -3053,7 +3054,7 @@ class DictEntrySenseQuote extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'dictionary': serializer.toJson<String>(dictionary),
-      'lemma': serializer.toJson<String>(lemma),
+      'entryKey': serializer.toJson<String>(entryKey),
       'lvl': serializer.toJson<String>(lvl),
       'seq': serializer.toJson<int>(seq),
       'content': serializer.toJson<String>(content),
@@ -3063,14 +3064,14 @@ class DictEntrySenseQuote extends i0.DataClass
 
   i1.DictEntrySenseQuote copyWith({
     String? dictionary,
-    String? lemma,
+    String? entryKey,
     String? lvl,
     int? seq,
     String? content,
     i0.Value<String?> translation = const i0.Value.absent(),
   }) => i1.DictEntrySenseQuote(
     dictionary: dictionary ?? this.dictionary,
-    lemma: lemma ?? this.lemma,
+    entryKey: entryKey ?? this.entryKey,
     lvl: lvl ?? this.lvl,
     seq: seq ?? this.seq,
     content: content ?? this.content,
@@ -3081,7 +3082,7 @@ class DictEntrySenseQuote extends i0.DataClass
       dictionary: data.dictionary.present
           ? data.dictionary.value
           : this.dictionary,
-      lemma: data.lemma.present ? data.lemma.value : this.lemma,
+      entryKey: data.entryKey.present ? data.entryKey.value : this.entryKey,
       lvl: data.lvl.present ? data.lvl.value : this.lvl,
       seq: data.seq.present ? data.seq.value : this.seq,
       content: data.content.present ? data.content.value : this.content,
@@ -3095,7 +3096,7 @@ class DictEntrySenseQuote extends i0.DataClass
   String toString() {
     return (StringBuffer('DictEntrySenseQuote(')
           ..write('dictionary: $dictionary, ')
-          ..write('lemma: $lemma, ')
+          ..write('entryKey: $entryKey, ')
           ..write('lvl: $lvl, ')
           ..write('seq: $seq, ')
           ..write('content: $content, ')
@@ -3106,13 +3107,13 @@ class DictEntrySenseQuote extends i0.DataClass
 
   @override
   int get hashCode =>
-      Object.hash(dictionary, lemma, lvl, seq, content, translation);
+      Object.hash(dictionary, entryKey, lvl, seq, content, translation);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.DictEntrySenseQuote &&
           other.dictionary == this.dictionary &&
-          other.lemma == this.lemma &&
+          other.entryKey == this.entryKey &&
           other.lvl == this.lvl &&
           other.seq == this.seq &&
           other.content == this.content &&
@@ -3122,14 +3123,14 @@ class DictEntrySenseQuote extends i0.DataClass
 class DictEntrySenseQuotesCompanion
     extends i0.UpdateCompanion<i1.DictEntrySenseQuote> {
   final i0.Value<String> dictionary;
-  final i0.Value<String> lemma;
+  final i0.Value<String> entryKey;
   final i0.Value<String> lvl;
   final i0.Value<int> seq;
   final i0.Value<String> content;
   final i0.Value<String?> translation;
   const DictEntrySenseQuotesCompanion({
     this.dictionary = const i0.Value.absent(),
-    this.lemma = const i0.Value.absent(),
+    this.entryKey = const i0.Value.absent(),
     this.lvl = const i0.Value.absent(),
     this.seq = const i0.Value.absent(),
     this.content = const i0.Value.absent(),
@@ -3137,19 +3138,19 @@ class DictEntrySenseQuotesCompanion
   });
   DictEntrySenseQuotesCompanion.insert({
     required String dictionary,
-    required String lemma,
+    required String entryKey,
     required String lvl,
     required int seq,
     required String content,
     this.translation = const i0.Value.absent(),
   }) : dictionary = i0.Value(dictionary),
-       lemma = i0.Value(lemma),
+       entryKey = i0.Value(entryKey),
        lvl = i0.Value(lvl),
        seq = i0.Value(seq),
        content = i0.Value(content);
   static i0.Insertable<i1.DictEntrySenseQuote> custom({
     i0.Expression<String>? dictionary,
-    i0.Expression<String>? lemma,
+    i0.Expression<String>? entryKey,
     i0.Expression<String>? lvl,
     i0.Expression<int>? seq,
     i0.Expression<String>? content,
@@ -3157,7 +3158,7 @@ class DictEntrySenseQuotesCompanion
   }) {
     return i0.RawValuesInsertable({
       if (dictionary != null) 'dictionary': dictionary,
-      if (lemma != null) 'lemma': lemma,
+      if (entryKey != null) 'entryKey': entryKey,
       if (lvl != null) 'lvl': lvl,
       if (seq != null) 'seq': seq,
       if (content != null) 'content': content,
@@ -3167,7 +3168,7 @@ class DictEntrySenseQuotesCompanion
 
   i1.DictEntrySenseQuotesCompanion copyWith({
     i0.Value<String>? dictionary,
-    i0.Value<String>? lemma,
+    i0.Value<String>? entryKey,
     i0.Value<String>? lvl,
     i0.Value<int>? seq,
     i0.Value<String>? content,
@@ -3175,7 +3176,7 @@ class DictEntrySenseQuotesCompanion
   }) {
     return i1.DictEntrySenseQuotesCompanion(
       dictionary: dictionary ?? this.dictionary,
-      lemma: lemma ?? this.lemma,
+      entryKey: entryKey ?? this.entryKey,
       lvl: lvl ?? this.lvl,
       seq: seq ?? this.seq,
       content: content ?? this.content,
@@ -3189,8 +3190,8 @@ class DictEntrySenseQuotesCompanion
     if (dictionary.present) {
       map['dictionary'] = i0.Variable<String>(dictionary.value);
     }
-    if (lemma.present) {
-      map['lemma'] = i0.Variable<String>(lemma.value);
+    if (entryKey.present) {
+      map['entryKey'] = i0.Variable<String>(entryKey.value);
     }
     if (lvl.present) {
       map['lvl'] = i0.Variable<String>(lvl.value);
@@ -3211,7 +3212,7 @@ class DictEntrySenseQuotesCompanion
   String toString() {
     return (StringBuffer('DictEntrySenseQuotesCompanion(')
           ..write('dictionary: $dictionary, ')
-          ..write('lemma: $lemma, ')
+          ..write('entryKey: $entryKey, ')
           ..write('lvl: $lvl, ')
           ..write('seq: $seq, ')
           ..write('content: $content, ')
@@ -3238,19 +3239,20 @@ class LnsRefResolutions extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
-  static const i0.VerificationMeta _lnsLemmaMeta = const i0.VerificationMeta(
-    'lnsLemma',
+  static const i0.VerificationMeta _lnsEntryKeyMeta = const i0.VerificationMeta(
+    'lnsEntryKey',
   );
-  late final i0.GeneratedColumn<String> lnsLemma = i0.GeneratedColumn<String>(
-    'lnsLemma',
-    aliasedName,
-    true,
-    type: i0.DriftSqlType.string,
-    requiredDuringInsert: false,
-    $customConstraints: '',
-  );
+  late final i0.GeneratedColumn<String> lnsEntryKey =
+      i0.GeneratedColumn<String>(
+        'lnsEntryKey',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: false,
+        $customConstraints: '',
+      );
   @override
-  List<i0.GeneratedColumn> get $columns => [dictionaryRef, lnsLemma];
+  List<i0.GeneratedColumn> get $columns => [dictionaryRef, lnsEntryKey];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3274,10 +3276,13 @@ class LnsRefResolutions extends i0.Table
     } else if (isInserting) {
       context.missing(_dictionaryRefMeta);
     }
-    if (data.containsKey('lnsLemma')) {
+    if (data.containsKey('lnsEntryKey')) {
       context.handle(
-        _lnsLemmaMeta,
-        lnsLemma.isAcceptableOrUnknown(data['lnsLemma']!, _lnsLemmaMeta),
+        _lnsEntryKeyMeta,
+        lnsEntryKey.isAcceptableOrUnknown(
+          data['lnsEntryKey']!,
+          _lnsEntryKeyMeta,
+        ),
       );
     }
     return context;
@@ -3293,9 +3298,9 @@ class LnsRefResolutions extends i0.Table
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
       )!,
-      lnsLemma: attachedDatabase.typeMapping.read(
+      lnsEntryKey: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}lnsLemma'],
+        data['${effectivePrefix}lnsEntryKey'],
       ),
     );
   }
@@ -3318,14 +3323,14 @@ class LnsRefResolutions extends i0.Table
 class LnsRefResolution extends i0.DataClass
     implements i0.Insertable<i1.LnsRefResolution> {
   final String dictionaryRef;
-  final String? lnsLemma;
-  const LnsRefResolution({required this.dictionaryRef, this.lnsLemma});
+  final String? lnsEntryKey;
+  const LnsRefResolution({required this.dictionaryRef, this.lnsEntryKey});
   @override
   Map<String, i0.Expression> toColumns(bool nullToAbsent) {
     final map = <String, i0.Expression>{};
     map['dictionaryRef'] = i0.Variable<String>(dictionaryRef);
-    if (!nullToAbsent || lnsLemma != null) {
-      map['lnsLemma'] = i0.Variable<String>(lnsLemma);
+    if (!nullToAbsent || lnsEntryKey != null) {
+      map['lnsEntryKey'] = i0.Variable<String>(lnsEntryKey);
     }
     return map;
   }
@@ -3333,9 +3338,9 @@ class LnsRefResolution extends i0.DataClass
   i1.LnsRefResolutionsCompanion toCompanion(bool nullToAbsent) {
     return i1.LnsRefResolutionsCompanion(
       dictionaryRef: i0.Value(dictionaryRef),
-      lnsLemma: lnsLemma == null && nullToAbsent
+      lnsEntryKey: lnsEntryKey == null && nullToAbsent
           ? const i0.Value.absent()
-          : i0.Value(lnsLemma),
+          : i0.Value(lnsEntryKey),
     );
   }
 
@@ -3346,7 +3351,7 @@ class LnsRefResolution extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return LnsRefResolution(
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
-      lnsLemma: serializer.fromJson<String?>(json['lnsLemma']),
+      lnsEntryKey: serializer.fromJson<String?>(json['lnsEntryKey']),
     );
   }
   @override
@@ -3354,23 +3359,25 @@ class LnsRefResolution extends i0.DataClass
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
-      'lnsLemma': serializer.toJson<String?>(lnsLemma),
+      'lnsEntryKey': serializer.toJson<String?>(lnsEntryKey),
     };
   }
 
   i1.LnsRefResolution copyWith({
     String? dictionaryRef,
-    i0.Value<String?> lnsLemma = const i0.Value.absent(),
+    i0.Value<String?> lnsEntryKey = const i0.Value.absent(),
   }) => i1.LnsRefResolution(
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
-    lnsLemma: lnsLemma.present ? lnsLemma.value : this.lnsLemma,
+    lnsEntryKey: lnsEntryKey.present ? lnsEntryKey.value : this.lnsEntryKey,
   );
   LnsRefResolution copyWithCompanion(i1.LnsRefResolutionsCompanion data) {
     return LnsRefResolution(
       dictionaryRef: data.dictionaryRef.present
           ? data.dictionaryRef.value
           : this.dictionaryRef,
-      lnsLemma: data.lnsLemma.present ? data.lnsLemma.value : this.lnsLemma,
+      lnsEntryKey: data.lnsEntryKey.present
+          ? data.lnsEntryKey.value
+          : this.lnsEntryKey,
     );
   }
 
@@ -3378,50 +3385,50 @@ class LnsRefResolution extends i0.DataClass
   String toString() {
     return (StringBuffer('LnsRefResolution(')
           ..write('dictionaryRef: $dictionaryRef, ')
-          ..write('lnsLemma: $lnsLemma')
+          ..write('lnsEntryKey: $lnsEntryKey')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(dictionaryRef, lnsLemma);
+  int get hashCode => Object.hash(dictionaryRef, lnsEntryKey);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.LnsRefResolution &&
           other.dictionaryRef == this.dictionaryRef &&
-          other.lnsLemma == this.lnsLemma);
+          other.lnsEntryKey == this.lnsEntryKey);
 }
 
 class LnsRefResolutionsCompanion
     extends i0.UpdateCompanion<i1.LnsRefResolution> {
   final i0.Value<String> dictionaryRef;
-  final i0.Value<String?> lnsLemma;
+  final i0.Value<String?> lnsEntryKey;
   const LnsRefResolutionsCompanion({
     this.dictionaryRef = const i0.Value.absent(),
-    this.lnsLemma = const i0.Value.absent(),
+    this.lnsEntryKey = const i0.Value.absent(),
   });
   LnsRefResolutionsCompanion.insert({
     required String dictionaryRef,
-    this.lnsLemma = const i0.Value.absent(),
+    this.lnsEntryKey = const i0.Value.absent(),
   }) : dictionaryRef = i0.Value(dictionaryRef);
   static i0.Insertable<i1.LnsRefResolution> custom({
     i0.Expression<String>? dictionaryRef,
-    i0.Expression<String>? lnsLemma,
+    i0.Expression<String>? lnsEntryKey,
   }) {
     return i0.RawValuesInsertable({
       if (dictionaryRef != null) 'dictionaryRef': dictionaryRef,
-      if (lnsLemma != null) 'lnsLemma': lnsLemma,
+      if (lnsEntryKey != null) 'lnsEntryKey': lnsEntryKey,
     });
   }
 
   i1.LnsRefResolutionsCompanion copyWith({
     i0.Value<String>? dictionaryRef,
-    i0.Value<String?>? lnsLemma,
+    i0.Value<String?>? lnsEntryKey,
   }) {
     return i1.LnsRefResolutionsCompanion(
       dictionaryRef: dictionaryRef ?? this.dictionaryRef,
-      lnsLemma: lnsLemma ?? this.lnsLemma,
+      lnsEntryKey: lnsEntryKey ?? this.lnsEntryKey,
     );
   }
 
@@ -3431,8 +3438,8 @@ class LnsRefResolutionsCompanion
     if (dictionaryRef.present) {
       map['dictionaryRef'] = i0.Variable<String>(dictionaryRef.value);
     }
-    if (lnsLemma.present) {
-      map['lnsLemma'] = i0.Variable<String>(lnsLemma.value);
+    if (lnsEntryKey.present) {
+      map['lnsEntryKey'] = i0.Variable<String>(lnsEntryKey.value);
     }
     return map;
   }
@@ -3441,7 +3448,7 @@ class LnsRefResolutionsCompanion
   String toString() {
     return (StringBuffer('LnsRefResolutionsCompanion(')
           ..write('dictionaryRef: $dictionaryRef, ')
-          ..write('lnsLemma: $lnsLemma')
+          ..write('lnsEntryKey: $lnsEntryKey')
           ..write(')'))
         .toString();
   }
@@ -3853,14 +3860,14 @@ class DictionaryLewisAndShortDictionary
 
 class DictionaryDictionaryEntry extends i0.DataClass {
   final String dictionary;
-  final String lemma;
+  final String key;
   final String? partOfSpeech;
   final String? inflection;
   final int idx;
   final int numberOfSenses;
   const DictionaryDictionaryEntry({
     required this.dictionary,
-    required this.lemma,
+    required this.key,
     this.partOfSpeech,
     this.inflection,
     required this.idx,
@@ -3873,7 +3880,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return DictionaryDictionaryEntry(
       dictionary: serializer.fromJson<String>(json['dictionary']),
-      lemma: serializer.fromJson<String>(json['lemma']),
+      key: serializer.fromJson<String>(json['key']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
       inflection: serializer.fromJson<String?>(json['inflection']),
       idx: serializer.fromJson<int>(json['idx']),
@@ -3885,7 +3892,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'dictionary': serializer.toJson<String>(dictionary),
-      'lemma': serializer.toJson<String>(lemma),
+      'key': serializer.toJson<String>(key),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
       'inflection': serializer.toJson<String?>(inflection),
       'idx': serializer.toJson<int>(idx),
@@ -3895,14 +3902,14 @@ class DictionaryDictionaryEntry extends i0.DataClass {
 
   i1.DictionaryDictionaryEntry copyWith({
     String? dictionary,
-    String? lemma,
+    String? key,
     i0.Value<String?> partOfSpeech = const i0.Value.absent(),
     i0.Value<String?> inflection = const i0.Value.absent(),
     int? idx,
     int? numberOfSenses,
   }) => i1.DictionaryDictionaryEntry(
     dictionary: dictionary ?? this.dictionary,
-    lemma: lemma ?? this.lemma,
+    key: key ?? this.key,
     partOfSpeech: partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
     inflection: inflection.present ? inflection.value : this.inflection,
     idx: idx ?? this.idx,
@@ -3912,7 +3919,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
   String toString() {
     return (StringBuffer('DictionaryDictionaryEntry(')
           ..write('dictionary: $dictionary, ')
-          ..write('lemma: $lemma, ')
+          ..write('key: $key, ')
           ..write('partOfSpeech: $partOfSpeech, ')
           ..write('inflection: $inflection, ')
           ..write('idx: $idx, ')
@@ -3924,7 +3931,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
   @override
   int get hashCode => Object.hash(
     dictionary,
-    lemma,
+    key,
     partOfSpeech,
     inflection,
     idx,
@@ -3935,7 +3942,7 @@ class DictionaryDictionaryEntry extends i0.DataClass {
       identical(this, other) ||
       (other is i1.DictionaryDictionaryEntry &&
           other.dictionary == this.dictionary &&
-          other.lemma == this.lemma &&
+          other.key == this.key &&
           other.partOfSpeech == this.partOfSpeech &&
           other.inflection == this.inflection &&
           other.idx == this.idx &&
@@ -3956,7 +3963,7 @@ class DictionaryDictionaryEntries
   @override
   List<i0.GeneratedColumn> get $columns => [
     dictionary,
-    lemma,
+    key,
     partOfSpeech,
     inflection,
     idx,
@@ -3969,7 +3976,7 @@ class DictionaryDictionaryEntries
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, COALESCE((SELECT COUNT(*) FROM DictEntrySenses WHERE DictEntrySenses.dictionary = DictionaryEntries.dictionary AND DictEntrySenses.lemma = DictionaryEntries.lemma AND DictEntrySenses.lvl BETWEEN \'000\' AND \'999\'), 0) AS numberOfSenses FROM DictionaryEntries ORDER BY DictionaryEntries.dictionary, DictionaryEntries.idx',
+        'CREATE VIEW "dictionary.DictionaryEntries" AS SELECT DictionaryEntries.*, COALESCE((SELECT COUNT(*) FROM DictEntrySenses WHERE DictEntrySenses.dictionary = DictionaryEntries.dictionary AND DictEntrySenses.entryKey = DictionaryEntries."key" AND DictEntrySenses.lvl BETWEEN \'000\' AND \'999\'), 0) AS numberOfSenses FROM DictionaryEntries ORDER BY DictionaryEntries.dictionary, DictionaryEntries.idx',
   };
   @override
   DictionaryDictionaryEntries get asDslTable => this;
@@ -3984,9 +3991,9 @@ class DictionaryDictionaryEntries
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionary'],
       )!,
-      lemma: attachedDatabase.typeMapping.read(
+      key: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}lemma'],
+        data['${effectivePrefix}key'],
       )!,
       partOfSpeech: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -4013,8 +4020,8 @@ class DictionaryDictionaryEntries
     false,
     type: i0.DriftSqlType.string,
   );
-  late final i0.GeneratedColumn<String> lemma = i0.GeneratedColumn<String>(
-    'lemma',
+  late final i0.GeneratedColumn<String> key = i0.GeneratedColumn<String>(
+    'key',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
@@ -4418,12 +4425,12 @@ class SearchableDictionaryEntriesCompanion
 
 class DictionaryResolvedLnsRef extends i0.DataClass {
   final String dictionaryRef;
-  final String lemma;
+  final String key;
   final String? inflection;
   final String? partOfSpeech;
   const DictionaryResolvedLnsRef({
     required this.dictionaryRef,
-    required this.lemma,
+    required this.key,
     this.inflection,
     this.partOfSpeech,
   });
@@ -4434,7 +4441,7 @@ class DictionaryResolvedLnsRef extends i0.DataClass {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return DictionaryResolvedLnsRef(
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
-      lemma: serializer.fromJson<String>(json['lemma']),
+      key: serializer.fromJson<String>(json['key']),
       inflection: serializer.fromJson<String?>(json['inflection']),
       partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
     );
@@ -4444,7 +4451,7 @@ class DictionaryResolvedLnsRef extends i0.DataClass {
     serializer ??= i0.driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
-      'lemma': serializer.toJson<String>(lemma),
+      'key': serializer.toJson<String>(key),
       'inflection': serializer.toJson<String?>(inflection),
       'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
     };
@@ -4452,12 +4459,12 @@ class DictionaryResolvedLnsRef extends i0.DataClass {
 
   i1.DictionaryResolvedLnsRef copyWith({
     String? dictionaryRef,
-    String? lemma,
+    String? key,
     i0.Value<String?> inflection = const i0.Value.absent(),
     i0.Value<String?> partOfSpeech = const i0.Value.absent(),
   }) => i1.DictionaryResolvedLnsRef(
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
-    lemma: lemma ?? this.lemma,
+    key: key ?? this.key,
     inflection: inflection.present ? inflection.value : this.inflection,
     partOfSpeech: partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
   );
@@ -4465,7 +4472,7 @@ class DictionaryResolvedLnsRef extends i0.DataClass {
   String toString() {
     return (StringBuffer('DictionaryResolvedLnsRef(')
           ..write('dictionaryRef: $dictionaryRef, ')
-          ..write('lemma: $lemma, ')
+          ..write('key: $key, ')
           ..write('inflection: $inflection, ')
           ..write('partOfSpeech: $partOfSpeech')
           ..write(')'))
@@ -4473,14 +4480,13 @@ class DictionaryResolvedLnsRef extends i0.DataClass {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(dictionaryRef, lemma, inflection, partOfSpeech);
+  int get hashCode => Object.hash(dictionaryRef, key, inflection, partOfSpeech);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is i1.DictionaryResolvedLnsRef &&
           other.dictionaryRef == this.dictionaryRef &&
-          other.lemma == this.lemma &&
+          other.key == this.key &&
           other.inflection == this.inflection &&
           other.partOfSpeech == this.partOfSpeech);
 }
@@ -4496,7 +4502,7 @@ class DictionaryResolvedLnsRefs
   @override
   List<i0.GeneratedColumn> get $columns => [
     dictionaryRef,
-    lemma,
+    key,
     inflection,
     partOfSpeech,
   ];
@@ -4507,7 +4513,7 @@ class DictionaryResolvedLnsRefs
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "dictionary.ResolvedLnsRefs" AS SELECT LnsRefResolutions.dictionaryRef, DictionaryEntries.lemma, DictionaryEntries.inflection, DictionaryEntries.partOfSpeech FROM LnsRefResolutions INNER JOIN DictionaryEntries ON DictionaryEntries.lemma = LnsRefResolutions.lnsLemma AND DictionaryEntries.dictionary = (SELECT id FROM Dictionaries WHERE name = \'Lewis & Short\' LIMIT 1)',
+        'CREATE VIEW "dictionary.ResolvedLnsRefs" AS SELECT LnsRefResolutions.dictionaryRef, DictionaryEntries."key", DictionaryEntries.inflection, DictionaryEntries.partOfSpeech FROM LnsRefResolutions INNER JOIN DictionaryEntries ON DictionaryEntries."key" = LnsRefResolutions.lnsEntryKey AND DictionaryEntries.dictionary = (SELECT id FROM Dictionaries WHERE name = \'Lewis & Short\' LIMIT 1)',
   };
   @override
   DictionaryResolvedLnsRefs get asDslTable => this;
@@ -4522,9 +4528,9 @@ class DictionaryResolvedLnsRefs
         i0.DriftSqlType.string,
         data['${effectivePrefix}dictionaryRef'],
       )!,
-      lemma: attachedDatabase.typeMapping.read(
+      key: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}lemma'],
+        data['${effectivePrefix}key'],
       )!,
       inflection: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -4544,8 +4550,8 @@ class DictionaryResolvedLnsRefs
         false,
         type: i0.DriftSqlType.string,
       );
-  late final i0.GeneratedColumn<String> lemma = i0.GeneratedColumn<String>(
-    'lemma',
+  late final i0.GeneratedColumn<String> key = i0.GeneratedColumn<String>(
+    'key',
     aliasedName,
     false,
     type: i0.DriftSqlType.string,
@@ -4582,7 +4588,7 @@ class DictionaryDrift extends i2.ModularAccessor {
   DictionaryDrift(i0.GeneratedDatabase db) : super(db);
   Future<int> fillDictionaryAlphabets() {
     return customInsert(
-      'INSERT INTO DictionaryAlphabets SELECT dictionary, UPPER(SUBSTR(lemma, 1, 1)), MIN(idx) FROM DictionaryEntries GROUP BY dictionary, UPPER(SUBSTR(lemma, 1, 1))',
+      'INSERT INTO DictionaryAlphabets SELECT dictionary, UPPER(SUBSTR("key", 1, 1)), MIN(idx) FROM DictionaryEntries GROUP BY dictionary, UPPER(SUBSTR("key", 1, 1))',
       variables: [],
       updates: {dictionaryAlphabets},
     );
@@ -4630,7 +4636,7 @@ class DictionaryDrift extends i2.ModularAccessor {
     ).map(
       (i0.QueryRow row) => i4.Entry(
         dictionary: row.read<String>('dictionary'),
-        lemma: row.read<String>('lemma'),
+        key: row.read<String>('key'),
         inflection: row.readNullable<String>('inflection'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         numberOfSenses: row.read<int>('numberOfSenses'),
@@ -4654,7 +4660,7 @@ class DictionaryDrift extends i2.ModularAccessor {
     String var2,
   ) {
     return customSelect(
-      'SELECT prettyLevel, content, Senses.dictionary AS "\$n_0", Senses.lemma AS "\$n_1", Senses.lvl AS "\$n_2" FROM DictEntrySenses AS Senses WHERE dictionary = ?1 AND lemma = ?2 ORDER BY dictionary, lemma, lvl',
+      'SELECT prettyLevel, content, Senses.dictionary AS "\$n_0", Senses.entryKey AS "\$n_1", Senses.lvl AS "\$n_2" FROM DictEntrySenses AS Senses WHERE dictionary = ?1 AND entryKey = ?2 ORDER BY dictionary, entryKey, lvl',
       variables: [i0.Variable<String>(var1), i0.Variable<String>(var2)],
       readsFrom: {dictEntrySenses, dictEntrySenseQuotes},
     ).asyncMap(
@@ -4663,7 +4669,7 @@ class DictionaryDrift extends i2.ModularAccessor {
         content: row.read<String>('content'),
         quotes:
             await customSelect(
-                  'SELECT seq, content, translation FROM DictEntrySenseQuotes WHERE dictionary = ?1 AND lemma = ?2 AND lvl = ?3 ORDER BY dictionary, lemma, lvl, seq',
+                  'SELECT seq, content, translation FROM DictEntrySenseQuotes WHERE dictionary = ?1 AND entryKey = ?2 AND lvl = ?3 ORDER BY dictionary, entryKey, lvl, seq',
                   variables: [
                     i0.Variable<String>(row.read('\$n_0')),
                     i0.Variable<String>(row.read('\$n_1')),
@@ -4685,7 +4691,7 @@ class DictionaryDrift extends i2.ModularAccessor {
 
   Future<int> fillSearchableDictionaryEntries() {
     return customInsert(
-      'INSERT INTO SearchableDictionaryEntries (headword, headwordInVowelLetters, dictionary, idx) SELECT headword, IIF(headword GLOB \'*[jvJV]*\', "REPLACE"("REPLACE"("REPLACE"("REPLACE"(headword, \'j\', \'i\'), \'J\', \'I\'), \'v\', \'u\'), \'V\', \'U\'), NULL), dictionary, idx FROM (SELECT RTRIM(lemma, \'0123456789\') AS headword, dictionary, idx FROM DictionaryEntries)',
+      'INSERT INTO SearchableDictionaryEntries (headword, headwordInVowelLetters, dictionary, idx) SELECT headword, IIF(headword GLOB \'*[jvJV]*\', "REPLACE"("REPLACE"("REPLACE"("REPLACE"(headword, \'j\', \'i\'), \'J\', \'I\'), \'v\', \'u\'), \'V\', \'U\'), NULL), dictionary, idx FROM (SELECT RTRIM("key", \'0123456789\') AS headword, dictionary, idx FROM DictionaryEntries)',
       variables: [],
       updates: {searchableDictionaryEntries},
     );
@@ -4706,7 +4712,7 @@ class DictionaryDrift extends i2.ModularAccessor {
     ).map(
       (i0.QueryRow row) => i4.Entry(
         dictionary: row.read<String>('dictionary'),
-        lemma: row.read<String>('lemma'),
+        key: row.read<String>('key'),
         inflection: row.readNullable<String>('inflection'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         numberOfSenses: row.read<int>('numberOfSenses'),
@@ -4729,7 +4735,7 @@ class DictionaryDrift extends i2.ModularAccessor {
     ).map(
       (i0.QueryRow row) => i4.Entry(
         dictionary: row.read<String>('dictionary'),
-        lemma: row.read<String>('lemma'),
+        key: row.read<String>('key'),
         inflection: row.readNullable<String>('inflection'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         numberOfSenses: row.read<int>('numberOfSenses'),
@@ -4752,7 +4758,7 @@ class DictionaryDrift extends i2.ModularAccessor {
     ).map(
       (i0.QueryRow row) => i4.Entry(
         dictionary: row.read<String>('dictionary'),
-        lemma: row.read<String>('lemma'),
+        key: row.read<String>('key'),
         inflection: row.readNullable<String>('inflection'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         numberOfSenses: row.read<int>('numberOfSenses'),
@@ -4775,7 +4781,7 @@ class DictionaryDrift extends i2.ModularAccessor {
     ).map(
       (i0.QueryRow row) => i4.Entry(
         dictionary: row.read<String>('dictionary'),
-        lemma: row.read<String>('lemma'),
+        key: row.read<String>('key'),
         inflection: row.readNullable<String>('inflection'),
         partOfSpeech: row.readNullable<String>('partOfSpeech'),
         numberOfSenses: row.read<int>('numberOfSenses'),

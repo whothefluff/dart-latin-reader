@@ -147,8 +147,8 @@ class SearchEntriesUseCase implements ISearchEntriesUseCase {
     });
   }
 
-  /// Returns [entry]'s lemma without its homograph number
-  static String _headwordOf(Entry entry) => entry.lemma.replaceFirst(_homographNumber, '');
+  /// Returns the entry key of [entry] without its homograph number.
+  static String _headwordOf(Entry entry) => entry.key.replaceFirst(_homographNumber, '');
   //
 }
 
@@ -178,27 +178,28 @@ extension type const DictionaryEntries._(UnmodifiableListView<Entry> unm)
 class Entry {
   const Entry({
     required this.dictionary,
-    required this.lemma,
+    required this.key,
     required this.inflection,
     required this.partOfSpeech,
     required this.numberOfSenses,
   });
 
+  /// The entry's key, unique within [dictionary]
+  final String key;
   final String dictionary;
-  final String lemma;
   final String? inflection;
   final String? partOfSpeech;
   final int numberOfSenses;
 
   @override
-  String toString() => 'Entry{lemma: $lemma}';
+  String toString() => 'Entry{key: $key}';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Entry && other.dictionary == dictionary && other.lemma == lemma);
+      (other is Entry && other.dictionary == dictionary && other.key == key);
 
   @override
-  int get hashCode => Object.hash(dictionary, lemma);
+  int get hashCode => Object.hash(dictionary, key);
   //
 }

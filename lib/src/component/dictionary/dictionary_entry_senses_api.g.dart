@@ -7,7 +7,7 @@ part of 'dictionary_entry_senses_api.dart';
 // **************************************************************************
 
 String _$dictionaryEntrySensesHash() =>
-    r'8fad5cd789a1ea80f0ab3577bffed5d7206a7be3';
+    r'92959641b5319d83dcaf594bbd2385864a3254cd';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -41,15 +41,15 @@ class DictionaryEntrySensesFamily
   const DictionaryEntrySensesFamily();
 
   /// See also [dictionaryEntrySenses].
-  DictionaryEntrySensesProvider call(String dictionary, String lemma) {
-    return DictionaryEntrySensesProvider(dictionary, lemma);
+  DictionaryEntrySensesProvider call(String dictionary, String entryKey) {
+    return DictionaryEntrySensesProvider(dictionary, entryKey);
   }
 
   @override
   DictionaryEntrySensesProvider getProviderOverride(
     covariant DictionaryEntrySensesProvider provider,
   ) {
-    return call(provider.dictionary, provider.lemma);
+    return call(provider.dictionary, provider.entryKey);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -71,12 +71,12 @@ class DictionaryEntrySensesFamily
 class DictionaryEntrySensesProvider
     extends AutoDisposeFutureProvider<DictionaryEntrySenses> {
   /// See also [dictionaryEntrySenses].
-  DictionaryEntrySensesProvider(String dictionary, String lemma)
+  DictionaryEntrySensesProvider(String dictionary, String entryKey)
     : this._internal(
         (ref) => dictionaryEntrySenses(
           ref as DictionaryEntrySensesRef,
           dictionary,
-          lemma,
+          entryKey,
         ),
         from: dictionaryEntrySensesProvider,
         name: r'dictionaryEntrySensesProvider',
@@ -87,7 +87,7 @@ class DictionaryEntrySensesProvider
         allTransitiveDependencies:
             DictionaryEntrySensesFamily._allTransitiveDependencies,
         dictionary: dictionary,
-        lemma: lemma,
+        entryKey: entryKey,
       );
 
   DictionaryEntrySensesProvider._internal(
@@ -98,11 +98,11 @@ class DictionaryEntrySensesProvider
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.dictionary,
-    required this.lemma,
+    required this.entryKey,
   }) : super.internal();
 
   final String dictionary;
-  final String lemma;
+  final String entryKey;
 
   @override
   Override overrideWith(
@@ -119,7 +119,7 @@ class DictionaryEntrySensesProvider
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         dictionary: dictionary,
-        lemma: lemma,
+        entryKey: entryKey,
       ),
     );
   }
@@ -133,14 +133,14 @@ class DictionaryEntrySensesProvider
   bool operator ==(Object other) {
     return other is DictionaryEntrySensesProvider &&
         other.dictionary == dictionary &&
-        other.lemma == lemma;
+        other.entryKey == entryKey;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, dictionary.hashCode);
-    hash = _SystemHash.combine(hash, lemma.hashCode);
+    hash = _SystemHash.combine(hash, entryKey.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -153,8 +153,8 @@ mixin DictionaryEntrySensesRef
   /// The parameter `dictionary` of this provider.
   String get dictionary;
 
-  /// The parameter `lemma` of this provider.
-  String get lemma;
+  /// The parameter `entryKey` of this provider.
+  String get entryKey;
 }
 
 class _DictionaryEntrySensesProviderElement
@@ -165,7 +165,7 @@ class _DictionaryEntrySensesProviderElement
   @override
   String get dictionary => (origin as DictionaryEntrySensesProvider).dictionary;
   @override
-  String get lemma => (origin as DictionaryEntrySensesProvider).lemma;
+  String get entryKey => (origin as DictionaryEntrySensesProvider).entryKey;
 }
 
 // ignore_for_file: type=lint

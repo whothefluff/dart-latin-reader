@@ -42,10 +42,10 @@ class _EmptyDb extends AppDb {
   //
 }
 
-/// Creates both dictionaries with [lemmas] in that order, and fills the search table with the
+/// Creates both dictionaries with [entryKeys] in that order, and fills the search table with the
 /// app's population step
 Future<AppDb> _dictionariesWith(
-  Map<String, List<String>> lemmas, {
+  Map<String, List<String>> entryKeys, {
   Map<String, int> senses = const {},
 }) async {
   final db = _EmptyDb();
@@ -63,10 +63,10 @@ Future<AppDb> _dictionariesWith(
     '1900-01-01',
   ]);
   await Future.wait(
-    lemmas.entries.expand(
+    entryKeys.entries.expand(
       (dict) => dict.value.indexed.map(
         (entry) => db.customStatement(
-          'INSERT INTO DictionaryEntries( dictionary, lemma, idx ) VALUES ( ?, ?, ? )',
+          'INSERT INTO DictionaryEntries( dictionary, key, idx ) VALUES ( ?, ?, ? )',
           [dict.key, entry.$2, entry.$1],
         ),
       ),
@@ -74,14 +74,14 @@ Future<AppDb> _dictionariesWith(
   );
   await Future.wait(
     senses.entries.expand(
-      (lemma) => List.generate(
-        lemma.value,
+      (entry) => List.generate(
+        entry.value,
         (i) => db.customStatement(
           '''
-          INSERT INTO DictEntrySenses( dictionary, lemma, lvl, prettyLevel, content )
+          INSERT INTO DictEntrySenses( dictionary, entryKey, lvl, prettyLevel, content )
               VALUES ( ?, ?, ?, '', '' )
           ''',
-          [_lewisAndShort, lemma.key, (i + 1).toString().padLeft(3, '0')],
+          [_lewisAndShort, entry.key, (i + 1).toString().padLeft(3, '0')],
         ),
       ),
     ),
@@ -110,14 +110,14 @@ Future<DictionaryEntries> _found(
       .read();
 }
 
-Future<List<String>> _lemmasFound(
+Future<List<String>> _entryKeysFound(
   AppDb db,
   String text, {
   String dictionary = _lewisAndShort,
   SemivowelSearchRules search = _neither,
 }) async {
   final entries = await _found(db, text, dictionary: dictionary, rules: search);
-  return entries.map((entry) => entry.lemma).toList();
+  return entries.map((entry) => entry.key).toList();
 }
 
 void main() {
@@ -132,8 +132,8 @@ void main() {
 
       final entries = await _found(db, 'amo');
 
-      expect(entries.map((entry) => entry.lemma), unorderedEquals(['amo', 'amor', 'clamo']));
-      expect(entries.singleWhere((entry) => entry.lemma == 'amo').numberOfSenses, 2);
+      expect(entries.map((entry) => entry.key), unorderedEquals(['amo', 'amor', 'clamo']));
+      expect(entries.singleWhere((entry) => entry.key == 'amo').numberOfSenses, 2);
     });
 
     test('an exact search ignores homograph numbers', () async {
@@ -141,7 +141,7 @@ void main() {
         _lewisAndShort: ['sum1', 'sum2', 'summa'],
       });
 
-      expect(await _lemmasFound(db, '"sum"'), unorderedEquals(['sum1', 'sum2']));
+      expect(await _entryKeysFound(db, '"sum"'), unorderedEquals(['sum1', 'sum2']));
     });
 
     test('text with spaces or punctuation is found inside a headword', () async {
@@ -149,8 +149,8 @@ void main() {
         _lewisAndShort: ['Graecia', 'Magna Graecia', 'ha!', 'hahae'],
       });
 
-      expect(await _lemmasFound(db, 'magna gr'), ['Magna Graecia']);
-      expect(await _lemmasFound(db, 'ha!'), ['ha!']);
+      expect(await _entryKeysFound(db, 'magna gr'), ['Magna Graecia']);
+      expect(await _entryKeysFound(db, 'ha!'), ['ha!']);
     });
 
     test('headwords are found with their own j and v', () async {
@@ -158,9 +158,9 @@ void main() {
         _lewisAndShort: ['jam', 'iambus', 'servus'],
       });
 
-      expect(await _lemmasFound(db, '"jam"'), ['jam']);
-      expect(await _lemmasFound(db, '"iam"'), isEmpty);
-      expect(await _lemmasFound(db, 'seruus'), isEmpty);
+      expect(await _entryKeysFound(db, '"jam"'), ['jam']);
+      expect(await _entryKeysFound(db, '"iam"'), isEmpty);
+      expect(await _entryKeysFound(db, 'seruus'), isEmpty);
     });
 
     test('a typed i or u also finds j or v as the settings say, and not the reverse', () async {
@@ -168,11 +168,11 @@ void main() {
         _lewisAndShort: ['jam', 'injuria', 'iambus', 'servus'],
       });
 
-      expect(await _lemmasFound(db, '"iam"', search: _both), ['jam']);
-      expect(await _lemmasFound(db, 'iniur', search: _both), ['injuria']);
-      expect(await _lemmasFound(db, 'seruus', search: _both), ['servus']);
-      expect(await _lemmasFound(db, 'seruus', search: _iOnly), isEmpty);
-      expect(await _lemmasFound(db, 'jamb', search: _both), isEmpty);
+      expect(await _entryKeysFound(db, '"iam"', search: _both), ['jam']);
+      expect(await _entryKeysFound(db, 'iniur', search: _both), ['injuria']);
+      expect(await _entryKeysFound(db, 'seruus', search: _both), ['servus']);
+      expect(await _entryKeysFound(db, 'seruus', search: _iOnly), isEmpty);
+      expect(await _entryKeysFound(db, 'jamb', search: _both), isEmpty);
     });
 
     test('what the headwords match as typed is listed once, first', () async {
@@ -180,7 +180,7 @@ void main() {
         _lewisAndShort: ['iam', 'jam'],
       });
 
-      expect(await _lemmasFound(db, '"iam"', search: _both), ['iam', 'jam']);
+      expect(await _entryKeysFound(db, '"iam"', search: _both), ['iam', 'jam']);
     });
 
     test('typed macrons are ignored', () async {
@@ -188,7 +188,7 @@ void main() {
         _lewisAndShort: ['amo', 'rosa'],
       });
 
-      expect(await _lemmasFound(db, 'rosā'), ['rosa']);
+      expect(await _entryKeysFound(db, 'rosā'), ['rosa']);
     });
 
     test('only the dictionary asked for is searched', () async {
@@ -197,9 +197,9 @@ void main() {
         _other: ['amo', 'amor'],
       });
 
-      expect(await _lemmasFound(db, 'amo'), ['amo']);
+      expect(await _entryKeysFound(db, 'amo'), ['amo']);
       expect(
-        await _lemmasFound(db, 'amo', dictionary: _other),
+        await _entryKeysFound(db, 'amo', dictionary: _other),
         unorderedEquals(['amo', 'amor']),
       );
     });
