@@ -65,7 +65,7 @@ class EnrichedResult {
   String? get additional => base.additional;
 
   /// Contains the value as it is actually found in the dictionary
-  String? get lnsLemma => lns?.lemma;
+  String? get lnsEntryKey => lns?.key;
   String? get lnsInflection => lns?.inflection;
   String? get lnsPartOfSpeech => lns?.partOfSpeech;
 

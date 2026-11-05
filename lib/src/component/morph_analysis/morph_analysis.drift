@@ -28,7 +28,7 @@ CREATE TABLE "MorphologicalDetailDicts"(
     "dictionaryRef" TEXT NOT NULL,
     PRIMARY KEY( form, item, dictionary ),
     FOREIGN KEY( form, item ) REFERENCES MorphologicalDetails( form, item ),
-    --FOREIGN KEY( dictionary, dictionaryRef ) REFERENCES DictionaryEntries( dictionary, lemma )
+    --FOREIGN KEY( dictionary, dictionaryRef ) REFERENCES DictionaryEntries( dictionary, "key" )
 ) STRICT, WITHOUT ROWID;
 
  */

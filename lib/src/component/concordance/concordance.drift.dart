@@ -3016,13 +3016,13 @@ class ConcordanceAnalysesWithOptionalInflections
 class ConcordanceLemma extends i0.DataClass {
   final String dictionaryRef;
   final String sublemma;
-  final String? lnsLemma;
+  final String? lnsEntryKey;
   final String? lnsPartOfSpeech;
   final String? lnsInflection;
   const ConcordanceLemma({
     required this.dictionaryRef,
     required this.sublemma,
-    this.lnsLemma,
+    this.lnsEntryKey,
     this.lnsPartOfSpeech,
     this.lnsInflection,
   });
@@ -3034,7 +3034,7 @@ class ConcordanceLemma extends i0.DataClass {
     return ConcordanceLemma(
       dictionaryRef: serializer.fromJson<String>(json['dictionaryRef']),
       sublemma: serializer.fromJson<String>(json['sublemma']),
-      lnsLemma: serializer.fromJson<String?>(json['lnsLemma']),
+      lnsEntryKey: serializer.fromJson<String?>(json['lnsEntryKey']),
       lnsPartOfSpeech: serializer.fromJson<String?>(json['lnsPartOfSpeech']),
       lnsInflection: serializer.fromJson<String?>(json['lnsInflection']),
     );
@@ -3045,7 +3045,7 @@ class ConcordanceLemma extends i0.DataClass {
     return <String, dynamic>{
       'dictionaryRef': serializer.toJson<String>(dictionaryRef),
       'sublemma': serializer.toJson<String>(sublemma),
-      'lnsLemma': serializer.toJson<String?>(lnsLemma),
+      'lnsEntryKey': serializer.toJson<String?>(lnsEntryKey),
       'lnsPartOfSpeech': serializer.toJson<String?>(lnsPartOfSpeech),
       'lnsInflection': serializer.toJson<String?>(lnsInflection),
     };
@@ -3054,13 +3054,13 @@ class ConcordanceLemma extends i0.DataClass {
   i1.ConcordanceLemma copyWith({
     String? dictionaryRef,
     String? sublemma,
-    i0.Value<String?> lnsLemma = const i0.Value.absent(),
+    i0.Value<String?> lnsEntryKey = const i0.Value.absent(),
     i0.Value<String?> lnsPartOfSpeech = const i0.Value.absent(),
     i0.Value<String?> lnsInflection = const i0.Value.absent(),
   }) => i1.ConcordanceLemma(
     dictionaryRef: dictionaryRef ?? this.dictionaryRef,
     sublemma: sublemma ?? this.sublemma,
-    lnsLemma: lnsLemma.present ? lnsLemma.value : this.lnsLemma,
+    lnsEntryKey: lnsEntryKey.present ? lnsEntryKey.value : this.lnsEntryKey,
     lnsPartOfSpeech: lnsPartOfSpeech.present
         ? lnsPartOfSpeech.value
         : this.lnsPartOfSpeech,
@@ -3073,7 +3073,7 @@ class ConcordanceLemma extends i0.DataClass {
     return (StringBuffer('ConcordanceLemma(')
           ..write('dictionaryRef: $dictionaryRef, ')
           ..write('sublemma: $sublemma, ')
-          ..write('lnsLemma: $lnsLemma, ')
+          ..write('lnsEntryKey: $lnsEntryKey, ')
           ..write('lnsPartOfSpeech: $lnsPartOfSpeech, ')
           ..write('lnsInflection: $lnsInflection')
           ..write(')'))
@@ -3084,7 +3084,7 @@ class ConcordanceLemma extends i0.DataClass {
   int get hashCode => Object.hash(
     dictionaryRef,
     sublemma,
-    lnsLemma,
+    lnsEntryKey,
     lnsPartOfSpeech,
     lnsInflection,
   );
@@ -3094,7 +3094,7 @@ class ConcordanceLemma extends i0.DataClass {
       (other is i1.ConcordanceLemma &&
           other.dictionaryRef == this.dictionaryRef &&
           other.sublemma == this.sublemma &&
-          other.lnsLemma == this.lnsLemma &&
+          other.lnsEntryKey == this.lnsEntryKey &&
           other.lnsPartOfSpeech == this.lnsPartOfSpeech &&
           other.lnsInflection == this.lnsInflection);
 }
@@ -3110,7 +3110,7 @@ class ConcordanceLemmas
   List<i0.GeneratedColumn> get $columns => [
     dictionaryRef,
     sublemma,
-    lnsLemma,
+    lnsEntryKey,
     lnsPartOfSpeech,
     lnsInflection,
   ];
@@ -3121,7 +3121,7 @@ class ConcordanceLemmas
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "concordance.Lemmas" AS SELECT DISTINCT Details.dictionaryRef, Details.sublemma, Resolved.lemma AS lnsLemma, Resolved.partOfSpeech AS lnsPartOfSpeech, Resolved.inflection AS lnsInflection FROM ConcordanceDetails AS Details LEFT OUTER JOIN "dictionary.ResolvedLnsRefs" AS Resolved ON Resolved.dictionaryRef = Details.dictionaryRef',
+        'CREATE VIEW "concordance.Lemmas" AS SELECT DISTINCT Details.dictionaryRef, Details.sublemma, Resolved."key" AS lnsEntryKey, Resolved.partOfSpeech AS lnsPartOfSpeech, Resolved.inflection AS lnsInflection FROM ConcordanceDetails AS Details LEFT OUTER JOIN "dictionary.ResolvedLnsRefs" AS Resolved ON Resolved.dictionaryRef = Details.dictionaryRef',
   };
   @override
   ConcordanceLemmas get asDslTable => this;
@@ -3137,9 +3137,9 @@ class ConcordanceLemmas
         i0.DriftSqlType.string,
         data['${effectivePrefix}sublemma'],
       )!,
-      lnsLemma: attachedDatabase.typeMapping.read(
+      lnsEntryKey: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
-        data['${effectivePrefix}lnsLemma'],
+        data['${effectivePrefix}lnsEntryKey'],
       ),
       lnsPartOfSpeech: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -3165,12 +3165,13 @@ class ConcordanceLemmas
     false,
     type: i0.DriftSqlType.string,
   );
-  late final i0.GeneratedColumn<String> lnsLemma = i0.GeneratedColumn<String>(
-    'lnsLemma',
-    aliasedName,
-    true,
-    type: i0.DriftSqlType.string,
-  );
+  late final i0.GeneratedColumn<String> lnsEntryKey =
+      i0.GeneratedColumn<String>(
+        'lnsEntryKey',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
   late final i0.GeneratedColumn<String> lnsPartOfSpeech =
       i0.GeneratedColumn<String>(
         'lnsPartOfSpeech',
@@ -3358,7 +3359,7 @@ class ConcordanceDrift extends i2.ModularAccessor {
     required int limit,
   }) {
     return customSelect(
-      'SELECT COALESCE(lnsLemma, dictionaryRef) AS entryRef, sublemma, COALESCE(GROUP_CONCAT(dictionaryRef), \'\') AS dictionaryRefs, MIN(lnsPartOfSpeech) AS partOfSpeech, MIN(lnsInflection) AS inflection FROM "concordance.Lemmas" GROUP BY COALESCE(lnsLemma, dictionaryRef), sublemma HAVING MAX(dictionaryRef LIKE ?1 || \'%\' OR lnsLemma LIKE ?1 || \'%\' OR sublemma LIKE ?1 || \'%\') ORDER BY IIF(sublemma = \'\', COALESCE(lnsLemma, dictionaryRef), sublemma) <> ?1, LENGTH(IIF(sublemma = \'\', COALESCE(lnsLemma, dictionaryRef), sublemma)), IIF(sublemma = \'\', COALESCE(lnsLemma, dictionaryRef), sublemma), COALESCE(lnsLemma, dictionaryRef) LIMIT ?2',
+      'SELECT COALESCE(lnsEntryKey, dictionaryRef) AS entryRef, sublemma, COALESCE(GROUP_CONCAT(dictionaryRef), \'\') AS dictionaryRefs, MIN(lnsPartOfSpeech) AS partOfSpeech, MIN(lnsInflection) AS inflection FROM "concordance.Lemmas" GROUP BY COALESCE(lnsEntryKey, dictionaryRef), sublemma HAVING MAX(dictionaryRef LIKE ?1 || \'%\' OR lnsEntryKey LIKE ?1 || \'%\' OR sublemma LIKE ?1 || \'%\') ORDER BY IIF(sublemma = \'\', COALESCE(lnsEntryKey, dictionaryRef), sublemma) <> ?1, LENGTH(IIF(sublemma = \'\', COALESCE(lnsEntryKey, dictionaryRef), sublemma)), IIF(sublemma = \'\', COALESCE(lnsEntryKey, dictionaryRef), sublemma), COALESCE(lnsEntryKey, dictionaryRef) LIMIT ?2',
       variables: [i0.Variable<String>(prefix), i0.Variable<int>(limit)],
       readsFrom: {
         concordanceDetails,

@@ -8,8 +8,13 @@ import 'package:latin_reader/src/component/dictionary/dictionary_entries_api.dar
 import 'package:latin_reader/src/ui/page/dictionary/dictionary_entries_page.dart';
 import 'package:latin_reader/src/ui/widget/lemma_text.dart';
 
-Entry _entry(String lemma) =>
-    Entry(dictionary: 'ls', lemma: lemma, inflection: null, partOfSpeech: null, numberOfSenses: 1);
+Entry _entry(String entryKey) => Entry(
+  dictionary: 'ls',
+  key: entryKey,
+  inflection: null,
+  partOfSpeech: null,
+  numberOfSenses: 1,
+);
 
 /// Dictionary entries with `sum1` and `sum2` at indices 40 and 41.
 final List<Entry> _entries = List.generate(
@@ -37,14 +42,17 @@ final _compact = ThemeData(visualDensity: VisualDensity.compact);
 
 final Matcher _highlighted = isNot(Colors.transparent);
 
-/// A minimal definition page that records the route's lemma.
+/// A minimal definition page that records the route's entry key.
 class _Definition extends StatelessWidget {
-  const _Definition(this.lemma);
+  const _Definition(
+    this.entryKey,
+  );
 
-  final String lemma;
+  final String entryKey;
 
   @override
   Widget build(context) => Scaffold(appBar: AppBar());
+  //
 }
 
 /// A search override returning [found] for [text].
@@ -64,8 +72,8 @@ Future<ValueNotifier<ThemeData>> _pumpPage(
         builder: (_, _) => const DictionaryEntriesPage('ls'),
         routes: [
           GoRoute(
-            path: 'entries/:lemma',
-            builder: (_, state) => _Definition(state.pathParameters['lemma']!),
+            path: 'entries/:entryKey',
+            builder: (_, state) => _Definition(state.pathParameters['entryKey']!),
           ),
         ],
       ),
@@ -98,46 +106,46 @@ Future<void> _search(WidgetTester tester, String text) async {
 }
 
 /// Row text, including the trailing space for the empty inflection.
-String _title(String lemma) => '${entryRefText(lemma)} ';
+String _title(String entryKey) => '${entryRefText(entryKey)} ';
 
-Finder _row(String lemma) => find.descendant(
+Finder _row(String entryKey) => find.descendant(
   of: find.byType(ListView),
-  matching: find.widgetWithText(ListTile, _title(lemma)),
+  matching: find.widgetWithText(ListTile, _title(entryKey)),
 );
 
-Finder _result(String lemma) => find.descendant(
+Finder _result(String entryKey) => find.descendant(
   of: find.byType(CustomScrollView),
-  matching: find.widgetWithText(ListTile, _title(lemma)),
+  matching: find.widgetWithText(ListTile, _title(entryKey)),
 );
 
-Finder _browseButton(String lemma) =>
-    find.descendant(of: _result(lemma), matching: find.byType(IconButton));
+Finder _browseButton(String entryKey) =>
+    find.descendant(of: _result(entryKey), matching: find.byType(IconButton));
 
 ScrollPosition _position(WidgetTester tester) {
   final list = find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable));
   return tester.state<ScrollableState>(list).position;
 }
 
-/// Vertical offset of [lemma]'s row from the top of the list.
-double _rowTop(WidgetTester tester, String lemma) =>
-    tester.getTopLeft(_row(lemma)).dy - tester.getTopLeft(find.byType(ListView)).dy;
+/// Vertical offset of [entryKey]'s row from the top of the list.
+double _rowTop(WidgetTester tester, String entryKey) =>
+    tester.getTopLeft(_row(entryKey)).dy - tester.getTopLeft(find.byType(ListView)).dy;
 
-/// The gap below [lemma]'s row, measured to the list's bottom edge.
-double _spaceBelow(WidgetTester tester, String lemma) =>
-    tester.getBottomLeft(find.byType(ListView)).dy - tester.getBottomLeft(_row(lemma)).dy;
+/// The gap below [entryKey]'s row, measured to the list's bottom edge.
+double _spaceBelow(WidgetTester tester, String entryKey) =>
+    tester.getBottomLeft(find.byType(ListView)).dy - tester.getBottomLeft(_row(entryKey)).dy;
 
-Color? _rowColor(WidgetTester tester, String lemma) =>
-    tester.widget<ListTile>(_row(lemma)).tileColor;
+Color? _rowColor(WidgetTester tester, String entryKey) =>
+    tester.widget<ListTile>(_row(entryKey)).tileColor;
 
-/// [lemma]'s row colors, sampled on the next frame and every 50 ms for [duration].
-Future<List<Color?>> _rowColorsOver(WidgetTester tester, String lemma, Duration duration) async {
+/// [entryKey]'s row colors, sampled on the next frame and every 50 ms for [duration].
+Future<List<Color?>> _rowColorsOver(WidgetTester tester, String entryKey, Duration duration) async {
   const frame = Duration(milliseconds: 50);
   final colors = <Color?>[];
   await Future.forEach(
     [Duration.zero, ...List.filled(duration.inMilliseconds ~/ frame.inMilliseconds, frame)],
     (wait) async {
       await tester.pump(wait);
-      colors.add(_rowColor(tester, lemma));
+      colors.add(_rowColor(tester, entryKey));
     },
   );
   return colors;
@@ -172,7 +180,7 @@ void main() {
       await tester.tap(_result('sum1'));
       await tester.pumpAndSettle();
       expect(find.byType(_Definition, skipOffstage: false), findsOneWidget);
-      expect(tester.widget<_Definition>(find.byType(_Definition)).lemma, 'sum1');
+      expect(tester.widget<_Definition>(find.byType(_Definition)).entryKey, 'sum1');
 
       // Let the initial hold expire behind the definition page
       await tester.pump(searchResultHighlight.hold);

@@ -28,7 +28,7 @@ EnrichedAnalysis _ofCicero(
     partOfSpeech: partOfSpeech,
     stem: form,
   ),
-  lns: const LnsBasicInfoEntry(lemma: 'Cicero', inflection: 'ōnis, m.', partOfSpeech: 'noun'),
+  lns: const LnsBasicInfoEntry(key: 'Cicero', inflection: 'ōnis, m.', partOfSpeech: 'noun'),
 );
 
 final EnrichedAnalysis _ciceronis = _ofCicero(
@@ -45,9 +45,11 @@ final Finder _entrysInflection = find.textContaining('ōnis, m.');
 
 /// Stands in for the dictionary entry that the card opens
 class _OpenedEntry extends StatelessWidget {
-  const _OpenedEntry(this.lemma);
+  const _OpenedEntry(
+    this.entryKey,
+  );
 
-  final String lemma;
+  final String entryKey;
 
   @override
   Widget build(context) => const Scaffold();
@@ -67,8 +69,8 @@ Future<void> _pumpCard(WidgetTester tester, EnrichedAnalysis analysis) async {
         builder: (_, _) => Scaffold(body: MorphologicalDataView(keys: keys)),
       ),
       GoRoute(
-        path: '/dictionaries/:dictionaryId/entries/:lemma',
-        builder: (_, state) => _OpenedEntry(state.pathParameters['lemma']!),
+        path: '/dictionaries/:dictionaryId/entries/:entryKey',
+        builder: (_, state) => _OpenedEntry(state.pathParameters['entryKey']!),
       ),
     ],
   );
@@ -152,7 +154,7 @@ void main() {
       await tester.tap(find.text('View in Dictionary'));
       await tester.pumpAndSettle();
 
-      expect(tester.widget<_OpenedEntry>(find.byType(_OpenedEntry)).lemma, 'Cicero');
+      expect(tester.widget<_OpenedEntry>(find.byType(_OpenedEntry)).entryKey, 'Cicero');
     });
   });
 }

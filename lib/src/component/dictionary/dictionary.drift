@@ -15,13 +15,13 @@ WITHOUT ROWID;
 
 CREATE TABLE "DictionaryEntries" (
     "dictionary" TEXT NOT NULL,
-    "lemma" TEXT NOT NULL, --not primary key but should still used to join with DictEntrySenses
+    "key" TEXT NOT NULL, -- headword + homograph disambiguation number
     "partOfSpeech" TEXT,
     "inflection" TEXT,
     "idx" INTEGER NOT NULL CHECK( idx >= 0 ),
     PRIMARY KEY( dictionary, idx ), -- idx is the order of the entry in the dictionary
     FOREIGN KEY( dictionary ) REFERENCES Dictionaries( id ),
-    UNIQUE( lemma, dictionary ) --should create an index to filter dictionaries by lemma
+    UNIQUE( "key", dictionary ) -- index to filter dictionaries by entry key ('key' is quoted so that drift doesn't take it as a keyword)
 )
 STRICT,
 WITHOUT ROWID;
@@ -39,38 +39,39 @@ WITHOUT ROWID;
 
 CREATE TABLE "DictEntrySenses" (
     "dictionary" TEXT NOT NULL,
-    "lemma" TEXT NOT NULL,
+    "entryKey" TEXT NOT NULL,
     "lvl" TEXT NOT NULL CHECK( lvl REGEXP '^\d{3}(\.\d{3})*$' ),
     "prettyLevel" TEXT NOT NULL,
     "content" TEXT NOT NULL,
-    PRIMARY KEY( dictionary, lemma, lvl ),
-    FOREIGN KEY( lemma, dictionary ) REFERENCES DictionaryEntries( lemma, dictionary ) -- matches the modified foreign key
+    PRIMARY KEY( dictionary, entryKey, lvl ),
+    FOREIGN KEY( entryKey, dictionary ) REFERENCES DictionaryEntries( "key", dictionary ) -- 'key' quoted because drift takes an unquoted identifier for the keyword KEY
 )
 STRICT,
 WITHOUT ROWID;
 
 CREATE TABLE "DictEntrySenseQuotes" (
     "dictionary" TEXT NOT NULL,
-    "lemma" TEXT NOT NULL,
+    "entryKey" TEXT NOT NULL,
     "lvl" TEXT NOT NULL,
     "seq" INTEGER NOT NULL CHECK( seq >= 0 ),
     "content" TEXT NOT NULL,
     "translation" TEXT,
-    PRIMARY KEY( dictionary, lemma, lvl, seq ),
-    FOREIGN KEY( dictionary, lemma, lvl ) REFERENCES DictEntrySenses( dictionary, lemma, lvl )
+    PRIMARY KEY( dictionary, entryKey, lvl, seq ),
+    FOREIGN KEY( dictionary, entryKey, lvl ) REFERENCES DictEntrySenses( dictionary, entryKey, lvl )
 )
 STRICT,
 WITHOUT ROWID;
 
 CREATE TABLE "LnsRefResolutions"(
     "dictionaryRef" TEXT NOT NULL,
-    "lnsLemma" TEXT,
+    "lnsEntryKey" TEXT,
     PRIMARY KEY( dictionaryRef )
 )
 STRICT, 
 WITHOUT ROWID;
 
-fillDictionaryAlphabets: INSERT INTO "DictionaryAlphabets" SELECT dictionary, UPPER( SUBSTR( lemma, 1, 1 ) ), MIN( idx ) FROM DictionaryEntries GROUP BY dictionary, UPPER( SUBSTR( lemma, 1, 1 ) );
+-- 'key' is quoted because otherwise drift takes it for the keyword KEY
+fillDictionaryAlphabets: INSERT INTO "DictionaryAlphabets" SELECT dictionary, UPPER( SUBSTR( "key", 1, 1 ) ), MIN( idx ) FROM DictionaryEntries GROUP BY dictionary, UPPER( SUBSTR( "key", 1, 1 ) );
 
 CREATE VIEW "dictionary.Dictionaries" AS
     SELECT Dictionaries.*,
@@ -102,7 +103,7 @@ CREATE VIEW "dictionary.DictionaryEntries" AS
            COALESCE( ( SELECT COUNT( * )  -- COALESCE is only for Drift's nullability analysis
                            FROM DictEntrySenses
                            WHERE DictEntrySenses.dictionary = DictionaryEntries.dictionary
-                                 AND DictEntrySenses.lemma = DictionaryEntries.lemma
+                                 AND DictEntrySenses.entryKey = DictionaryEntries.key
                                  AND DictEntrySenses.lvl BETWEEN '000' AND '999' ),
                      0 ) AS numberOfSenses
         FROM DictionaryEntries
@@ -119,14 +120,14 @@ getDictionaryEntrySenses WITH EntrySense: SELECT prettyLevel,
                                                               translation 
                                                            FROM DictEntrySenseQuotes 
                                                            WHERE dictionary = Senses.dictionary 
-                                                                 AND lemma = Senses.lemma 
+                                                                 AND entryKey = Senses.entryKey
                                                                  AND lvl = Senses.lvl
-                                                           ORDER BY dictionary, lemma, lvl, seq ) AS Quotes
+                                                           ORDER BY dictionary, entryKey, lvl, seq ) AS Quotes
                                               FROM DictEntrySenses AS Senses 
-                                              WHERE dictionary = ? AND lemma = ?
-                                              ORDER BY dictionary, lemma, lvl;
+                                              WHERE dictionary = ? AND entryKey = ?
+                                              ORDER BY dictionary, entryKey, lvl;
 
--- headword is the lemma without its homograph number
+-- headword is the entry key without its homograph number
 CREATE VIRTUAL TABLE SearchableDictionaryEntries USING fts5(
     headword,
     headwordInVowelLetters,
@@ -141,7 +142,7 @@ fillSearchableDictionaryEntries:
                IIF( headword GLOB '*[jvJV]*', "REPLACE"( "REPLACE"( "REPLACE"( "REPLACE"( headword, 'j', 'i' ), 'J', 'I' ), 'v', 'u' ), 'V', 'U' ), NULL ),
                dictionary,
                idx
-            FROM ( SELECT RTRIM( lemma, '0123456789' ) AS headword,
+            FROM ( SELECT RTRIM( "key", '0123456789' ) AS headword, -- quoted because drift takes an unquoted 'key' for the keyword KEY
                           dictionary,
                           idx
                        FROM DictionaryEntries );
@@ -188,12 +189,12 @@ searchDictionaryEntriesInVowelLettersWithLike(:term AS TEXT) WITH Entry:
 
 CREATE VIEW "dictionary.ResolvedLnsRefs" AS
     SELECT LnsRefResolutions.dictionaryRef,
-           DictionaryEntries.lemma,
+           DictionaryEntries.key,
            DictionaryEntries.inflection,
            DictionaryEntries.partOfSpeech
         FROM LnsRefResolutions
         INNER JOIN DictionaryEntries
-            ON DictionaryEntries.lemma = LnsRefResolutions.lnsLemma
+            ON DictionaryEntries.key = LnsRefResolutions.lnsEntryKey
                AND DictionaryEntries.dictionary = ( SELECT id 
                                                         FROM Dictionaries 
                                                         WHERE name = 'Lewis & Short' -- literal 2 of 3

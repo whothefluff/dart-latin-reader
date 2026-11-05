@@ -7,10 +7,10 @@ import '../dictionary/lewis_and_short_basic_info_api.dart';
 /// Items whose dictionaryRef has no match get `null`
 Iterable<U> _zipWithLns<T, U>({
   required Iterable<T> items,
-  required String Function(T item) getLemma,
+  required String Function(T item) getDictRef,
   required U Function(T item, LnsBasicInfoEntry? lns) createEnriched,
   required LnsBasicInfoByRef resolved,
-}) => items.map((i) => createEnriched(i, resolved[getLemma(i)]));
+}) => items.map((i) => createEnriched(i, resolved[getDictRef(i)]));
 
 /// Enriches [items] with their L&S basic info, which is `null` for items whose
 /// dictionaryRef has no match (i.e. not resolvable at data population time).
@@ -24,7 +24,7 @@ Future<Iterable<U>> enrichWithLns<T, U>({
   final resolved = await ref.watch(lnsBasicInfoProvider(DictionaryRefs(dictRefs)).future);
   return _zipWithLns(
     items: items,
-    getLemma: getDictRef,
+    getDictRef: getDictRef,
     createEnriched: createEnriched,
     resolved: resolved,
   );

@@ -39,7 +39,7 @@ Future<AppDb> _romaAndRomani() async {
   );
   await db.customStatement(
     '''
-    INSERT INTO DictionaryEntries( dictionary, lemma, partOfSpeech, inflection, idx )
+    INSERT INTO DictionaryEntries( dictionary, key, partOfSpeech, inflection, idx )
         VALUES ( '00000000-0000-0000-0000-000000000001', 'Roma', 'noun', 'ae', 0 )
     ''',
   );
@@ -63,7 +63,7 @@ void main() {
           .listen(enrichedMorphologicalAnalysesProvider(keys).future, (_, _) {})
           .read();
       expect(
-        analyses.map((analysis) => (analysis.form, analysis.lnsLemma)),
+        analyses.map((analysis) => (analysis.form, analysis.lnsEntryKey)),
         unorderedEquals([('Roma', 'Roma'), ('Romani', null)]),
       );
     });

@@ -1204,7 +1204,7 @@ Future<LemmaChoice> _lemmaChoice(WidgetRef ref, Lemma lemma) async {
   );
   final entry = resolved[lemma.dictionaryRef];
   return LemmaChoice(
-    entryRef: entry?.lemma ?? lemma.dictionaryRef,
+    entryRef: entry?.key ?? lemma.dictionaryRef,
     dictionaryRefs: [lemma.dictionaryRef],
     sublemma: lemma.sublemma,
     partOfSpeech: entry?.partOfSpeech,
@@ -1309,7 +1309,7 @@ Future<void> _goToDictionaryForForm(
   } else {
     final resolved = await ref.read(lnsBasicInfoProvider(DictionaryRefs(refs)).future);
     if (context.mounted) {
-      final entryKeys = resolved.values.map((e) => e.lemma).toSet().toList()..sort();
+      final entryKeys = resolved.values.map((e) => e.key).toSet().toList()..sort();
       if (entryKeys.isEmpty) {
         _notFound(context);
       } else {
@@ -1357,7 +1357,7 @@ Future<void> _goToDictionaryForLemma(
     } else {
       final lns = await ref.read(lewisAndShortDictionaryProvider.future);
       if (context.mounted) {
-        await DictionaryEntryRoute(lns.id, entry.lemma).push<void>(context);
+        await DictionaryEntryRoute(lns.id, entry.key).push<void>(context);
       }
     }
   }

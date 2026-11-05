@@ -307,7 +307,9 @@ void main() {
       ],
     );
     expect(
-      await rows('SELECT lemma, partOfSpeech, inflection, idx FROM DictionaryEntries ORDER BY idx'),
+      await rows(
+        'SELECT key, partOfSpeech, inflection, idx FROM DictionaryEntries ORDER BY idx',
+      ),
       [
         ['ad', 'preposition', null, 667],
         ['aura', 'noun', 'ae', 4536],
@@ -330,9 +332,9 @@ void main() {
     );
   });
 
-  test("resolves each analysis's lemma to a Lewis & Short entry", () async {
+  test("resolves each analysis's dictionaryRef to a Lewis & Short entry", () async {
     expect(
-      await rows('SELECT dictionaryRef, lnsLemma FROM LnsRefResolutions ORDER BY dictionaryRef'),
+      await rows('SELECT dictionaryRef, lnsEntryKey FROM LnsRefResolutions ORDER BY dictionaryRef'),
       [
         ['Roma', 'Roma'],
         ['ad', 'ad'],

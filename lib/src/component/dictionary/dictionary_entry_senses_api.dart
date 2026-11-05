@@ -19,13 +19,13 @@ part 'dictionary_entry_senses_api.g.dart';
 Future<DictionaryEntrySenses> dictionaryEntrySenses(
   Ref ref,
   String dictionary,
-  String lemma,
+  String entryKey,
 ) async {
-  log.info(() => '@riverpod - using $dictionary, $lemma');
+  log.info(() => '@riverpod - using $dictionary, $entryKey');
   ref.cacheFor(const Duration(minutes: 5));
   final db = await ref.watch(dbProvider.future);
   final repo = DictionaryRepository(db);
-  return GetEntrySensesUseCase(repo, dictionary, lemma).invoke();
+  return GetEntrySensesUseCase(repo, dictionary, entryKey).invoke();
 }
 
 class DictionaryRepository implements IDictionaryRepository {
@@ -36,9 +36,9 @@ class DictionaryRepository implements IDictionaryRepository {
   final AppDb _db;
 
   @override
-  Future<DictionaryEntrySenses> getEntrySensesOf(String dictionary, String lemma) async {
-    log.fine('reading entry senses of "$lemma" in "$dictionary" from db');
-    final dbData = await _db.dictionaryDrift.getDictionaryEntrySenses(dictionary, lemma).get();
+  Future<DictionaryEntrySenses> getEntrySensesOf(String dictionary, String entryKey) async {
+    log.fine('reading entry senses of "$entryKey" in "$dictionary" from db');
+    final dbData = await _db.dictionaryDrift.getDictionaryEntrySenses(dictionary, entryKey).get();
     return DictionaryEntrySenses(dbData);
   }
 
@@ -49,7 +49,7 @@ class DictionaryRepository implements IDictionaryRepository {
 
 abstract interface class IDictionaryRepository {
   //
-  Future<DictionaryEntrySenses> getEntrySensesOf(String dictionary, String lemma);
+  Future<DictionaryEntrySenses> getEntrySensesOf(String dictionary, String entryKey);
   //
 }
 
@@ -57,15 +57,16 @@ class GetEntrySensesUseCase implements IGetEntrySensesUseCase {
   GetEntrySensesUseCase(
     this._repository,
     this._dictionary,
-    this._lemma,
+    this._entryKey,
   );
 
   final IDictionaryRepository _repository;
   final String _dictionary;
-  final String _lemma;
+  final String _entryKey;
 
   @override
-  Future<DictionaryEntrySenses> invoke() async => _repository.getEntrySensesOf(_dictionary, _lemma);
+  Future<DictionaryEntrySenses> invoke() async =>
+      _repository.getEntrySensesOf(_dictionary, _entryKey);
   //
 }
 

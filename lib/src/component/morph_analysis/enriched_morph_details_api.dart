@@ -70,7 +70,7 @@ class EnrichedAnalysis {
   String? get voice => base.voice;
   String? get person => base.person;
   String? get additional => base.additional;
-  String? get lnsLemma => lns?.lemma;
+  String? get lnsEntryKey => lns?.key;
   String? get lnsInflection => lns?.inflection;
   String? get lnsPartOfSpeech => lns?.partOfSpeech;
 
