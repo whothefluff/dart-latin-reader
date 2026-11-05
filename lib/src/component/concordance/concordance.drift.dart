@@ -3354,7 +3354,7 @@ class ConcordanceDrift extends i2.ModularAccessor {
     ).map((i0.QueryRow row) => row.read<String>('spelling'));
   }
 
-  i0.Selectable<i3.LemmaChoice> searchConcordanceLemmas({
+  i0.Selectable<i3.LemmaChoice> searchConcordanceLemmasStartingWith({
     required String prefix,
     required int limit,
   }) {
