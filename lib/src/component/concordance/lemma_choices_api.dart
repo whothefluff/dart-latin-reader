@@ -42,7 +42,10 @@ class ConcordanceRepository implements IConcordanceRepository {
     // dart format off
     log.fine('reading lemma choices whose dictionaryRef, entry key or sublemma starts with "$prefix"');
     // dart format on
-    return LemmaChoices(await _db.searchConcordanceLemmas(prefix: prefix, limit: limit).get());
+    final dbData = await _db
+        .searchConcordanceLemmasStartingWith(prefix: prefix, limit: limit)
+        .get();
+    return LemmaChoices(dbData);
   }
 
   //
