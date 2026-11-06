@@ -243,14 +243,14 @@ Future<void> _openTab(WidgetTester tester, IconData icon) =>
 Finder _firstTileIn(Type list) =>
     find.descendant(of: find.byType(list), matching: find.byType(ListTile)).hitTestable().first;
 
-/// Pumps frames until [page] has loaded, then expects no severe log records.
+/// Pumps frames until [page] has loaded or a severe record arrives, then expects no severe records.
 Future<void> _load(WidgetTester tester, Type page) async {
   final deadline = DateTime.now().add(_loadTimeout);
-  while (!_isLoaded(tester, page) && DateTime.now().isBefore(deadline)) {
+  while (!_isLoaded(tester, page) && _severeLogs.isEmpty && DateTime.now().isBefore(deadline)) {
     await tester.pump(_frameInterval);
   }
-  expect(_isLoaded(tester, page), isTrue, reason: 'The page is still loading after $_loadTimeout');
   expect(_severeLogs.map(_describe), isEmpty, reason: 'Severe log records while loading the page');
+  expect(_isLoaded(tester, page), isTrue, reason: 'The page is still loading after $_loadTimeout');
 }
 
 /// Whether [page] is shown, with no loading indicator and no frame waiting to be drawn.
