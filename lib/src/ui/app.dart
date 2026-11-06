@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../component/settings/general_settings_api.dart';
+import '../external/route_failure_logger.dart';
 import 'router/config.dart';
 import 'widget/custom_adaptive_scaffold.dart';
 import 'widget/page_scaffold.dart';
@@ -45,6 +47,7 @@ class AppState extends ConsumerState<App> {
       ],
       errorBuilder: backToHome,
     );
+    logRouteFailures(_router, Level.SEVERE);
   }
 
   @override
