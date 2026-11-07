@@ -27,6 +27,7 @@ import 'package:latin_reader/src/ui/page/dictionary/dictionaries_page.dart';
 import 'package:latin_reader/src/ui/page/dictionary/dictionary_entries_page.dart';
 import 'package:latin_reader/src/ui/page/dictionary/dictionary_entry_page.dart';
 import 'package:latin_reader/src/ui/page/library/text_page.dart';
+import 'package:latin_reader/src/ui/page/library/work_details_page.dart';
 import 'package:latin_reader/src/ui/page/library/works_page.dart';
 import 'package:latin_reader/src/ui/page/morphology/common.dart';
 import 'package:latin_reader/src/ui/page/morphology/morphological_data_page.dart';
@@ -164,6 +165,12 @@ const _openingTheDictionary = FrequencySettings(
 const _openingMorphology = FrequencySettings(
   showSummary: true,
   formTapAction: FormTapAction.openMorphology,
+  narrowLemmaCoverage: NarrowLemmaCoverage.anyCandidate,
+);
+
+const _openingConcordance = FrequencySettings(
+  showSummary: true,
+  formTapAction: FormTapAction.openConcordance,
   narrowLemmaCoverage: NarrowLemmaCoverage.anyCandidate,
 );
 
@@ -328,6 +335,125 @@ void main() {
       expect(find.byType(ConcordanceHitsPage), findsOneWidget);
     });
   });
+
+  group("the reader's menu", () {
+    testWidgets('opens each tab, and the library brings the reader back', (tester) async {
+      await _launch(tester);
+      await _read(tester, 'Carmina Altera');
+
+      await _visitFromTheReaderMenu(tester, Icons.translate, DictionariesPage);
+      await _visitFromTheReaderMenu(tester, Icons.bar_chart, WordFrequencyPage);
+      await _visitFromTheReaderMenu(tester, Icons.edit_note, MorphologicalSearchPage);
+      await _visitFromTheReaderMenu(tester, Icons.manage_search, ConcordancePage);
+    });
+
+    group('opens a tab where it was left', () {
+      testWidgets('the library, from the reader at a concordance hit', (tester) async {
+        await _launch(tester);
+        await tester.tap(find.text('Carmina Altera'));
+        await _settle(tester);
+        await _openTab(tester, Icons.manage_search);
+        await _readTheFirstHitOf(tester, _speculum);
+
+        await _openTabFromTheReaderMenu(tester, Icons.auto_stories);
+
+        expect(find.byType(WorkDetailsPage), findsOneWidget);
+        await _goBack(tester);
+        expect(find.byType(WorksPage), findsOneWidget);
+      });
+
+      testWidgets('the dictionaries', (tester) async {
+        await _launch(tester);
+        await _openTab(tester, Icons.translate);
+        await _openTheFirstEntry(tester);
+        await _openTab(tester, Icons.auto_stories);
+        await _read(tester, 'Carmina Altera');
+
+        await _openTabFromTheReaderMenu(tester, Icons.translate);
+
+        expect(find.byType(DictionaryEntryPage), findsOneWidget);
+        await _goBack(tester);
+        expect(find.byType(DictionaryEntriesPage), findsOneWidget);
+      });
+
+      testWidgets('the frequency report', (tester) async {
+        await _launch(tester);
+        await _openTab(tester, Icons.bar_chart);
+        await tester.tap(find.text(_speculo));
+        await _settle(tester);
+        await _openTab(tester, Icons.auto_stories);
+        await _read(tester, 'Carmina Altera');
+
+        await _openTabFromTheReaderMenu(tester, Icons.bar_chart);
+
+        expect(find.byType(DictionaryEntryPage), findsOneWidget);
+        await _goBack(tester);
+        expect(find.byType(WordFrequencyPage), findsOneWidget);
+      });
+
+      testWidgets('morphology', (tester) async {
+        await _launch(tester);
+        await _openTab(tester, Icons.edit_note);
+        await _searchMorphology(tester, _speculo);
+        await _openTheEntry(tester);
+        await _openTab(tester, Icons.auto_stories);
+        await _read(tester, 'Carmina Altera');
+
+        await _openTabFromTheReaderMenu(tester, Icons.edit_note);
+
+        expect(find.byType(DictionaryEntryPage), findsOneWidget);
+        await _goBack(tester);
+        expect(find.byType(MorphologicalDataView), findsOneWidget);
+      });
+
+      testWidgets('the concordance', (tester) async {
+        await _launch(tester);
+        await _openTab(tester, Icons.manage_search);
+        await _searchTheConcordance(tester, _speculum);
+        await _openTab(tester, Icons.auto_stories);
+        await _read(tester, 'Carmina Altera');
+
+        await _openTabFromTheReaderMenu(tester, Icons.manage_search);
+
+        expect(find.byType(ConcordanceHitsPage), findsOneWidget);
+        await _goBack(tester);
+        expect(find.byType(ConcordancePage), findsOneWidget);
+      });
+    });
+
+    group('opens the first page of the tab that the reader is in', () {
+      testWidgets('the library', (tester) async {
+        await _launch(tester);
+        await _read(tester, 'Carmina Altera');
+
+        await _openTabFromTheReaderMenu(tester, Icons.auto_stories);
+
+        expect(find.byType(WorksPage), findsOneWidget);
+      });
+
+      testWidgets('the frequency report, from the reader at a hit of a form', (tester) async {
+        await _launch(tester, frequencyView: _openingConcordance);
+        await _openTab(tester, Icons.bar_chart);
+        await tester.tap(find.text(_speculo));
+        await _settle(tester);
+        await _readTheFirstHit(tester);
+
+        await _openTabFromTheReaderMenu(tester, Icons.bar_chart);
+
+        expect(find.byType(WordFrequencyPage), findsOneWidget);
+      });
+
+      testWidgets('the concordance', (tester) async {
+        await _launch(tester);
+        await _openTab(tester, Icons.manage_search);
+        await _readTheFirstHitOf(tester, _speculum);
+
+        await _openTabFromTheReaderMenu(tester, Icons.manage_search);
+
+        expect(find.byType(ConcordancePage), findsOneWidget);
+      });
+    });
+  });
 }
 
 /// Launches the app on the two works, as `main` does, with the settings above and
@@ -419,6 +545,29 @@ Offset _centerOf(WidgetTester tester, String word) {
   return text.renderEditable.localToGlobal(boxes.first.toRect().center);
 }
 
+/// Opens the reader's menu, as a long press on a margin does.
+Future<void> _openTheReaderMenu(WidgetTester tester) async {
+  final text = tester.getRect(find.byType(SelectableText));
+  await tester.longPressAt(Offset(text.left / 2, text.center.dy));
+  await _settle(tester);
+}
+
+/// Opens the tab with [icon] from the reader's menu.
+Future<void> _openTabFromTheReaderMenu(WidgetTester tester, IconData icon) async {
+  await _openTheReaderMenu(tester);
+  await tester.tap(_inTheRail(icon));
+  await _settle(tester);
+}
+
+/// Opens the tab with [icon] from the reader's menu and expects its [page], then goes back to the
+/// reader through the library tab.
+Future<void> _visitFromTheReaderMenu(WidgetTester tester, IconData icon, Type page) async {
+  await _openTabFromTheReaderMenu(tester, icon);
+  expect(find.byType(page), findsOneWidget);
+  await _openTab(tester, Icons.auto_stories);
+  expect(find.byType(TextPage), findsOneWidget);
+}
+
 /// Opens the Lewis & Short entry of the morphology on screen.
 Future<void> _openTheEntry(WidgetTester tester) async {
   await tester.tap(find.text('View in Dictionary'));
@@ -449,10 +598,20 @@ Future<void> _searchMorphology(WidgetTester tester, String form) async {
 
 /// Searches the concordance for [form], and opens the reader at the first hit.
 Future<void> _readTheFirstHitOf(WidgetTester tester, String form) async {
+  await _searchTheConcordance(tester, form);
+  await _readTheFirstHit(tester);
+}
+
+/// Searches the concordance for [form].
+Future<void> _searchTheConcordance(WidgetTester tester, String form) async {
   await tester.enterText(find.widgetWithText(TextField, 'Word form'), form);
   await _settle(tester);
   await tester.tap(find.text('Search'));
   await _settle(tester);
+}
+
+/// Opens the reader at the first hit on screen.
+Future<void> _readTheFirstHit(WidgetTester tester) async {
   await tester.tap(
     find.descendant(of: find.byType(ListView), matching: find.byType(InkWell)).first,
   );
