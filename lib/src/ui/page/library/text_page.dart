@@ -313,7 +313,7 @@ class TextPageState extends ConsumerState<TextPage> {
       _navMenuOpen = true;
       try {
         ContextMenuController.removeAny();
-        final branchIds = mainBranches.map((entry) => entry.id).toList();
+        final navigationShell = StatefulNavigationShell.of(context);
         //the menu closes registers what to do, but it doesn't run yet
         final action = await showGeneralDialog<Future<void> Function()>(
           context: context,
@@ -325,7 +325,11 @@ class TextPageState extends ConsumerState<TextPage> {
             scaffoldKey: customAdaptiveScaffoldKey,
             onNavigate: (index) => _closeMenu(
               menuContext,
-              () async => context.go(branchIds[index]),
+              () async => navigationShell.goBranch(
+                index,
+                //navigate to the initial location when tapping the item that is already active
+                initialLocation: index == navigationShell.currentIndex,
+              ),
             ),
             onIndex: () => _closeMenu(menuContext, _openIndex),
             onSettings: () => _closeMenu(
