@@ -58,14 +58,14 @@ class _SettingsShellPageState extends State<SettingsShellPage> {
 
   /// The tabs after General, with the shortened bottom bar's labels
   List<NavigationDestination> get _barDestinations => mainBranches
-      .map((b) => _destination(b, label: _shortBarLabels[_extractId(b.id)] ?? b.navDest.label))
+      .map((b) => _destination(b, label: _shortBarLabels[b.id] ?? b.navDest.label))
       .toList();
 
   NavigationDestination _destination(
     ({String id, NavigationDestination navDest}) branch, {
     required String label,
   }) {
-    final isEnabled = implementedPages.containsKey(_extractId(branch.id));
+    final isEnabled = implementedPages.containsKey(branch.id);
     return NavigationDestination(
       icon: branch.navDest.icon,
       selectedIcon: branch.navDest.selectedIcon,
@@ -80,12 +80,10 @@ class _SettingsShellPageState extends State<SettingsShellPage> {
     super.initState();
     _tabIds = [
       'general',
-      ...mainBranches.map((b) => _extractId(b.id)),
+      ...mainBranches.map((b) => b.id),
     ];
     _currentIndex = _tabIds.indexOf(widget.tab).clamp(0, _tabIds.length - 1);
   }
-
-  String _extractId(String path) => path.replaceAll('/', '');
 
   @override
   Widget build(context) => CustomAdaptiveScaffold(
@@ -191,7 +189,7 @@ class _SettingsShellPageState extends State<SettingsShellPage> {
       : implementedPages[tabId] ?? _unimplementedPage(tabId);
 
   Widget _unimplementedPage(String tabId) {
-    final branch = mainBranches.where((b) => _extractId(b.id) == tabId).firstOrNull;
+    final branch = mainBranches.where((b) => b.id == tabId).firstOrNull;
     final title = branch?.navDest.label ?? 'Settings';
     return SafeBodyScaffold(
       appBar: AppBar(title: Text('$title Settings')),
