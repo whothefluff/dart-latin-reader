@@ -33,21 +33,21 @@ const String concordanceId = 'concordance';
 
 const List<({String id, NavigationDestination navDest})> mainBranches = [
   (
-    id: '/$libraryId',
+    id: libraryId,
     navDest: NavigationDestination(
       icon: Icon(Icons.auto_stories),
       label: 'Library',
     ),
   ),
   (
-    id: '/$dictionariesId',
+    id: dictionariesId,
     navDest: NavigationDestination(
       icon: Icon(Icons.translate),
       label: 'Dictionaries',
     ),
   ),
   (
-    id: '/$wordFrequencyId',
+    id: wordFrequencyId,
     navDest: NavigationDestination(
       icon: Icon(Icons.bar_chart),
       label: 'Frequency',
@@ -55,7 +55,7 @@ const List<({String id, NavigationDestination navDest})> mainBranches = [
     ),
   ),
   (
-    id: '/$morphAnalysisId',
+    id: morphAnalysisId,
     navDest: NavigationDestination(
       icon: Icon(Icons.edit_note),
       label: 'Morphology',
@@ -63,7 +63,7 @@ const List<({String id, NavigationDestination navDest})> mainBranches = [
     ),
   ),
   (
-    id: '/$concordanceId',
+    id: concordanceId,
     navDest: NavigationDestination(
       icon: Icon(Icons.manage_search),
       label: 'Concordance',
