@@ -214,13 +214,22 @@ class Details extends StatelessWidget {
             children: [Text('Number of words: $numberOfWords')],
           ),
           const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              readButton(context),
-              ?_toAuthorButton(context),
-            ],
+          //keeps the buttons at the two ends of the box, and shrinks them when they don't fit
+          LayoutBuilder(
+            builder: (context, constraints) => FittedBox(
+              fit: BoxFit.scaleDown,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    readButton(context),
+                    ?_toAuthorButton(context),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
