@@ -136,7 +136,8 @@ class _SensesState extends State<_Senses> {
       .expandIndexed(
         (index, tile) => [
           if (tile.open && index > 0) MaterialGap(key: ValueKey('gap ${index - 1}')),
-          MaterialSlice(key: ValueKey(tile.hierarchy.first.prettyLevel), child: tile),
+          // MergeableMaterial makes a global key of it, so it has to be unique to this page
+          MaterialSlice(key: ValueKey((context, tile.hierarchy.first.prettyLevel)), child: tile),
           if (tile.open && index < tiles.length - 1) MaterialGap(key: ValueKey('gap $index')),
         ],
       )

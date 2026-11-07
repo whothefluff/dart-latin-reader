@@ -27,6 +27,7 @@ Future<void> _pumpPage(
   List<String> prettyLevels, {
   Set<String> long = const {},
   bool openFirstSense = false,
+  Widget home = const DictionaryEntryPage('ls', 'amo'),
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -46,7 +47,7 @@ Future<void> _pumpPage(
           () => _SavedSettings(DictionarySettings(openFirstSense: openFirstSense)),
         ),
       ],
-      child: const MaterialApp(home: DictionaryEntryPage('ls', 'amo')),
+      child: MaterialApp(home: home),
     ),
   );
   await tester.pumpAndSettle();
@@ -155,6 +156,22 @@ void main() {
       await _pumpPage(tester, ['1', '2', '2.1'], openFirstSense: true);
 
       expect(_expanded(tester), [false]);
+    });
+
+    testWidgets('shows its senses next to another page of the same entry', (tester) async {
+      // Each tab keeps its pages, so two of them can show the same entry
+      await _pumpPage(
+        tester,
+        ['1'],
+        home: const Row(
+          children: [
+            Expanded(child: DictionaryEntryPage('ls', 'amo')),
+            Expanded(child: DictionaryEntryPage('ls', 'amo')),
+          ],
+        ),
+      );
+
+      expect(_senseText('1'), findsNWidgets(2));
     });
   });
 }
