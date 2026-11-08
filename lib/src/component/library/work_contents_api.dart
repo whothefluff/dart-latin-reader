@@ -99,7 +99,7 @@ class WorkContentsSegment {
     required this.uncertaintyBitMask,
     required this.typ,
     required this.depth,
-    required this.poem,
+    required this.piece,
     required this.lookupForm,
     required this.macronLookupForm,
     required this.baseNormForm,
@@ -125,9 +125,9 @@ class WorkContentsSegment {
   /// `null` when unknown
   final ProperNounState? properNounState;
 
-  /// The node of the poem, prologue or epilogue that it belongs to.
-  /// `null` for a book's title.
-  final String? poem;
+  /// The node of the poem, prologue, epilogue, chapter or scene that it belongs to.
+  /// `null` for the title of a book or an act.
+  final String? piece;
 
   final bool isNumeral;
   final String macronizedWord;

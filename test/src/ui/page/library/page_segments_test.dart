@@ -12,7 +12,7 @@ WorkContentsSegment _segment(
   bool isNumeral = false,
   String node = 'verse',
   SubdivisionType typ = SubdivisionType.verse,
-  String? poem = 'poem',
+  String? piece = 'poem',
 }) => WorkContentsSegment(
   workId: 'fables',
   parent: null,
@@ -23,7 +23,7 @@ WorkContentsSegment _segment(
   uncertaintyBitMask: 0,
   typ: typ,
   depth: 1,
-  poem: poem,
+  piece: piece,
   lookupForm: word,
   macronLookupForm: macronized ?? word,
   baseNormForm: word,
@@ -31,6 +31,13 @@ WorkContentsSegment _segment(
   isNumeral: isNumeral,
   sourceReference: '1',
 );
+
+WorkContentsSegment _paragraph(
+  int idx,
+  String word, {
+  required String node,
+  required String piece,
+}) => _segment(idx, word, node: node, typ: SubdivisionType.paragraph, piece: piece);
 
 /// A page with two verses, each preceded by a line break, and no spaces before punctuation.
 PageSegments _page({
@@ -126,11 +133,11 @@ void main() {
   });
 
   group('lineBreaksBefore', () {
-    final lastVerse = _segment(16, '.', node: 'last verse', poem: 'poem 1');
+    final lastVerse = _segment(16, '.', node: 'last verse', piece: 'poem 1');
 
     test('the first verse of the next untitled poem comes after a blank line', () {
       expect(
-        lineBreaksBefore(lastVerse, _segment(17, 'Ranae', node: 'first verse', poem: 'poem 2')),
+        lineBreaksBefore(lastVerse, _segment(17, 'Ranae', node: 'first verse', piece: 'poem 2')),
         2,
       );
     });
@@ -139,7 +146,7 @@ void main() {
       expect(
         lineBreaksBefore(
           lastVerse,
-          _segment(17, 'Damon', node: 'speaker', typ: SubdivisionType.speech, poem: 'poem 2'),
+          _segment(17, 'Damon', node: 'speaker', typ: SubdivisionType.speech, piece: 'poem 2'),
         ),
         2,
       );
@@ -149,7 +156,7 @@ void main() {
       expect(
         lineBreaksBefore(
           lastVerse,
-          _segment(17, 'LIBER', node: 'book title', typ: SubdivisionType.book, poem: null),
+          _segment(17, 'LIBER', node: 'book title', typ: SubdivisionType.book, piece: null),
         ),
         3,
       );
@@ -157,7 +164,7 @@ void main() {
 
     test('a verse of another line group of the same poem comes on the next line', () {
       expect(
-        lineBreaksBefore(lastVerse, _segment(17, 'Ranae', node: 'next verse', poem: 'poem 1')),
+        lineBreaksBefore(lastVerse, _segment(17, 'Ranae', node: 'next verse', piece: 'poem 1')),
         1,
       );
     });
@@ -166,7 +173,7 @@ void main() {
       expect(
         lineBreaksBefore(
           lastVerse,
-          _segment(17, 'Damon', node: 'speaker', typ: SubdivisionType.speech, poem: 'poem 1'),
+          _segment(17, 'Damon', node: 'speaker', typ: SubdivisionType.speech, piece: 'poem 1'),
         ),
         1,
       );
@@ -175,15 +182,45 @@ void main() {
     test('a word of the same verse comes on the same line', () {
       expect(
         lineBreaksBefore(
-          _segment(16, 'Ranae', poem: 'poem 1'),
-          _segment(17, 'regem', poem: 'poem 1'),
+          _segment(16, 'Ranae', piece: 'poem 1'),
+          _segment(17, 'regem', piece: 'poem 1'),
         ),
         0,
       );
     });
 
+    test('the first paragraph of the next chapter comes after a blank line', () {
+      expect(
+        lineBreaksBefore(
+          _paragraph(16, '.', node: 'last paragraph', piece: 'chapter 1'),
+          _paragraph(17, 'Apud', node: 'first paragraph', piece: 'chapter 2'),
+        ),
+        2,
+      );
+    });
+
+    test('a paragraph of the next section of the same chapter comes on the next line', () {
+      expect(
+        lineBreaksBefore(
+          _paragraph(16, '.', node: 'paragraph', piece: 'chapter 1'),
+          _paragraph(17, 'Hi', node: 'next paragraph', piece: 'chapter 1'),
+        ),
+        1,
+      );
+    });
+
+    test('the speaker who opens the next scene comes after a blank line', () {
+      expect(
+        lineBreaksBefore(
+          _segment(16, '.', node: 'last verse', piece: 'scene 1'),
+          _segment(17, 'Sosia', node: 'speaker', typ: SubdivisionType.speech, piece: 'scene 2'),
+        ),
+        2,
+      );
+    });
+
     test('the first segment starts a line, whatever poem it belongs to', () {
-      expect(lineBreaksBefore(null, _segment(17, 'Ranae', poem: 'poem 2')), 1);
+      expect(lineBreaksBefore(null, _segment(17, 'Ranae', piece: 'poem 2')), 1);
     });
   });
 }

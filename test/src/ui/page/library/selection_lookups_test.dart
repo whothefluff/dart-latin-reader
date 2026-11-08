@@ -23,7 +23,7 @@ WorkContentsSegment _segment(
   uncertaintyBitMask: 0,
   typ: SubdivisionType.verse,
   depth: 1,
-  poem: 'poem',
+  piece: 'poem',
   lookupForm: word,
   macronLookupForm: word,
   baseNormForm: baseNormForm ?? word.toLowerCase(),

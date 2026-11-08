@@ -201,7 +201,7 @@ CREATE INDEX "WorkContents_WordPosition"
 CREATE TABLE "WorkContentSubdivisions"(
     "workId" TEXT NOT NULL,
     "node" TEXT NOT NULL CHECK( node LIKE '________-____-____-____-____________' ),
-    "typ" TEXT NOT NULL MAPPED BY `const SubdivisionTypeConverter()` CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','LGRP','SPCH','TITL','PARA') ),
+    "typ" TEXT NOT NULL MAPPED BY `const SubdivisionTypeConverter()` CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','CHAP','SECT','ACT','SCEN','LGRP','SPCH','TITL','PARA') ),
     "cnt" INTEGER NOT NULL CHECK( cnt >= 0 ),
     "name" TEXT NOT NULL,
     "parent" TEXT CHECK( parent IS NULL OR parent LIKE '________-____-____-____-____________' ),
@@ -213,10 +213,10 @@ CREATE TABLE "WorkContentSubdivisions"(
     FOREIGN KEY( workId, toIndex ) REFERENCES WorkContents( workId, idx ),
     FOREIGN KEY( workId, parent ) REFERENCES WorkContentSubdivisions( workId, node ) DEFERRABLE INITIALLY DEFERRED,
     CHECK( fromIndex <= toIndex ),
-    CHECK( typ <> 'BOOK' OR parent IS NULL ), --Books are roots...
-    CHECK( parent IS NOT NULL OR typ IN ('BOOK','POEM','PROL','EPIL') ), --...and so are the poems of a work without books.
-    CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','LGRP','SPCH','PARA') OR LENGTH( TRIM( name ) ) > 0 ), --titles must be labelled
-    CHECK( ( editionLabel IS NOT NULL ) = ( typ IN ('BOOK','POEM','PROL','EPIL','VERS') ) )
+    CHECK( typ NOT IN ('BOOK','ACT') OR parent IS NULL ), --Books and acts are roots...
+    CHECK( parent IS NOT NULL OR typ IN ('BOOK','POEM','PROL','EPIL','ACT') ), --...and so are the poems of a work without books.
+    CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','CHAP','SECT','ACT','SCEN','LGRP','SPCH','PARA') OR LENGTH( TRIM( name ) ) > 0 ), --titles must be labelled
+    CHECK( ( editionLabel IS NOT NULL ) = ( typ IN ('BOOK','POEM','PROL','EPIL','CHAP','SECT','ACT','SCEN','VERS') ) )
 ) 
 STRICT, 
 WITHOUT ROWID;
@@ -350,19 +350,19 @@ CREATE VIEW "library.staging.ResolvedMacronizations" AS
 CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS 
     WITH RECURSIVE Subsets AS ( SELECT *,
                                        0 AS depth,
-                                       CASE WHEN typ IN ('POEM','PROL','EPIL') 
+                                       CASE WHEN typ IN ('POEM','PROL','EPIL','CHAP','SCEN') 
                                             THEN node 
                                             ELSE NULL -- required because of Drift typing
-                                       END AS poem -- the poem, prologue or epilogue that holds it
+                                       END AS piece -- the poem, prologue, epilogue, chapter or scene that holds it
                                     FROM WorkContentSubdivisions
                                     WHERE parent IS NULL
                                 UNION ALL
                                 -- Recursively find descendants until reaching leaf nodes
                                 SELECT s.*,
                                        Subsets.depth + 1,
-                                       CASE WHEN s.typ IN ('POEM','PROL','EPIL') 
+                                       CASE WHEN s.typ IN ('POEM','PROL','EPIL','CHAP','SCEN') 
                                             THEN s.node 
-                                            ELSE Subsets.poem 
+                                            ELSE Subsets.piece 
                                        END
                                     FROM WorkContentSubdivisions AS s
                                     INNER JOIN Subsets 
@@ -465,7 +465,7 @@ CREATE VIEW "library.WorkContents" AS
                                         SubdivsHierarchy.typ,
                                         SubdivsHierarchy.parent,
                                         SubdivsHierarchy.depth,
-                                        SubdivsHierarchy.poem,
+                                        SubdivsHierarchy.piece,
                                         ROW_NUMBER( ) OVER( PARTITION BY WorkContents.workId, WorkContents.idx
                                                             ORDER BY SubdivsHierarchy.fromIndex DESC, -- deterministic ordering thanks to the node
                                                                      SubdivsHierarchy.depth DESC,
@@ -485,7 +485,7 @@ CREATE VIEW "library.WorkContents" AS
                uncertaintyBitMask,
                typ,
                depth,
-               poem,
+               piece,
                lookupForm,
                macronLookupForm,
                baseNormForm,
@@ -555,7 +555,7 @@ CREATE VIEW "library.WorkIndexes" AS
         INNER JOIN WorkContents AS EndToken
             ON SubdivsHierarchy.workId = EndToken.workId
                AND SubdivsHierarchy.toIndex = EndToken.idx
-        WHERE SubdivsHierarchy.typ IN ('BOOK','POEM','PROL','EPIL')
+        WHERE SubdivsHierarchy.typ IN ('BOOK','POEM','PROL','EPIL','CHAP','ACT','SCEN')
         ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.depth, SubdivsHierarchy.cnt,
                  SubdivsHierarchy.node;
 

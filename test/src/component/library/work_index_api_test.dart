@@ -83,6 +83,16 @@ void main() {
       expect(_entry(SubdivisionType.book, editionLabel: '4').typeLabel, 'Book 4');
       expect(_entry(SubdivisionType.book, cnt: 5, editionLabel: 'appendix').typeLabel, 'Book 6');
     });
+
+    test('a chapter is labelled with its TEI n', () {
+      expect(_entry(SubdivisionType.chapter, editionLabel: '55').typeLabel, 'Chapter 55');
+    });
+
+    test('an act or a scene is labelled with its TEI n, or counted when that is no number', () {
+      expect(_entry(SubdivisionType.act, editionLabel: '2').typeLabel, 'Act 2');
+      expect(_entry(SubdivisionType.scene, editionLabel: '3').typeLabel, 'Scene 3');
+      expect(_entry(SubdivisionType.scene, editionLabel: 'pr').typeLabel, 'Scene 1');
+    });
   });
 
   group('workIndexProvider', () {
@@ -165,6 +175,108 @@ void main() {
         [
           (SubdivisionType.poem, null, 'ECLOGA', '8 – 8.21'),
           (SubdivisionType.poem, null, 'Poem 9', '9.1'),
+        ],
+      );
+    });
+
+    test('a work of books of chapters lists its books and chapters, not their sections', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'COMMENTARIUS', '1', 1, 0, 0, 'COMMENTARIUS', 0, TRUE ),
+                   ( ?, 1, 'Gallia', '1.1.1', 1, 1, 0, 'Gallia', 0, FALSE ),
+                   ( ?, 2, 'Hi', '1.1.2', 1, 2, 0, 'Hi', 0, FALSE ),
+                   ( ?, 3, 'Apud', '1.2.1', 1, 3, 0, 'Apud', 0, FALSE )
+        ''',
+        List.filled(4, duties),
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'BOOK', 0, 'COMMENTARIUS', NULL, 0,
+                     3, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'TITL', 0, 'COMMENTARIUS',
+                     '00000000-0000-0000-0000-0000000000c1', 0, 0, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c3', 'CHAP', 0, '',
+                     '00000000-0000-0000-0000-0000000000c1', 1, 2, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c4', 'SECT', 0, '',
+                     '00000000-0000-0000-0000-0000000000c3', 1, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c5', 'SECT', 1, '',
+                     '00000000-0000-0000-0000-0000000000c3', 2, 2, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c6', 'CHAP', 1, '',
+                     '00000000-0000-0000-0000-0000000000c1', 3, 3, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c7', 'SECT', 0, '',
+                     '00000000-0000-0000-0000-0000000000c6', 3, 3, '1' )
+        ''',
+        List.filled(7, duties),
+      );
+      final index = await _index(db, duties);
+
+      expect(
+        index.entries.map(
+          (entry) => (entry.typ, entry.labelSpelledWith(_uAndIOnly), entry.referenceLabel),
+        ),
+        [
+          (SubdivisionType.book, 'COMMENTARIUS', '1 – 1.2.1'),
+          (SubdivisionType.chapter, 'Chapter 1', '1.1.1 – 1.1.2'),
+          (SubdivisionType.chapter, 'Chapter 2', '1.2.1'),
+        ],
+      );
+    });
+
+    test('a play lists its acts and scenes, and a prologue', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Mercurius', '1', 1, 0, 0, 'Mercurius', 0, TRUE ),
+                   ( ?, 1, 'Ut', '1', 1, 1, 0, 'Ut', 0, FALSE ),
+                   ( ?, 2, 'Sosia', '153', 1, 2, 0, 'Sosia', 0, TRUE ),
+                   ( ?, 3, 'Qui', '153', 1, 3, 0, 'Qui', 0, FALSE )
+        ''',
+        List.filled(4, duties),
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'PROL', 0, '', NULL, 0, 1,
+                     'prologue' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'SCEN', 0, '',
+                     '00000000-0000-0000-0000-0000000000c1', 0, 1, 'pr' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c3', 'SPCH', 0, 'Mercurius',
+                     '00000000-0000-0000-0000-0000000000c2', 0, 1, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c4', 'TITL', 0, 'Mercurius',
+                     '00000000-0000-0000-0000-0000000000c3', 0, 0, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c5', 'VERS', 0, 'Ut',
+                     '00000000-0000-0000-0000-0000000000c3', 1, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c6', 'ACT', 0, '', NULL, 2, 3, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c7', 'SCEN', 0, '',
+                     '00000000-0000-0000-0000-0000000000c6', 2, 3, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c8', 'SPCH', 0, 'Sosia',
+                     '00000000-0000-0000-0000-0000000000c7', 2, 3, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c9', 'TITL', 0, 'Sosia',
+                     '00000000-0000-0000-0000-0000000000c8', 2, 2, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000ca', 'VERS', 0, 'Qui',
+                     '00000000-0000-0000-0000-0000000000c8', 3, 3, '153' )
+        ''',
+        List.filled(10, duties),
+      );
+      final index = await _index(db, duties);
+
+      expect(
+        index.entries.map(
+          (entry) => (entry.typ, entry.labelSpelledWith(_uAndIOnly), entry.referenceLabel),
+        ),
+        [
+          (SubdivisionType.prologue, 'Prologue', '1'),
+          (SubdivisionType.scene, 'Scene 1', '1'),
+          (SubdivisionType.act, 'Act 1', '153'),
+          (SubdivisionType.scene, 'Scene 1', '153'),
         ],
       );
     });

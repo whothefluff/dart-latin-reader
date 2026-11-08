@@ -10,6 +10,10 @@ const _lineGroup = '00000000-0000-0000-0000-0000000000c3';
 const _speech = '00000000-0000-0000-0000-0000000000c4';
 const _verse = '00000000-0000-0000-0000-0000000000c5';
 const _title = '00000000-0000-0000-0000-0000000000c6';
+const _chapter = '00000000-0000-0000-0000-0000000000c7';
+const _section = '00000000-0000-0000-0000-0000000000c8';
+const _act = '00000000-0000-0000-0000-0000000000c9';
+const _scene = '00000000-0000-0000-0000-0000000000ca';
 
 final Matcher _checkFailure = throwsA(
   isA<SqliteException>().having(
@@ -84,8 +88,58 @@ void main() {
       );
     });
 
+    test('a book holds chapters, which hold sections', () async {
+      await _addSubdivision(db, node: _book, typ: 'BOOK', editionLabel: '1');
+      await _addSubdivision(db, node: _chapter, typ: 'CHAP', parent: _book, editionLabel: '1');
+      await _addSubdivision(db, node: _section, typ: 'SECT', parent: _chapter, editionLabel: '1');
+
+      final rows = await db
+          .customSelect('SELECT typ, parent FROM WorkContentSubdivisions ORDER BY node')
+          .get();
+      expect(rows.map((row) => row.data.values.toList()), [
+        ['BOOK', null],
+        ['CHAP', _book],
+        ['SECT', _chapter],
+      ]);
+    });
+
+    test('a chapter is never a root', () async {
+      await expectLater(
+        _addSubdivision(db, node: _chapter, typ: 'CHAP', editionLabel: '1'),
+        _checkFailure,
+      );
+    });
+
+    test('an act is always a root, and holds scenes', () async {
+      await _addSubdivision(db, node: _act, typ: 'ACT', editionLabel: '1');
+      await _addSubdivision(db, node: _scene, typ: 'SCEN', parent: _act, editionLabel: '1');
+
+      await expectLater(
+        _addSubdivision(db, node: _poem, typ: 'ACT', parent: _act, editionLabel: '2'),
+        _checkFailure,
+      );
+    });
+
     test('a poem has its TEI n as its edition label', () async {
       await expectLater(_addSubdivision(db, node: _poem, typ: 'POEM'), _checkFailure);
+    });
+
+    test('a chapter, section, act or scene has its TEI n as its edition label', () async {
+      await _addSubdivision(db, node: _book, typ: 'BOOK', editionLabel: '1');
+
+      await expectLater(
+        _addSubdivision(db, node: _chapter, typ: 'CHAP', parent: _book),
+        _checkFailure,
+      );
+      await expectLater(
+        _addSubdivision(db, node: _section, typ: 'SECT', parent: _book),
+        _checkFailure,
+      );
+      await expectLater(_addSubdivision(db, node: _act, typ: 'ACT'), _checkFailure);
+      await expectLater(
+        _addSubdivision(db, node: _scene, typ: 'SCEN', parent: _book),
+        _checkFailure,
+      );
     });
 
     test('a title has no edition label', () async {
