@@ -15,6 +15,7 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
   //
   static const _prefix = 'reader.';
   static const _macronsOn = '${_prefix}showMacrons';
+  static const _ictusOn = '${_prefix}showIctus';
   static const _fontFamily = '${_prefix}fontFamily';
   static const _fontSize = '${_prefix}fontSize';
   static const _lineHeight = '${_prefix}lineHeight';
@@ -50,6 +51,7 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
     log.entry<void>();
     final repo = ref.watch(settingsRepositoryProvider);
     final savedShowMacrons = await repo.get(_macronsOn, PrefBool.hint);
+    final savedShowIctus = await repo.get(_ictusOn, PrefBool.hint);
     final savedFontFamily = await repo.get(_fontFamily, PrefString.hint);
     final savedFontSize = await repo.get(_fontSize, PrefDouble.hint);
     final savedLineHeight = await repo.get(_lineHeight, PrefDouble.hint);
@@ -70,6 +72,7 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
     final savedIjCapitals = await repo.get(_ijCapitals, PrefString.hint);
     final settings = ReaderSettings(
       showMacrons: savedShowMacrons?.value ?? ReaderSettings._defaultShowMacrons,
+      showIctus: savedShowIctus?.value ?? ReaderSettings._defaultShowIctus,
       fontFamily: savedFontFamily?.value,
       fontSize: savedFontSize?.value ?? ReaderSettings._defaultFontSize,
       lineHeight: savedLineHeight?.value ?? ReaderSettings._defaultLineHeight,
@@ -107,6 +110,7 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
       try {
         final repo = ref.read(settingsRepositoryProvider);
         await repo.set(_macronsOn, PrefBool(newSettings.showMacrons));
+        await repo.set(_ictusOn, PrefBool(newSettings.showIctus));
         await repo.set(_fontFamily, _fontFamilyValue(newSettings));
         await repo.set(_fontSize, PrefDouble(newSettings.fontSize));
         await repo.set(_lineHeight, PrefDouble(newSettings.lineHeight));
@@ -153,6 +157,7 @@ class ReaderSettingsNotifier extends _$ReaderSettingsNotifier {
 class ReaderSettings {
   const ReaderSettings({
     required this.showMacrons,
+    required this.showIctus,
     required this.fontFamily,
     required this.fontSize,
     required this.lineHeight,
@@ -173,6 +178,7 @@ class ReaderSettings {
   const ReaderSettings.defaults()
     : this(
         showMacrons: _defaultShowMacrons,
+        showIctus: _defaultShowIctus,
         fontFamily: _defaultFontFamily,
         fontSize: _defaultFontSize,
         lineHeight: _defaultLineHeight,
@@ -215,6 +221,9 @@ class ReaderSettings {
   final SemivowelForm? ijCapitals;
 
   final bool showMacrons;
+
+  /// Whether the text shows the acutes that some editions print on vowels to mark the ictus.
+  final bool showIctus;
   final double fontSize;
   final double lineHeight;
   final double letterSpacing;
@@ -222,6 +231,7 @@ class ReaderSettings {
   final bool markCommonWords;
   static const _unset = Object();
   static const bool _defaultShowMacrons = true;
+  static const bool _defaultShowIctus = true;
   static const String? _defaultFontFamily = null;
   static const double _defaultFontSize = 20.0;
   static const double _defaultLineHeight = 1.5;
@@ -246,6 +256,7 @@ class ReaderSettings {
   /// distinguishing it from "not provided".
   ReaderSettings copyWith({
     bool? showMacrons,
+    bool? showIctus,
     Object? fontFamily = _unset,
     double? fontSize,
     double? lineHeight,
@@ -263,6 +274,7 @@ class ReaderSettings {
     Object? ijCapitals = _unset,
   }) => ReaderSettings(
     showMacrons: showMacrons ?? this.showMacrons,
+    showIctus: showIctus ?? this.showIctus,
     fontFamily: fontFamily == _unset ? this.fontFamily : fontFamily as String?,
     fontSize: fontSize ?? this.fontSize,
     lineHeight: lineHeight ?? this.lineHeight,
@@ -300,6 +312,7 @@ class ReaderSettings {
   String toString() =>
       'ReaderSettings{'
       'showMacrons: $showMacrons, '
+      'showIctus: $showIctus, '
       'fontFamily: $fontFamily, '
       'fontSize: $fontSize, '
       'lineHeight: $lineHeight, '
@@ -321,6 +334,7 @@ class ReaderSettings {
       identical(this, other) ||
       (other is ReaderSettings &&
           other.showMacrons == showMacrons &&
+          other.showIctus == showIctus &&
           other.fontFamily == fontFamily &&
           other.fontSize == fontSize &&
           other.lineHeight == lineHeight &&
@@ -340,6 +354,7 @@ class ReaderSettings {
   @override
   int get hashCode => Object.hash(
     showMacrons,
+    showIctus,
     fontFamily,
     fontSize,
     lineHeight,

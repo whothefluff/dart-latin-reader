@@ -21,6 +21,7 @@ WorkContentsSegment _segment(
   word: word,
   macronizedWord: word,
   uncertaintyBitMask: 0,
+  ictusBitMask: 0,
   typ: SubdivisionType.verse,
   depth: 1,
   piece: 'poem',

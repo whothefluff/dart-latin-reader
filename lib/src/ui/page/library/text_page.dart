@@ -507,7 +507,6 @@ class _TextRenderer {
 
   /// Letter spans for [segment], colored by frequency and inside a marked span when highlighted
   List<TextSpan> _wordSpans(WorkContentsSegment segment, Color textColor) {
-    final word = readerSettings.showMacrons ? segment.macronizedWord : segment.word;
     final mask = readerSettings.showMacrons ? segment.uncertaintyBitMask : 0;
     final uncertainStyle = TextStyle(
       decoration: TextDecoration.underline,
@@ -515,11 +514,16 @@ class _TextRenderer {
       decorationColor: theme.colorScheme.primary,
       decorationThickness: 1,
     );
-    final spelling = semivowelOrthographyOf(segment, semivowelOrthography);
-    // mask bits follow the stored characters, and respellEach writes one string for each
+    final shown = shownLetters(
+      segment,
+      semivowelOrthography,
+      showMacrons: readerSettings.showMacrons,
+      showIctus: readerSettings.showIctus,
+    );
+    // mask bits follow the stored characters, and shownLetters writes one string for each
     final letters = mask == 0
-        ? [TextSpan(text: spelling.respell(word))]
-        : spelling.respellEach(word).mapIndexed((i, letter) {
+        ? [TextSpan(text: shown.join())]
+        : shown.mapIndexed((i, letter) {
             final isUncertain = ((mask >> i) & 1) != 0;
             return TextSpan(
               text: letter,
@@ -1217,6 +1221,7 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
       _TextRenderer.pageSpans(allSpans, visible.first, visible.last),
       segments.sublist(visible.first, visible.last + 1),
       showMacrons: settings.showMacrons,
+      showIctus: settings.showIctus,
       semivowelOrthography: semivowelOrthography,
     );
   }

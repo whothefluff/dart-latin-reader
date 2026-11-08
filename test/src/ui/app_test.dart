@@ -137,6 +137,7 @@ const _listingWorks = LibrarySettings(view: LibraryView.works);
 /// Shows each word as the fixture spells it.
 const _withoutMacronsOrMarks = ReaderSettings(
   showMacrons: false,
+  showIctus: false,
   fontFamily: null,
   fontSize: 20.0,
   lineHeight: 1.5,

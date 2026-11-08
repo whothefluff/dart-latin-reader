@@ -779,6 +779,7 @@ typedef $WorkContentsCreateCompanionBuilder =
       i0.Value<String?> expansion,
       required String macronizedWord,
       required int uncertaintyBitMask,
+      i0.Value<int> ictusBitMask,
       i0.Value<bool> isTitle,
     });
 typedef $WorkContentsUpdateCompanionBuilder =
@@ -795,6 +796,7 @@ typedef $WorkContentsUpdateCompanionBuilder =
       i0.Value<String?> expansion,
       i0.Value<String> macronizedWord,
       i0.Value<int> uncertaintyBitMask,
+      i0.Value<int> ictusBitMask,
       i0.Value<bool> isTitle,
     });
 
@@ -869,6 +871,11 @@ class $WorkContentsFilterComposer
 
   i0.ColumnFilters<int> get uncertaintyBitMask => $composableBuilder(
     column: $table.uncertaintyBitMask,
+    builder: (column) => i0.ColumnFilters(column),
+  );
+
+  i0.ColumnFilters<int> get ictusBitMask => $composableBuilder(
+    column: $table.ictusBitMask,
     builder: (column) => i0.ColumnFilters(column),
   );
 
@@ -1002,6 +1009,11 @@ class $WorkContentsOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<int> get ictusBitMask => $composableBuilder(
+    column: $table.ictusBitMask,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<bool> get isTitle => $composableBuilder(
     column: $table.isTitle,
     builder: (column) => i0.ColumnOrderings(column),
@@ -1119,6 +1131,11 @@ class $WorkContentsAnnotationComposer
     builder: (column) => column,
   );
 
+  i0.GeneratedColumn<int> get ictusBitMask => $composableBuilder(
+    column: $table.ictusBitMask,
+    builder: (column) => column,
+  );
+
   i0.GeneratedColumn<bool> get isTitle =>
       $composableBuilder(column: $table.isTitle, builder: (column) => column);
 
@@ -1224,6 +1241,7 @@ class $WorkContentsTableManager
                 i0.Value<String?> expansion = const i0.Value.absent(),
                 i0.Value<String> macronizedWord = const i0.Value.absent(),
                 i0.Value<int> uncertaintyBitMask = const i0.Value.absent(),
+                i0.Value<int> ictusBitMask = const i0.Value.absent(),
                 i0.Value<bool> isTitle = const i0.Value.absent(),
               }) => i1.WorkContentsCompanion(
                 workId: workId,
@@ -1238,6 +1256,7 @@ class $WorkContentsTableManager
                 expansion: expansion,
                 macronizedWord: macronizedWord,
                 uncertaintyBitMask: uncertaintyBitMask,
+                ictusBitMask: ictusBitMask,
                 isTitle: isTitle,
               ),
           createCompanionCallback:
@@ -1255,6 +1274,7 @@ class $WorkContentsTableManager
                 i0.Value<String?> expansion = const i0.Value.absent(),
                 required String macronizedWord,
                 required int uncertaintyBitMask,
+                i0.Value<int> ictusBitMask = const i0.Value.absent(),
                 i0.Value<bool> isTitle = const i0.Value.absent(),
               }) => i1.WorkContentsCompanion.insert(
                 workId: workId,
@@ -1269,6 +1289,7 @@ class $WorkContentsTableManager
                 expansion: expansion,
                 macronizedWord: macronizedWord,
                 uncertaintyBitMask: uncertaintyBitMask,
+                ictusBitMask: ictusBitMask,
                 isTitle: isTitle,
               ),
           withReferenceMapper: (p0) => p0
@@ -3753,6 +3774,17 @@ class WorkContents extends i0.Table
         requiredDuringInsert: true,
         $customConstraints: 'NOT NULL',
       );
+  static const i0.VerificationMeta _ictusBitMaskMeta =
+      const i0.VerificationMeta('ictusBitMask');
+  late final i0.GeneratedColumn<int> ictusBitMask = i0.GeneratedColumn<int>(
+    'ictusBitMask',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0',
+    defaultValue: const i0.CustomExpression('0'),
+  );
   static const i0.VerificationMeta _isTitleMeta = const i0.VerificationMeta(
     'isTitle',
   );
@@ -3977,6 +4009,7 @@ class WorkContents extends i0.Table
     expansion,
     macronizedWord,
     uncertaintyBitMask,
+    ictusBitMask,
     isTitle,
     auxExpansionNoMacrons,
     auxPlainBase,
@@ -4095,6 +4128,15 @@ class WorkContents extends i0.Table
       );
     } else if (isInserting) {
       context.missing(_uncertaintyBitMaskMeta);
+    }
+    if (data.containsKey('ictusBitMask')) {
+      context.handle(
+        _ictusBitMaskMeta,
+        ictusBitMask.isAcceptableOrUnknown(
+          data['ictusBitMask']!,
+          _ictusBitMaskMeta,
+        ),
+      );
     }
     if (data.containsKey('isTitle')) {
       context.handle(
@@ -4254,6 +4296,10 @@ class WorkContents extends i0.Table
         i0.DriftSqlType.int,
         data['${effectivePrefix}uncertaintyBitMask'],
       )!,
+      ictusBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}ictusBitMask'],
+      )!,
       isTitle: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.bool,
         data['${effectivePrefix}isTitle'],
@@ -4358,6 +4404,9 @@ class WorkContent extends i0.DataClass
   final String? expansion;
   final String macronizedWord;
   final int uncertaintyBitMask;
+  final int ictusBitMask;
+
+  ///bit N: the edition's acute of the ictus on the Nth letter of word
   final bool isTitle;
 
   ///TRUE when part of a TITL sequence
@@ -4390,6 +4439,7 @@ class WorkContent extends i0.DataClass
     this.expansion,
     required this.macronizedWord,
     required this.uncertaintyBitMask,
+    required this.ictusBitMask,
     required this.isTitle,
     this.auxExpansionNoMacrons,
     this.auxPlainBase,
@@ -4428,6 +4478,7 @@ class WorkContent extends i0.DataClass
     }
     map['macronizedWord'] = i0.Variable<String>(macronizedWord);
     map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask);
+    map['ictusBitMask'] = i0.Variable<int>(ictusBitMask);
     map['isTitle'] = i0.Variable<bool>(isTitle);
     return map;
   }
@@ -4454,6 +4505,7 @@ class WorkContent extends i0.DataClass
           : i0.Value(expansion),
       macronizedWord: i0.Value(macronizedWord),
       uncertaintyBitMask: i0.Value(uncertaintyBitMask),
+      ictusBitMask: i0.Value(ictusBitMask),
       isTitle: i0.Value(isTitle),
     );
   }
@@ -4478,6 +4530,7 @@ class WorkContent extends i0.DataClass
       expansion: serializer.fromJson<String?>(json['expansion']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
       uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
+      ictusBitMask: serializer.fromJson<int>(json['ictusBitMask']),
       isTitle: serializer.fromJson<bool>(json['isTitle']),
       auxExpansionNoMacrons: serializer.fromJson<String?>(
         json['aux_expansionNoMacrons'],
@@ -4518,6 +4571,7 @@ class WorkContent extends i0.DataClass
       'expansion': serializer.toJson<String?>(expansion),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
       'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
+      'ictusBitMask': serializer.toJson<int>(ictusBitMask),
       'isTitle': serializer.toJson<bool>(isTitle),
       'aux_expansionNoMacrons': serializer.toJson<String?>(
         auxExpansionNoMacrons,
@@ -4548,6 +4602,7 @@ class WorkContent extends i0.DataClass
     i0.Value<String?> expansion = const i0.Value.absent(),
     String? macronizedWord,
     int? uncertaintyBitMask,
+    int? ictusBitMask,
     bool? isTitle,
     i0.Value<String?> auxExpansionNoMacrons = const i0.Value.absent(),
     i0.Value<String?> auxPlainBase = const i0.Value.absent(),
@@ -4575,6 +4630,7 @@ class WorkContent extends i0.DataClass
     expansion: expansion.present ? expansion.value : this.expansion,
     macronizedWord: macronizedWord ?? this.macronizedWord,
     uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
+    ictusBitMask: ictusBitMask ?? this.ictusBitMask,
     isTitle: isTitle ?? this.isTitle,
     auxExpansionNoMacrons: auxExpansionNoMacrons.present
         ? auxExpansionNoMacrons.value
@@ -4617,6 +4673,7 @@ class WorkContent extends i0.DataClass
           ..write('expansion: $expansion, ')
           ..write('macronizedWord: $macronizedWord, ')
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
+          ..write('ictusBitMask: $ictusBitMask, ')
           ..write('isTitle: $isTitle, ')
           ..write('auxExpansionNoMacrons: $auxExpansionNoMacrons, ')
           ..write('auxPlainBase: $auxPlainBase, ')
@@ -4647,6 +4704,7 @@ class WorkContent extends i0.DataClass
     expansion,
     macronizedWord,
     uncertaintyBitMask,
+    ictusBitMask,
     isTitle,
     auxExpansionNoMacrons,
     auxPlainBase,
@@ -4676,6 +4734,7 @@ class WorkContent extends i0.DataClass
           other.expansion == this.expansion &&
           other.macronizedWord == this.macronizedWord &&
           other.uncertaintyBitMask == this.uncertaintyBitMask &&
+          other.ictusBitMask == this.ictusBitMask &&
           other.isTitle == this.isTitle &&
           other.auxExpansionNoMacrons == this.auxExpansionNoMacrons &&
           other.auxPlainBase == this.auxPlainBase &&
@@ -4703,6 +4762,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
   final i0.Value<String?> expansion;
   final i0.Value<String> macronizedWord;
   final i0.Value<int> uncertaintyBitMask;
+  final i0.Value<int> ictusBitMask;
   final i0.Value<bool> isTitle;
   const WorkContentsCompanion({
     this.workId = const i0.Value.absent(),
@@ -4717,6 +4777,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     this.expansion = const i0.Value.absent(),
     this.macronizedWord = const i0.Value.absent(),
     this.uncertaintyBitMask = const i0.Value.absent(),
+    this.ictusBitMask = const i0.Value.absent(),
     this.isTitle = const i0.Value.absent(),
   });
   WorkContentsCompanion.insert({
@@ -4732,6 +4793,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     this.expansion = const i0.Value.absent(),
     required String macronizedWord,
     required int uncertaintyBitMask,
+    this.ictusBitMask = const i0.Value.absent(),
     this.isTitle = const i0.Value.absent(),
   }) : workId = i0.Value(workId),
        idx = i0.Value(idx),
@@ -4754,6 +4816,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     i0.Expression<String>? expansion,
     i0.Expression<String>? macronizedWord,
     i0.Expression<int>? uncertaintyBitMask,
+    i0.Expression<int>? ictusBitMask,
     i0.Expression<bool>? isTitle,
   }) {
     return i0.RawValuesInsertable({
@@ -4769,6 +4832,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
       if (expansion != null) 'expansion': expansion,
       if (macronizedWord != null) 'macronizedWord': macronizedWord,
       if (uncertaintyBitMask != null) 'uncertaintyBitMask': uncertaintyBitMask,
+      if (ictusBitMask != null) 'ictusBitMask': ictusBitMask,
       if (isTitle != null) 'isTitle': isTitle,
     });
   }
@@ -4786,6 +4850,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     i0.Value<String?>? expansion,
     i0.Value<String>? macronizedWord,
     i0.Value<int>? uncertaintyBitMask,
+    i0.Value<int>? ictusBitMask,
     i0.Value<bool>? isTitle,
   }) {
     return i1.WorkContentsCompanion(
@@ -4801,6 +4866,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
       expansion: expansion ?? this.expansion,
       macronizedWord: macronizedWord ?? this.macronizedWord,
       uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
+      ictusBitMask: ictusBitMask ?? this.ictusBitMask,
       isTitle: isTitle ?? this.isTitle,
     );
   }
@@ -4846,6 +4912,9 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
     if (uncertaintyBitMask.present) {
       map['uncertaintyBitMask'] = i0.Variable<int>(uncertaintyBitMask.value);
     }
+    if (ictusBitMask.present) {
+      map['ictusBitMask'] = i0.Variable<int>(ictusBitMask.value);
+    }
     if (isTitle.present) {
       map['isTitle'] = i0.Variable<bool>(isTitle.value);
     }
@@ -4867,6 +4936,7 @@ class WorkContentsCompanion extends i0.UpdateCompanion<i1.WorkContent> {
           ..write('expansion: $expansion, ')
           ..write('macronizedWord: $macronizedWord, ')
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
+          ..write('ictusBitMask: $ictusBitMask, ')
           ..write('isTitle: $isTitle')
           ..write(')'))
         .toString();
@@ -7916,6 +7986,7 @@ class LibraryWorkContent extends i0.DataClass {
   final String word;
   final String macronizedWord;
   final int uncertaintyBitMask;
+  final int ictusBitMask;
   final i5.SubdivisionType typ;
   final int depth;
   final String? piece;
@@ -7933,6 +8004,7 @@ class LibraryWorkContent extends i0.DataClass {
     required this.word,
     required this.macronizedWord,
     required this.uncertaintyBitMask,
+    required this.ictusBitMask,
     required this.typ,
     required this.depth,
     this.piece,
@@ -7956,6 +8028,7 @@ class LibraryWorkContent extends i0.DataClass {
       word: serializer.fromJson<String>(json['word']),
       macronizedWord: serializer.fromJson<String>(json['macronizedWord']),
       uncertaintyBitMask: serializer.fromJson<int>(json['uncertaintyBitMask']),
+      ictusBitMask: serializer.fromJson<int>(json['ictusBitMask']),
       typ: serializer.fromJson<i5.SubdivisionType>(json['typ']),
       depth: serializer.fromJson<int>(json['depth']),
       piece: serializer.fromJson<String?>(json['piece']),
@@ -7980,6 +8053,7 @@ class LibraryWorkContent extends i0.DataClass {
       'word': serializer.toJson<String>(word),
       'macronizedWord': serializer.toJson<String>(macronizedWord),
       'uncertaintyBitMask': serializer.toJson<int>(uncertaintyBitMask),
+      'ictusBitMask': serializer.toJson<int>(ictusBitMask),
       'typ': serializer.toJson<i5.SubdivisionType>(typ),
       'depth': serializer.toJson<int>(depth),
       'piece': serializer.toJson<String?>(piece),
@@ -8002,6 +8076,7 @@ class LibraryWorkContent extends i0.DataClass {
     String? word,
     String? macronizedWord,
     int? uncertaintyBitMask,
+    int? ictusBitMask,
     i5.SubdivisionType? typ,
     int? depth,
     i0.Value<String?> piece = const i0.Value.absent(),
@@ -8019,6 +8094,7 @@ class LibraryWorkContent extends i0.DataClass {
     word: word ?? this.word,
     macronizedWord: macronizedWord ?? this.macronizedWord,
     uncertaintyBitMask: uncertaintyBitMask ?? this.uncertaintyBitMask,
+    ictusBitMask: ictusBitMask ?? this.ictusBitMask,
     typ: typ ?? this.typ,
     depth: depth ?? this.depth,
     piece: piece.present ? piece.value : this.piece,
@@ -8043,6 +8119,7 @@ class LibraryWorkContent extends i0.DataClass {
           ..write('word: $word, ')
           ..write('macronizedWord: $macronizedWord, ')
           ..write('uncertaintyBitMask: $uncertaintyBitMask, ')
+          ..write('ictusBitMask: $ictusBitMask, ')
           ..write('typ: $typ, ')
           ..write('depth: $depth, ')
           ..write('piece: $piece, ')
@@ -8065,6 +8142,7 @@ class LibraryWorkContent extends i0.DataClass {
     word,
     macronizedWord,
     uncertaintyBitMask,
+    ictusBitMask,
     typ,
     depth,
     piece,
@@ -8086,6 +8164,7 @@ class LibraryWorkContent extends i0.DataClass {
           other.word == this.word &&
           other.macronizedWord == this.macronizedWord &&
           other.uncertaintyBitMask == this.uncertaintyBitMask &&
+          other.ictusBitMask == this.ictusBitMask &&
           other.typ == this.typ &&
           other.depth == this.depth &&
           other.piece == this.piece &&
@@ -8113,6 +8192,7 @@ class LibraryWorkContents
     word,
     macronizedWord,
     uncertaintyBitMask,
+    ictusBitMask,
     typ,
     depth,
     piece,
@@ -8130,7 +8210,7 @@ class LibraryWorkContents
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.baseNormForm, WorkContents.properNounState, WorkContents.tokenType = 3 AS isNumeral, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, SubdivsHierarchy.piece, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, typ, depth, piece, lookupForm, macronLookupForm, baseNormForm, properNounState, isNumeral, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.ictusBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.baseNormForm, WorkContents.properNounState, WorkContents.tokenType = 3 AS isNumeral, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, SubdivsHierarchy.piece, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, ictusBitMask, typ, depth, piece, lookupForm, macronLookupForm, baseNormForm, properNounState, isNumeral, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
   };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -8165,6 +8245,10 @@ class LibraryWorkContents
       uncertaintyBitMask: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.int,
         data['${effectivePrefix}uncertaintyBitMask'],
+      )!,
+      ictusBitMask: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.int,
+        data['${effectivePrefix}ictusBitMask'],
       )!,
       typ: i1.WorkContentSubdivisions.$convertertyp.fromSql(
         attachedDatabase.typeMapping.read(
@@ -8253,6 +8337,12 @@ class LibraryWorkContents
         false,
         type: i0.DriftSqlType.int,
       );
+  late final i0.GeneratedColumn<int> ictusBitMask = i0.GeneratedColumn<int>(
+    'ictusBitMask',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.int,
+  );
   late final i0.GeneratedColumnWithTypeConverter<i5.SubdivisionType, String>
   typ = i0.GeneratedColumn<String>(
     'typ',
@@ -9101,6 +9191,7 @@ class LibraryDrift extends i6.ModularAccessor {
         word: row.read<String>('word'),
         macronizedWord: row.read<String>('macronizedWord'),
         uncertaintyBitMask: row.read<int>('uncertaintyBitMask'),
+        ictusBitMask: row.read<int>('ictusBitMask'),
         typ: i1.WorkContentSubdivisions.$convertertyp.fromSql(
           row.read<String>('typ'),
         ),

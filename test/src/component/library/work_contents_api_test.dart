@@ -68,6 +68,39 @@ void main() {
       );
     });
 
+    test('each token keeps the ictus that its edition prints', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, ictusBitMask,
+                                  isTitle )
+            VALUES ( ?, 0, 'Levis', '1', 1, 0, 0, 'Levis', 0, 2, FALSE ),
+                   ( ?, 1, 'est', '1', 1, 0, 1, 'est', 0, 0, FALSE )
+        ''',
+        [duties, duties],
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '$_firstPoem', 'POEM', 0, '', NULL, 0, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'VERS', 0, 'Lévis est',
+                     '$_firstPoem', 0, 1, '1' )
+        ''',
+        [duties, duties],
+      );
+      final contents = await _contents(db, duties, 0, 1);
+
+      expect(
+        contents.map((segment) => (segment.idx, segment.word, segment.ictusBitMask)),
+        [
+          (0, 'Levis', 2),
+          (1, 'est', 0),
+        ],
+      );
+    });
+
     test("a book's title belongs to no poem", () async {
       final db = await smallLibrary();
       await db.customStatement(

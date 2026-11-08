@@ -64,6 +64,7 @@ CREATE TABLE "WorkContents"(
     "expansion" TEXT,
     "macronizedWord" TEXT NOT NULL,
     "uncertaintyBitMask" INTEGER NOT NULL,
+    "ictusBitMask" INTEGER NOT NULL DEFAULT 0, --bit N: the edition's acute of the ictus on the Nth letter of word
     "isTitle" BOOLEAN NOT NULL DEFAULT FALSE, --TRUE when part of a TITL sequence
     -- aux (internal use only)
     "aux_expansionNoMacrons" TEXT GENERATED ALWAYS AS (
@@ -455,6 +456,7 @@ CREATE VIEW "library.WorkContents" AS
                                         WorkContents.word,
                                         WorkContents.macronizedWord,
                                         WorkContents.uncertaintyBitMask,
+                                        WorkContents.ictusBitMask,
                                         WorkContents.sourceReference,
                                         WorkContents.lookupForm,
                                         WorkContents.macronLookupForm,
@@ -483,6 +485,7 @@ CREATE VIEW "library.WorkContents" AS
                word,
                macronizedWord,
                uncertaintyBitMask,
+               ictusBitMask,
                typ,
                depth,
                piece,

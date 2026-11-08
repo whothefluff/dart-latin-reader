@@ -89,16 +89,17 @@ class _ReaderSettingsSection extends StatelessWidget {
     title: 'Reader Settings',
     icon: Icons.my_library_books,
     groups: [
-      _readerMacrons(),
+      _readerDiacritics(),
       _readerSemivowels(context),
       _readerTypography(context),
       _readerFrequencies(context),
     ],
   );
 
-  SettingsGroup _readerMacrons() => SettingsGroup(
+  SettingsGroup _readerDiacritics() => SettingsGroup(
     rows: [
       _macronsToggle(),
+      _ictusToggle(),
     ],
   );
 
@@ -175,6 +176,14 @@ class _ReaderSettingsSection extends StatelessWidget {
     value: settings.showMacrons,
     onChanged: (val) => notifier.updateSettings(
       settings.copyWith(showMacrons: val),
+    ),
+  );
+
+  SwitchListTile _ictusToggle() => SwitchListTile(
+    title: const Text('Show Ictus'),
+    value: settings.showIctus,
+    onChanged: (val) => notifier.updateSettings(
+      settings.copyWith(showIctus: val),
     ),
   );
 

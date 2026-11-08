@@ -9,6 +9,7 @@ WorkContentsSegment _segment(
   int idx,
   String word, {
   String? macronized,
+  int ictusBitMask = 0,
   bool isNumeral = false,
   String node = 'verse',
   SubdivisionType typ = SubdivisionType.verse,
@@ -21,6 +22,7 @@ WorkContentsSegment _segment(
   word: word,
   macronizedWord: macronized ?? word,
   uncertaintyBitMask: 0,
+  ictusBitMask: ictusBitMask,
   typ: typ,
   depth: 1,
   piece: piece,
@@ -42,12 +44,13 @@ WorkContentsSegment _paragraph(
 /// A page with two verses, each preceded by a line break, and no spaces before punctuation.
 PageSegments _page({
   required bool showMacrons,
+  bool showIctus = false,
   SemivowelOrthography semivowelOrthography = SemivowelOrthography.allVocalicConsonantal,
 }) {
   final laidOut = [
     (_segment(10, 'Lupus'), before: '\n', after: ' '),
     (_segment(11, 'et'), before: '', after: ' '),
-    (_segment(12, 'agnus'), before: '', after: ''),
+    (_segment(12, 'agnus', ictusBitMask: 1), before: '', after: ''),
     (_segment(13, ','), before: '', after: ' '),
     (_segment(14, 'et'), before: '\n', after: ' '),
     (_segment(15, 'venerunt', macronized: 'vēnērunt'), before: '', after: ''),
@@ -61,9 +64,12 @@ PageSegments _page({
             text: entry.before,
             children: [
               TextSpan(
-                text: semivowelOrthographyOf(entry.$1, semivowelOrthography).respell(
-                  showMacrons ? entry.$1.macronizedWord : entry.$1.word,
-                ),
+                text: shownLetters(
+                  entry.$1,
+                  semivowelOrthography,
+                  showMacrons: showMacrons,
+                  showIctus: showIctus,
+                ).join(),
               ),
               TextSpan(text: entry.after),
             ],
@@ -72,6 +78,7 @@ PageSegments _page({
         .toList(),
     laidOut.map((entry) => entry.$1),
     showMacrons: showMacrons,
+    showIctus: showIctus,
     semivowelOrthography: semivowelOrthography,
   );
 }
@@ -130,6 +137,73 @@ void main() {
       expect(withMacrons.selectedSegment(_select(withMacrons, 'uēnērunt'))?.idx, 15);
       expect(withMacrons.selectedSegment(_select(withMacrons, 'IV'))?.idx, 17);
     });
+
+    test('a word is found by the text shown, with or without its ictus, and so are the next', () {
+      final withIctus = _page(showMacrons: false, showIctus: true);
+
+      expect(withIctus.selectedSegment(_select(withIctus, 'a\u0301gnus'))?.idx, 12);
+      expect(withIctus.selectedSegment(_select(withIctus, 'et', occurrence: 1))?.idx, 14);
+      expect(page.selectedSegment(_select(page, 'agnus'))?.idx, 12);
+    });
+  });
+
+  group('shownLetters', () {
+    final levis = _segment(1, 'levis', macronized: 'lēvis', ictusBitMask: 2);
+
+    test('the acute of the ictus goes after its letter, with or without macrons', () {
+      expect(
+        shownLetters(
+          levis,
+          SemivowelOrthography.allVocalicConsonantal,
+          showMacrons: true,
+          showIctus: true,
+        ),
+        ['l', 'ē\u0301', 'v', 'i', 's'],
+      );
+      expect(
+        shownLetters(
+          levis,
+          SemivowelOrthography.allVocalicConsonantal,
+          showMacrons: false,
+          showIctus: true,
+        ),
+        ['l', 'e\u0301', 'v', 'i', 's'],
+      );
+    });
+
+    test('a word shown without its ictus has no acute', () {
+      expect(
+        shownLetters(
+          levis,
+          SemivowelOrthography.allVocalicConsonantal,
+          showMacrons: false,
+          showIctus: false,
+        ),
+        ['l', 'e', 'v', 'i', 's'],
+      );
+    });
+
+    test(
+      'the acute of the ictus goes on the stored letter that it marks, however it is spelled',
+      () {
+        const iOnly = SemivowelOrthography(
+          uvLowercase: SemivowelForm.vocalicConsonantal,
+          uvCapitals: SemivowelForm.vocalicConsonantal,
+          ijLowercase: SemivowelForm.vocalic,
+          ijCapitals: SemivowelForm.vocalic,
+        );
+
+        expect(
+          shownLetters(
+            _segment(1, 'jussu', ictusBitMask: 2),
+            iOnly,
+            showMacrons: false,
+            showIctus: true,
+          ),
+          ['i', 'u\u0301', 's', 's', 'u'],
+        );
+      },
+    );
   });
 
   group('lineBreaksBefore', () {
