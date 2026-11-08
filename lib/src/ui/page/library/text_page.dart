@@ -46,6 +46,10 @@ bool _isHeadingType(SubdivisionType type) => switch (type) {
       SubdivisionType.prologue ||
       SubdivisionType.poem ||
       SubdivisionType.epilogue ||
+      SubdivisionType.chapter ||
+      SubdivisionType.section ||
+      SubdivisionType.act ||
+      SubdivisionType.scene ||
       SubdivisionType.speech ||
       SubdivisionType.title) =>
     true,
@@ -439,9 +443,13 @@ class _TextRenderer {
   /// Theme style for a block of [type]
   TextStyle _themeStyle(SubdivisionType type) => switch (type) {
     SubdivisionType.book => textTheme.headlineSmall!,
+    SubdivisionType.act => textTheme.headlineSmall!,
     SubdivisionType.prologue => textTheme.titleMedium!,
     SubdivisionType.epilogue => textTheme.titleMedium!,
     SubdivisionType.poem => textTheme.titleMedium!,
+    SubdivisionType.chapter => textTheme.titleMedium!,
+    SubdivisionType.section => textTheme.titleSmall!,
+    SubdivisionType.scene => textTheme.titleMedium!,
     SubdivisionType.lineGroup => textTheme.bodyLarge!,
     SubdivisionType.speech => textTheme.titleSmall!,
     SubdivisionType.title => textTheme.bodyMedium!,

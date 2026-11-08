@@ -20,17 +20,21 @@ int lineBreaksBefore(WorkContentsSegment? previous, WorkContentsSegment segment)
   final lineBreaks = previous != null && segment.typ != previous.typ
       ? _lineBreaksBefore(segment.typ)
       : (segment.node != previous?.node ? 1 : 0);
-  final poemLineBreaks = _lineBreaksBefore(SubdivisionType.poem);
-  return _belongsToAnotherPoem(previous, segment) ? max(lineBreaks, poemLineBreaks) : lineBreaks;
+  final pieceLineBreaks = _lineBreaksBefore(SubdivisionType.poem);
+  return _belongsToAnotherPiece(previous, segment) ? max(lineBreaks, pieceLineBreaks) : lineBreaks;
 }
 
 /// Returns how many line breaks go before a block of [type] when the block before it is of
 /// another kind.
 int _lineBreaksBefore(SubdivisionType type) => switch (type) {
   SubdivisionType.book => 3,
+  SubdivisionType.act => 3,
   SubdivisionType.prologue => 2,
   SubdivisionType.epilogue => 2,
   SubdivisionType.poem => 2,
+  SubdivisionType.chapter => 2,
+  SubdivisionType.scene => 2,
+  SubdivisionType.section => 1,
   SubdivisionType.lineGroup => 1,
   SubdivisionType.speech => 1,
   SubdivisionType.title => 1,
@@ -38,10 +42,11 @@ int _lineBreaksBefore(SubdivisionType type) => switch (type) {
   SubdivisionType.paragraph => 1,
 };
 
-/// True when [segment] belongs to another poem, prologue or epilogue than [previous].
-bool _belongsToAnotherPoem(WorkContentsSegment? previous, WorkContentsSegment segment) =>
-    switch (previous?.poem) {
-      final poem? => poem != segment.poem,
+/// True when [segment] belongs to another poem, prologue, epilogue, chapter or scene than
+/// [previous].
+bool _belongsToAnotherPiece(WorkContentsSegment? previous, WorkContentsSegment segment) =>
+    switch (previous?.piece) {
+      final piece? => piece != segment.piece,
       null => false,
     };
 

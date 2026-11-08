@@ -73,7 +73,7 @@ abstract interface class IGetWorkIndexUseCase {
   //
 }
 
-/// A book, poem, prologue or epilogue of a work
+/// A book, poem, prologue, epilogue, chapter, act or scene of a work
 @immutable
 class WorkIndexEntry {
   const WorkIndexEntry({
@@ -158,12 +158,16 @@ class WorkIndexEntry {
       startReference == endReference ? startReference : '$startReference – $endReference';
 
   // Counters are zero-based within their parent.
-  // A book whose TEI n isn't a number is labelled by its position.
+  // A book, act or scene whose TEI n isn't a number is labelled by its position.
   String get typeLabel => switch (typ) {
     SubdivisionType.book => 'Book ${int.tryParse(editionLabel) ?? cnt + 1}',
     SubdivisionType.poem => 'Poem $editionLabel',
     SubdivisionType.prologue => 'Prologue',
     SubdivisionType.epilogue => 'Epilogue',
+    SubdivisionType.chapter => 'Chapter $editionLabel',
+    SubdivisionType.section => 'Section $editionLabel',
+    SubdivisionType.act => 'Act ${int.tryParse(editionLabel) ?? cnt + 1}',
+    SubdivisionType.scene => 'Scene ${int.tryParse(editionLabel) ?? cnt + 1}',
     SubdivisionType.lineGroup => 'Line group ${cnt + 1}',
     SubdivisionType.speech => 'Speech ${cnt + 1}',
     SubdivisionType.verse => 'Verse $editionLabel',

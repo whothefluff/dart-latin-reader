@@ -8,6 +8,10 @@ import 'library_fixture.dart';
 
 const _firstPoem = '00000000-0000-0000-0000-0000000000c1';
 const _secondPoem = '00000000-0000-0000-0000-0000000000c7';
+const _firstChapter = '00000000-0000-0000-0000-0000000000d1';
+const _secondChapter = '00000000-0000-0000-0000-0000000000d4';
+const _prologueScene = '00000000-0000-0000-0000-0000000000e2';
+const _firstScene = '00000000-0000-0000-0000-0000000000e6';
 
 Future<WorkContentsSegments> _contents(AppDb db, String work, int fromIndex, int toIndex) {
   final container = ProviderContainer(overrides: [dbProvider.overrideWith((_) => db)]);
@@ -54,7 +58,7 @@ void main() {
       final contents = await _contents(db, duties, 0, 3);
 
       expect(
-        contents.map((segment) => (segment.idx, segment.typ, segment.poem)),
+        contents.map((segment) => (segment.idx, segment.typ, segment.piece)),
         [
           (0, SubdivisionType.poem, _firstPoem),
           (1, SubdivisionType.verse, _firstPoem),
@@ -93,10 +97,100 @@ void main() {
       final contents = await _contents(db, duties, 0, 1);
 
       expect(
-        contents.map((segment) => (segment.idx, segment.typ, segment.poem)),
+        contents.map((segment) => (segment.idx, segment.typ, segment.piece)),
         [
           (0, SubdivisionType.book, null),
           (1, SubdivisionType.verse, _firstPoem),
+        ],
+      );
+    });
+
+    test('each token belongs to the chapter that holds it, whatever section holds it', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Gallia', '1.1.1', 1, 0, 0, 'Gallia', 0, FALSE ),
+                   ( ?, 1, 'Hi', '1.1.2', 1, 1, 0, 'Hi', 0, FALSE ),
+                   ( ?, 2, 'Apud', '1.2.1', 1, 2, 0, 'Apud', 0, FALSE )
+        ''',
+        List.filled(3, duties),
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000d0', 'BOOK', 0, '', NULL, 0, 2, '1' ),
+                   ( ?, '$_firstChapter', 'CHAP', 0, '', '00000000-0000-0000-0000-0000000000d0',
+                     0, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000d2', 'SECT', 0, '', '$_firstChapter',
+                     0, 0, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000d3', 'SECT', 1, '', '$_firstChapter',
+                     1, 1, '2' ),
+                   ( ?, '$_secondChapter', 'CHAP', 1, '', '00000000-0000-0000-0000-0000000000d0',
+                     2, 2, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000d5', 'SECT', 0, '', '$_secondChapter',
+                     2, 2, '1' )
+        ''',
+        List.filled(6, duties),
+      );
+      final contents = await _contents(db, duties, 0, 2);
+
+      expect(
+        contents.map((segment) => (segment.idx, segment.typ, segment.piece)),
+        [
+          (0, SubdivisionType.section, _firstChapter),
+          (1, SubdivisionType.section, _firstChapter),
+          (2, SubdivisionType.section, _secondChapter),
+        ],
+      );
+    });
+
+    test('each token belongs to the scene that holds it, also in a prologue', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Mercurius', '1', 1, 0, 0, 'Mercurius', 0, TRUE ),
+                   ( ?, 1, 'Ut', '1', 1, 1, 0, 'Ut', 0, FALSE ),
+                   ( ?, 2, 'Sosia', '153', 1, 2, 0, 'Sosia', 0, TRUE ),
+                   ( ?, 3, 'Qui', '153', 1, 3, 0, 'Qui', 0, FALSE )
+        ''',
+        List.filled(4, duties),
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000e1', 'PROL', 0, '', NULL, 0, 1,
+                     'prologue' ),
+                   ( ?, '$_prologueScene', 'SCEN', 0, '', '00000000-0000-0000-0000-0000000000e1',
+                     0, 1, 'pr' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000e3', 'SPCH', 0, 'Mercurius',
+                     '$_prologueScene', 0, 1, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000e4', 'VERS', 0, 'Ut',
+                     '00000000-0000-0000-0000-0000000000e3', 1, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000e5', 'ACT', 0, '', NULL, 2, 3, '1' ),
+                   ( ?, '$_firstScene', 'SCEN', 0, '', '00000000-0000-0000-0000-0000000000e5', 2,
+                     3, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000e7', 'SPCH', 0, 'Sosia', '$_firstScene',
+                     2, 3, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000e8', 'VERS', 0, 'Qui',
+                     '00000000-0000-0000-0000-0000000000e7', 3, 3, '153' )
+        ''',
+        List.filled(8, duties),
+      );
+      final contents = await _contents(db, duties, 0, 3);
+
+      expect(
+        contents.map((segment) => (segment.idx, segment.typ, segment.piece)),
+        [
+          (0, SubdivisionType.speech, _prologueScene),
+          (1, SubdivisionType.verse, _prologueScene),
+          (2, SubdivisionType.speech, _firstScene),
+          (3, SubdivisionType.verse, _firstScene),
         ],
       );
     });
