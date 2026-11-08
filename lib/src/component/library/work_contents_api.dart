@@ -97,6 +97,7 @@ class WorkContentsSegment {
     required this.word,
     required this.macronizedWord,
     required this.uncertaintyBitMask,
+    required this.ictusBitMask,
     required this.typ,
     required this.depth,
     required this.piece,
@@ -111,6 +112,10 @@ class WorkContentsSegment {
   /// Set bits mark uncertain characters, starting at bit 0.
   /// A value of -1 marks the whole word as uncertain.
   final int uncertaintyBitMask;
+
+  /// Set bits mark the characters that the edition prints with the acute of the ictus, starting at
+  /// bit 0.
+  final int ictusBitMask;
 
   /// How the word is looked up in the analyses.
   /// `null` for tokens that aren't counted words.

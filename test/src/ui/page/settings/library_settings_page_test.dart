@@ -27,6 +27,7 @@ class _InMemoryReader extends ReaderSettingsNotifier {
 /// Set explicitly so the tests don't depend on the defaults
 const _marking = ReaderSettings(
   showMacrons: true,
+  showIctus: true,
   fontFamily: null,
   fontSize: 20.0,
   lineHeight: 1.5,
@@ -75,6 +76,19 @@ Future<void> _drag(WidgetTester tester, Finder finder, Offset offset) async {
 }
 
 void main() {
+  group('Diacritics', () {
+    testWidgets('hiding the ictus saves only that', (tester) async {
+      final container = await _pumpPage(tester);
+
+      await _tap(tester, find.text('Show Ictus'));
+
+      expect(
+        container.read(readerSettingsNotifierProvider).value,
+        _marking.copyWith(showIctus: false),
+      );
+    });
+  });
+
   group('Typography', () {
     testWidgets('dragging word spacing to its maximum saves only that', (tester) async {
       final container = await _pumpPage(tester);

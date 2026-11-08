@@ -149,6 +149,7 @@ final operations = [
                   wordIdx: intValue(row[7].toString()),
                   enclitic: stringValue(row[8].toString()),
                   expansion: stringValue(row[9].toString()),
+                  ictusBitMask: Value(int.parse(row[10].toString())),
                   macronizedWord: const Value(''), // easier error tracking
                   uncertaintyBitMask: const Value(-1), // fully uncertain until staging
                 ),

@@ -6,6 +6,7 @@ import 'package:latin_reader/src/component/word_frequency/lookup_frequency_api.d
 /// Set explicitly so the tests don't depend on the defaults
 const _uOnlyAndCapitalJ = ReaderSettings(
   showMacrons: true,
+  showIctus: true,
   fontFamily: null,
   fontSize: 20.0,
   lineHeight: 1.5,

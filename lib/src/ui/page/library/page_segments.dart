@@ -12,6 +12,26 @@ SemivowelOrthography semivowelOrthographyOf(
   SemivowelOrthography orthography,
 ) => segment.isNumeral ? SemivowelOrthography.allVocalicConsonantal : orthography;
 
+/// The acute that marks the ictus, written after the letter that it goes on.
+const _ictusMark = '\u0301';
+
+/// Returns one string for each stored character of [segment], as the text shows it: with or
+/// without macrons, in [orthography], and with the acute of the ictus where the edition prints
+/// one, when [showIctus] is set.
+List<String> shownLetters(
+  WorkContentsSegment segment,
+  SemivowelOrthography orthography, {
+  required bool showMacrons,
+  required bool showIctus,
+}) {
+  final word = showMacrons ? segment.macronizedWord : segment.word;
+  final ictusBitMask = showIctus ? segment.ictusBitMask : 0;
+  return semivowelOrthographyOf(segment, orthography)
+      .respellEach(word)
+      .mapIndexed((i, letter) => ((ictusBitMask >> i) & 1) != 0 ? '$letter$_ictusMark' : letter)
+      .toList();
+}
+
 /// Returns how many line breaks go before [segment], which comes after [previous].
 ///
 /// The next word of a verse or title stays on the same line, and the next verse starts a new line.
@@ -60,11 +80,13 @@ class PageSegments {
     List<TextSpan> spans,
     Iterable<WorkContentsSegment> segments, {
     required bool showMacrons,
+    required bool showIctus,
     required SemivowelOrthography semivowelOrthography,
   }) : this._(
          TextSpan(children: spans),
          Map.unmodifiable(Map.fromIterables(_textStartsOf(spans), segments)),
          showMacrons: showMacrons,
+         showIctus: showIctus,
          semivowelOrthography: semivowelOrthography,
        );
 
@@ -72,6 +94,7 @@ class PageSegments {
     this.text,
     this._byTextStart, {
     required this.showMacrons,
+    required this.showIctus,
     required this.semivowelOrthography,
   }) : _plainText = text.toPlainText();
 
@@ -80,6 +103,7 @@ class PageSegments {
       _plainText = '',
       _byTextStart = const {},
       showMacrons = false,
+      showIctus = false,
       semivowelOrthography = SemivowelOrthography.allVocalicConsonantal;
 
   /// The page's styled text.
@@ -87,6 +111,7 @@ class PageSegments {
   final String _plainText;
   final Map<int, WorkContentsSegment> _byTextStart;
   final bool showMacrons;
+  final bool showIctus;
   final SemivowelOrthography semivowelOrthography;
 
   /// Returns the segment whose full text is selected, or `null` if there is no exact match.
@@ -101,10 +126,12 @@ class PageSegments {
     return segment != null && shownText(segment) == selected ? segment : null;
   }
 
-  String shownText(WorkContentsSegment segment) {
-    final word = showMacrons ? segment.macronizedWord : segment.word;
-    return semivowelOrthographyOf(segment, semivowelOrthography).respell(word);
-  }
+  String shownText(WorkContentsSegment segment) => shownLetters(
+    segment,
+    semivowelOrthography,
+    showMacrons: showMacrons,
+    showIctus: showIctus,
+  ).join();
 
   static Iterable<int> _textStartsOf(List<TextSpan> spans) {
     final spanStarts = spans.fold(

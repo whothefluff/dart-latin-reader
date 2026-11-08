@@ -113,6 +113,7 @@ const _listingWorks = LibrarySettings(view: LibraryView.works);
 
 const _markingCommonAndUncommon = ReaderSettings(
   showMacrons: true,
+  showIctus: true,
   fontFamily: null,
   fontSize: 20.0,
   lineHeight: 1.5,
