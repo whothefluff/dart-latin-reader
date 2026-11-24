@@ -11,6 +11,7 @@ WorkContentsSegment _segment(
   String? macronized,
   int ictusBitMask = 0,
   bool isNumeral = false,
+  bool hasExpansion = false,
   String node = 'verse',
   SubdivisionType typ = SubdivisionType.verse,
   String? piece = 'poem',
@@ -31,6 +32,7 @@ WorkContentsSegment _segment(
   baseNormForm: word,
   properNounState: null,
   isNumeral: isNumeral,
+  hasExpansion: hasExpansion,
   sourceReference: '1',
 );
 
@@ -46,8 +48,8 @@ PageSegments _page({
   required bool showMacrons,
   bool showIctus = false,
   SemivowelOrthography semivowelOrthography = SemivowelOrthography.allVocalicConsonantal,
-}) {
-  final laidOut = [
+}) => _pageOf(
+  [
     (_segment(10, 'Lupus'), before: '\n', after: ' '),
     (_segment(11, 'et'), before: '', after: ' '),
     (_segment(12, 'agnus', ictusBitMask: 1), before: '', after: ''),
@@ -56,32 +58,57 @@ PageSegments _page({
     (_segment(15, 'venerunt', macronized: 'vēnērunt'), before: '', after: ''),
     (_segment(16, '.'), before: '', after: ''),
     (_segment(17, 'IV', isNumeral: true), before: '\n', after: ''),
-  ];
-  return PageSegments(
-    laidOut
-        .map(
-          (entry) => TextSpan(
-            text: entry.before,
-            children: [
-              TextSpan(
-                text: shownLetters(
-                  entry.$1,
-                  semivowelOrthography,
-                  showMacrons: showMacrons,
-                  showIctus: showIctus,
-                ).join(),
-              ),
-              TextSpan(text: entry.after),
-            ],
-          ),
-        )
-        .toList(),
-    laidOut.map((entry) => entry.$1),
-    showMacrons: showMacrons,
-    showIctus: showIctus,
-    semivowelOrthography: semivowelOrthography,
-  );
-}
+  ],
+  showMacrons: showMacrons,
+  showIctus: showIctus,
+  semivowelOrthography: semivowelOrthography,
+);
+
+/// A verse with the contraction locutu's, an apostrophe that ends a word, and a word, an apostrophe
+/// and an s that aren't a contraction.
+PageSegments _contractionPage({required bool showMacrons}) => _pageOf(
+  [
+    (_segment(20, 'locutu', macronized: 'locūtu', hasExpansion: true), before: '\n', after: ''),
+    (_segment(21, "'"), before: '', after: ''),
+    (_segment(22, 's', hasExpansion: true), before: '', after: ' '),
+    (_segment(23, 'talin'), before: '', after: ''),
+    (_segment(24, "'"), before: '', after: ''),
+    (_segment(25, 's'), before: '', after: ''),
+  ],
+  showMacrons: showMacrons,
+  showIctus: false,
+  semivowelOrthography: SemivowelOrthography.allVocalicConsonantal,
+);
+
+PageSegments _pageOf(
+  List<(WorkContentsSegment, {String before, String after})> laidOut, {
+  required bool showMacrons,
+  required bool showIctus,
+  required SemivowelOrthography semivowelOrthography,
+}) => PageSegments(
+  laidOut
+      .map(
+        (entry) => TextSpan(
+          text: entry.before,
+          children: [
+            TextSpan(
+              text: shownLetters(
+                entry.$1,
+                semivowelOrthography,
+                showMacrons: showMacrons,
+                showIctus: showIctus,
+              ).join(),
+            ),
+            TextSpan(text: entry.after),
+          ],
+        ),
+      )
+      .toList(),
+  laidOut.map((entry) => entry.$1),
+  showMacrons: showMacrons,
+  showIctus: showIctus,
+  semivowelOrthography: semivowelOrthography,
+);
 
 /// A selection covering occurrence [occurrence] of [text] on [page], counting from zero.
 TextSelection _select(PageSegments page, String text, {int occurrence = 0}) {
@@ -144,6 +171,78 @@ void main() {
       expect(withIctus.selectedSegment(_select(withIctus, 'a\u0301gnus'))?.idx, 12);
       expect(withIctus.selectedSegment(_select(withIctus, 'et', occurrence: 1))?.idx, 14);
       expect(page.selectedSegment(_select(page, 'agnus'))?.idx, 12);
+    });
+  });
+
+  group('PageSegments.selectedWords', () {
+    final page = _contractionPage(showMacrons: false);
+
+    test('a selected word is the one word', () {
+      expect(page.selectedWords(_select(page, 'talin')).map((word) => word.idx), [23]);
+    });
+
+    test('a selected contraction is both its words, with or without macrons', () {
+      final withMacrons = _contractionPage(showMacrons: true);
+
+      expect(page.selectedWords(_select(page, "locutu's")).map((word) => word.idx), [20, 22]);
+      expect(
+        withMacrons.selectedWords(_select(withMacrons, "locūtu's")).map((word) => word.idx),
+        [20, 22],
+      );
+    });
+
+    test('part of a contraction, or a word with an apostrophe and an s, is no word', () {
+      expect(page.selectedWords(_select(page, "locutu'")), isEmpty);
+      expect(page.selectedWords(_select(page, "'s")), isEmpty);
+      expect(page.selectedWords(_select(page, "talin's")), isEmpty);
+    });
+  });
+
+  group('isSpacedFromNext', () {
+    final word = _segment(1, 'est');
+
+    test('a word is spaced from the next word', () {
+      expect(isSpacedFromNext(null, word, _segment(2, 'levis')), isTrue);
+    });
+
+    test('punctuation, a closing quotation mark and an apostrophe go right after a word', () {
+      expect(
+        [',', '”', '’', '»', "'"].map((sign) => isSpacedFromNext(null, word, _segment(2, sign))),
+        everyElement(isFalse),
+      );
+    });
+
+    test('a word goes right after an opening parenthesis or quotation mark', () {
+      expect(
+        ['(', '“', '‘', '«'].map((sign) => isSpacedFromNext(word, _segment(2, sign), word)),
+        everyElement(isFalse),
+      );
+    });
+
+    test('the second word of a contraction goes right after its apostrophe', () {
+      expect(
+        isSpacedFromNext(
+          _segment(1, 'locutu', hasExpansion: true),
+          _segment(2, "'"),
+          _segment(3, 's', hasExpansion: true),
+        ),
+        isFalse,
+      );
+    });
+
+    test('a word after the apostrophe that ends another word is spaced from it', () {
+      expect(
+        isSpacedFromNext(_segment(1, 'talin'), _segment(2, "'"), _segment(3, 'pavidissime')),
+        isTrue,
+      );
+      expect(
+        isSpacedFromNext(
+          _segment(1, 'talin'),
+          _segment(2, "'"),
+          _segment(3, 's', hasExpansion: true),
+        ),
+        isTrue,
+      );
     });
   });
 

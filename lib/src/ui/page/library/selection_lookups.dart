@@ -82,6 +82,10 @@ bool isMacronizedAs(String macronized, {required String form, required String ma
   return '$macronizedForm$restOfForm'.toLowerCase() == macronized.toLowerCase();
 }
 
+/// Returns [segment]'s macronized lookup form, or `null` when macrons are hidden or absent.
+String? macronizedFormToMatch(WorkContentsSegment segment, {required bool showMacrons}) =>
+    showMacrons && segment.macronLookupForm != segment.lookupForm ? segment.macronLookupForm : null;
+
 /// Wiktionary page names for [segment], based on its proper-noun state.
 ///
 /// Without a state, follows the word's capitalization in the text. Includes

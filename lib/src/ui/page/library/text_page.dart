@@ -459,13 +459,14 @@ class _TextRenderer {
 
   TextTheme get textTheme => theme.textTheme;
 
-  String _getSpace(int index, WorkContentsSegment segment) {
-    final nextIsPunctuation =
-        index + 1 < workSegments.length &&
-        closingPunctSigns.any(workSegments[index + 1].word.startsWith);
-    final endsWithOpeningParenthesis = segment.word.endsWith('(');
-    return nextIsPunctuation || endsWithOpeningParenthesis ? _empty : _blank;
-  }
+  String _getSpace(int index, WorkContentsSegment segment) =>
+      isSpacedFromNext(
+        index > 0 ? workSegments[index - 1] : null,
+        segment,
+        index + 1 < workSegments.length ? workSegments[index + 1] : null,
+      )
+      ? _blank
+      : _empty;
 
   List<TextSpan> createSpans() {
     final baseTextStyle = TextStyle(
@@ -585,6 +586,7 @@ typedef _WordReadings = ({AnalysisKeys keys, EnrichedAnalyses analyses});
 /// Candidate readings have not been ruled out by the word's certain macrons.
 typedef _WordLookups = ({
   Set<String> wiktionaryPages,
+  String shownLookupForm,
   Future<_WordReadings> Function() lookUpReadings,
   Future<_WordReadings> Function() lookUpCandidateReadings,
   ({bool pending, bool showIgnoringMacrons}) macronComparison,
@@ -599,11 +601,11 @@ class _WordDetailsButton extends ContextMenuButtonItem {
     required bool compact,
     bool ignoreMacrons = false,
   }) : super(
-         label: _label(word, compact: compact, ignoreMacrons: ignoreMacrons),
+         label: labelFor(word, compact: compact, ignoreMacrons: ignoreMacrons),
          onPressed: () => open(lookUp, pageContext),
        );
 
-  static String _label(String word, {required bool compact, required bool ignoreMacrons}) =>
+  static String labelFor(String word, {required bool compact, required bool ignoreMacrons}) =>
       switch ((compact, ignoreMacrons)) {
         (true, false) => 'Morph',
         (true, true) => 'Morph (plain)',
@@ -919,18 +921,23 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     );
   }
 
-  /// Preloads morphology results for a fully selected word.
+  /// Preloads morphology results for a fully selected word, or for both words of a contraction.
   void _preloadSelectionLookups(PageSegments page, TextSelection selection) {
     if (selection.isValid) {
       log.info(() => 'user selected text "${selection.textInside(page.text.toPlainText())}"');
     }
-    final segment = page.selectedSegment(selection);
-    final lookupForm = segment?.lookupForm;
-    log.info(() => segment == null ? 'no word selected' : '$segment selected');
-    if (segment != null && lookupForm != null && page.showMacrons) {
-      _lookUpCandidateReadings(segment).ignore();
-    } else if (segment != null && lookupForm != null) {
-      _lookUpAllReadings(segment, lookupForm).ignore();
+    final words = page.selectedWords(selection);
+    log.info(() => words.isEmpty ? 'no word selected' : '${words.join(', ')} selected');
+    Future.wait(words.map((word) => _preloadLookups(page, word))).ignore();
+  }
+
+  /// Preloads morphology results for [word].
+  Future<void> _preloadLookups(PageSegments page, WorkContentsSegment word) async {
+    final lookupForm = word.lookupForm;
+    if (lookupForm != null && page.showMacrons) {
+      await _lookUpCandidateReadings(word);
+    } else if (lookupForm != null) {
+      await _lookUpAllReadings(word, lookupForm);
     }
   }
 
@@ -948,20 +955,22 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     WidgetRef menuRef,
     PageSegments page,
   ) {
-    final lookups = _watchWordLookups(menuRef, page, page.selectedSegment(value.selection));
-    return lookups != null && lookups.macronComparison.pending
+    final lookups = page
+        .selectedWords(value.selection)
+        .map((word) => _watchWordLookups(menuRef, page, word))
+        .nonNulls
+        .toList();
+    return lookups.any((lookup) => lookup.macronComparison.pending)
         ? const SizedBox.shrink()
         : AdaptiveTextSelectionToolbar.buttonItems(
             anchors: state.contextMenuAnchors,
             buttonItems: _arrangeButtonItems(
               state.contextMenuButtonItems,
-              lookups == null
-                  ? const []
-                  : _buildWordLookupButtons(
-                      state.contextMenuAnchors.primaryAnchor,
-                      value.selection.textInside(value.text).trim(),
-                      lookups,
-                    ),
+              _buildWordLookupButtons(
+                state.contextMenuAnchors.primaryAnchor,
+                value.selection.textInside(value.text).trim(),
+                lookups,
+              ),
             ),
           );
   }
@@ -988,44 +997,45 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
     TargetPlatform.iOS,
   }.contains(Theme.of(context).platform);
 
-  /// Lookup data for [segment], or `null` if [segment] is missing or has no lookup form.
+  /// Lookup data for [segment], or `null` if [segment] has no lookup form.
   _WordLookups? _watchWordLookups(
     WidgetRef menuRef,
     PageSegments page,
-    WorkContentsSegment? segment,
+    WorkContentsSegment segment,
   ) {
-    final lookupForm = segment?.lookupForm;
-    return segment == null || lookupForm == null
-        ? null
-        : _watchLookupsOf(menuRef, page, segment, lookupForm);
+    final lookupForm = segment.lookupForm;
+    return lookupForm == null ? null : _watchLookupsOf(menuRef, page, segment, lookupForm);
   }
 
   /// Lookups for [segment], based on [page]'s macron setting.
   ///
   /// `lookUpReadings` returns all readings when macrons are hidden. Otherwise,
-  /// it returns candidate readings, matching the word's macronized spelling if it has macrons.
-  /// Readings are compared with the stored spelling, not with the letters shown.
+  /// it returns candidate readings, matching the macrons of the form that the word is looked up by
+  /// if it has any. Readings are compared with that form, not with the letters shown.
   _WordLookups _watchLookupsOf(
     WidgetRef menuRef,
     PageSegments page,
     WorkContentsSegment segment,
     String lookupForm,
   ) {
-    final isShownWithMacrons = page.showMacrons && segment.macronizedWord != segment.word;
+    final macronized = macronizedFormToMatch(segment, showMacrons: page.showMacrons);
+    final orthography = semivowelOrthographyOf(segment, page.semivowelOrthography);
     Future<_WordReadings> lookUpCandidateReadings() => _lookUpCandidateReadings(segment);
-    Future<_WordReadings> lookUpMacronizedReadings() async =>
-        _readingsMacronizedAs(await lookUpCandidateReadings(), segment.macronizedWord);
     return (
       wiktionaryPages: wiktionaryPagesOf(segment, widget.segments),
-      lookUpReadings: switch ((page.showMacrons, isShownWithMacrons)) {
+      shownLookupForm: orthography.respell(macronized ?? lookupForm),
+      lookUpReadings: switch ((page.showMacrons, macronized)) {
         (false, _) => () => _lookUpAllReadings(segment, lookupForm),
-        (true, false) => lookUpCandidateReadings,
-        (true, true) => lookUpMacronizedReadings,
+        (true, null) => lookUpCandidateReadings,
+        (true, final macronized?) => () async => _readingsMacronizedAs(
+          await lookUpCandidateReadings(),
+          macronized,
+        ),
       },
       lookUpCandidateReadings: lookUpCandidateReadings,
-      macronComparison: isShownWithMacrons
-          ? _compareWithMacrons(_watchCandidateReadings(menuRef, segment), segment.macronizedWord)
-          : (pending: false, showIgnoringMacrons: false),
+      macronComparison: macronized == null
+          ? (pending: false, showIgnoringMacrons: false)
+          : _compareWithMacrons(_watchCandidateReadings(menuRef, segment), macronized),
     );
   }
 
@@ -1110,29 +1120,68 @@ class _StyledWordListState extends ConsumerState<_StyledWordList> {
 
   ProviderContainer get _providers => ProviderScope.containerOf(context, listen: false);
 
+  /// Returns the lookup buttons of one selected word, or menus with both words of a contraction.
   List<ContextMenuButtonItem> _buildWordLookupButtons(
     Offset anchor,
-    String word,
-    _WordLookups lookups,
+    String selected,
+    List<_WordLookups> words,
   ) {
     final compact = _usesCompactLabels(context);
-    return [
-      _WordDetailsButton(
-        word: word,
-        lookUp: lookups.lookUpReadings,
-        pageContext: context,
-        compact: compact,
-      ),
-      if (lookups.macronComparison.showIgnoringMacrons)
+    final wordsIgnoringMacrons = words.where((word) => word.macronComparison.showIgnoringMacrons);
+    return switch (words) {
+      [] => const [],
+      [final word] => [
         _WordDetailsButton(
-          word: word,
-          lookUp: lookups.lookUpCandidateReadings,
+          word: selected,
+          lookUp: word.lookUpReadings,
           pageContext: context,
           compact: compact,
-          ignoreMacrons: true,
         ),
-      ..._buildWiktionaryButtons(anchor, lookups.wiktionaryPages, compact: compact),
-    ];
+        if (word.macronComparison.showIgnoringMacrons)
+          _WordDetailsButton(
+            word: selected,
+            lookUp: word.lookUpCandidateReadings,
+            pageContext: context,
+            compact: compact,
+            ignoreMacrons: true,
+          ),
+        ..._buildWiktionaryButtons(anchor, word.wiktionaryPages, compact: compact),
+      ],
+      _ => [
+        LookupMenuButton(
+          label: _WordDetailsButton.labelFor(selected, compact: compact, ignoreMacrons: false),
+          anchor: anchor,
+          pageContext: context,
+          choices: words
+              .map(
+                (word) => (
+                  label: word.shownLookupForm,
+                  open: () => _WordDetailsButton.open(word.lookUpReadings, context),
+                ),
+              )
+              .toList(),
+        ),
+        if (wordsIgnoringMacrons.isNotEmpty)
+          LookupMenuButton(
+            label: _WordDetailsButton.labelFor(selected, compact: compact, ignoreMacrons: true),
+            anchor: anchor,
+            pageContext: context,
+            choices: wordsIgnoringMacrons
+                .map(
+                  (word) => (
+                    label: word.shownLookupForm,
+                    open: () => _WordDetailsButton.open(word.lookUpCandidateReadings, context),
+                  ),
+                )
+                .toList(),
+          ),
+        ..._buildWiktionaryButtons(
+          anchor,
+          words.expand((word) => word.wiktionaryPages).toSet(),
+          compact: compact,
+        ),
+      ],
+    };
   }
 
   /// Returns a Wiktionary button, a menu for multiple pages, or no buttons for an empty set.

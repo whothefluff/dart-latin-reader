@@ -101,6 +101,48 @@ void main() {
       );
     });
 
+    test('each word of a contraction is looked up by its expansion', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, properNounState, tokenType,
+                                  sentenceIdx, wordIdx, expansion, macronizedWord,
+                                  uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'locutu', '1', 0, 1, 0, 0, 'locūtus', 'locūtu', 0, FALSE ),
+                   ( ?, 1, ?, '1', NULL, 4, 0, NULL, NULL, ?, 0, FALSE ),
+                   ( ?, 2, 's', '1', 0, 1, 0, 1, 'es', 's', 0, FALSE )
+        ''',
+        [duties, duties, "'", "'", duties],
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '$_firstPoem', 'POEM', 0, '', NULL, 0, 2, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'VERS', 0, ?, '$_firstPoem',
+                     0, 2, '1' )
+        ''',
+        [duties, duties, "locutu's"],
+      );
+      final contents = await _contents(db, duties, 0, 2);
+
+      expect(
+        contents.map(
+          (segment) => (
+            segment.word,
+            segment.hasExpansion,
+            segment.lookupForm,
+            segment.macronLookupForm,
+          ),
+        ),
+        [
+          ('locutu', true, 'locutus', 'locūtus'),
+          ("'", false, null, null),
+          ('s', true, 'es', 'es'),
+        ],
+      );
+    });
+
     test("a book's title belongs to no poem", () async {
       final db = await smallLibrary();
       await db.customStatement(

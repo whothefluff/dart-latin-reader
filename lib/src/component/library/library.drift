@@ -159,7 +159,7 @@ CREATE TABLE "WorkContents"(
     CHECK( (wordIdx IS NULL) = (tokenType >= 4) ), --fancy XNOR expression (both must be true or both must be false)
     CHECK( expansion IS NULL OR enclitic IS NULL ),
     CHECK( properNounState IS NULL OR tokenType <= 3 ),
-    CHECK( expansion IS NULL OR tokenType IN (2, 3) ),
+    CHECK( expansion IS NULL OR tokenType <= 3 ),
     CHECK( enclitic IS NULL
            OR ( LENGTH( enclitic ) > 0
                 AND LENGTH( enclitic ) < LENGTH( word )
@@ -463,6 +463,7 @@ CREATE VIEW "library.WorkContents" AS
                                         WorkContents.baseNormForm,
                                         WorkContents.properNounState,
                                         WorkContents.tokenType = 3 AS isNumeral,
+                                        WorkContents.expansion IS NOT NULL AS hasExpansion,
                                         SubdivsHierarchy.node,
                                         SubdivsHierarchy.typ,
                                         SubdivsHierarchy.parent,
@@ -494,6 +495,7 @@ CREATE VIEW "library.WorkContents" AS
                baseNormForm,
                properNounState,
                isNumeral,
+               hasExpansion,
                sourceReference --( SELECT name FROM WorkContentSubdivisions AS aux WHERE aux.parent = ClosestSubdivision.parent AND aux.typ = 'TITL' LIMIT 1 ) AS title
             FROM ClosestSubdivision
             WHERE rn = 1
