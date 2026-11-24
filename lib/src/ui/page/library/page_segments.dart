@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+import '../../../component/library/punctuation.dart';
 import '../../../component/library/semivowel_orthography.dart';
 import '../../../component/library/subdivision_type.dart';
 import '../../../component/library/work_contents_api.dart';
@@ -62,6 +63,22 @@ int _lineBreaksBefore(SubdivisionType type) => switch (type) {
   SubdivisionType.paragraph => 1,
 };
 
+/// Returns whether a space separates [segment] from [next].
+bool isSpacedFromNext(
+  WorkContentsSegment? previous,
+  WorkContentsSegment segment,
+  WorkContentsSegment? next,
+) {
+  final nextGoesRightAfter = next != null && signsWithoutSpaceBefore.any(next.word.startsWith);
+  final endsWithOpeningSign = ['(', ...openingQuotationMarks].any(segment.word.endsWith);
+  final joinsContraction = isContractionApostrophe(
+    segment.word,
+    wordBeforeHasExpansion: previous?.hasExpansion ?? false,
+    wordAfterHasExpansion: next?.hasExpansion ?? false,
+  );
+  return !(nextGoesRightAfter || endsWithOpeningSign || joinsContraction);
+}
+
 /// True when [segment] belongs to another poem, prologue, epilogue, chapter or scene than
 /// [previous].
 bool _belongsToAnotherPiece(WorkContentsSegment? previous, WorkContentsSegment segment) =>
@@ -84,6 +101,7 @@ class PageSegments {
     required SemivowelOrthography semivowelOrthography,
   }) : this._(
          TextSpan(children: spans),
+         List.unmodifiable(segments),
          Map.unmodifiable(Map.fromIterables(_textStartsOf(spans), segments)),
          showMacrons: showMacrons,
          showIctus: showIctus,
@@ -92,6 +110,7 @@ class PageSegments {
 
   PageSegments._(
     this.text,
+    this._segments,
     this._byTextStart, {
     required this.showMacrons,
     required this.showIctus,
@@ -101,6 +120,7 @@ class PageSegments {
   const PageSegments.empty()
     : text = const TextSpan(text: ''),
       _plainText = '',
+      _segments = const [],
       _byTextStart = const {},
       showMacrons = false,
       showIctus = false,
@@ -109,6 +129,7 @@ class PageSegments {
   /// The page's styled text.
   final TextSpan text;
   final String _plainText;
+  final List<WorkContentsSegment> _segments;
   final Map<int, WorkContentsSegment> _byTextStart;
   final bool showMacrons;
   final bool showIctus;
@@ -117,14 +138,44 @@ class PageSegments {
   /// Returns the segment whose full text is selected, or `null` if there is no exact match.
   /// Ignores surrounding whitespace.
   WorkContentsSegment? selectedSegment(TextSelection selection) {
-    final selected = selection.isValid && selection.end <= _plainText.length
-        ? selection.textInside(_plainText).trim()
-        : '';
-    final segment = selected.isEmpty
-        ? null
-        : _byTextStart[_plainText.indexOf(selected, selection.start)];
+    final selected = _selectedText(selection);
+    final segment = _firstSelected(selected, selection);
     return segment != null && shownText(segment) == selected ? segment : null;
   }
+
+  /// Returns the word whose full text is selected, or the two words of a selected contraction.
+  List<WorkContentsSegment> selectedWords(TextSelection selection) {
+    final word = selectedSegment(selection);
+    return word != null ? [word] : _selectedContraction(selection);
+  }
+
+  /// Returns the two words of a contraction such as locutu's when its full text is selected, or
+  /// none.
+  List<WorkContentsSegment> _selectedContraction(TextSelection selection) {
+    final selected = _selectedText(selection);
+    final first = _firstSelected(selected, selection);
+    final contraction = _segments.skipWhile((segment) => segment != first).take(3).toList();
+    return switch (contraction) {
+      [final word, final sign, final next]
+          when isContractionApostrophe(
+                sign.word,
+                wordBeforeHasExpansion: word.hasExpansion,
+                wordAfterHasExpansion: next.hasExpansion,
+              ) &&
+              contraction.map(shownText).join() == selected =>
+        [word, next],
+      _ => const [],
+    };
+  }
+
+  String _selectedText(TextSelection selection) =>
+      selection.isValid && selection.end <= _plainText.length
+      ? selection.textInside(_plainText).trim()
+      : '';
+
+  /// Returns the segment whose text starts where [selected] does, or `null`.
+  WorkContentsSegment? _firstSelected(String selected, TextSelection selection) =>
+      selected.isEmpty ? null : _byTextStart[_plainText.indexOf(selected, selection.start)];
 
   String shownText(WorkContentsSegment segment) => shownLetters(
     segment,

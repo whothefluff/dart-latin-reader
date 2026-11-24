@@ -106,6 +106,7 @@ class WorkContentsSegment {
     required this.baseNormForm,
     required this.properNounState,
     required this.isNumeral,
+    required this.hasExpansion,
     required this.sourceReference,
   });
 
@@ -124,7 +125,7 @@ class WorkContentsSegment {
   /// [lookupForm] but macronized
   final String? macronLookupForm;
 
-  /// The word without its enclitic, or the expansion of an abbreviation, cased like [lookupForm]
+  /// The word without its enclitic, or its expansion, cased like [lookupForm]
   final String? baseNormForm;
 
   /// `null` when unknown
@@ -135,6 +136,7 @@ class WorkContentsSegment {
   final String? piece;
 
   final bool isNumeral;
+  final bool hasExpansion;
   final String macronizedWord;
   final String workId;
   final String? parent;

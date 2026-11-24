@@ -383,6 +383,7 @@ getConcordanceHits(:works AS TEXT, :phrase AS TEXT, :sortNeighbour AS INTEGER):
                Context.idx AS contextIdx,
                Context.word AS contextWord,
                Context.macronizedWord AS contextMacronizedWord,
+               Context.expansion IS NOT NULL AS contextHasExpansion,
                Context.sourceReference AS contextReference
             FROM Page
             CROSS JOIN WorkContents AS Context

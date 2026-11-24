@@ -11,25 +11,30 @@ WorkContentsSegment _segment(
   int idx,
   String word, {
   String line = 'line 2',
+  String? macronized,
+  String? lookupForm,
+  String? macronLookupForm,
   String? baseNormForm,
   ProperNounState? state,
+  bool hasExpansion = false,
 }) => WorkContentsSegment(
   workId: 'fables',
   parent: null,
   node: line,
   idx: idx,
   word: word,
-  macronizedWord: word,
+  macronizedWord: macronized ?? word,
   uncertaintyBitMask: 0,
   ictusBitMask: 0,
   typ: SubdivisionType.verse,
   depth: 1,
   piece: 'poem',
-  lookupForm: word,
-  macronLookupForm: word,
+  lookupForm: lookupForm ?? word,
+  macronLookupForm: macronLookupForm ?? macronized ?? word,
   baseNormForm: baseNormForm ?? word.toLowerCase(),
   properNounState: state,
   isNumeral: false,
+  hasExpansion: hasExpansion,
   sourceReference: '1',
 );
 
@@ -153,6 +158,35 @@ void main() {
       expect(isMacronizedAs('Jūnō', form: 'Juno', macronizedForm: 'Jūnō'), isTrue);
       expect(isMacronizedAs('Iūnō', form: 'Juno', macronizedForm: 'Jūnō'), isFalse);
       expect(isMacronizedAs('voluit', form: 'voluit', macronizedForm: 'volvit'), isFalse);
+    });
+  });
+
+  group('macronizedFormToMatch', () {
+    final locutu = _segment(
+      1,
+      'locutu',
+      macronized: 'locūtu',
+      lookupForm: 'locutus',
+      macronLookupForm: 'locūtus',
+      hasExpansion: true,
+    );
+
+    test('a word printed short is matched with the macrons of its expansion', () {
+      expect(macronizedFormToMatch(locutu, showMacrons: true), 'locūtus');
+    });
+
+    test('a word without an expansion is matched with its own macrons', () {
+      expect(
+        macronizedFormToMatch(_segment(1, 'venerunt', macronized: 'vēnērunt'), showMacrons: true),
+        'vēnērunt',
+      );
+    });
+
+    test('a word is matched without macrons when they are hidden or the form has none', () {
+      final s = _segment(3, 's', lookupForm: 'es', macronLookupForm: 'es', hasExpansion: true);
+
+      expect(macronizedFormToMatch(locutu, showMacrons: false), isNull);
+      expect(macronizedFormToMatch(s, showMacrons: true), isNull);
     });
   });
 

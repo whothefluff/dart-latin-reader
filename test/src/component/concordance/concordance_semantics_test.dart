@@ -90,6 +90,26 @@ void main() {
     expect(await starts([const FormCriterion('populus'), const FormCriterion('que')]), isEmpty);
   });
 
+  test('each word of a contraction is found by its whole word, and is shown with it', () async {
+    await token(db, 0, 'locutu', macron: 'locūtu', expansion: 'locūtus');
+    await token(db, 1, "'", type: 4);
+    await token(db, 2, 's', position: 1, expansion: 'es');
+    expect(await starts([const FormCriterion('locutus')]), [0]);
+    expect(await starts([const FormCriterion('es')]), [2]);
+    final page = await repository.getHits(
+      ConcordanceQuery(slots: const [FormCriterion('es')]),
+      [work],
+      0,
+      100,
+      SpellingsWithSemivowels.none,
+    );
+    expect(page.hits.single.context.map((token) => (token.word, token.hasExpansion)), [
+      ('locutu', true),
+      ("'", false),
+      ('s', true),
+    ]);
+  });
+
   test('distance counts words: punctuation and gaps in idx add none', () async {
     await token(db, 10, 'puellam', position: 0);
     await token(db, 11, ',', type: 4);

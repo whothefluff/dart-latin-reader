@@ -4373,7 +4373,7 @@ class WorkContents extends i0.Table
     'CHECK((wordIdx IS NULL)=(tokenType >= 4))',
     'CHECK(expansion IS NULL OR enclitic IS NULL)',
     'CHECK(properNounState IS NULL OR tokenType <= 3)',
-    'CHECK(expansion IS NULL OR tokenType IN (2, 3))',
+    'CHECK(expansion IS NULL OR tokenType <= 3)',
     'CHECK(enclitic IS NULL OR(LENGTH(enclitic) > 0 AND LENGTH(enclitic) < LENGTH(word) AND LOWER(SUBSTR(word, LENGTH(word) - LENGTH(enclitic) + 1)) = LOWER(enclitic)))',
     'CHECK(enclitic IS NULL OR tokenType = 1)',
     'CHECK(expansion IS NULL OR macronizedWord = \'\' OR uncertaintyBitMask = 0)',
@@ -7995,6 +7995,7 @@ class LibraryWorkContent extends i0.DataClass {
   final String? baseNormForm;
   final i4.ProperNounState? properNounState;
   final bool isNumeral;
+  final bool hasExpansion;
   final String sourceReference;
   const LibraryWorkContent({
     required this.workId,
@@ -8013,6 +8014,7 @@ class LibraryWorkContent extends i0.DataClass {
     this.baseNormForm,
     this.properNounState,
     required this.isNumeral,
+    required this.hasExpansion,
     required this.sourceReference,
   });
   factory LibraryWorkContent.fromJson(
@@ -8039,6 +8041,7 @@ class LibraryWorkContent extends i0.DataClass {
         json['properNounState'],
       ),
       isNumeral: serializer.fromJson<bool>(json['isNumeral']),
+      hasExpansion: serializer.fromJson<bool>(json['hasExpansion']),
       sourceReference: serializer.fromJson<String>(json['sourceReference']),
     );
   }
@@ -8064,6 +8067,7 @@ class LibraryWorkContent extends i0.DataClass {
         properNounState,
       ),
       'isNumeral': serializer.toJson<bool>(isNumeral),
+      'hasExpansion': serializer.toJson<bool>(hasExpansion),
       'sourceReference': serializer.toJson<String>(sourceReference),
     };
   }
@@ -8085,6 +8089,7 @@ class LibraryWorkContent extends i0.DataClass {
     i0.Value<String?> baseNormForm = const i0.Value.absent(),
     i0.Value<i4.ProperNounState?> properNounState = const i0.Value.absent(),
     bool? isNumeral,
+    bool? hasExpansion,
     String? sourceReference,
   }) => i1.LibraryWorkContent(
     workId: workId ?? this.workId,
@@ -8107,6 +8112,7 @@ class LibraryWorkContent extends i0.DataClass {
         ? properNounState.value
         : this.properNounState,
     isNumeral: isNumeral ?? this.isNumeral,
+    hasExpansion: hasExpansion ?? this.hasExpansion,
     sourceReference: sourceReference ?? this.sourceReference,
   );
   @override
@@ -8128,6 +8134,7 @@ class LibraryWorkContent extends i0.DataClass {
           ..write('baseNormForm: $baseNormForm, ')
           ..write('properNounState: $properNounState, ')
           ..write('isNumeral: $isNumeral, ')
+          ..write('hasExpansion: $hasExpansion, ')
           ..write('sourceReference: $sourceReference')
           ..write(')'))
         .toString();
@@ -8151,6 +8158,7 @@ class LibraryWorkContent extends i0.DataClass {
     baseNormForm,
     properNounState,
     isNumeral,
+    hasExpansion,
     sourceReference,
   );
   @override
@@ -8173,6 +8181,7 @@ class LibraryWorkContent extends i0.DataClass {
           other.baseNormForm == this.baseNormForm &&
           other.properNounState == this.properNounState &&
           other.isNumeral == this.isNumeral &&
+          other.hasExpansion == this.hasExpansion &&
           other.sourceReference == this.sourceReference);
 }
 
@@ -8201,6 +8210,7 @@ class LibraryWorkContents
     baseNormForm,
     properNounState,
     isNumeral,
+    hasExpansion,
     sourceReference,
   ];
   @override
@@ -8210,7 +8220,7 @@ class LibraryWorkContents
   @override
   Map<i0.SqlDialect, String> get createViewStatements => {
     i0.SqlDialect.sqlite:
-        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.ictusBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.baseNormForm, WorkContents.properNounState, WorkContents.tokenType = 3 AS isNumeral, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, SubdivsHierarchy.piece, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, ictusBitMask, typ, depth, piece, lookupForm, macronLookupForm, baseNormForm, properNounState, isNumeral, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
+        'CREATE VIEW "library.WorkContents" AS WITH ClosestSubdivision AS (SELECT WorkContents.workId, WorkContents.idx, WorkContents.word, WorkContents.macronizedWord, WorkContents.uncertaintyBitMask, WorkContents.ictusBitMask, WorkContents.sourceReference, WorkContents.lookupForm, WorkContents.macronLookupForm, WorkContents.baseNormForm, WorkContents.properNounState, WorkContents.tokenType = 3 AS isNumeral, WorkContents.expansion IS NOT NULL AS hasExpansion, SubdivsHierarchy.node, SubdivsHierarchy.typ, SubdivsHierarchy.parent, SubdivsHierarchy.depth, SubdivsHierarchy.piece, ROW_NUMBER()OVER (PARTITION BY WorkContents.workId, WorkContents.idx ORDER BY SubdivsHierarchy.fromIndex DESC, SubdivsHierarchy.depth DESC, SubdivsHierarchy.toIndex ASC, SubdivsHierarchy.node RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS rn FROM WorkContents INNER JOIN "library.WorkContentSubdivisionsHierarchy" AS SubdivsHierarchy ON WorkContents.workId = SubdivsHierarchy.workId AND WorkContents.idx BETWEEN SubdivsHierarchy.fromIndex AND SubdivsHierarchy.toIndex AND SubdivsHierarchy.typ <> \'TITL\') SELECT workId, parent, node, idx, word, macronizedWord, uncertaintyBitMask, ictusBitMask, typ, depth, piece, lookupForm, macronLookupForm, baseNormForm, properNounState, isNumeral, hasExpansion, sourceReference FROM ClosestSubdivision WHERE rn = 1 ORDER BY idx',
   };
   @override
   LibraryWorkContents get asDslTable => this;
@@ -8285,6 +8295,10 @@ class LibraryWorkContents
       isNumeral: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.bool,
         data['${effectivePrefix}isNumeral'],
+      )!,
+      hasExpansion: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.bool,
+        data['${effectivePrefix}hasExpansion'],
       )!,
       sourceReference: attachedDatabase.typeMapping.read(
         i0.DriftSqlType.string,
@@ -8399,6 +8413,15 @@ class LibraryWorkContents
     type: i0.DriftSqlType.bool,
     defaultConstraints: i0.GeneratedColumn.constraintIsAlways(
       'CHECK ("isNumeral" IN (0, 1))',
+    ),
+  );
+  late final i0.GeneratedColumn<bool> hasExpansion = i0.GeneratedColumn<bool>(
+    'hasExpansion',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.bool,
+    defaultConstraints: i0.GeneratedColumn.constraintIsAlways(
+      'CHECK ("hasExpansion" IN (0, 1))',
     ),
   );
   late final i0.GeneratedColumn<String> sourceReference =
@@ -9205,6 +9228,7 @@ class LibraryDrift extends i6.ModularAccessor {
           row.readNullable<int>('properNounState'),
         ),
         isNumeral: row.read<bool>('isNumeral'),
+        hasExpansion: row.read<bool>('hasExpansion'),
         sourceReference: row.read<String>('sourceReference'),
       ),
     );

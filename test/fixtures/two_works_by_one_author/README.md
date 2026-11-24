@@ -4,16 +4,16 @@ The test `test/src/external/db_util_test.dart` loads these CSV files into a data
 
 ## Where the files come from
 
-These files come from the producer (python-latin-sources-processor), at commit `a451978f4a08322cc1b0bc97c3c2fa597cd45b21`: `author_abbreviations.csv`, `authors.csv`, `authors_and_works.csv`, `unambiguous_macronizations.csv`, `work_abbreviations.csv`, `work_content_subdivisions.csv`, `work_content_supplementary.csv`, `work_contents.csv`, `work_macronizations.csv`, `works.csv`.
+These files come from the producer (python-latin-sources-processor), at commit `e9691ede30d4e145ce80a43abba7be4f91b6d9fc`: `author_abbreviations.csv`, `authors.csv`, `authors_and_works.csv`, `unambiguous_macronizations.csv`, `work_abbreviations.csv`, `work_content_subdivisions.csv`, `work_content_supplementary.csv`, `work_contents.csv`, `work_macronizations.csv`, `works.csv`.
 
 The producer has two small invented works in `tests/library/fixtures/two_works_by_one_author`. The script runs the producer's own code for combining works over them, one at a time: first `carmina_prima`, then `carmina_altera` added to it.
 
 The other files come from this repository's `assets/preprocessed_data`. The script copies only the rows that the two works need, without changing them:
 
-- `morphological_details.csv` (14 rows): the analyses of the works' words, whatever their capital letters.
-- `morphological_detail_inflections.csv` (40 rows): the inflections of those analyses.
+- `morphological_details.csv` (17 rows): the analyses of the works' words, whatever their capital letters.
+- `morphological_detail_inflections.csv` (53 rows): the inflections of those analyses.
 - `dictionaries.csv` (1 row): the whole file.
-- `dictionary_entries.csv` (17 rows): the dictionary entries of those analyses' lemmas, and the other entries with the same headword.
+- `dictionary_entries.csv` (18 rows): the dictionary entries of those analyses' lemmas, and the other entries with the same headword.
 - `dict_entry_senses.csv` and `dict_entry_sense_quotes.csv`: only the first line (the quotes file is empty).
 
 ## Updating these files

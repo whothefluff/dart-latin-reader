@@ -437,20 +437,28 @@ class _HitText {
   final ConcordanceHit hit;
   final bool showMacrons;
 
-  static const _openingSigns = ['(', '['];
+  static const List<String> _openingSigns = ['(', '[', ...openingQuotationMarks];
   static const _lineBreak = ' / ';
 
   /// Each token of the context as shown, and what separates it from the one
-  /// before: a line break, a space, or nothing before punctuation
+  /// before: a line break, a space, or nothing before punctuation and inside a contraction
   late final Map<int, ({String gap, String text})> _shown = Map.fromEntries(
     hit.context.indexed.map((entry) {
       final (i, token) = entry;
+      final followsContractionApostrophe =
+          i > 1 &&
+          isContractionApostrophe(
+            hit.context[i - 1].word,
+            wordBeforeHasExpansion: hit.context[i - 2].hasExpansion,
+            wordAfterHasExpansion: token.hasExpansion,
+          );
       final gap = switch (i == 0 ? null : hit.context[i - 1]) {
         null => '',
         final previous when previous.reference != token.reference => _lineBreak,
         final previous
-            when closingPunctSigns.any(token.word.startsWith) ||
-                _openingSigns.any(previous.word.endsWith) =>
+            when signsWithoutSpaceBefore.any(token.word.startsWith) ||
+                _openingSigns.any(previous.word.endsWith) ||
+                followsContractionApostrophe =>
           '',
         _ => ' ',
       };

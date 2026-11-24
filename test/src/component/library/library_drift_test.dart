@@ -56,6 +56,34 @@ void main() {
     );
   });
 
+  group('WorkContents', () {
+    test(
+      'a word printed short has its whole word as its expansion, but punctuation has none',
+      () async {
+        await db.customStatement(
+          '''
+          INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                    wordIdx, expansion, macronizedWord, uncertaintyBitMask )
+              VALUES ( ?, 2, 'locutu', '8.18', 1, 2, 0, 'locūtus', 'locūtu', 0 )
+          ''',
+          [fables],
+        );
+
+        await expectLater(
+          db.customStatement(
+            '''
+            INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                      wordIdx, expansion, macronizedWord, uncertaintyBitMask )
+                VALUES ( ?, 3, ?, '8.18', 4, 2, NULL, 'es', ?, 0 )
+            ''',
+            [fables, "'", "'"],
+          ),
+          _checkFailure,
+        );
+      },
+    );
+  });
+
   group('WorkContentSubdivisions', () {
     test('a work without books has its poems as roots, with line groups and speeches', () async {
       await _addSubdivision(db, node: _poem, typ: 'POEM', editionLabel: '8');

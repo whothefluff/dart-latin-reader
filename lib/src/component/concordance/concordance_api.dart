@@ -114,6 +114,7 @@ class ConcordanceRepository implements IConcordanceRepository {
           idx: row.contextIdx,
           word: row.contextWord,
           macronizedWord: row.contextMacronizedWord,
+          hasExpansion: row.contextHasExpansion,
           reference: row.contextReference,
         ),
       ),
@@ -283,12 +284,14 @@ class ConcordanceToken {
     required this.idx,
     required this.word,
     required this.macronizedWord,
+    required this.hasExpansion,
     required this.reference,
   });
 
   final int idx;
   final String word;
   final String macronizedWord;
+  final bool hasExpansion;
 
   /// Citation of the token's line (a verse, a title...).
   /// Where it changes, a new line starts.
