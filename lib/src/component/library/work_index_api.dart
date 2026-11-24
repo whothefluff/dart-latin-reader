@@ -73,7 +73,8 @@ abstract interface class IGetWorkIndexUseCase {
   //
 }
 
-/// A book, poem, prologue, epilogue, chapter, act or scene of a work
+/// A book, poem, prologue, epilogue, chapter, act or scene of a work, or a section outside a
+/// chapter
 @immutable
 class WorkIndexEntry {
   const WorkIndexEntry({
@@ -223,7 +224,8 @@ extension type const LabelWordIndexes._(UnmodifiableSetView<int> unm)
       );
 }
 
-/// The books, poems, prologues and epilogues of a work, as a tree
+/// The tree of a work's books, poems, prologues, epilogues, chapters, acts and scenes, and of its
+/// sections outside a chapter
 @immutable
 class WorkIndex {
   WorkIndex(

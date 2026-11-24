@@ -80,7 +80,7 @@ bool isSpacedFromNext(
 }
 
 /// True when [segment] belongs to another poem, prologue, epilogue, chapter or scene than
-/// [previous].
+/// [previous], or to another book when no such division holds them.
 bool _belongsToAnotherPiece(WorkContentsSegment? previous, WorkContentsSegment segment) =>
     switch (previous?.piece) {
       final piece? => piece != segment.piece,

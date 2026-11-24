@@ -131,8 +131,8 @@ class WorkContentsSegment {
   /// `null` when unknown
   final ProperNounState? properNounState;
 
-  /// The node of the poem, prologue, epilogue, chapter or scene that it belongs to.
-  /// `null` for the title of a book or an act.
+  /// The node of the poem, prologue, epilogue, chapter or scene that it belongs to, or else of its
+  /// book. `null` for the title of a book or an act, and outside all of those.
   final String? piece;
 
   final bool isNumeral;

@@ -12,6 +12,8 @@ const _firstChapter = '00000000-0000-0000-0000-0000000000d1';
 const _secondChapter = '00000000-0000-0000-0000-0000000000d4';
 const _prologueScene = '00000000-0000-0000-0000-0000000000e2';
 const _firstScene = '00000000-0000-0000-0000-0000000000e6';
+const _firstBook = '00000000-0000-0000-0000-0000000000f1';
+const _secondBook = '00000000-0000-0000-0000-0000000000f6';
 
 Future<WorkContentsSegments> _contents(AppDb db, String work, int fromIndex, int toIndex) {
   final container = ProviderContainer(overrides: [dbProvider.overrideWith((_) => db)]);
@@ -218,6 +220,160 @@ void main() {
           (0, SubdivisionType.section, _firstChapter),
           (1, SubdivisionType.section, _firstChapter),
           (2, SubdivisionType.section, _secondChapter),
+        ],
+      );
+    });
+
+    test('a verse outside any poem belongs to the book that holds it, unlike its title', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'LIBER', '1', 1, 0, 0, 'LIBER', 0, TRUE ),
+                   ( ?, 1, 'In', '1.1', 1, 1, 0, 'In', 0, FALSE ),
+                   ( ?, 2, 'Ante', '2.1', 1, 2, 0, 'Ante', 0, FALSE )
+        ''',
+        List.filled(3, duties),
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '$_firstBook', 'BOOK', 0, 'LIBER', NULL, 0, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f2', 'TITL', 0, 'LIBER', '$_firstBook',
+                     0, 0, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f3', 'VERS', 0, 'In', '$_firstBook',
+                     1, 1, '1' ),
+                   ( ?, '$_secondBook', 'BOOK', 1, '', NULL, 2, 2, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f7', 'VERS', 0, 'Ante', '$_secondBook',
+                     2, 2, '1' )
+        ''',
+        List.filled(5, duties),
+      );
+      final contents = await _contents(db, duties, 0, 2);
+
+      expect(
+        contents.map((segment) => (segment.idx, segment.typ, segment.piece)),
+        [
+          (0, SubdivisionType.book, null),
+          (1, SubdivisionType.verse, _firstBook),
+          (2, SubdivisionType.verse, _secondBook),
+        ],
+      );
+    });
+
+    test('a paragraph of a section outside a chapter belongs to the book that holds it', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Saepe', '1.1', 1, 0, 0, 'Saepe', 0, FALSE ),
+                   ( ?, 1, 'Ac', '1.2', 1, 1, 0, 'Ac', 0, FALSE ),
+                   ( ?, 2, 'Crotoniatae', '2.1', 1, 2, 0, 'Crotoniatae', 0, FALSE )
+        ''',
+        List.filled(3, duties),
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '$_firstBook', 'BOOK', 0, '', NULL, 0, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f2', 'SECT', 0, '', '$_firstBook',
+                     0, 0, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f3', 'PARA', 0, 'Saepe',
+                     '00000000-0000-0000-0000-0000000000f2', 0, 0, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f4', 'SECT', 1, '', '$_firstBook',
+                     1, 1, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f5', 'PARA', 0, 'Ac',
+                     '00000000-0000-0000-0000-0000000000f4', 1, 1, NULL ),
+                   ( ?, '$_secondBook', 'BOOK', 1, '', NULL, 2, 2, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f7', 'SECT', 0, '', '$_secondBook',
+                     2, 2, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f8', 'PARA', 0, 'Crotoniatae',
+                     '00000000-0000-0000-0000-0000000000f7', 2, 2, NULL )
+        ''',
+        List.filled(8, duties),
+      );
+      final contents = await _contents(db, duties, 0, 2);
+
+      expect(
+        contents.map((segment) => (segment.idx, segment.typ, segment.piece)),
+        [
+          (0, SubdivisionType.paragraph, _firstBook),
+          (1, SubdivisionType.paragraph, _firstBook),
+          (2, SubdivisionType.paragraph, _secondBook),
+        ],
+      );
+    });
+
+    test('a paragraph of a chapter with no division above it belongs to its chapter', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Caesar', '1', 1, 0, 0, 'Caesar', 0, FALSE ),
+                   ( ?, 1, 'Legionibus', '2', 1, 1, 0, 'Legionibus', 0, FALSE )
+        ''',
+        [duties, duties],
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '$_firstChapter', 'CHAP', 0, '', NULL, 0, 0, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000d2', 'PARA', 0, 'Caesar',
+                     '$_firstChapter', 0, 0, NULL ),
+                   ( ?, '$_secondChapter', 'CHAP', 1, '', NULL, 1, 1, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000d5', 'PARA', 0, 'Legionibus',
+                     '$_secondChapter', 1, 1, NULL )
+        ''',
+        List.filled(4, duties),
+      );
+      final contents = await _contents(db, duties, 0, 1);
+
+      expect(
+        contents.map((segment) => (segment.idx, segment.typ, segment.piece)),
+        [
+          (0, SubdivisionType.paragraph, _firstChapter),
+          (1, SubdivisionType.paragraph, _secondChapter),
+        ],
+      );
+    });
+
+    test('a paragraph of a section with no division above it belongs to none', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Credo', '1', 1, 0, 0, 'Credo', 0, FALSE ),
+                   ( ?, 1, 'Quae', '2', 1, 1, 0, 'Quae', 0, FALSE )
+        ''',
+        [duties, duties],
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000f2', 'SECT', 0, '', NULL, 0, 0, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f3', 'PARA', 0, 'Credo',
+                     '00000000-0000-0000-0000-0000000000f2', 0, 0, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f4', 'SECT', 1, '', NULL, 1, 1, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000f5', 'PARA', 0, 'Quae',
+                     '00000000-0000-0000-0000-0000000000f4', 1, 1, NULL )
+        ''',
+        List.filled(4, duties),
+      );
+      final contents = await _contents(db, duties, 0, 1);
+
+      expect(
+        contents.map((segment) => (segment.idx, segment.typ, segment.piece)),
+        [
+          (0, SubdivisionType.paragraph, null),
+          (1, SubdivisionType.paragraph, null),
         ],
       );
     });
