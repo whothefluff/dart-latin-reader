@@ -14,6 +14,7 @@ const _chapter = '00000000-0000-0000-0000-0000000000c7';
 const _section = '00000000-0000-0000-0000-0000000000c8';
 const _act = '00000000-0000-0000-0000-0000000000c9';
 const _scene = '00000000-0000-0000-0000-0000000000ca';
+const _paragraph = '00000000-0000-0000-0000-0000000000cb';
 
 final Matcher _checkFailure = throwsA(
   isA<SqliteException>().having(
@@ -100,11 +101,21 @@ void main() {
       ]);
     });
 
-    test('a verse is never a root', () async {
-      await expectLater(
-        _addSubdivision(db, node: _verse, typ: 'VERS', editionLabel: '17'),
-        _checkFailure,
-      );
+    test('a chapter, a section, a verse or a speech with no division above it is a root', () async {
+      await _addSubdivision(db, node: _chapter, typ: 'CHAP', editionLabel: '1');
+      await _addSubdivision(db, node: _section, typ: 'SECT', editionLabel: '1');
+      await _addSubdivision(db, node: _verse, typ: 'VERS', editionLabel: '17');
+      await _addSubdivision(db, node: _speech, typ: 'SPCH');
+
+      final rows = await db
+          .customSelect('SELECT typ, parent FROM WorkContentSubdivisions ORDER BY node')
+          .get();
+      expect(rows.map((row) => row.data.values.toList()), [
+        ['SPCH', null],
+        ['VERS', null],
+        ['CHAP', null],
+        ['SECT', null],
+      ]);
     });
 
     test('a book is always a root', () async {
@@ -131,9 +142,15 @@ void main() {
       ]);
     });
 
-    test('a chapter is never a root', () async {
+    test('a scene, a line group, a paragraph or a title is never a root', () async {
       await expectLater(
-        _addSubdivision(db, node: _chapter, typ: 'CHAP', editionLabel: '1'),
+        _addSubdivision(db, node: _scene, typ: 'SCEN', editionLabel: '1'),
+        _checkFailure,
+      );
+      await expectLater(_addSubdivision(db, node: _lineGroup, typ: 'LGRP'), _checkFailure);
+      await expectLater(_addSubdivision(db, node: _paragraph, typ: 'PARA'), _checkFailure);
+      await expectLater(
+        _addSubdivision(db, node: _title, typ: 'TITL', name: 'Damon'),
         _checkFailure,
       );
     });

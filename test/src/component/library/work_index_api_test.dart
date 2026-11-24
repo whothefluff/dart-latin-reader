@@ -227,6 +227,146 @@ void main() {
       );
     });
 
+    test('a work of chapters with no division above them lists them', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Caesar', '1', 1, 0, 0, 'Caesar', 0, FALSE ),
+                   ( ?, 1, 'Legionibus', '2', 1, 1, 0, 'Legionibus', 0, FALSE )
+        ''',
+        [duties, duties],
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'CHAP', 0, '', NULL, 0, 0, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'PARA', 0, 'Caesar',
+                     '00000000-0000-0000-0000-0000000000c1', 0, 0, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c3', 'CHAP', 1, '', NULL, 1, 1, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c4', 'PARA', 0, 'Legionibus',
+                     '00000000-0000-0000-0000-0000000000c3', 1, 1, NULL )
+        ''',
+        List.filled(4, duties),
+      );
+      final index = await _index(db, duties);
+
+      expect(
+        index.entries.map(
+          (entry) =>
+              (entry.typ, entry.parent, entry.labelSpelledWith(_uAndIOnly), entry.referenceLabel),
+        ),
+        [
+          (SubdivisionType.chapter, null, 'Chapter 1', '1'),
+          (SubdivisionType.chapter, null, 'Chapter 2', '2'),
+        ],
+      );
+    });
+
+    test('a work of sections with no division above them lists them', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Credo', '1', 1, 0, 0, 'Credo', 0, FALSE ),
+                   ( ?, 1, 'Quae', '2', 1, 1, 0, 'Quae', 0, FALSE )
+        ''',
+        [duties, duties],
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'SECT', 0, '', NULL, 0, 0, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'PARA', 0, 'Credo',
+                     '00000000-0000-0000-0000-0000000000c1', 0, 0, NULL ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c3', 'SECT', 1, '', NULL, 1, 1, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c4', 'PARA', 0, 'Quae',
+                     '00000000-0000-0000-0000-0000000000c3', 1, 1, NULL )
+        ''',
+        List.filled(4, duties),
+      );
+      final index = await _index(db, duties);
+
+      expect(
+        index.entries.map(
+          (entry) =>
+              (entry.typ, entry.parent, entry.labelSpelledWith(_uAndIOnly), entry.referenceLabel),
+        ),
+        [
+          (SubdivisionType.section, null, 'Section 1', '1'),
+          (SubdivisionType.section, null, 'Section 2', '2'),
+        ],
+      );
+    });
+
+    test('a work of books of sections lists its books and their sections', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Saepe', '1.1', 1, 0, 0, 'Saepe', 0, FALSE ),
+                   ( ?, 1, 'Ac', '1.2', 1, 1, 0, 'Ac', 0, FALSE ),
+                   ( ?, 2, 'Crotoniatae', '2.1', 1, 2, 0, 'Crotoniatae', 0, FALSE )
+        ''',
+        List.filled(3, duties),
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'BOOK', 0, '', NULL, 0, 1, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'SECT', 0, '',
+                     '00000000-0000-0000-0000-0000000000c1', 0, 0, '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c3', 'SECT', 1, '',
+                     '00000000-0000-0000-0000-0000000000c1', 1, 1, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c4', 'BOOK', 1, '', NULL, 2, 2, '2' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c5', 'SECT', 0, '',
+                     '00000000-0000-0000-0000-0000000000c4', 2, 2, '1' )
+        ''',
+        List.filled(5, duties),
+      );
+      final index = await _index(db, duties);
+
+      expect(index.entries.map((entry) => (entry.typ, entry.parent, entry.referenceLabel)), [
+        (SubdivisionType.book, null, '1.1 – 1.2'),
+        (SubdivisionType.section, '00000000-0000-0000-0000-0000000000c1', '1.1'),
+        (SubdivisionType.section, '00000000-0000-0000-0000-0000000000c1', '1.2'),
+        (SubdivisionType.book, null, '2.1'),
+        (SubdivisionType.section, '00000000-0000-0000-0000-0000000000c4', '2.1'),
+      ]);
+    });
+
+    test('a work of verses with no division above them lists nothing', () async {
+      final db = await smallLibrary();
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContents( workId, idx, word, sourceReference, tokenType, sentenceIdx,
+                                  wordIdx, macronizedWord, uncertaintyBitMask, isTitle )
+            VALUES ( ?, 0, 'Legerat', '1', 1, 0, 0, 'Legerat', 0, FALSE ),
+                   ( ?, 1, 'Ille', '2', 1, 1, 0, 'Ille', 0, FALSE )
+        ''',
+        [duties, duties],
+      );
+      await db.customStatement(
+        '''
+        INSERT INTO WorkContentSubdivisions( workId, node, typ, cnt, name, parent, fromIndex,
+                                             toIndex, editionLabel )
+            VALUES ( ?, '00000000-0000-0000-0000-0000000000c1', 'VERS', 0, 'Legerat', NULL, 0, 0,
+                     '1' ),
+                   ( ?, '00000000-0000-0000-0000-0000000000c2', 'VERS', 1, 'Ille', NULL, 1, 1, '2' )
+        ''',
+        [duties, duties],
+      );
+      final index = await _index(db, duties);
+
+      expect(index.entries, isEmpty);
+    });
+
     test('a play lists its acts and scenes, and a prologue', () async {
       final db = await smallLibrary();
       await db.customStatement(

@@ -215,7 +215,7 @@ CREATE TABLE "WorkContentSubdivisions"(
     FOREIGN KEY( workId, parent ) REFERENCES WorkContentSubdivisions( workId, node ) DEFERRABLE INITIALLY DEFERRED,
     CHECK( fromIndex <= toIndex ),
     CHECK( typ NOT IN ('BOOK','ACT') OR parent IS NULL ), --Books and acts are roots...
-    CHECK( parent IS NOT NULL OR typ IN ('BOOK','POEM','PROL','EPIL','ACT') ), --...and so are the poems of a work without books.
+    CHECK( parent IS NOT NULL OR typ IN ('BOOK','POEM','PROL','EPIL','CHAP','SECT','ACT','VERS','SPCH') ), --...and so are the poems, chapters, sections, verses and speeches with no division above them.
     CHECK( typ IN ('VERS','BOOK','POEM','PROL','EPIL','CHAP','SECT','ACT','SCEN','LGRP','SPCH','PARA') OR LENGTH( TRIM( name ) ) > 0 ), --titles must be labelled
     CHECK( ( editionLabel IS NOT NULL ) = ( typ IN ('BOOK','POEM','PROL','EPIL','CHAP','SECT','ACT','SCEN','VERS') ) )
 ) 
@@ -354,7 +354,7 @@ CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS
                                        CASE WHEN typ IN ('POEM','PROL','EPIL','CHAP','SCEN') 
                                             THEN node 
                                             ELSE NULL -- required because of Drift typing
-                                       END AS piece -- the poem, prologue, epilogue, chapter or scene that holds it
+                                       END AS piece -- the poem, prologue, epilogue, chapter or scene that holds it, or else its book
                                     FROM WorkContentSubdivisions
                                     WHERE parent IS NULL
                                 UNION ALL
@@ -363,6 +363,8 @@ CREATE VIEW "library.WorkContentSubdivisionsHierarchy" AS
                                        Subsets.depth + 1,
                                        CASE WHEN s.typ IN ('POEM','PROL','EPIL','CHAP','SCEN') 
                                             THEN s.node 
+                                            WHEN Subsets.typ = 'BOOK'
+                                            THEN Subsets.node
                                             ELSE Subsets.piece 
                                        END
                                     FROM WorkContentSubdivisions AS s
@@ -561,6 +563,12 @@ CREATE VIEW "library.WorkIndexes" AS
             ON SubdivsHierarchy.workId = EndToken.workId
                AND SubdivsHierarchy.toIndex = EndToken.idx
         WHERE SubdivsHierarchy.typ IN ('BOOK','POEM','PROL','EPIL','CHAP','ACT','SCEN')
+              OR ( SubdivsHierarchy.typ = 'SECT'
+                   AND NOT EXISTS ( SELECT 1
+                                        FROM WorkContentSubdivisions AS Chapters
+                                        WHERE Chapters.workId = SubdivsHierarchy.workId
+                                              AND Chapters.node = SubdivsHierarchy.parent
+                                              AND Chapters.typ = 'CHAP' ) ) -- outside a chapter
         ORDER BY SubdivsHierarchy.fromIndex, SubdivsHierarchy.toIndex DESC, SubdivsHierarchy.depth, SubdivsHierarchy.cnt,
                  SubdivsHierarchy.node;
 
